@@ -1,0 +1,70 @@
+{
+  "code": "NAM",
+  "name": "Namibie",
+  "currency": "NAD",
+  "allShareIndex": "NSX Overall Index",
+  "institutions": {
+    "exchange": {
+      "name": "Namibia Securities Exchange",
+      "url": "https://nsx.com.na/"
+    },
+    "regulator": {
+      "name": "NAMFISA",
+      "url": "https://www.namfisa.com.na/"
+    },
+    "centralBank": {
+      "name": "Bank of Namibia",
+      "url": "https://www.bon.com.na/"
+    },
+    "statistics": {
+      "name": "Namibia Statistics Agency",
+      "url": "https://nsa.org.na/"
+    },
+    "debtOffice": {
+      "name": "Bank of Namibia Investor Relations",
+      "url": "https://www.bon.com.na/Bank/Financial-Markets/Investor-Relations.aspx"
+    }
+  },
+  "endpoints": [
+    {
+      "id": "nam-nsx-indices",
+      "label": "NSX indices",
+      "url": "https://nsx.com.na/",
+      "dataFamily": "EQUITY_INDEX",
+      "collector": "DOCUMENT_LINK_INDEX",
+      "frequency": "DAILY"
+    },
+    {
+      "id": "nam-bon-yield",
+      "label": "Daily Benchmark Yield",
+      "url": "https://www.bon.com.na/Bank/Financial-Markets/Investor-Relations/Market-Data-and-Information/Daily-Benchmark-Yield.aspx",
+      "dataFamily": "YIELD_CURVE",
+      "collector": "HTML_TABLE",
+      "frequency": "DAILY"
+    },
+    {
+      "id": "nam-bon-tbill",
+      "label": "Treasury Bill Auctions",
+      "url": "https://www.bon.com.na/Bank/Financial-Markets/Investor-Relations/Government-Debt-Instruments/Treasury-Bill-Auctions.aspx",
+      "dataFamily": "TREASURY_RATE",
+      "collector": "DOCUMENT_LINK_INDEX",
+      "frequency": "AUCTION"
+    },
+    {
+      "id": "nam-bon-bonds",
+      "label": "Bond Auctions",
+      "url": "https://www.bon.com.na/Bank/Financial-Markets/Investor-Relations/Government-Debt-Instruments/Bond-Auctions.aspx",
+      "dataFamily": "TREASURY_RATE",
+      "collector": "DOCUMENT_LINK_INDEX",
+      "frequency": "AUCTION"
+    },
+    {
+      "id": "nam-bon-historical-tbill",
+      "label": "Historical Treasury Bills Excel",
+      "url": "https://www.bon.com.na/Bank/Financial-Markets/Investor-Relations/Domestic-Auctions/Historical-Data/Treasury-Bills-%28Monthly-Excel-Data%29.aspx",
+      "dataFamily": "TREASURY_RATE",
+      "collector": "XLSX_LINK_INDEX",
+      "frequency": "MONTHLY"
+    }
+  ]
+}

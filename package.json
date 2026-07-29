@@ -1,0 +1,41 @@
+{
+  "name": "africafunds-market-data-pipeline",
+  "version": "0.2.0",
+  "private": true,
+  "description": "Pipeline historisé d'ingestion des indices, taux, courbes et instruments africains pour AfricaFunds.",
+  "type": "module",
+  "engines": {
+    "node": ">=20.11"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "start": "node dist/src/cli/index.js scheduler",
+    "scheduler": "tsx src/cli/index.ts scheduler",
+    "ingest": "tsx src/cli/index.ts ingest",
+    "backfill": "tsx src/cli/index.ts backfill",
+    "discover": "tsx src/cli/index.ts discover",
+    "audit:sources": "tsx src/cli/index.ts audit-sources",
+    "db:migrate": "tsx src/cli/index.ts migrate",
+    "db:seed": "tsx src/cli/index.ts seed",
+    "test": "node --import tsx --test test/**/*.test.ts",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "api": "tsx src/api/server.ts",
+    "start:api": "node dist/src/api/server.js"
+  },
+  "dependencies": {
+    "cheerio": "1.0.0",
+    "dotenv": "16.4.7",
+    "node-cron": "3.0.3",
+    "pg": "8.13.1",
+    "pino": "9.5.0",
+    "pino-pretty": "13.0.0",
+    "xlsx": "0.18.5",
+    "zod": "3.24.1"
+  },
+  "devDependencies": {
+    "@types/node": "22.10.2",
+    "@types/pg": "8.11.10",
+    "tsx": "4.19.2",
+    "typescript": "5.7.2"
+  }
+}

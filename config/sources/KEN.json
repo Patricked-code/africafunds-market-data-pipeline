@@ -1,0 +1,62 @@
+{
+  "code": "KEN",
+  "name": "Kenya",
+  "currency": "KES",
+  "allShareIndex": "NSE All Share Index",
+  "institutions": {
+    "exchange": {
+      "name": "Nairobi Securities Exchange",
+      "url": "https://www.nse.co.ke/"
+    },
+    "regulator": {
+      "name": "Capital Markets Authority Kenya",
+      "url": "https://www.cma.or.ke/"
+    },
+    "centralBank": {
+      "name": "Central Bank of Kenya",
+      "url": "https://www.centralbank.go.ke/"
+    },
+    "statistics": {
+      "name": "Kenya National Bureau of Statistics",
+      "url": "https://www.knbs.or.ke/"
+    },
+    "debtOffice": {
+      "name": "Public Debt Management Office",
+      "url": "https://pdmo.treasury.go.ke/"
+    }
+  },
+  "endpoints": [
+    {
+      "id": "ken-nse-market",
+      "label": "NSE indices and market reports",
+      "url": "https://www.nse.co.ke/",
+      "dataFamily": "EQUITY_INDEX",
+      "collector": "DOCUMENT_LINK_INDEX",
+      "frequency": "DAILY"
+    },
+    {
+      "id": "ken-cbk-markets",
+      "label": "CBK markets and KESONIA",
+      "url": "https://www.centralbank.go.ke/",
+      "dataFamily": "MONEY_MARKET_RATE",
+      "collector": "DOCUMENT_LINK_INDEX",
+      "frequency": "DAILY"
+    },
+    {
+      "id": "ken-pdmo-home",
+      "label": "PDMO indicators",
+      "url": "https://pdmo.treasury.go.ke/",
+      "dataFamily": "YIELD_CURVE",
+      "collector": "HTML_TABLE",
+      "frequency": "DAILY"
+    },
+    {
+      "id": "ken-pdmo-domestic",
+      "label": "Domestic debt data",
+      "url": "https://pdmo.treasury.go.ke/domestic-debt",
+      "dataFamily": "TREASURY_RATE",
+      "collector": "DOCUMENT_LINK_INDEX",
+      "frequency": "MONTHLY"
+    }
+  ]
+}

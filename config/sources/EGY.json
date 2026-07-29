@@ -1,0 +1,78 @@
+{
+  "code": "EGY",
+  "name": "Égypte",
+  "currency": "EGP",
+  "allShareIndex": "EGX100 EWI",
+  "institutions": {
+    "exchange": {
+      "name": "Egyptian Exchange",
+      "url": "https://www.egx.com.eg/"
+    },
+    "regulator": {
+      "name": "Financial Regulatory Authority",
+      "url": "https://fra.gov.eg/en/"
+    },
+    "centralBank": {
+      "name": "Central Bank of Egypt",
+      "url": "https://www.cbe.org.eg/en/"
+    },
+    "statistics": {
+      "name": "CAPMAS",
+      "url": "https://www.capmas.gov.eg/"
+    },
+    "debtOffice": {
+      "name": "Ministry of Finance",
+      "url": "https://mof.gov.eg/en"
+    }
+  },
+  "endpoints": [
+    {
+      "id": "egy-egx-indices",
+      "label": "EGX indices",
+      "url": "https://www.egx.com.eg/en/indices.aspx",
+      "dataFamily": "EQUITY_INDEX",
+      "collector": "HTML_LINK_INDEX",
+      "frequency": "DAILY"
+    },
+    {
+      "id": "egy-cbe-conia",
+      "label": "CONIA historique",
+      "url": "https://www.cbe.org.eg/en/economic-research/statistics/conia/historical-data",
+      "dataFamily": "MONEY_MARKET_RATE",
+      "collector": "MANUAL_API_DISCOVERY",
+      "frequency": "DAILY"
+    },
+    {
+      "id": "egy-cbe-conia-index",
+      "label": "CONIA Index historique",
+      "url": "https://www.cbe.org.eg/ar/economic-research/statistics/conia/index-historical-data",
+      "dataFamily": "MONEY_MARKET_INDEX",
+      "collector": "MANUAL_API_DISCOVERY",
+      "frequency": "DAILY"
+    },
+    {
+      "id": "egy-cbe-interbank",
+      "label": "Daily interbank rates and volumes",
+      "url": "https://www.cbe.org.eg/en/economic-research/statistics/daily-interbank-rates-and-volumes/historical-data",
+      "dataFamily": "MONEY_MARKET_RATE",
+      "collector": "MANUAL_API_DISCOVERY",
+      "frequency": "DAILY"
+    },
+    {
+      "id": "egy-cbe-tbills",
+      "label": "EGP T-Bills historical data",
+      "url": "https://www.cbe.org.eg/en/auctions/egp-t-bills/historical-data",
+      "dataFamily": "TREASURY_RATE",
+      "collector": "MANUAL_API_DISCOVERY",
+      "frequency": "AUCTION"
+    },
+    {
+      "id": "egy-cbe-tbonds",
+      "label": "EGP fixed coupon T-Bonds historical data",
+      "url": "https://www.cbe.org.eg/en/auctions/egp-t-bonds-fixed-coupon/historical-data",
+      "dataFamily": "TREASURY_RATE",
+      "collector": "MANUAL_API_DISCOVERY",
+      "frequency": "AUCTION"
+    }
+  ]
+}

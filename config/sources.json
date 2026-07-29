@@ -1,0 +1,25 @@
+{
+  "version": "0.2.0",
+  "generatedAt": "2026-07-29",
+  "defaultPolicies": {
+    "respectRobotsTxt": true,
+    "requestsPerSecond": 0.5,
+    "maxRetries": 4,
+    "archiveEveryResponse": true,
+    "doNotBypassCaptcha": true,
+    "doNotBypassAuthentication": true
+  },
+  "marketFiles": [
+    "sources/MAR.json",
+    "sources/GHA.json",
+    "sources/UEMOA.json",
+    "sources/TUN.json",
+    "sources/EGY.json",
+    "sources/NGA.json",
+    "sources/KEN.json",
+    "sources/CEMAC.json",
+    "sources/BWA.json",
+    "sources/NAM.json",
+    "sources/ETH.json"
+  ]
+}

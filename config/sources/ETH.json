@@ -1,0 +1,46 @@
+{
+  "code": "ETH",
+  "name": "Éthiopie",
+  "currency": "ETB",
+  "allShareIndex": null,
+  "institutions": {
+    "exchange": {
+      "name": "Ethiopian Securities Exchange",
+      "url": "https://esx.et/"
+    },
+    "regulator": {
+      "name": "Ethiopian Capital Market Authority",
+      "url": "https://ecma.gov.et/"
+    },
+    "centralBank": {
+      "name": "National Bank of Ethiopia",
+      "url": "https://nbe.gov.et/"
+    },
+    "statistics": {
+      "name": "Ethiopian Statistics Service",
+      "url": "https://ess.gov.et/"
+    },
+    "debtOffice": {
+      "name": "National Bank of Ethiopia Treasury Bills",
+      "url": "https://nbe.gov.et/treasury-bills/"
+    }
+  },
+  "endpoints": [
+    {
+      "id": "eth-esx-market",
+      "label": "ESX market data",
+      "url": "https://esx.et/data/market-data-tools-services/",
+      "dataFamily": "EQUITY_INDEX",
+      "collector": "DOCUMENT_LINK_INDEX",
+      "frequency": "DAILY"
+    },
+    {
+      "id": "eth-nbe-tbills",
+      "label": "NBE Treasury Bills",
+      "url": "https://nbe.gov.et/treasury-bills/",
+      "dataFamily": "TREASURY_RATE",
+      "collector": "HTML_TABLE",
+      "frequency": "AUCTION"
+    }
+  ]
+}

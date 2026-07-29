@@ -1,0 +1,62 @@
+{
+  "code": "GHA",
+  "name": "Ghana",
+  "currency": "GHS",
+  "allShareIndex": "GSE Composite Index",
+  "institutions": {
+    "exchange": {
+      "name": "Ghana Stock Exchange",
+      "url": "https://gse.com.gh/"
+    },
+    "regulator": {
+      "name": "SEC Ghana",
+      "url": "https://sec.gov.gh/"
+    },
+    "centralBank": {
+      "name": "Bank of Ghana",
+      "url": "https://www.bog.gov.gh/"
+    },
+    "statistics": {
+      "name": "Ghana Statistical Service",
+      "url": "https://statsghana.gov.gh/"
+    },
+    "debtOffice": {
+      "name": "Debt Management Division",
+      "url": "https://mofep.gov.gh/divisions/dmd"
+    }
+  },
+  "endpoints": [
+    {
+      "id": "gha-gse-market",
+      "label": "GSE indices and market data",
+      "url": "https://gse.com.gh/market-data/",
+      "dataFamily": "EQUITY_INDEX",
+      "collector": "HTML_LINK_INDEX",
+      "frequency": "DAILY"
+    },
+    {
+      "id": "gha-bog-tbill",
+      "label": "Treasury Bill Rates",
+      "url": "https://www.bog.gov.gh/treasury-and-the-markets/treasury-bill-rates/",
+      "dataFamily": "TREASURY_RATE",
+      "collector": "HTML_TABLE",
+      "frequency": "WEEKLY"
+    },
+    {
+      "id": "gha-bog-bills",
+      "label": "Bank of Ghana Bill Rates",
+      "url": "https://www.bog.gov.gh/treasury-and-the-markets/bank-of-ghana-bill-rates/",
+      "dataFamily": "MONEY_MARKET_RATE",
+      "collector": "HTML_TABLE",
+      "frequency": "WEEKLY"
+    },
+    {
+      "id": "gha-bog-interest",
+      "label": "Interest Rates",
+      "url": "https://www.bog.gov.gh/economic-data/interest-rates/",
+      "dataFamily": "YIELD_CURVE",
+      "collector": "HTML_LINK_INDEX",
+      "frequency": "MONTHLY"
+    }
+  ]
+}

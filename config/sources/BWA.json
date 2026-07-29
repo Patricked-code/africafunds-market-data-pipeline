@@ -1,0 +1,54 @@
+{
+  "code": "BWA",
+  "name": "Botswana",
+  "currency": "BWP",
+  "allShareIndex": "Domestic Company Index",
+  "institutions": {
+    "exchange": {
+      "name": "Botswana Stock Exchange",
+      "url": "https://www.bse.co.bw/"
+    },
+    "regulator": {
+      "name": "NBFIRA",
+      "url": "https://www.nbfira.org.bw/"
+    },
+    "centralBank": {
+      "name": "Bank of Botswana",
+      "url": "https://www.bankofbotswana.bw/"
+    },
+    "statistics": {
+      "name": "Statistics Botswana",
+      "url": "https://www.statsbots.org.bw/"
+    },
+    "debtOffice": {
+      "name": "Bank of Botswana Government Securities",
+      "url": "https://www.bankofbotswana.bw/government-securities-auctions"
+    }
+  },
+  "endpoints": [
+    {
+      "id": "bwa-bse-market",
+      "label": "BSE market data",
+      "url": "https://www.bse.co.bw/",
+      "dataFamily": "EQUITY_INDEX",
+      "collector": "DOCUMENT_LINK_INDEX",
+      "frequency": "DAILY"
+    },
+    {
+      "id": "bwa-bob-news",
+      "label": "BoBC auction results",
+      "url": "https://www.bankofbotswana.bw/news",
+      "dataFamily": "MONEY_MARKET_RATE",
+      "collector": "DOCUMENT_LINK_INDEX",
+      "frequency": "WEEKLY"
+    },
+    {
+      "id": "bwa-bob-government",
+      "label": "Government securities auctions",
+      "url": "https://www.bankofbotswana.bw/government-securities-auctions",
+      "dataFamily": "TREASURY_RATE",
+      "collector": "DOCUMENT_LINK_INDEX",
+      "frequency": "AUCTION"
+    }
+  ]
+}

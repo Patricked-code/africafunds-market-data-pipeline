@@ -1,0 +1,70 @@
+{
+  "code": "MAR",
+  "name": "Maroc",
+  "currency": "MAD",
+  "allShareIndex": "MASI",
+  "institutions": {
+    "exchange": {
+      "name": "Bourse de Casablanca",
+      "url": "https://www.casablanca-bourse.com/"
+    },
+    "regulator": {
+      "name": "AMMC",
+      "url": "https://www.ammc.ma/"
+    },
+    "centralBank": {
+      "name": "Bank Al-Maghrib",
+      "url": "https://www.bkam.ma/"
+    },
+    "statistics": {
+      "name": "Haut-Commissariat au Plan",
+      "url": "https://www.hcp.ma/"
+    },
+    "debtOffice": {
+      "name": "Ministère de l’Économie et des Finances",
+      "url": "https://www.finances.gov.ma/"
+    }
+  },
+  "endpoints": [
+    {
+      "id": "mar-bvc-indices",
+      "label": "Indices actions Casablanca",
+      "url": "https://www.casablanca-bourse.com/en/marche-du-cache/indices",
+      "dataFamily": "EQUITY_INDEX",
+      "collector": "HTML_LINK_INDEX",
+      "frequency": "DAILY"
+    },
+    {
+      "id": "mar-bam-monia",
+      "label": "MONIA",
+      "url": "https://www.bkam.ma/en/Markets/Key-indicators/Money-market/Monia-index-moroccan-overnight-index-average",
+      "dataFamily": "MONEY_MARKET_RATE",
+      "collector": "HTML_TABLE_CSV",
+      "frequency": "DAILY"
+    },
+    {
+      "id": "mar-bam-interbank",
+      "label": "Marché monétaire interbancaire",
+      "url": "https://www.bkam.ma/Marches/Principaux-indicateurs/Marche-monetaire/Marche-monetaire-interbancaire",
+      "dataFamily": "MONEY_MARKET_RATE",
+      "collector": "HTML_TABLE_CSV",
+      "frequency": "DAILY"
+    },
+    {
+      "id": "mar-bam-interbank-reference",
+      "label": "Taux de référence interbancaire par maturité",
+      "url": "https://www.bkam.ma/Marches/Principaux-indicateurs/Marche-monetaire/Taux-de-reference-du-marche-interbancaire",
+      "dataFamily": "YIELD_CURVE",
+      "collector": "HTML_TABLE_CSV",
+      "frequency": "DAILY"
+    },
+    {
+      "id": "mar-bam-fx",
+      "label": "Cours de référence MAD",
+      "url": "https://www.bkam.ma/Marches/Principaux-indicateurs/Marche-des-changes/Cours-de-change/Cours-de-reference",
+      "dataFamily": "FX",
+      "collector": "HTML_TABLE_CSV",
+      "frequency": "DAILY"
+    }
+  ]
+}

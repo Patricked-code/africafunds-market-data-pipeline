@@ -1,0 +1,14 @@
+# Alternative au scheduler intégré. Ne pas activer les deux simultanément.
+# Variables à adapter au chemin de déploiement.
+SHELL=/bin/bash
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+AF_PROJECT=/opt/apps/africafunds-market-data-pipeline
+
+# Ingestion incrémentale des jours ouvrés à 21h30 heure du serveur.
+30 21 * * 1-5 cd $AF_PROJECT && /usr/bin/flock -n /tmp/af-market-ingest.lock docker compose run --rm collector node dist/src/cli/index.js ingest --scope=daily >> logs/cron.log 2>&1
+
+# Découverte hebdomadaire des nouveaux fichiers et liens.
+15 2 * * 0 cd $AF_PROJECT && /usr/bin/flock -n /tmp/af-market-discover.lock docker compose run --rm collector node dist/src/cli/index.js discover >> logs/cron.log 2>&1
+
+# Audit mensuel des portails, liens, formats et ruptures de séries.
+0 3 1 * * cd $AF_PROJECT && /usr/bin/flock -n /tmp/af-market-audit.lock docker compose run --rm collector node dist/src/cli/index.js audit-sources >> logs/cron.log 2>&1

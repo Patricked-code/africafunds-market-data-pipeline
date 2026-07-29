@@ -1,0 +1,62 @@
+{
+  "code": "NGA",
+  "name": "Nigeria",
+  "currency": "NGN",
+  "allShareIndex": "NGX All-Share Index",
+  "institutions": {
+    "exchange": {
+      "name": "Nigerian Exchange",
+      "url": "https://ngxgroup.com/exchange/"
+    },
+    "regulator": {
+      "name": "SEC Nigeria",
+      "url": "https://sec.gov.ng/"
+    },
+    "centralBank": {
+      "name": "Central Bank of Nigeria",
+      "url": "https://www.cbn.gov.ng/"
+    },
+    "statistics": {
+      "name": "National Bureau of Statistics",
+      "url": "https://www.nigerianstat.gov.ng/"
+    },
+    "debtOffice": {
+      "name": "Debt Management Office",
+      "url": "https://www.dmo.gov.ng/"
+    }
+  },
+  "endpoints": [
+    {
+      "id": "nga-ngx-market",
+      "label": "NGX market data",
+      "url": "https://ngxgroup.com/exchange/data/market-data/",
+      "dataFamily": "EQUITY_INDEX",
+      "collector": "DOCUMENT_LINK_INDEX",
+      "frequency": "DAILY"
+    },
+    {
+      "id": "nga-cbn-nofr",
+      "label": "NOFR and NOFRI",
+      "url": "https://www.cbn.gov.ng/rates/NOF_Rates.html",
+      "dataFamily": "MONEY_MARKET_INDEX",
+      "collector": "HTML_TABLE",
+      "frequency": "DAILY"
+    },
+    {
+      "id": "nga-cbn-government",
+      "label": "Government securities rates",
+      "url": "https://www.cbn.gov.ng/rates/GovtSecurities.html",
+      "dataFamily": "TREASURY_RATE",
+      "collector": "HTML_TABLE",
+      "frequency": "DAILY"
+    },
+    {
+      "id": "nga-dmo-auctions",
+      "label": "FGN Bonds auction results",
+      "url": "https://www.dmo.gov.ng/fgn-bonds/bonds-auction-results",
+      "dataFamily": "TREASURY_RATE",
+      "collector": "DOCUMENT_LINK_INDEX",
+      "frequency": "MONTHLY"
+    }
+  ]
+}

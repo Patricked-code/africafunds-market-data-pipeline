@@ -1,0 +1,54 @@
+{
+  "code": "CEMAC",
+  "name": "BVMAC / CEMAC",
+  "currency": "XAF",
+  "allShareIndex": "BVMAC All Share Index",
+  "institutions": {
+    "exchange": {
+      "name": "BVMAC",
+      "url": "https://www.bvm-ac.org/"
+    },
+    "regulator": {
+      "name": "COSUMAF",
+      "url": "https://webcosumaf.org/"
+    },
+    "centralBank": {
+      "name": "BEAC",
+      "url": "https://www.beac.int/"
+    },
+    "statistics": {
+      "name": "Commission CEMAC",
+      "url": "https://cemac.int/"
+    },
+    "debtOffice": {
+      "name": "BEAC Marché des titres publics",
+      "url": "https://www.beac.int/m-des-titres-publics/"
+    }
+  },
+  "endpoints": [
+    {
+      "id": "cemac-bvmac-index",
+      "label": "BVMAC All Share and market notices",
+      "url": "https://www.bvm-ac.org/",
+      "dataFamily": "EQUITY_INDEX",
+      "collector": "DOCUMENT_LINK_INDEX",
+      "frequency": "DAILY"
+    },
+    {
+      "id": "cemac-beac-money",
+      "label": "Statistiques du marché monétaire",
+      "url": "https://www.beac.int/economie-stats/statistiques-marche-monetaire/",
+      "dataFamily": "MONEY_MARKET_RATE",
+      "collector": "DOCUMENT_LINK_INDEX",
+      "frequency": "MONTHLY"
+    },
+    {
+      "id": "cemac-beac-securities",
+      "label": "Statistiques des titres publics",
+      "url": "https://www.beac.int/economie-stats/statistiques-titres-publics/",
+      "dataFamily": "YIELD_CURVE",
+      "collector": "DOCUMENT_LINK_INDEX",
+      "frequency": "MONTHLY"
+    }
+  ]
+}

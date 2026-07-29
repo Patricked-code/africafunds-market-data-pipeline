@@ -1,0 +1,62 @@
+{
+  "code": "TUN",
+  "name": "Tunisie",
+  "currency": "TND",
+  "allShareIndex": "TUNINDEX",
+  "institutions": {
+    "exchange": {
+      "name": "Bourse de Tunis",
+      "url": "https://www.tunis-stockexchange.com/"
+    },
+    "regulator": {
+      "name": "CMF",
+      "url": "https://www.cmf.tn/"
+    },
+    "centralBank": {
+      "name": "Banque Centrale de Tunisie",
+      "url": "https://www.bct.gov.tn/"
+    },
+    "statistics": {
+      "name": "Institut National de la Statistique",
+      "url": "https://www.ins.tn/"
+    },
+    "debtOffice": {
+      "name": "Ministère des Finances",
+      "url": "https://www.finances.gov.tn/"
+    }
+  },
+  "endpoints": [
+    {
+      "id": "tun-bvmt-market",
+      "label": "Indices BVMT",
+      "url": "https://www.tunis-stockexchange.com/en",
+      "dataFamily": "EQUITY_INDEX",
+      "collector": "HTML_LINK_INDEX",
+      "frequency": "DAILY"
+    },
+    {
+      "id": "tun-bct-gosdmx",
+      "label": "Portail statistique BCT GOSDMX",
+      "url": "https://gosdmx.bct.gov.tn/gosdmx/pnrd?lang=FR",
+      "dataFamily": "MONEY_MARKET_RATE",
+      "collector": "MANUAL_API_DISCOVERY",
+      "frequency": "DAILY"
+    },
+    {
+      "id": "tun-fin-auctions",
+      "label": "Adjudications du Trésor",
+      "url": "https://www.finances.gov.tn/fr/adjudications",
+      "dataFamily": "TREASURY_RATE",
+      "collector": "DOCUMENT_LINK_INDEX",
+      "frequency": "WEEKLY"
+    },
+    {
+      "id": "tun-cmf-curves",
+      "label": "Courbes des taux CMF",
+      "url": "https://www.cmf.tn/courbes-des-taux",
+      "dataFamily": "YIELD_CURVE",
+      "collector": "DOCUMENT_LINK_INDEX",
+      "frequency": "DAILY"
+    }
+  ]
+}

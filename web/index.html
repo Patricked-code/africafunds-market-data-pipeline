@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Supervision du pipeline AfricaFunds pour les indices, taux et courbes africains.">
+  <title>AfricaFunds — Market Data Pipeline</title>
+  <style>
+    :root{color-scheme:light dark;--bg:#f5f7fb;--panel:#fff;--text:#172033;--muted:#667085;--border:#dfe4ec;--accent:#155eef;--good:#087443;--warn:#b54708;--bad:#b42318}
+    @media(prefers-color-scheme:dark){:root{--bg:#111827;--panel:#182230;--text:#f2f4f7;--muted:#98a2b3;--border:#344054;--accent:#84adff;--good:#6ce9a6;--warn:#fec84b;--bad:#fda29b}}
+    *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif;line-height:1.45}.wrap{max-width:1180px;margin:auto;padding:28px 20px 56px}header{display:flex;gap:24px;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;margin-bottom:26px}h1{font-size:clamp(1.7rem,4vw,2.5rem);margin:0 0 6px}.subtitle{margin:0;color:var(--muted)}.pill{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--border);background:var(--panel);border-radius:999px;padding:9px 13px;font-size:.92rem}.dot{width:9px;height:9px;border-radius:50%;background:var(--warn)}.dot.ok{background:var(--good)}.dot.bad{background:var(--bad)}.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}.card{background:var(--panel);border:1px solid var(--border);border-radius:16px;padding:17px}.label{font-size:.86rem;color:var(--muted);margin-bottom:6px}.value{font-size:1.65rem;font-weight:700}.section{margin-top:24px}.section h2{font-size:1.15rem;margin:0 0 12px}.table-wrap{overflow:auto;border:1px solid var(--border);border-radius:16px;background:var(--panel)}table{width:100%;border-collapse:collapse;min-width:720px}th,td{text-align:left;padding:12px 14px;border-bottom:1px solid var(--border);font-size:.92rem}th{color:var(--muted);font-weight:600}tr:last-child td{border-bottom:0}.status{font-weight:650}.status.ok{color:var(--good)}.status.warn{color:var(--warn)}.status.bad{color:var(--bad)}.toolbar{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin-bottom:12px}button,select{border:1px solid var(--border);background:var(--panel);color:var(--text);border-radius:10px;padding:9px 11px;font:inherit}button{cursor:pointer}button:hover{border-color:var(--accent)}.error{display:none;margin:16px 0;border:1px solid var(--bad);color:var(--bad);border-radius:12px;padding:12px;background:var(--panel)}footer{color:var(--muted);font-size:.85rem;margin-top:28px}@media(max-width:860px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:520px){.grid{grid-template-columns:1fr}.wrap{padding:20px 14px 40px}}
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <header>
+      <div>
+        <h1>AfricaFunds Market Data</h1>
+        <p class="subtitle">Collecte, historisation, courbes de taux et indices propriétaires.</p>
+      </div>
+      <div class="pill"><span id="health-dot" class="dot"></span><span id="health-label">Connexion à l’API…</span></div>
+    </header>
+
+    <div id="error" class="error"></div>
+
+    <section class="grid" aria-label="Indicateurs principaux">
+      <article class="card"><div class="label">Marchés actifs</div><div id="markets-count" class="value">—</div></article>
+      <article class="card"><div class="label">Sources activées</div><div id="sources-count" class="value">—</div></article>
+      <article class="card"><div class="label">Observations de taux</div><div id="rates-count" class="value">—</div></article>
+      <article class="card"><div class="label">Valeurs d’indices</div><div id="indices-count" class="value">—</div></article>
+    </section>
+
+    <section class="section">
+      <div class="toolbar">
+        <h2>Marchés couverts</h2>
+        <button id="refresh" type="button">Actualiser</button>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Marché</th><th>Devise</th><th>Indice large</th><th>Sources</th><th>Indices officiels</th><th>Séries de taux</th></tr></thead>
+          <tbody id="markets-body"><tr><td colspan="6">Chargement…</td></tr></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Dernière exécution</h2>
+      <div class="card" id="last-run">Aucune donnée chargée.</div>
+    </section>
+
+    <section class="section">
+      <h2>Rattrapage historique</h2>
+      <div class="grid">
+        <article class="card"><div class="label">En attente</div><div id="backfill-pending" class="value">—</div></article>
+        <article class="card"><div class="label">Réussis</div><div id="backfill-success" class="value">—</div></article>
+        <article class="card"><div class="label">À reprendre</div><div id="backfill-retry" class="value">—</div></article>
+        <article class="card"><div class="label">Adaptateurs bloqués</div><div id="backfill-blocked" class="value">—</div></article>
+      </div>
+    </section>
+
+    <footer>Interface de supervision en lecture seule · Les données brutes et calculées restent traçables jusqu’à leur source officielle.</footer>
+  </main>
+  <script src="/app.js" defer></script>
+</body>
+</html>

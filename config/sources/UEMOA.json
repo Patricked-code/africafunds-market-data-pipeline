@@ -1,0 +1,62 @@
+{
+  "code": "UEMOA",
+  "name": "BRVM / UEMOA",
+  "currency": "XOF",
+  "allShareIndex": "BRVM Composite",
+  "institutions": {
+    "exchange": {
+      "name": "BRVM",
+      "url": "https://www.brvm.org/"
+    },
+    "regulator": {
+      "name": "AMF-UMOA",
+      "url": "https://www.amf-umoa.org/"
+    },
+    "centralBank": {
+      "name": "BCEAO",
+      "url": "https://www.bceao.int/"
+    },
+    "statistics": {
+      "name": "Commission UEMOA",
+      "url": "https://www.uemoa.int/"
+    },
+    "debtOffice": {
+      "name": "UMOA-Titres",
+      "url": "https://www.umoatitres.org/fr/"
+    }
+  },
+  "endpoints": [
+    {
+      "id": "uemoa-brvm-indices",
+      "label": "Indices BRVM",
+      "url": "https://www.brvm.org/fr/indices",
+      "dataFamily": "EQUITY_INDEX",
+      "collector": "HTML_TABLE",
+      "frequency": "DAILY"
+    },
+    {
+      "id": "uemoa-bceao-interbank",
+      "label": "Évolution du marché interbancaire",
+      "url": "https://www.bceao.int/fr/documents/evolution-du-marche-interbancaire-de-luemoa",
+      "dataFamily": "MONEY_MARKET_RATE",
+      "collector": "HTML_LINK_INDEX",
+      "frequency": "WEEKLY"
+    },
+    {
+      "id": "uemoa-bceao-operations",
+      "label": "Opérations interbancaires UMOA",
+      "url": "https://www.bceao.int/fr/documents/operations-effectuees-sur-le-marche-interbancaire-de-lumoa-0",
+      "dataFamily": "MONEY_MARKET_RATE",
+      "collector": "HTML_LINK_INDEX",
+      "frequency": "WEEKLY"
+    },
+    {
+      "id": "uemoa-ut-curves",
+      "label": "Courbes de taux par émetteur",
+      "url": "https://www.umoatitres.org/fr/ressources-2/courbe-des-taux/",
+      "dataFamily": "YIELD_CURVE",
+      "collector": "PDF_LINK_INDEX",
+      "frequency": "WEEKLY"
+    }
+  ]
+}
