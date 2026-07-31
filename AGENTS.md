@@ -8,14 +8,18 @@ Lire dans cet ordre :
 
 1. `docs/00_PROJECT_MEMORY.md`
 2. `docs/01_PRODUCT_VISION_SCOPE.md`
-3. `docs/02_ARCHITECTURE_TARGET.md`
-4. `docs/03_DATA_GOVERNANCE_INTEROPERABILITY.md`
-5. `docs/04_FINANCIAL_METHODOLOGIES.md`
-6. `docs/05_IMPLEMENTATION_ROADMAP.md`
-7. `docs/06_CURRENT_STATUS_AND_GAPS.md`
-8. `docs/07_AI_HANDOFF_PROTOCOL.md`
-9. `docs/08_DECISION_LOG.md`
-10. `docs/10_DEPLOYMENT_GATES.md`
+3. `docs/11_CAHIER_DE_CONCEPTION_MASTER.md`
+4. `docs/02_ARCHITECTURE_TARGET.md`
+5. `docs/12_ARCHITECTURE_DE_CONCEPTION_DETAILLEE.md`
+6. `docs/03_DATA_GOVERNANCE_INTEROPERABILITY.md`
+7. `docs/04_FINANCIAL_METHODOLOGIES.md`
+8. `docs/13_MODE_DE_REALISATION_ET_PLAN_DE_LOTS.md`
+9. `docs/14_MATRICE_EXIGENCES_RECETTE.md`
+10. `docs/05_IMPLEMENTATION_ROADMAP.md`
+11. `docs/06_CURRENT_STATUS_AND_GAPS.md`
+12. `docs/07_AI_HANDOFF_PROTOCOL.md`
+13. `docs/08_DECISION_LOG.md`
+14. `docs/10_DEPLOYMENT_GATES.md`
 
 ## Règles impératives
 
@@ -37,7 +41,8 @@ Chaque PR fonctionnelle doit mettre à jour au minimum :
 - `docs/06_CURRENT_STATUS_AND_GAPS.md` ;
 - `docs/09_CHANGELOG_WORKLOG.md` ;
 - `docs/08_DECISION_LOG.md` si une décision d’architecture ou de méthodologie change ;
-- `docs/05_IMPLEMENTATION_ROADMAP.md` si le périmètre ou l’ordre des travaux change.
+- `docs/05_IMPLEMENTATION_ROADMAP.md` si le périmètre ou l’ordre des travaux change ;
+- `docs/11_CAHIER_DE_CONCEPTION_MASTER.md`, `docs/12_ARCHITECTURE_DE_CONCEPTION_DETAILLEE.md`, `docs/13_MODE_DE_REALISATION_ET_PLAN_DE_LOTS.md` ou `docs/14_MATRICE_EXIGENCES_RECETTE.md` lorsque le cadrage maître concerné évolue.
 
 ## Définition de « terminé »
 
