@@ -86,7 +86,7 @@ export async function processBackfillJobs(limit = 10): Promise<void> {
       [job.backfill_job_id],
     );
     try {
-      await runIngestion({ endpointCode: job.endpoint_code, mode: 'discover' });
+      await runIngestion({ endpointCode: job.endpoint_code, mode: 'discover', failOnEndpointError: true });
       await pool.query(
         `UPDATE ops.backfill_jobs SET status='SUCCESS', finished_at=now(), last_error=NULL WHERE backfill_job_id=$1`,
         [job.backfill_job_id],
