@@ -60,17 +60,23 @@ jobs:
         run: npm run db:migrate
       - name: Seed source registry
         run: npm run db:seed
-      - name: Verify six expected migrations registered
+      - name: Verify migration registry matches SQL files
         run: |
-          python3 - <<'PY'
-          import os
-          import subprocess
-          url=os.environ['DATABASE_URL']
-          proc=subprocess.run(['psql',url,'-At','-c','select count(*) from public.schema_migrations'],capture_output=True,text=True,check=True)
-          actual=int(proc.stdout.strip())
-          assert actual==6, f'Expected 6 migrations, got {actual}'
-          print('Applied migrations:',actual)
-          PY
+          node --input-type=module <<'NODE'
+          import { readdir } from 'node:fs/promises';
+          import pg from 'pg';
+          const expected = (await readdir('sql/migrations')).filter(f => f.endsWith('.sql')).length;
+          const client = new pg.Client({ connectionString: process.env.DATABASE_URL });
+          await client.connect();
+          try {
+            const { rows } = await client.query('SELECT count(*)::int AS n FROM public.schema_migrations');
+            const actual = rows[0].n;
+            if (actual !== expected) throw new Error(`Expected ${expected} migrations, got ${actual}`);
+            console.log(`Verified ${actual} recorded migrations`);
+          } finally {
+            await client.end();
+          }
+          NODE
       - name: Record smoke-check outcome
         if: always()
         run: |
