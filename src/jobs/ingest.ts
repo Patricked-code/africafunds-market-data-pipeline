@@ -53,7 +53,7 @@ async function persistRows(endpoint: SourceEndpoint, artifactId: string, sheetNa
       await client.query(
         `INSERT INTO market.raw_records(raw_artifact_id, endpoint_code, market_code, data_family, sheet_name, row_number, payload)
          VALUES ($1,$2,$3,$4,$5,$6,$7::jsonb)
-         ON CONFLICT(raw_artifact_id, sheet_name, row_number) DO UPDATE SET payload=EXCLUDED.payload`,
+         ON CONFLICT ON CONSTRAINT raw_records_identity_nullsafe DO UPDATE SET payload=EXCLUDED.payload`,
         [artifactId, endpoint.id, endpoint.marketCode, endpoint.dataFamily, sheetName, index + 1, JSON.stringify(rows[index])],
       );
     }
