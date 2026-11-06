@@ -2,6 +2,17 @@
 
 Ce journal décrit les travaux réellement effectués. Ajouter les nouvelles entrées en tête.
 
+## 2026-11-07 00:39 Europe/Paris — PR #12 : test de concurrence PostgreSQL réel et gate CI
+
+- **RECONCILIATION** : main `fb7ec155fc748b133a771564bbd4510e1546fc68` (`protected=false`), PR #1/#2/#4/#10/#11/#12 Draft ouvertes, issues #3/#5/#6/#7/#8/#9 ouvertes. Le HEAD précédent PR #12 `e75fb6927be4e4d101d1b51c2bf6c30b8715ce6b` a la preuve [CI 42306338209](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/42306338209) `SUCCESS` (Node/typecheck/tests unitaires/build/migrations/seed), **pas encore une preuve d'intégration multi-workers**.
+- **ACTION_EFFECTIVE** : sur la branche PR [#12](https://github.com/Patricked-code/africafunds-market-data-pipeline/pull/12), ajout de `test/integration/backfill-claim.test.ts` (commit `fbae3440698482886aa57fc47be964222a32b06b`) : deux connexions PostgreSQL distinctes, transaction du premier worker laissée ouverte, tentative concurrente avec `lock_timeout`, assertion `SKIP LOCKED`, puis vérification RUNNING/attempts et nettoyage du job de test. Modification additive de `.github/workflows/ci.yml` (commit `ab45f3ffe175f69e45ba3f06ffe3b033185c6e3e`) pour exécuter ce test après migrations et seed, sans remplacer le workflow existant.
+- **TEST_EVIDENCE** : nouveau HEAD `ab45f3ffe175f69e45ba3f06ffe3b033185c6e3e`, [CI 42313428780](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/42313428780) `QUEUED` à la dernière lecture. **Le test d'intégration ajouté n'est PAS encore attesté PASS** ; aucune preuve RED locale n'est revendiquée. Run précédent sur commit intermédiaire 42313417357 en cours, susceptible d'être annulé par la concurrence CI.
+- **BLOCK_REASON** : protection main #3 absente ; CI du nouveau HEAD à confirmer ; récupération des RUNNING abandonnés non implémentée ; fenêtres historiques non propagées ; pas d'exécuteur de codage hébergé prouvé #9. Aucune fusion, aucune migration S1, aucun déploiement.
+- **NEXT_ACTION** : vérifier le résultat exact de CI 42313428780 et corriger les échecs éventuels. Ensuite poursuivre #5 avec bail/heartbeat et récupération sûre des RUNNING, puis adaptation de la collecte aux fenêtres `window_from/window_to` avec tests réels. Reprendre #7 si #5 bloqué ; conserver les gates #3 et le statut Draft.
+- **ROLLBACK** : deux commits isolés sur la branche PR #12 ; aucune action sur main ni production.
+
+---
+
 ## 2026-11-06 23:38 Europe/Paris — P0 #5 : claim atomique PostgreSQL dans PR #12
 
 - **RECONCILIATION** : branche `main` SHA `fb7ec155fc748b133a771564bbd4510e1546fc68`, `protected=false`. PR #1/#2/#4/#10/#11/#12 ouvertes, pas de fusion. Issues ouvertes #3/#5/#6/#7/#8/#9. CI précédente PR #12 run [42297570871](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/42297570871) SUCCESS pour SHA `73da818a44ef4942d845f3a0d0aa0848be200e20` (preuve valable pour cet ancien SHA uniquement).
