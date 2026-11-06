@@ -2,6 +2,19 @@
 
 Ce journal décrit les travaux réellement effectués. Ajouter les nouvelles entrées en tête.
 
+## 2026-11-06 — Mandat de finalisation complète et contrat d'exécution continue Claude/ChatGPT
+
+- Branche : `docs/persistent-project-memory-20260731` (PR #1, Draft).
+- Objectif validé : **achever intégralement AfricaFunds Market Data Pipeline/SadiaAF** ; enchaîner sans nouvelle demande humaine les tâches admissibles d'un agent codeur Claude ou ChatGPT, dans le périmètre des outils et permissions disponibles.
+- Réalisé : spécification du cycle continu dans `docs/15_AUTONOMOUS_AGENT_EXECUTION.md`, pointeur obligatoire `AGENTS.md`, protocole de handoff complété, décision `ADR-010` inscrite.
+- Nature : **documentation/contrat**, sans orchestration autonome réelle déployée, sans modification du code métier, sans tests CI/PostgreSQL ni déploiement S1.
+- Exigences permanentes : RESUME FIRST, réconciliation GitHub réelle, tâche admissible, claim anti-collision à implémenter, TDD RED/GREEN, validation, PR/revue/CI, checkpoint et reprise automatique ; refus de contourner les gates.
+- Limites : la continuité 24 h/24 nécessite un runner/scheduler actif avec credentials et capacité d'invoquer Claude ou ChatGPT. Aucun tel dispositif n'est attesté dans ce dépôt.
+- **NEXT_ACTION du chantier principal conservé** : réconcilier PR #1 et PR #2 et leurs mémoires, valider les documents/gates, puis préparer CI et corrections P0. **Travail supplémentaire à planifier dans les lots existants** : implémenter et démontrer le runner et le claim multi-agent selon la recette du contrat, sans créer de programme concurrent.
+- Rollback : restauration documentaire de ces ajouts via la PR ; aucune opération production à annuler.
+
+---
+
 ## 2026-11-06 — Audit GitHub, distinction des périmètres et checkpoint de reprise
 
 - Branche : `docs/persistent-project-memory-20260731` (PR brouillon #1).
