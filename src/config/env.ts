@@ -9,6 +9,8 @@ const schema = z.object({
   LOG_LEVEL: z.string().default('info'),
   HTTP_TIMEOUT_MS: z.coerce.number().int().positive().default(45_000),
   HTTP_MAX_RETRIES: z.coerce.number().int().min(0).max(10).default(4),
+  // Upper bound for a downloaded response, including chunked streams.
+  HTTP_MAX_RESPONSE_BYTES: z.coerce.number().int().positive().default(100 * 1024 * 1024),
   HTTP_USER_AGENT: z.string().default('AfricaFundsMarketCollector/0.1'),
   SCHEDULER_TIMEZONE: z.string().default('Europe/Paris'),
   ENABLE_SCHEDULER: z.coerce.boolean().default(true),
