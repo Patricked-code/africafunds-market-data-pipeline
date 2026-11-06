@@ -1,5 +1,9 @@
 # 00 — Mémoire persistante du projet
 
+## Sources documentaires et priorité
+
+Le présent document est la mémoire d'entrée du projet. Le contenu complémentaire de la PR #2 est conservé intégralement dans [`docs/PROJECT_MEMORY.md`](PROJECT_MEMORY.md) comme **annexe historique détaillée**, et non comme second état courant. Pour le statut opérationnel, utiliser `docs/06_CURRENT_STATUS_AND_GAPS.md`, `docs/09_CHANGELOG_WORKLOG.md` et les preuves GitHub, en vérifiant leurs dates et SHAs.
+
 ## Identité
 
 - Projet : **AfricaFunds Market Data Pipeline / SadiaAF**
