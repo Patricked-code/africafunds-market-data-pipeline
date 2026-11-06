@@ -1,4 +1,5 @@
 import { Buffer } from 'node:buffer';
+import { assertIngestionSucceeded } from './ingestionOutcome.js';
 import { fetchWithRetry } from '../http/fetcher.js';
 import { archiveRaw } from '../archive/rawStore.js';
 import { discoverLinks, parseHtmlTables } from '../parsers/html.js';
@@ -120,7 +121,7 @@ async function ingestEndpoint(endpoint: SourceEndpoint, mode: 'ingest' | 'discov
   return { artifacts, rows, links: linksCount };
 }
 
-export async function runIngestion(input: { market?: string; family?: string; endpointCode?: string; mode?: 'ingest' | 'discover' } = {}): Promise<void> {
+export async function runIngestion(input: { market?: string; family?: string; endpointCode?: string; mode?: 'ingest' | 'discover'; failOnEndpointError?: boolean } = {}): Promise<void> {
   const mode = input.mode ?? 'ingest';
   const endpoints = (await listEndpoints({
     ...(input.market !== undefined ? { market: input.market } : {}),
@@ -144,6 +145,7 @@ export async function runIngestion(input: { market?: string; family?: string; en
       }
     }
     await finishRun(runId, summary.failed === 0 ? 'SUCCESS' : summary.success ? 'PARTIAL' : 'FAILED', summary);
+    if (input.failOnEndpointError) assertIngestionSucceeded(summary);
   } catch (error) {
     await finishRun(runId, 'FAILED', summary, error);
     throw error;
