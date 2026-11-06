@@ -29,6 +29,23 @@ Avant toute reprise après interruption ou parenthèse, consulter le **dernier c
 
 **But permanent : achever le pipeline de données AfricaFunds/SadiaAF dans le cadre des 14 lots existants.** Dès que le dernier travail admissible est terminé, sélectionner et commencer automatiquement le suivant avec preuve et checkpoint GitHub ; ne pas attendre un nouveau prompt à chaque tâche. Appliquer le contrat commun et ses gates dans `docs/15_AUTONOMOUS_AGENT_EXECUTION.md`. **Un agent ne devient pas un service permanent par simple lecture de ce fichier : il faut un exécuteur réel ; ne jamais déclarer ce runner actif sans preuve.**
 
+## Principe obligatoire : évolution du socle technique existant
+
+**Objectif premier : achever le système AfricaFunds Market Data Pipeline / SadiaAF initialement conçu, en partant de son code et de son architecture réels, sans le remplacer par un système parallèle.** L'amélioration ne doit jamais devenir une refonte implicite.
+
+Avant toute PR, tout agent codeur Claude/ChatGPT doit :
+
+1. **INVENTORIER** les composants réels sur la branche de référence, leurs contrats, données, tests, dépendances et mécanismes de reprise ; distinguer les composants codés, testés, déployés et seulement prévus.
+2. **CARTOGRAPHIER L'ÉCART** entre ce qui existe, la cible des 14 lots et la matrice de recette. Reprendre les chantiers engagés avant toute extension facultative.
+3. **PRÉSERVER** la chaîne industrielle déjà en place : source registry → ordonnanceur/ingestion → HTTP → archive brute SHA-256 → parseurs → PostgreSQL et qualité → normalisation → calculs → publication (les dernières étapes sont partiellement à achever). Conserver aussi la file historique de backfill, l'API, Docker, les migrations et les autorités documentaires existantes.
+4. **COMPLÉTER/RENFORCER** le composant existant par la modification minimale cohérente, avec compatibilité des interfaces, migrations additives, gestion de version, tests RED/GREEN et preuve de non-régression.
+5. **ÉVALUER LES NOUVEAUTÉS** seulement si elles ont un bénéfice démontrable pour la cible : sécurité, données, méthodes financières, fiabilité, reprises, performances, interopérabilité ou autonomie des agents. Une technologie nouvelle ne justifie ni duplication de fonction ni création d'une seconde autorité.
+6. **VALIDER ET TRACER** le comportement initial conservé, le nouvel attendu, les tests et leurs limites, les risques, les critères d'acceptation, la PR/CI et le `NEXT_ACTION`. Ne pas appeler `DONE` une étape prévue mais non exécutée.
+
+**Interdiction par défaut :** réécriture globale, remplacement du scheduler, de la base, du moteur de calcul ou du pipeline par un nouvel orchestrateur sans preuve d'impossibilité de faire évoluer l'existant et sans ADR explicite, revue, plan de migration, sauvegarde, rollback et approbations requises.
+
+Les deux industries sont distinctes : **l'usine des données** exécute collecte→transformation→publication ; **l'usine de développement** fait évoluer cette base via agents, branches, tests, CI, PR et continuité GitHub. Leur raccordement ne doit pas confondre leurs cycles ni leurs responsabilités.
+
 ## Règles impératives
 
 - Ne jamais prétendre qu’une fonction, un historique, un adaptateur ou un déploiement est terminé sans preuve reproductible.
