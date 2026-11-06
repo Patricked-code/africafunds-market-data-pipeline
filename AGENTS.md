@@ -20,6 +20,9 @@ Lire dans cet ordre :
 12. `docs/07_AI_HANDOFF_PROTOCOL.md`
 13. `docs/08_DECISION_LOG.md`
 14. `docs/10_DEPLOYMENT_GATES.md`
+15. `docs/09_CHANGELOG_WORKLOG.md` (commencer par l'entrée la plus récente et suivre le lien vers le dernier checkpoint de continuité)
+
+Avant toute reprise après interruption ou parenthèse, consulter le **dernier checkpoint daté référencé par `docs/09_CHANGELOG_WORKLOG.md`** et vérifier l'état réel de GitHub (branches, SHAs, PR, CI). Les snapshots ne remplacent jamais cette vérification.
 
 ## Règles impératives
 
