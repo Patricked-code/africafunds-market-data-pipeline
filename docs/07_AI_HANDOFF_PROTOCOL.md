@@ -3,10 +3,11 @@
 ## Au démarrage
 
 1. Lire `AGENTS.md` et tous les fichiers `docs/00` à `docs/10`.
-2. Vérifier la branche, le dernier commit, les PR et issues ouvertes.
-3. Vérifier l’état réel du code et des tests ; ne pas se fier uniquement au statut écrit.
-4. Lire les migrations et le dictionnaire avant de modifier les données.
-5. Identifier les secrets, serveurs et connecteurs disponibles sans les exposer.
+2. Lire l'entrée la plus récente de `docs/09_CHANGELOG_WORKLOG.md` et le checkpoint daté qui y est référencé (actuellement `docs/CONTINUITY_CHECKPOINT_2026-11-06.md`).
+3. Vérifier la branche, le dernier commit, les PR et issues ouvertes ; réconcilier le checkpoint avec GitHub.
+4. Vérifier l’état réel du code et des tests ; ne pas se fier uniquement au statut écrit.
+5. Lire les migrations et le dictionnaire avant de modifier les données.
+6. Identifier les secrets, serveurs et connecteurs disponibles sans les exposer.
 
 ## Avant de coder
 
@@ -65,4 +66,4 @@ Documenter :
 
 ## Mise à jour de la mémoire
 
-À la fin de chaque session, ajouter une entrée dans `docs/09_CHANGELOG_WORKLOG.md` avec date, branche, commit/PR, actions, tests, blocages et prochaine étape.
+À la fin de chaque session, ajouter une entrée dans `docs/09_CHANGELOG_WORKLOG.md` avec date, branche, commit/PR, actions, tests, blocages et prochaine étape (`NEXT_ACTION`). Référencer un checkpoint daté lorsque la session change la phase du projet ou ferme une longue interruption. Une parenthèse ne remplace pas le `NEXT_ACTION` déjà acté ; la reprise doit vérifier l'actualité des preuves.
