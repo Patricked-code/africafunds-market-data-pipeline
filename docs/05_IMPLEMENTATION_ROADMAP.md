@@ -93,3 +93,17 @@
 ## Phase 9 — Production S1
 
 Interdite tant que `docs/10_DEPLOYMENT_GATES.md` n’est pas entièrement validé.
+
+
+## Chantier transversal 2026-11-07 — Qualifier et achever les sources du pipeline initial
+
+Ce parcours n'ajoute aucun nouveau lot aux **14 lots 0–13** et ne crée aucun registre de sources concurrent ; il réutilise `config/sources.json`, PostgreSQL, les adaptateurs et les exigences existants.
+
+1. [ ] **Lot 4/11 — Audit 44 endpoints** : issue [#13](https://github.com/Patricked-code/africafunds-market-data-pipeline/issues/13), branche `audit/official-source-qualification-20261107`, PR [#18](https://github.com/Patricked-code/africafunds-market-data-pipeline/pull/18) Draft ; scripts, tests, matrice et workflow ajoutés ; succès des vérifications et résultats de chaque source à attester sur SHA exact.
+2. [ ] **Lot 4 — Six adaptateurs dynamiques** : issue [#14](https://github.com/Patricked-code/africafunds-market-data-pipeline/issues/14) — Égypte (5), Tunisie (1), parseurs PDF/JSON/SDMX ; interdiction de contourner les accès.
+3. [ ] **Lot 4/11 — Backfill historique vrai** : issue [#5](https://github.com/Patricked-code/africafunds-market-data-pipeline/issues/5), PR #12 Draft avec correctifs de propagation des erreurs et claim atomique ; fenêtres historiques effectives, récupération crash et validation réelle restent nécessaires.
+4. [ ] **Lots 2–7 — Normalisation et qualité** : issue [#15](https://github.com/Patricked-code/africafunds-market-data-pipeline/issues/15), exploiter les schémas et calculs existants.
+5. [ ] **Lots 2/4/7 — FX, inflation, fonds/VL** : issue [#16](https://github.com/Patricked-code/africafunds-market-data-pipeline/issues/16), recherche et qualification avant enrichissement additif du registre.
+6. [ ] **Lots 4–13 — Recette par marché et publication** : issue [#17](https://github.com/Patricked-code/africafunds-market-data-pipeline/issues/17), couverture, historiques, courbes, indices, API et staging gouvernés.
+
+**Gates :** `REGISTERED_ONLY` ne signifie pas URL accessible ; un `HTTP 200` ne certifie ni série normalisée ni historique complet. Aucun `HISTORY_COMPLETE` ni production S1 sans document témoin, rapprochement, droits d'accès et preuve de reprise. La roadmap est un programme de travail, pas un certificat DONE.
