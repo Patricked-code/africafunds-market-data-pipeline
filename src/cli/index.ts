@@ -16,6 +16,10 @@ function options(args: string[]): Record<string, string> {
 async function main(): Promise<void> {
   const [command = 'help', ...args] = process.argv.slice(2);
   const opts = options(args);
+  const filters = {
+    ...(opts.market !== undefined ? { market: opts.market } : {}),
+    ...(opts.family !== undefined ? { family: opts.family } : {}),
+  };
   switch (command) {
     case 'migrate':
       await migrate();
@@ -27,12 +31,12 @@ async function main(): Promise<void> {
     case 'ingest':
       await migrate();
       await seedRegistry();
-      await runIngestion({ market: opts.market, family: opts.family, mode: 'ingest' });
+      await runIngestion({ ...filters, mode: 'ingest' });
       break;
     case 'discover':
       await migrate();
       await seedRegistry();
-      await runIngestion({ market: opts.market, family: opts.family, mode: 'discover' });
+      await runIngestion({ ...filters, mode: 'discover' });
       break;
     case 'backfill':
       await migrate();
@@ -43,7 +47,7 @@ async function main(): Promise<void> {
         await processBackfillJobs(Number(opts.limit ?? 10));
       } else {
         if (!opts.from || !opts.to) throw new Error('Options requises : --from=YYYY-MM-DD --to=YYYY-MM-DD');
-        await enqueueBackfill({ market: opts.market, family: opts.family, from: opts.from, to: opts.to });
+        await enqueueBackfill({ ...filters, from: opts.from, to: opts.to });
       }
       break;
     case 'audit-sources':
