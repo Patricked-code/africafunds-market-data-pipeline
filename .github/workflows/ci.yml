@@ -77,6 +77,8 @@ jobs:
             await client.end();
           }
           NODE
+      - name: Backfill claim PostgreSQL integration test
+        run: node --import tsx --test test/integration/backfill-claim.test.ts
       - name: Record smoke-check outcome
         if: always()
         run: |
