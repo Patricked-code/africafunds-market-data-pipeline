@@ -1,0 +1,79 @@
+name: CI — AfricaFunds Market Data Pipeline
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    name: validate
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: africafunds
+          POSTGRES_PASSWORD: ci-only-not-for-production
+          POSTGRES_DB: africafunds_ci
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd 'pg_isready -U africafunds -d africafunds_ci'
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 15
+    env:
+      NODE_ENV: test
+      DATABASE_URL: postgresql://africafunds:ci-only-not-for-production@localhost:5432/africafunds_ci
+      RAW_ARCHIVE_DIR: ./data/raw
+      ENABLE_SCHEDULER: 'false'
+      LOG_LEVEL: warn
+    steps:
+      - name: Checkout the exact PR revision
+        uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install dependencies (until a reviewed lockfile is committed)
+        run: npm install --no-audit --no-fund
+      - name: Verify TypeScript types
+        run: npm run typecheck
+      - name: Unit tests
+        run: npm run test:ci
+      - name: Build
+        run: npm run build
+      - name: Apply PostgreSQL migrations
+        run: npm run db:migrate
+      - name: Reapply migrations (idempotency)
+        run: npm run db:migrate
+      - name: Seed source registry
+        run: npm run db:seed
+      - name: Verify six expected migrations registered
+        run: |
+          python3 - <<'PY'
+          import os
+          import subprocess
+          url=os.environ['DATABASE_URL']
+          proc=subprocess.run(['psql',url,'-At','-c','select count(*) from public.schema_migrations'],capture_output=True,text=True,check=True)
+          actual=int(proc.stdout.strip())
+          assert actual==6, f'Expected 6 migrations, got {actual}'
+          print('Applied migrations:',actual)
+          PY
+      - name: Record smoke-check outcome
+        if: always()
+        run: |
+          echo 'CI run: ${{ github.run_id }}' >> "$GITHUB_STEP_SUMMARY"
+          echo 'Head SHA: ${{ github.sha }}' >> "$GITHUB_STEP_SUMMARY"
+          echo 'The result is authoritative only in GitHub Actions.' >> "$GITHUB_STEP_SUMMARY"
