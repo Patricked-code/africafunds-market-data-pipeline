@@ -2,6 +2,18 @@
 
 Ce journal décrit les travaux réellement effectués. Ajouter les nouvelles entrées en tête.
 
+## 2026-11-06 — Reprise immédiate exercée, sécurité HTTP étendue, borne runtime documentée
+
+- **Exécution immédiate** : l'automatisation `Automation_a523352a7c448191a41080097ce8b01f` a été relue (`is_enabled=true`, RRULE horaire, timezone Europe/Paris) puis déclenchée en mode `run_now`. Résultat de l'outil : **`inline_run` — « Ready to run in this conversation »**. Cela ne confirme **aucun worker autonome hébergé** ni démarrage autonome hors session ; premier run planifié séparé non attesté.
+- **PR #11 / issue #7** : deuxième tranche HTTP `HTTP_MAX_RESPONSE_BYTES` (100 MiB par défaut), lecture limitée des réponses en flux, taille `Content-Length` et flux sans taille, `HttpBodyTooLargeError`, nouveaux tests, `.env.example`. Preuve : [run 42292780013](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/42292780013) **SUCCESS** pour SHA `15fa74875ea91dfccc50dc238d9bb57a37e9b5f3`. PR reste Draft ; blocage SSRF/redirects/allowlists et conformité aux sources non résolu.
+- **README de la PR #1** : transformé en entrée documentaire pour tout agent Claude/ChatGPT, corrige les 44 endpoints configurés (au lieu de l'estimation 45+) et souligne la différence **socle/pipeline vs application AfricaFunds vs cible SadiaAF**. Correction des avertissements sur les fenêtres historiques et sur le déploiement S1, commit `de7f7faa80ea4a3c59b0f6e1cb91259e7ecf7400`.
+- **Chaîne de gouvernance** : code et preuves enregistrés sur GitHub ; aucun commit sur `main`, pas de merge ni d'activation S1. PR #1/#2/#4/#10/#11 ouvertes Draft à la dernière réconciliation, `main` `fb7ec155fc748b133a771564bbd4510e1546fc68` non protégée.
+- **NEXT_ACTION** : protéger `main` (issue #3, blocage GitHub plan/permission), examiner et valider les PR documentaires et la CI actuelle, réconcilier les branches empilées #10/#11 avec la branche CI lorsque les gates seront satisfaits, corriger le backfill historique #5 sans faux SUCCESS, terminer les protections HTTP #7, et raccorder un véritable agent codeur hébergé #9 en réutilisant les autorités existantes, avec preuve de deux tâches consécutives sans prompt.
+- **Définition du DONE** : les runs verts démontrent uniquement les tests de ces commits, pas la production, la complétude des lots ni un exécuteur autonome 24 h/24.
+- **Rollback** : changements documentaires GitHub sur PR #1 ; aucune action serveur.
+
+---
+
 ## 2026-11-06 — CI reproductible et deuxième correctif P0 validés ; agent hébergé à raccorder
 
 - **Référence autoritative** : le dépôt GitHub, ses branches et ses preuves ; cette entrée est un checkpoint daté, pas une attestation future. **Aucun merge dans `main` et aucun déploiement S1 exécutés.**
