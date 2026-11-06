@@ -67,6 +67,15 @@ Utiliser ce fichier pour les décisions durables. Ne pas supprimer les anciennes
 - Conséquences : réaliser et tester un véritable orchestrateur/runner et des claims multi-agents avant de qualifier le fonctionnement de permanent. Les gates de revue, de sécurité et de production de l'ADR-002 restent obligatoires ; aucune exécution 24 h/24 n'est déclarée active à cette date.
 - Remplace / remplacée par : aucune.
 
+## ADR-011 — Convergence des mémoires des PR #1 et #2
+
+- Date : 2026-11-06
+- Statut : ACCEPTED (organisation documentaire de la branche PR #1, encore soumise à revue/fusion)
+- Contexte : deux PR Draft issues du même SHA `main` exposent des mémoires partiellement redondantes, et `docs/PROJECT_MEMORY.md` se présentait comme un second point d'entrée.
+- Décision : `docs/00_PROJECT_MEMORY.md` est le point d'entrée canonique ; la mémoire intégrale PR #2 est importée en annexe historique `docs/PROJECT_MEMORY.md`, conservant sa provenance sans écraser les décisions acceptées et les journaux. Aucun statut daté n'est considéré comme une preuve runtime actuelle.
+- Conséquences : la PR #2 doit être revue puis clôturée comme reprise sans perte **après validation de la convergence**. Pas de merge ou suppression automatique de cette PR par la seule adoption de cette ADR.
+- Remplace / remplacée par : aucune.
+
 ## Modèle d’entrée
 
 ```markdown
