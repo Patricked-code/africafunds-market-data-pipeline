@@ -76,6 +76,17 @@ Utiliser ce fichier pour les décisions durables. Ne pas supprimer les anciennes
 - Conséquences : la PR #2 doit être revue puis clôturée comme reprise sans perte **après validation de la convergence**. Pas de merge ou suppression automatique de cette PR par la seule adoption de cette ADR.
 - Remplace / remplacée par : aucune.
 
+## ADR-012 — Préserver, compléter et achever l'architecture industrielle originelle
+
+- Date : 2026-11-06
+- Statut : ACCEPTED (principe de réalisation ; aucune capacité runtime supplémentaire attestée par cette décision)
+- Contexte : le dépôt contient déjà un socle technique structuré et un enchaînement industriel initial : scheduler `src/jobs/scheduler.ts`, registry des sources, ingestion `src/jobs/ingest.ts`, collecte HTTP, archives SHA-256, parseurs, tables PostgreSQL, file backfill, qualité, fonctions de calcul et API. Le projet cible prévoit aussi normalisation, calcul complet et publication, encore partiellement inachevés.
+- Décision : **partir exclusivement de cette base vérifiée**, préserver les composants fonctionnels et leurs contrats, corriger et compléter les mécanismes existants, atteindre les fonctionnalités et performances prévues dans les 14 lots, puis y intégrer seulement les meilleures améliorations justifiées et compatibles. Pas de reconstruction ou de système parallèle par défaut.
+- Méthode : inventaire réel → comparaison avec l'architecture cible/matrice de recette → évolution minimale/additive → tests de non-régression et de métier → PR/CI/revue et gates → preuves/checkpoint → travail suivant. Toute refonte indispensable requiert comparaison d'options, ADR spécifique, plan de migration/rollback et autorisations adaptées.
+- Distinction : usine de données (collecte, archives, normalisation, calculs, diffusion) ≠ usine de développement autonome (Claude/ChatGPT, PR, CI, continuité), cette seconde devant aider à achever la première sans substituer ses mécanismes ou son autorité.
+- Conséquences : le succès n'est ni le nombre de PR, ni l'adoption d'un nouveau framework, mais l'achèvement vérifié de la chaîne industrielle prévue, avec provenance, sécurité, fiabilité et interopérabilité. La conservation de `main` n'implique pas à elle seule que tous les comportements sont déjà validés en production.
+- Remplace / remplacée par : aucune ; complète ADR-003, ADR-010 et ADR-011.
+
 ## Modèle d’entrée
 
 ```markdown
