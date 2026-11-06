@@ -21,8 +21,13 @@ Lire dans cet ordre :
 13. `docs/08_DECISION_LOG.md`
 14. `docs/10_DEPLOYMENT_GATES.md`
 15. `docs/09_CHANGELOG_WORKLOG.md` (commencer par l'entrée la plus récente et suivre le lien vers le dernier checkpoint de continuité)
+16. `docs/15_AUTONOMOUS_AGENT_EXECUTION.md` (**obligatoire pour tout agent codeur Claude/ChatGPT qui reprend, exécute, transmet ou enchaîne des tâches**)
 
 Avant toute reprise après interruption ou parenthèse, consulter le **dernier checkpoint daté référencé par `docs/09_CHANGELOG_WORKLOG.md`** et vérifier l'état réel de GitHub (branches, SHAs, PR, CI). Les snapshots ne remplacent jamais cette vérification.
+
+## Mandat d'exécution continue
+
+**But permanent : achever le pipeline de données AfricaFunds/SadiaAF dans le cadre des 14 lots existants.** Dès que le dernier travail admissible est terminé, sélectionner et commencer automatiquement le suivant avec preuve et checkpoint GitHub ; ne pas attendre un nouveau prompt à chaque tâche. Appliquer le contrat commun et ses gates dans `docs/15_AUTONOMOUS_AGENT_EXECUTION.md`. **Un agent ne devient pas un service permanent par simple lecture de ce fichier : il faut un exécuteur réel ; ne jamais déclarer ce runner actif sans preuve.**
 
 ## Règles impératives
 
