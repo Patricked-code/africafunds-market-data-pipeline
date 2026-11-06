@@ -46,15 +46,8 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Install dependencies (until a reviewed lockfile is committed)
-        run: npm install --no-audit --no-fund
-      - name: Export generated npm lockfile for reproducibility work
-        uses: actions/upload-artifact@v4
-        with:
-          name: npm-lockfile-${{ github.sha }}
-          path: package-lock.json
-          retention-days: 7
-          if-no-files-found: error
+      - name: Install exact reviewed dependency tree
+        run: npm ci --no-audit --no-fund
       - name: Verify TypeScript types
         run: npm run typecheck
       - name: Unit tests
