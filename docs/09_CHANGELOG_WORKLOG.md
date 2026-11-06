@@ -2,6 +2,24 @@
 
 Ce journal décrit les travaux réellement effectués. Ajouter les nouvelles entrées en tête.
 
+## 2026-11-06 — Exécution concrète : CI, défaut P0, continuité planifiée
+
+- Dépôt : `Patricked-code/africafunds-market-data-pipeline` ; `main` reste `fb7ec155fc748b133a771564bbd4510e1546fc68` lors du contrôle initial de cette intervention. **Revalider avant toute nouvelle action**.
+- Documentaires : PR #1 (`docs/persistent-project-memory-20260731`) reçoit l'intégralité de `docs/PROJECT_MEMORY.md` de PR #2 comme annexe historique ; `docs/00_PROJECT_MEMORY.md` reste l'entrée canonique ; ADR-011 traite la coexistence. **PR #1 et #2 conservées Draft, non fusionnées**.
+- Sécurité : issue [#3](https://github.com/Patricked-code/africafunds-market-data-pipeline/issues/3) ouverte pour protection réelle de `main` : branche privée non protégée et rulesets refusés HTTP 403 (offre GitHub). Pas de fusion autonome tant que protection/gates manquent.
+- CI : [PR #4](https://github.com/Patricked-code/africafunds-market-data-pipeline/pull/4) branche `fix/ci-baseline-20261106`, Node 22, PostgreSQL 16, typecheck, 3 fichiers de tests unitaires, build, 6 migrations, réexécution, seed. Les premiers runs ont révélé une option Docker incorrecte et 7 erreurs TypeScript historiques ; corrections apportées.
+- **Preuve CI #4** : run [42288784384](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/42288784384), `SUCCESS`, commit `f4051ba3ed3e0464abbe95de80924c839b0628d7`. Second run [42289248428](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/42289248428) `SUCCESS`, commit `8620e4564980835bed574d955cb97132c2961b48` (déclencheur PR étendu). Un run ultérieur est requis pour tout nouveau HEAD.
+- **Correction P0 issue #6** : [PR #10](https://github.com/Patricked-code/africafunds-market-data-pipeline/pull/10) empilée sur PR #4, migration additive `006_raw_records_nullsafe.sql`, nouvelle contrainte `UNIQUE NULLS NOT DISTINCT`, UPSERT explicite, test PostgreSQL transactionnel `test/integration/raw-records.test.ts` avec ROLLBACK. Preuve run [42289453883](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/42289453883), `SUCCESS`, commit `ec4b8d33b709514479b3eef29880c66917efcf49`. **Aucune migration sur S1 ni fusion**, doublons historiques bloquants plutôt qu'effacés.
+- Backlog canonique GitHub : issues [#5](https://github.com/Patricked-code/africafunds-market-data-pipeline/issues/5) backfill/fenêtres/concurrence, [#6](https://github.com/Patricked-code/africafunds-market-data-pipeline/issues/6) idempotence, [#7](https://github.com/Patricked-code/africafunds-market-data-pipeline/issues/7) HTTP et sûreté, [#8](https://github.com/Patricked-code/africafunds-market-data-pipeline/issues/8) lockfile/CI reproductible, [#9](https://github.com/Patricked-code/africafunds-market-data-pipeline/issues/9) vrai exécuteur codeur Claude/ChatGPT. Toutes reliées aux lots 0–13 existants ; aucun programme parallèle.
+- Continuité récurrente : automatisation ChatGPT horaire `Automation_a523352a7c448191a41080097ce8b01f`, créée et activée le 06/11. **Planification seulement** : premier run et environnement effectif non vérifiés ; elle ne prouve pas un moteur codeur 24 h/24. Autorité demeure GitHub.
+- Ongoing à la rédaction : tentative de création d'un `package-lock.json` vérifié via artefact GitHub Actions, puis `npm ci` ; contrôle CI sur le HEAD suivant nécessaire.
+- **NEXT_ACTION** : (1) confirmer dernier run CI PR #4 après modification, récupérer l'artefact lockfile et verrouiller les dépendances, (2) stabiliser les PR #4/#10, (3) résoudre la protection GitHub de #3, (4) implémenter #5/#7, (5) raccorder un exécuteur de codage réellement opérationnel sur #9 sans duplication des autorités et sans Codex. Relire les preuves actuelles avant toute modification.
+- Rollback : commits Git de branches Draft, aucun serveur ni donnée réelle modifiés.
+
+---
+
+
+
 ## 2026-11-06 — Mandat de finalisation complète et contrat d'exécution continue Claude/ChatGPT
 
 - Branche : `docs/persistent-project-memory-20260731` (PR #1, Draft).
