@@ -23,6 +23,7 @@ jobs:
       postgres:
         image: postgres:16
         env:
+          PGUSER: africafunds
           POSTGRES_USER: africafunds
           POSTGRES_PASSWORD: ci-only-not-for-production
           POSTGRES_DB: africafunds_ci
