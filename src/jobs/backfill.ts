@@ -5,6 +5,7 @@ import { toIsoDate } from '../utils/dates.js';
 import { logger } from '../config/logger.js';
 import { loadRegistry } from '../config/registry.js';
 import { runIngestion } from './ingest.js';
+import { CLAIM_PENDING_BACKFILLS_SQL } from './backfillClaim.js';
 
 export async function enqueueBackfill(input: { market?: string; family?: string; from: string; to: string }): Promise<number> {
   const endpoints = await listEndpoints({
@@ -52,21 +53,16 @@ export async function listPendingBackfills(limit = 100): Promise<void> {
 export async function processBackfillJobs(limit = 10): Promise<void> {
   const registry = await loadRegistry();
   const collectors = new Map(registry.markets.flatMap((market) => market.endpoints.map((endpoint) => [endpoint.id, endpoint.collector] as const)));
+  // Atomic claim: row locks and RUNNING transitions occur in the same SQL statement.
+  // A plain SELECT ... FOR UPDATE through pool.query releases its lock before
+  // the subsequent UPDATE, allowing two workers to process the same job.
   const jobs = await pool.query<{
     backfill_job_id: string;
     endpoint_code: string;
     window_from: string;
     window_to: string;
     attempts: number;
-  }>(
-    `SELECT backfill_job_id, endpoint_code, window_from::text, window_to::text, attempts
-       FROM ops.backfill_jobs
-      WHERE status IN ('PENDING','RETRY')
-      ORDER BY window_from, endpoint_code
-      FOR UPDATE SKIP LOCKED
-      LIMIT $1`,
-    [limit],
-  );
+  }>(CLAIM_PENDING_BACKFILLS_SQL, [limit]);
 
   for (const job of jobs.rows) {
     const collector = collectors.get(job.endpoint_code);
