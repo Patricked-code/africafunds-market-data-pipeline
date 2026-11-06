@@ -17,6 +17,49 @@ export class HttpResponseError extends Error {
   }
 }
 
+/** Large or infinite responses are rejected before they can exhaust worker memory. */
+export class HttpBodyTooLargeError extends Error {
+  constructor(public readonly maxBytes: number) {
+    super(`Réponse HTTP trop volumineuse (limite ${maxBytes} octets)`);
+    this.name = 'HttpBodyTooLargeError';
+  }
+}
+
+async function readLimitedBody(response: Response, maxBytes: number): Promise<Uint8Array> {
+  const declared = Number(response.headers.get('content-length'));
+  if (Number.isFinite(declared) && declared > maxBytes) {
+    throw new HttpBodyTooLargeError(maxBytes);
+  }
+  if (!response.body) return new Uint8Array();
+
+  const reader = response.body.getReader();
+  const chunks: Uint8Array[] = [];
+  let total = 0;
+  try {
+    while (true) {
+      const next = await reader.read();
+      if (next.done) break;
+      if (!next.value) continue;
+      total += next.value.byteLength;
+      if (total > maxBytes) {
+        await reader.cancel();
+        throw new HttpBodyTooLargeError(maxBytes);
+      }
+      chunks.push(next.value);
+    }
+  } finally {
+    reader.releaseLock();
+  }
+
+  const body = new Uint8Array(total);
+  let offset = 0;
+  for (const chunk of chunks) {
+    body.set(chunk, offset);
+    offset += chunk.byteLength;
+  }
+  return body;
+}
+
 export async function fetchWithRetry(url: string, init: RequestInit = {}): Promise<FetchResult> {
   let lastError: unknown;
   for (let attempt = 0; attempt <= env.HTTP_MAX_RETRIES; attempt += 1) {
@@ -42,14 +85,14 @@ export async function fetchWithRetry(url: string, init: RequestInit = {}): Promi
         url: response.url,
         status: response.status,
         headers: Object.fromEntries(response.headers.entries()),
-        body: new Uint8Array(await response.arrayBuffer()),
+        body: await readLimitedBody(response, env.HTTP_MAX_RESPONSE_BYTES),
         fetchedAt: new Date().toISOString(),
       };
     } catch (error) {
       lastError = error;
       const isTerminalClientError = error instanceof HttpResponseError
         && error.status >= 400 && error.status < 500 && error.status !== 429;
-      if (isTerminalClientError || attempt >= env.HTTP_MAX_RETRIES) break;
+      if (isTerminalClientError || error instanceof HttpBodyTooLargeError || attempt >= env.HTTP_MAX_RETRIES) break;
       await delay(500 * (2 ** attempt));
     } finally {
       clearTimeout(timer);
