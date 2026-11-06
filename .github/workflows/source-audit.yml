@@ -1,0 +1,52 @@
+name: Source Qualification — read-only
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/audit-source-registry.mjs'
+      - 'test/source-audit.test.mjs'
+      - 'config/sources.json'
+      - 'config/sources/**'
+      - '.github/workflows/source-audit.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: source-qualification-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  qualify-sources:
+    name: qualify-44-endpoints
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Test inventory and safety contract
+        run: node --test test/source-audit.test.mjs
+      - name: Record deterministic 44-source inventory
+        run: node scripts/audit-source-registry.mjs --output audit-results/inventory.json
+      - name: Read-only site checks with robots gating
+        run: node scripts/audit-source-registry.mjs --live --output audit-results/live-head-checks.json
+        continue-on-error: true
+      - name: Publish inspection evidence, never claim historical certification
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: source-qualification-evidence-${{ github.run_id }}
+          path: audit-results/
+          if-no-files-found: error
+          retention-days: 30
+      - name: Report limitations
+        if: always()
+        run: |
+          echo 'These are URL/HEAD checks only. Not proof of historical completeness, valid mapping, or production readiness.' >> "$GITHUB_STEP_SUMMARY"
+          echo "Workflow run: ${{ github.run_id }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "HEAD SHA: ${{ github.sha }}" >> "$GITHUB_STEP_SUMMARY"
