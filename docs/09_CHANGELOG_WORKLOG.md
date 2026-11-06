@@ -2,6 +2,16 @@
 
 Ce journal décrit les travaux réellement effectués. Ajouter les nouvelles entrées en tête.
 
+## 2026-11-06 — Règle fondamentale confirmée : achever en faisant évoluer le socle réel
+
+- **Mandat propriétaire confirmé** : partir du socle industriel existant AfricaFunds Market Data Pipeline, y ajouter les fonctions manquantes, compléter ce qui était prévu, corriger les faiblesses et sélectionner les meilleures évolutions utiles **sans destruction, duplication ni refonte injustifiée**.
+- **Socle vérifié** : `src/jobs/scheduler.ts`, `ingest.ts`, `backfill.ts`, `src/http/fetcher.ts`, `src/archive/rawStore.ts`, parseurs, PostgreSQL, `src/quality/validate.ts`, fonctions `src/calc`, API et `docker-compose.yml`. Enchaînement initial collecte/archivage/ingestion réel dans le code ; normalisation→calculs complets→publication et reprise historique robuste encore incomplets. Ne pas confondre présence de code et fonctionnement attesté en production.
+- **Conservation dans GitHub** : ajout d'ADR-012 au registre de décisions et renforcement d'`AGENTS.md` avec méthode INVENTORIER → CARTOGRAPHIER → PRÉSERVER → COMPLÉTER → ÉVALUER → VALIDER. Aucune modification métier, aucun merge, aucun déploiement.
+- **Continuité inchangée** : dernière PR technique connue #12 (`fix/backfill-failure-propagation-20261106`, SHA historique `73da818a44ef4942d845f3a0d0aa0848be200e20`), CI [run 42297570871](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/42297570871) `SUCCESS` observé. Protection `main` #3 non résolue au dernier contrôle ; revérifier le dépôt à la reprise.
+- **NEXT_ACTION** : reprendre les PR/CI et le dernier `NEXT_ACTION` effectivement actifs ; terminer le backfill #5 (fenêtres, claim et récupération) et protections HTTP #7, traiter les gates et le raccordement de l'exécuteur #9 sans nouvel orchestrateur concurrent, conformément aux 14 lots. Continuer à préserver l'industrialisation de données existante.
+
+---
+
 ## 2026-11-06 22:31 Europe/Paris — Exécution autonome : correctif backfill partiel PR #12
 
 - **RECONCILIATION** : `main` `fb7ec155fc748b133a771564bbd4510e1546fc68`, `protected=false`; PR #1/#2/#4/#10/#11 Draft non fusionnées à la lecture ; CI #4 run 42290548842 SUCCESS pour `b307202921e66c395f7d0454868a462cc36c6158`, CI #11 run 42292780013 SUCCESS pour `15fa74875ea91dfccc50dc238d9bb57a37e9b5f3`. Aucun nouveau merge S1.
