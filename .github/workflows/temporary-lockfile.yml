@@ -1,0 +1,33 @@
+name: TEMP — Commit npm lockfile to CI branch only
+on:
+  push:
+    branches:
+      - fix/ci-baseline-20261106
+permissions:
+  contents: read
+jobs:
+  lockfile:
+    if: github.repository == 'Patricked-code/africafunds-market-data-pipeline' && github.ref == 'refs/heads/fix/ci-baseline-20261106'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: fix/ci-baseline-20261106
+          persist-credentials: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Resolve lockfile without running dependency scripts
+        run: npm install --package-lock-only --ignore-scripts --no-audit --no-fund
+      - name: Commit only package-lock.json onto the CI feature branch
+        run: |
+          git add -- package-lock.json
+          if git diff --cached --quiet; then
+            echo 'No lockfile changes to commit'
+            exit 0
+          fi
+          git -c user.name='github-actions[bot]' -c user.email='41898282+github-actions[bot]@users.noreply.github.com' commit -m 'build: record resolved dependencies for reproducible CI'
+          git push origin HEAD:refs/heads/fix/ci-baseline-20261106
