@@ -2,6 +2,17 @@
 
 Ce journal décrit les travaux réellement effectués. Ajouter les nouvelles entrées en tête.
 
+## 2026-11-06 22:31 Europe/Paris — Exécution autonome : correctif backfill partiel PR #12
+
+- **RECONCILIATION** : `main` `fb7ec155fc748b133a771564bbd4510e1546fc68`, `protected=false`; PR #1/#2/#4/#10/#11 Draft non fusionnées à la lecture ; CI #4 run 42290548842 SUCCESS pour `b307202921e66c395f7d0454868a462cc36c6158`, CI #11 run 42292780013 SUCCESS pour `15fa74875ea91dfccc50dc238d9bb57a37e9b5f3`. Aucun nouveau merge S1.
+- **ACTION EFFECTIVE** : nouvelle branche `fix/backfill-failure-propagation-20261106` depuis `fix/ci-baseline-20261106` ; PR [#12](https://github.com/Patricked-code/africafunds-market-data-pipeline/pull/12) Draft, HEAD initial `73da818a44ef4942d845f3a0d0aa0848be200e20`. Ajout `src/jobs/ingestionOutcome.ts`, `test/ingestion-outcome.test.ts`, modification `src/jobs/ingest.ts` et `src/jobs/backfill.ts`. Un backfill active `failOnEndpointError` : les échecs ou zéro endpoint déclenchent une exception après sauvegarde du statut du run, afin que le job prenne la voie RETRY/FAILED au lieu d'un faux SUCCESS. L'ingestion ordinaire conserve son comportement antérieur.
+- **TEST_EVIDENCE** : quatre tests ajoutés ; exécution CI sur le HEAD de PR #12 **à vérifier**. Aucun PASS revendiqué pour ces nouveaux tests avant preuve GitHub.
+- **BLOCK_REASON** : protection `main` indisponible (#3, rulesets 403) ; les fenêtres historiques `window_from/window_to` ne sont toujours pas propagées à la découverte ; claim/lease concurrent atomique non prouvé ; exécuteur hébergé Claude/ChatGPT 24/7 non attesté (#9). PR #12 est une tranche **PARTIAL**, pas une clôture de l'issue #5.
+- **NEXT_ACTION** : vérifier le dernier run CI de PR #12 et corriger si nécessaire ; poursuivre #5 par la sélection des liens selon fenêtres et le claim atomique/reprise crash, avec tests ; préparer intégration seulement après #4, protection et revues. Poursuivre en parallèle #7 si #5 est bloqué. Aucun push main, aucun déploiement S1.
+- **Rollback** : branche PR #12 indépendante, aucune migration ni écriture sur serveur.
+
+---
+
 ## 2026-11-06 — Reprise immédiate exercée, sécurité HTTP étendue, borne runtime documentée
 
 - **Exécution immédiate** : l'automatisation `Automation_a523352a7c448191a41080097ce8b01f` a été relue (`is_enabled=true`, RRULE horaire, timezone Europe/Paris) puis déclenchée en mode `run_now`. Résultat de l'outil : **`inline_run` — « Ready to run in this conversation »**. Cela ne confirme **aucun worker autonome hébergé** ni démarrage autonome hors session ; premier run planifié séparé non attesté.
