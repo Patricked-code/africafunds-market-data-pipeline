@@ -9,6 +9,14 @@ export interface FetchResult {
   fetchedAt: string;
 }
 
+/** A non-2xx response must never be archived as a successful source artifact. */
+export class HttpResponseError extends Error {
+  constructor(public readonly status: number) {
+    super(`Réponse HTTP non valide (statut ${status})`);
+    this.name = 'HttpResponseError';
+  }
+}
+
 export async function fetchWithRetry(url: string, init: RequestInit = {}): Promise<FetchResult> {
   let lastError: unknown;
   for (let attempt = 0; attempt <= env.HTTP_MAX_RETRIES; attempt += 1) {
@@ -25,25 +33,27 @@ export async function fetchWithRetry(url: string, init: RequestInit = {}): Promi
         redirect: 'follow',
         signal: controller.signal,
       });
-      const body = new Uint8Array(await response.arrayBuffer());
-      if (!response.ok && response.status >= 500 && attempt < env.HTTP_MAX_RETRIES) {
-        await delay(500 * (2 ** attempt));
-        continue;
+      if (!response.ok) {
+        // 4xx fails immediately, except retryable 429; 5xx retries within policy.
+        // Do not read or persist error bodies as market data.
+        throw new HttpResponseError(response.status);
       }
       return {
         url: response.url,
         status: response.status,
         headers: Object.fromEntries(response.headers.entries()),
-        body,
+        body: new Uint8Array(await response.arrayBuffer()),
         fetchedAt: new Date().toISOString(),
       };
     } catch (error) {
       lastError = error;
-      if (attempt >= env.HTTP_MAX_RETRIES) break;
+      const isTerminalClientError = error instanceof HttpResponseError
+        && error.status >= 400 && error.status < 500 && error.status !== 429;
+      if (isTerminalClientError || attempt >= env.HTTP_MAX_RETRIES) break;
       await delay(500 * (2 ** attempt));
     } finally {
       clearTimeout(timer);
     }
   }
-  throw lastError instanceof Error ? lastError : new Error(`Échec HTTP: ${url}`);
+  throw lastError instanceof Error ? lastError : new Error('Échec HTTP');
 }
