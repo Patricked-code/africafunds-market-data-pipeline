@@ -2,12 +2,15 @@
 
 ## Au démarrage
 
+Pour l'agent codeur Claude ou ChatGPT : suivre la boucle de travail et les contrôles de `docs/15_AUTONOMOUS_AGENT_EXECUTION.md` ; conserver les autorités et les lots existants.
+
 1. Lire `AGENTS.md` et tous les fichiers `docs/00` à `docs/10`.
 2. Lire l'entrée la plus récente de `docs/09_CHANGELOG_WORKLOG.md` et le checkpoint daté qui y est référencé (actuellement `docs/CONTINUITY_CHECKPOINT_2026-11-06.md`).
 3. Vérifier la branche, le dernier commit, les PR et issues ouvertes ; réconcilier le checkpoint avec GitHub.
 4. Vérifier l’état réel du code et des tests ; ne pas se fier uniquement au statut écrit.
 5. Lire les migrations et le dictionnaire avant de modifier les données.
 6. Identifier les secrets, serveurs et connecteurs disponibles sans les exposer.
+7. Récupérer la tâche admissible, sa dépendance, sa branche/PR éventuelle et le `NEXT_ACTION` : reprendre avant de créer de nouveaux travaux ; s'il n'y a pas de runner autonome, ne pas prétendre exécuter les tâches après la fin de la session.
 
 ## Avant de coder
 
@@ -63,6 +66,10 @@ Documenter :
 - pas de réécriture d’historique Git ;
 - pas de statut `DONE` sur simple génération de code ;
 - pas d’utilisation de valeurs fictives en production.
+
+## Enchaînement entre deux travaux
+
+Une fois une tâche validée, documentée et intégrée conformément aux gates, inscrire immédiatement son résultat dans GitHub, puis reprendre à l'étape `RECONCILIATION` du contrat continu pour sélectionner la tâche suivante sans nouveau prompt. Si une PR attend une validation non délégable, passer à une autre tâche indépendante et conserver l'attente, sans fusion forcée.
 
 ## Mise à jour de la mémoire
 
