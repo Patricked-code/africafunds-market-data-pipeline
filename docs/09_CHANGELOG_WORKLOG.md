@@ -2,6 +2,17 @@
 
 Ce journal décrit les travaux réellement effectués. Ajouter les nouvelles entrées en tête.
 
+## 2026-11-06 23:38 Europe/Paris — P0 #5 : claim atomique PostgreSQL dans PR #12
+
+- **RECONCILIATION** : branche `main` SHA `fb7ec155fc748b133a771564bbd4510e1546fc68`, `protected=false`. PR #1/#2/#4/#10/#11/#12 ouvertes, pas de fusion. Issues ouvertes #3/#5/#6/#7/#8/#9. CI précédente PR #12 run [42297570871](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/42297570871) SUCCESS pour SHA `73da818a44ef4942d845f3a0d0aa0848be200e20` (preuve valable pour cet ancien SHA uniquement).
+- **ACTION_EFFECTIVE** : poursuite sur la PR [#12](https://github.com/Patricked-code/africafunds-market-data-pipeline/pull/12) et sa branche existante `fix/backfill-failure-propagation-20261106` ; remplacement de la séquence dangereuse SELECT FOR UPDATE puis UPDATE via pool.query (verrou relâché entre deux appels) par une instruction atomique `WITH candidates ... FOR UPDATE SKIP LOCKED ... UPDATE ... RETURNING` dans `src/jobs/backfillClaim.ts`. `src/jobs/backfill.ts` utilise le claim atomique et ne répète plus la mise à jour RUNNING. Le compteur `attempts` est incrémenté une seule fois ; la valeur antérieure est retournée pour conserver le seuil de retry existant.
+- **TESTS** : `test/backfill-claim.test.ts` contient deux tests de contrat SQL (sélection et transition atomique). Il s'agit de vérifications de structure, **pas d'une preuve de concurrence multi-workers PostgreSQL**. CI du nouveau HEAD `e75fb6927be4e4d101d1b51c2bf6c30b8715ce6b` : [run 42306338209](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/42306338209) PENDING au dernier contrôle ; résultat final non encore attesté. Commits intermédiaires `be8a55ce123d18df5da6eecff1af71daffa0c9db`, `338bcd35da73d9bbd9a7b4623180d4378a334dae`, `2c78e03015df0311b1a2073ac4bc6ab81b407814`.
+- **BLOCK_REASON** : protection main #3 non résolue ; CI du HEAD actuel à vérifier ; aucune recette de concurrence PostgreSQL réelle ; aucun mécanisme de récupération des RUNNING abandonnés ; fenêtres historiques `window_from/window_to` non utilisées pour découvrir les données de la période ; runner codeur hébergé #9 non attesté. PR #12 demeure PARTIAL/Draft, pas de merge ni déploiement S1.
+- **NEXT_ACTION** : vérifier le run CI 42306338209 sur SHA exact ; ajouter un test d'intégration PostgreSQL à deux connexions prouvant l'exclusion atomique, puis reprise des RUNNING expirés avec bail et tests, sans récupérer des travaux encore actifs. Ensuite traiter la propagation effective des fenêtres historiques et les protections HTTP #7, en conservant les gates de #3. Ne jamais déclarer l'issue #5 DONE avant ces preuves.
+- **Rollback** : modifications limitées à la branche de PR #12, sans migration, sans écriture serveur et sans modification de `main`.
+
+---
+
 ## 2026-11-06 — Règle fondamentale confirmée : achever en faisant évoluer le socle réel
 
 - **Mandat propriétaire confirmé** : partir du socle industriel existant AfricaFunds Market Data Pipeline, y ajouter les fonctions manquantes, compléter ce qui était prévu, corriger les faiblesses et sélectionner les meilleures évolutions utiles **sans destruction, duplication ni refonte injustifiée**.
