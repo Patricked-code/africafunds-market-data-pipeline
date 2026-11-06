@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { fetchWithRetry, HttpResponseError } from '../src/http/fetcher.js';
+import { fetchWithRetry, HttpResponseError, HttpBodyTooLargeError } from '../src/http/fetcher.js';
 import { env } from '../src/config/env.js';
 
 test('HTTP 200 returns a valid body without changing source content', async () => {
@@ -66,6 +66,57 @@ test('HTTP 503 and 429 retry within policy but never return an error page', asyn
     }
   } finally {
     env.HTTP_MAX_RETRIES = retries;
+    globalThis.fetch = original;
+  }
+});
+
+test('content-length larger than the configured limit is rejected without retry', async () => {
+  const original = globalThis.fetch;
+  const originalLimit = env.HTTP_MAX_RESPONSE_BYTES;
+  let calls = 0;
+  try {
+    env.HTTP_MAX_RESPONSE_BYTES = 8;
+    globalThis.fetch = async () => {
+      calls += 1;
+      return new Response('1234567890', { status: 200, headers: { 'content-length': '10' } });
+    };
+    await assert.rejects(
+      fetchWithRetry('https://example.invalid/big.csv'),
+      (error: unknown) => {
+        assert.ok(error instanceof HttpBodyTooLargeError);
+        assert.equal(error.maxBytes, 8);
+        return true;
+      },
+    );
+    assert.equal(calls, 1);
+  } finally {
+    env.HTTP_MAX_RESPONSE_BYTES = originalLimit;
+    globalThis.fetch = original;
+  }
+});
+
+test('chunked response without content-length is stopped at the byte cap', async () => {
+  const original = globalThis.fetch;
+  const originalLimit = env.HTTP_MAX_RESPONSE_BYTES;
+  let calls = 0;
+  try {
+    env.HTTP_MAX_RESPONSE_BYTES = 8;
+    globalThis.fetch = async () => {
+      calls += 1;
+      const stream = new ReadableStream<Uint8Array>({
+        start(controller) {
+          controller.enqueue(new TextEncoder().encode('1234'));
+          controller.enqueue(new TextEncoder().encode('56789'));
+          controller.close();
+        },
+      });
+      return new Response(stream, { status: 200 });
+    };
+    await assert.rejects(fetchWithRetry('https://example.invalid/stream'),
+      (error: unknown) => error instanceof HttpBodyTooLargeError && error.maxBytes === 8);
+    assert.equal(calls, 1);
+  } finally {
+    env.HTTP_MAX_RESPONSE_BYTES = originalLimit;
     globalThis.fetch = original;
   }
 });
