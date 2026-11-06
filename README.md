@@ -1,5 +1,17 @@
 # AfricaFunds Market Data Pipeline
 
+> **État vérifié au 6 novembre 2026 : socle v0.2.0, plateforme cible SadiaAF non terminée, aucune attestation de déploiement de ce dépôt sur S1.** La présence de scripts Plesk ne constitue pas une autorisation de production. Le moteur est distinct du produit AfricaFunds, qui est un de ses consommateurs futurs.
+
+### Point d'entrée pour Claude, ChatGPT et toute reprise
+
+1. Lire [`AGENTS.md`](AGENTS.md) et [`docs/00_PROJECT_MEMORY.md`](docs/00_PROJECT_MEMORY.md) pour la mission et l'autorité documentaire.
+2. Lire le [journal de continuité](docs/09_CHANGELOG_WORKLOG.md), le dernier checkpoint daté et [l'état réel](docs/06_CURRENT_STATUS_AND_GAPS.md) ; **revérifier les SHAs, PR et CI sur GitHub avant de reprendre**.
+3. Reprendre le [plan canonique de 14 lots](docs/13_MODE_DE_REALISATION_ET_PLAN_DE_LOTS.md) et la [matrice d'exigences/recette](docs/14_MATRICE_EXIGENCES_RECETTE.md), sans plan parallèle.
+4. Pour un agent codeur Claude ou ChatGPT, suivre [le contrat d'exécution continue](docs/15_AUTONOMOUS_AGENT_EXECUTION.md) et [le protocole de transmission](docs/07_AI_HANDOFF_PROTOCOL.md). Les spécifications n'attestent pas un exécuteur autonome 24 h/24 ; le véritable raccordement reste à démontrer.
+5. Aucun push direct sur `main`, aucun déploiement S1 sans [gates](docs/10_DEPLOYMENT_GATES.md), revue et autorisations applicables. Les décisions durables sont dans [`docs/08_DECISION_LOG.md`](docs/08_DECISION_LOG.md).
+
+**Photographie des travaux du 6 novembre (à vérifier à chaque reprise) :** PR #1 (mémoire), PR #2 (mémoire annexée à #1 sans fusion), PR #4 (CI reproductible), PR #10 (idempotence SQL), PR #11 (traitement HTTP) ; issues #3 (protection de `main`), #5 (backfill historique), #7 (sécurité HTTP), #9 (vrai exécuteur codeur). Le code `main` demeure la référence livrée jusqu'à fusion effective.
+
 Pipeline autonome d’ingestion, d’archivage et de normalisation des données officielles nécessaires aux indices AfricaFunds.
 
 ## Périmètre v0.1
@@ -87,7 +99,7 @@ docker compose run --rm collector node dist/src/cli/index.js backfill --list=tru
 docker compose run --rm collector node dist/src/cli/index.js backfill --work=true --limit=10
 ```
 
-Les pages reposant sur une API dynamique inconnue passent en `BLOCKED_ADAPTER`. Cela évite de déclarer un historique terminé alors que l’API ou la pagination n’est pas encore comprise.
+Les adaptateurs explicitement déclarés `MANUAL_API_DISCOVERY` sont marqués `BLOCKED_ADAPTER`. **Attention** : l'audit du 6 novembre montre que les autres tâches de backfill n'appliquent pas encore nécessairement leurs fenêtres `window_from/window_to` ; leur succès ne doit pas être interprété comme la preuve d'une reconstitution historique. Voir l'issue #5 et les tests de recette à réaliser.
 
 ## Planification
 
@@ -118,7 +130,7 @@ scheduler
 ## Ce qui fonctionne dans le socle
 
 - registre des 11 marchés et de leurs institutions ;
-- 45+ endpoints officiels initiaux ;
+- 44 endpoints configurés sur 11 marchés au contrôle du 6 novembre 2026 ; configuration ne prouvant pas une ingestion réelle réussie ;
 - téléchargement avec redirections, délai maximal et reprises ;
 - archivage local par marché/source/date/empreinte ;
 - extraction générique des tableaux HTML ;
@@ -160,7 +172,7 @@ La version 0.2 ajoute :
 - un stack Docker PostgreSQL/API/collector/web ;
 - des scripts Plesk de sauvegarde, remplacement et rollback.
 
-Documentation : `docs/S1_DEPLOYMENT.md`.
+Documentation : `docs/S1_DEPLOYMENT.md`. **Les commandes ci-dessous sont historiques et informatives : elles ne doivent pas être exécutées sur S1 avant sauvegarde PostgreSQL/archives brutes, staging, restauration, rollback testé et autorisation explicite.**
 
 ```bash
 sudo ./deploy/s1/preflight.sh
