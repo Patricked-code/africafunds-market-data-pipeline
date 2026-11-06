@@ -58,6 +58,15 @@ Utiliser ce fichier pour les décisions durables. Ne pas supprimer les anciennes
 - Statut : ACCEPTED
 - Décision : PostHog mesure l’usage produit, les parcours et les feature flags. Logs, métriques et traces techniques utilisent une chaîne d’observabilité dédiée.
 
+## ADR-010 — Objectif de finalisation et continuité des agents codeurs
+
+- Date : 2026-11-06
+- Statut : ACCEPTED (mandat et contrat cible, **pas** attestation d'implémentation runtime)
+- Contexte : le projet doit aller au-delà du cadrage et des PR documentaires pour parvenir à une plateforme fonctionnelle, testée et déployée sous gates, avec reprise sans perte de fil conducteur entre Claude et ChatGPT.
+- Décision : conserver les 14 lots et les documents canoniques ; adopter `docs/15_AUTONOMOUS_AGENT_EXECUTION.md` comme contrat inter-agent de sélection, exécution TDD, PR, preuves, checkpoint, reprise et enchaînement des travaux admissibles sans nouvelle instruction par tâche.
+- Conséquences : réaliser et tester un véritable orchestrateur/runner et des claims multi-agents avant de qualifier le fonctionnement de permanent. Les gates de revue, de sécurité et de production de l'ADR-002 restent obligatoires ; aucune exécution 24 h/24 n'est déclarée active à cette date.
+- Remplace / remplacée par : aucune.
+
 ## Modèle d’entrée
 
 ```markdown
