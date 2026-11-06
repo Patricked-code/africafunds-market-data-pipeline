@@ -2,6 +2,23 @@
 
 Ce journal décrit les travaux réellement effectués. Ajouter les nouvelles entrées en tête.
 
+## 2026-11-06 — CI reproductible et deuxième correctif P0 validés ; agent hébergé à raccorder
+
+- **Référence autoritative** : le dépôt GitHub, ses branches et ses preuves ; cette entrée est un checkpoint daté, pas une attestation future. **Aucun merge dans `main` et aucun déploiement S1 exécutés.**
+- **CI reproductible** : PR [#4](https://github.com/Patricked-code/africafunds-market-data-pipeline/pull/4) ; lockfile `package-lock.json` v3 réellement généré sur GitHub Actions puis commité, racines de dépendances recoupées (118 packages) ; `npm ci` sur la CI et dans le Dockerfile, suppression du workflow de génération temporaire à permission écriture ; [run CI 42290548842](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/42290548842) **SUCCESS** pour HEAD exact `b307202921e66c395f7d0454868a462cc36c6158`. PR encore Draft, pas de fusion.
+- **Idempotence SQL** : PR [#10](https://github.com/Patricked-code/africafunds-market-data-pipeline/pull/10) `UNIQUE NULLS NOT DISTINCT` + UPSERT + test d'intégration PostgreSQL ; [run 42289453883](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/42289453883) **SUCCESS** SHA `ec4b8d33b709514479b3eef29880c66917efcf49`. PR empilée sur #4, pas de base réelle S1 testée.
+- **HTTP/P0 tranche 1** : PR [#11](https://github.com/Patricked-code/africafunds-market-data-pipeline/pull/11) ajout de `HttpResponseError`, rejet des pages 4xx/5xx, retry borné 429/5xx ; tests unitaires simulés 200, 404, 429, 503 ; [run 42291180598](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/42291180598) **SUCCESS** pour SHA `f2516761ec3250a366fddbc4b179f91468f567b7`. Issue [#7](https://github.com/Patricked-code/africafunds-market-data-pipeline/issues/7) reste **PARTIAL** (redirections, SSRF, limites, politiques de sources non terminées).
+- **PR #1 vs #2** : import complet de la mémoire PR #2 dans `docs/PROJECT_MEMORY.md` comme annexe historique de la PR #1 ; `docs/00_PROJECT_MEMORY.md` point d'entrée, ADR-011. PR #2 laissée ouverte Draft, commentaire expliquant la convergence ; aucune information supprimée par cet arbitrage.
+- **Protection** : `main` vérifiée privée et non protégée, rulesets 403 ; issue [#3](https://github.com/Patricked-code/africafunds-market-data-pipeline/issues/3) **BLOCKED** par fonctionnalité/paramétrage GitHub. Aucune fusion autorisée comme substitut.
+- **Vérification de réutilisation d'exécuteurs** : le MCP WealthTech SSH Bridge répond et son runtime est sain, mais sa file de tâches actuelle concerne `Patricked-code/MCP` ; le dépôt UAES public se décrit toujours comme sans runtime hébergé/GitHub App/mandat externe opérationnels. Rien n'atteste aujourd'hui un agent Claude/ChatGPT 24 h/24 pour AfricaFunds. **Ne pas fusionner les autorités MCP/UAES/AfricaFunds.**
+- **Planification ChatGPT** : automatisation horaire `Automation_a523352a7c448191a41080097ce8b01f` activée ; résultat du premier run, environnement et éventuel code continu **non attestés**. Ne pas la présenter comme exécuteur autonome permanent.
+- **État d'intégration** : PR #1/#2/#4/#10/#11 **Draft et non fusionnées** lors de cette séance ; seules les branches portent ces changements. Les assertions de tests concernent les commits et runs précis ci-dessus.
+- **NEXT_ACTION — reprise obligatoire** : vérifier d'abord les derniers HEAD/CI/PR ; résoudre la protection `main` issue #3 sans rendre le repo public ; obtenir la revue/gates des PR #1 et #4, puis les corrections P0 PR #10 et #11 selon leurs dépendances ; continuer [#5](https://github.com/Patricked-code/africafunds-market-data-pipeline/issues/5) backfill et la fin de #7 ; industrialiser le vrai codeur autonome [#9](https://github.com/Patricked-code/africafunds-market-data-pipeline/issues/9) seulement en raccordant un exécuteur hébergé réellement attesté, avec claims/reprise et fournisseur modèle autorisé.
+- **Règle de reprise** : ne jamais considérer ce checkpoint historique comme preuve de statut GitHub courant ; un agent doit toujours réconcilier les SHAs/CI/PR et mettre à jour le journal après travail.
+- **Rollback** : les changements sont sur branches/PR non fusionnées ; aucun rollback production requis.
+
+---
+
 ## 2026-11-06 — Exécution concrète : CI, défaut P0, continuité planifiée
 
 - Dépôt : `Patricked-code/africafunds-market-data-pipeline` ; `main` reste `fb7ec155fc748b133a771564bbd4510e1546fc68` lors du contrôle initial de cette intervention. **Revalider avant toute nouvelle action**.
