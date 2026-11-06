@@ -1,8 +1,7 @@
 name: CI — AfricaFunds Market Data Pipeline
 
 on:
-  pull_request:
-    branches: [main]
+  pull_request:  # Validate stacked PRs and ordinary PRs with the same gate
   push:
     branches: [main]
   workflow_dispatch:
