@@ -115,7 +115,7 @@ test('an HTTP 200 cannot bypass license, adapter, backfill or publication gates'
 test('only explicit approval plus adapter, historical, financial and evidence gates makes a source audit-eligible', () => {
   const assessed = {
     endpointId: 'fixture', configured: true, urlPolicy: 'APPROVED_HOST',
-    rightsStatus: 'APPROVED', sourceFormatStatus: 'VALIDATED',
+    url: 'https://www.brvm.org/fr/indices', rightsStatus: 'APPROVED', sourceFormatStatus: 'VALIDATED',
     historicalAdapterStatus: 'TESTED', historicalCoverage: 'VALIDATED',
     normalizationStatus: 'VALIDATED', publicationStatus: 'APPROVED',
     evidenceReferences: ['fixture:reproducible-evidence'],
@@ -199,7 +199,7 @@ test('robots equal-specificity groups combine rules conservatively', () => {
 test('publication readiness fails closed for disabled sources and unapproved URL policy', () => {
   const verified = {
     endpointId: 'test-official', configured: true, urlPolicy: 'APPROVED_HOST',
-    rightsStatus: 'APPROVED', sourceFormatStatus: 'VALIDATED',
+    url: 'https://www.brvm.org/fr/indices', rightsStatus: 'APPROVED', sourceFormatStatus: 'VALIDATED',
     historicalAdapterStatus: 'TESTED', historicalCoverage: 'VALIDATED',
     normalizationStatus: 'VALIDATED', publicationStatus: 'APPROVED',
     evidenceReferences: ['fixture:official-licensed-source'],
@@ -218,7 +218,7 @@ test('publication readiness fails closed for disabled sources and unapproved URL
 test('publication readiness rejects missing or ambiguous endpoint enablement and host approval', () => {
   const valid = {
     configured: true, urlPolicy: 'APPROVED_HOST',
-    rightsStatus: 'APPROVED', sourceFormatStatus: 'VALIDATED',
+    url: 'https://www.brvm.org/fr/indices', rightsStatus: 'APPROVED', sourceFormatStatus: 'VALIDATED',
     historicalAdapterStatus: 'TESTED', historicalCoverage: 'VALIDATED',
     normalizationStatus: 'VALIDATED', publicationStatus: 'APPROVED',
     evidenceReferences: ['fixture:reproducible-evidence'],
@@ -321,4 +321,23 @@ test('HTML challenge returned for robots.txt blocks HEAD without dropping endpoi
   assert.deepEqual(result.endpoints[0].response,
     { status: 'NOT_PROBED', reason: 'ROBOTS_UNEXPECTED_CONTENT_TYPE' });
   assert.equal(result.endpoints[0].historicalCoverage, 'NOT_VERIFIED');
+});
+
+
+test('publication readiness rejects a forged host approval label and missing URL', () => {
+  const approved = {
+    endpointId: 'fixture', configured: true, urlPolicy: 'APPROVED_HOST',
+    url: 'https://www.brvm.org/fr/indices', rightsStatus: 'APPROVED',
+    sourceFormatStatus: 'VALIDATED', historicalAdapterStatus: 'TESTED',
+    historicalCoverage: 'VALIDATED', normalizationStatus: 'VALIDATED',
+    publicationStatus: 'APPROVED', evidenceReferences: ['fixture:licensed'],
+  };
+  assert.equal(sourceReadiness(approved).eligibleForPublication, true);
+  for (const url of [undefined, null, 'http://www.brvm.org/fr/indices',
+    'https://localhost/private', 'https://www.brvm.org:8443/indices',
+    'https://unapproved.example.org/indices', 'not a URL']) {
+    const decision = sourceReadiness({ ...approved, url });
+    assert.equal(decision.eligibleForPublication, false, String(url));
+    assert.ok(decision.blockers.includes('URL_POLICY_NOT_APPROVED'));
+  }
 });
