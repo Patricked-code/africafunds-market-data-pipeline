@@ -26,3 +26,10 @@ Le détail des organismes et endpoints est dans `config/sources.json`. Le regist
 | `PDF_LINK_INDEX` | Recherche prioritairement les PDF |
 | `XLSX_LINK_INDEX` | Recherche prioritairement les classeurs Excel |
 | `MANUAL_API_DISCOVERY` | Bloque la certification jusqu’à compréhension de l’API dynamique |
+
+
+## Qualification vérifiable des endpoints (évolution additive 2026-11-07)
+
+Le catalogue de 11 marchés et 44 endpoints reste dans `config/sources.json` et `config/sources/*.json`, sans duplication ni remplacement. L'inventaire initial exhaustif et les critères de certification se trouvent dans [`SOURCE_QUALIFICATION_BASELINE_20261107.md`](SOURCE_QUALIFICATION_BASELINE_20261107.md).
+
+Le script `scripts/audit-source-registry.mjs` génère un inventaire déterministe, puis, avec `--live`, contrôle en lecture seule le fichier `robots.txt` avant toute requête `HEAD` HTTPS sur un hôte officiel autorisé. Les résultats sont archivés comme preuves de workflow, jamais comme preuve implicite de collecte ou de couverture historique. Chaque source exige ensuite adaptateur, données témoins et recette spécifique. Les travaux complémentaires sont enregistrés dans les issues #13–#17 et l'issue backfill #5.
