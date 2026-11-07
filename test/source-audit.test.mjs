@@ -401,3 +401,25 @@ test('valid plaintext robots directives are recognized with leading whitespace a
     { status: 'NOT_PROBED', reason: 'ROBOTS_DISALLOW' });
   assert.equal(result.endpoints[0].historicalCoverage, 'NOT_VERIFIED');
 });
+
+
+test('robots rate-limit and redirect responses never authorize a source HEAD', async () => {
+  for (const status of [301, 302, 401, 403, 429, 500, 503]) {
+    const calls = [];
+    const inventory = { registeredMarkets: 1, registeredEndpoints: 1, endpoints: [{
+      endpointId: 'robots-http-' + status, configured: true,
+      urlPolicy: 'APPROVED_HOST', url: 'https://www.brvm.org/fr/indices',
+      historicalCoverage: 'NOT_VERIFIED', qualification: 'REGISTERED_ONLY',
+    }] };
+    const result = await probeInventory(inventory, async (_url, init) => {
+      calls.push(init.method);
+      return new Response(null, { status });
+    });
+    assert.deepEqual(calls, ['GET'], `robots HTTP ${status} must prevent HEAD`);
+    assert.deepEqual(result.endpoints[0].response, {
+      status: 'NOT_PROBED', reason: 'ROBOTS_HTTP_' + status,
+    });
+    assert.equal(result.endpoints[0].historicalCoverage, 'NOT_VERIFIED');
+    assert.equal(sourceReadiness(result.endpoints[0]).eligibleForPublication, false);
+  }
+});
