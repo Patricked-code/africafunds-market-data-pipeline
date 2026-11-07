@@ -24,7 +24,8 @@ export interface HistoricalWindowEvidence {
 
 export interface HistoricalWindowAdapter {
   readonly endpointCode: string;
-  ingestWindow(window: HistoricalWindow): Promise<HistoricalWindowEvidence>;
+  /** Optional cooperative cancellation. Implementations must check signal before side effects. */
+  ingestWindow(window: HistoricalWindow, signal?: AbortSignal): Promise<HistoricalWindowEvidence>;
 }
 
 // Deliberately empty until actual date-bounded official adapters have passed
