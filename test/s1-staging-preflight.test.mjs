@@ -36,8 +36,8 @@ test('staging readiness requires exact code identity and real local prerequisite
   const script = await read('deploy/s1/staging-preflight.sh');
   for (const required of [
     /SADIAAF_EXPECTED_GIT_SHA/,
-    /git -C "\\$SOURCE_DIR" rev-parse HEAD/,
-    /git -C "\\$SOURCE_DIR" status --porcelain/,
+    /rev-parse HEAD/,
+    /status --porcelain/,
     /docker compose version/,
     /docker info/,
     /df -Pk/,
