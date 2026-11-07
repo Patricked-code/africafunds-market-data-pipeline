@@ -60,6 +60,8 @@ jobs:
         run: npm run db:migrate
       - name: Seed source registry
         run: npm run db:seed
+      - name: PostgreSQL integration tests
+        run: npm run test:integration
       - name: Verify migration registry matches SQL files
         run: |
           node --input-type=module <<'NODE'

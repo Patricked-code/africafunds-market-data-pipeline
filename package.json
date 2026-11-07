@@ -21,7 +21,8 @@
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "api": "tsx src/api/server.ts",
     "start:api": "node dist/src/api/server.js",
-    "test:ci": "node --import tsx --test test/*.test.ts"
+    "test:ci": "node --import tsx --test test/*.test.ts",
+    "test:integration": "node --import tsx --test test/integration/*.test.ts"
   },
   "dependencies": {
     "cheerio": "1.0.0",
