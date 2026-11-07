@@ -1,5 +1,17 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-07 15:30 Europe/Paris — Qualification HEAD sans fausse certification (#13 / PR #18)
+
+- **RECONCILIATION** : AGENTS.md, journal canonique, checkpoint docs/CONTINUITY_CHECKPOINT_2026-11-06.md et docs/15_AUTONOMOUS_AGENT_EXECUTION.md consultés sur branche PR #1 ; PR #1/#18, issues ouvertes et PR ouvertes interrogées ; source de vérité GitHub. Le dépôt reste déclaré public par get_repo. Aucun SHA historique supposé courant.
+- **PREUVE CI** : pour commit exact `5c652ece870e5970150de18d59c0ca2be96de660`, CI run [42377671102](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/42377671102) et Source Qualification run [42377671106](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/42377671106) = completed/success (connecteur GitHub). Ces résultats ne valident pas le commit suivant.
+- **CODE/TEST** : ajout additif de tests paramétrés HEAD HTTP 301/403/404/405/501 : classification REDIRECT_NOT_FOLLOWED/RESTRICTED/NOT_FOUND/HEAD_UNSUPPORTED, redirect=manual, robots préalable, aucune certification historique ni publication. Commit PR #18 `eff4ca4696585080bdac5b9a3f18e3f061230c51`. Les 44 sources ne sont pas modifiées.
+- **VALIDATION** : tests locaux NOT_RUN ; workflows du nouveau SHA à contrôler. Les résultats de l'ancien SHA ne valent pas attestation de ce nouveau commit.
+- **BLOCK_REASON** : les 22 NOT_PROBED, 7 HEAD 403 et 1 HEAD 404 historiques ne sont pas requalifiés par ces tests ; droits/licences et échantillons #14 non attestés ; PR #12 sans claim non modifiée ; protection/revues main non démontrées, visibilité publique à traiter dans issue #3. Aucune fusion ni déploiement S1.
+- **NEXT_ACTION** : contrôler CI et audit sur `eff4ca4696585080bdac5b9a3f18e3f061230c51`, lire les artefacts du run 42314547906 et la matrice docs/SOURCE_AUDIT_RUN_42314547906.md ; qualifier légalement les sources et commencer les adaptateurs #14 sur contrats/fixtures officiels, puis #5 après claim, #15–#17 sur données réelles. Ne jamais conclure HISTORY_COMPLETE sans preuve.
+
+---
+
+
 ## 2026-11-07 14:34 Europe/Paris — Validation CI et tests HTTP robots supplémentaires (#13 / PR #18)
 
 - **RECONCILIATION** : AGENTS.md, documents maîtres 00–15, journal et contrat autonome lus sur la branche documentaire PR #1 ; issue #13, PR #18, code et tests de sa branche consultés. GitHub REST confirme visibilité `public`. Les HEAD de toutes les PR et la protection main ne sont pas intégralement attestés ici ; ne pas réutiliser d'anciens SHA comme actuels.
