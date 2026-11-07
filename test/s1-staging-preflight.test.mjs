@@ -55,7 +55,7 @@ test('staging readiness requires exact code identity and real local prerequisite
 test('Compose continues to retain PostgreSQL data and disables collector by default', async () => {
   const compose = await read('docker-compose.yml');
   const env = await read('.env.production.example');
-  assert.match(compose, /postgres_data: \/var\/lib\/postgresql\/data/);
+  assert.match(compose, /-\s+postgres_data:\/var\/lib\/postgresql\/data/);
   assert.match(compose, /collector:[\s\S]*?profiles:\s*\n\s+- collection/);
   assert.match(env, /^ENABLE_SCHEDULER=false$/m);
   assert.doesNotMatch(compose, /5432:5432/);
