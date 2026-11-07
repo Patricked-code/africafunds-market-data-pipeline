@@ -1,5 +1,32 @@
 # SadiaAF — S1 : audit d'hébergement et voie de déploiement non destructive
 
+## Vérification complémentaire — runtime Docker complet et scheduler opt-in (2026-11-07)
+
+**Cible inchangée** : domaines `sadiaaf.wealthtechinnovations.com`, `api.sadiaaf.wealthtechinnovations.com` ; aucun conteneur MCP, volume MCP, vhost Plesk ou base existante ne doit être modifié.
+
+### Défaut P0 dans la configuration existante
+
+`src/config/env.ts` utilisait `ENABLE_SCHEDULER: z.coerce.boolean().default(true)`. La coercition JavaScript transforme la chaîne `"false"` en `true` : le template `.env.production.example` indiquait `ENABLE_SCHEDULER=false`, sans garantir que le scheduler resterait arrêté si le conteneur était démarré.
+
+**Correction additive sur branche** : `src/config/schedulerEnabled.ts` implémente la conversion stricte : `true/1/yes/on` explicites activent, `false/0/no/off` désactivent, absence de valeur désactive, valeurs non reconnues déclenchent une erreur. Tests `test/scheduler-enabled-env.test.ts` couvrent les cas normaux et la protection contre la collecte involontaire. **Ne pas confondre sécurité du switch avec licence des sources**, qui exige une validation indépendante.
+
+### Recette du vrai runtime Docker en CI éphémère
+
+La branche `feat/sadiaaf-isolated-compose-runtime-smoke-20261107` ajoute le workflow `.github/workflows/staging-runtime-smoke.yml`, limité aux runners GitHub hébergés (`ubuntu-latest`), jamais à S1. Identité Compose unique `sadiaaf-smoke-<run_id>`, identifiants PostgreSQL temporaires et données CI non financières.
+
+Contrôles attendus : construction des images Node 22 indépendantes du MCP, démarrage de PostgreSQL 16, migrations et seed dans la base CI, lancement API+Nginx sur 127.0.0.1:18991/18992, `/health` et `/api/v1/status` valides, absence de conteneur collector automatique, recréation complète des conteneurs **sans supprimer le volume** et maintien du nombre de migrations dans la même base. Nettoyage final **du seul projet éphémère GitHub**, sans action serveur.
+
+Le workflow ajoute une preuve que le modèle Docker peut réellement démarrer et conserver ses données entre deux cycles de conteneurs, au-delà du simple `docker compose config`. **Il n'atteste toujours ni les ressources S1, ni la création de PostgreSQL sur S1, ni les collectes réelles, ni les sauvegardes et restaurations de production.**
+
+### Garde de validation
+
+Statut tant que la CI n'est pas achevée : **PARTIAL**. En cas de défaut dans le Dockerfile/Compose, corriger dans le dépôt initial avec tests et nouvelle CI. Aucun `deploy_sadiaaf_s1(allow_write=true)` tant que les précontrôles S1 et les gates de production ne sont pas attestés.
+
+Prochaine étape après CI : faire exposer un exécuteur **borné** de staging PostgreSQL sur S1, distinct de l'ancien déploiement public, puis vérifier mémoire, ports, volumes, backup/restore et santé de l'API avant collecte pilote autorisée.
+
+---
+
+
 ## Audit complémentaire de prérequis S1 — contrôle du 7 novembre 2026
 
 **Décision propriétaire confirmée : conserver sans changement** les deux domaines historiques `sadiaaf.wealthtechinnovations.com` et `api.sadiaaf.wealthtechinnovations.com`. L'installation du pipeline ne doit ni créer un domaine alternatif ni écraser le contenu du vhost.

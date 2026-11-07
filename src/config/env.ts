@@ -1,5 +1,6 @@
 import 'dotenv/config';
 import { z } from 'zod';
+import { schedulerEnabledSchema } from './schedulerEnabled.js';
 
 const schema = z.object({
   NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
@@ -13,7 +14,7 @@ const schema = z.object({
   HTTP_MAX_RESPONSE_BYTES: z.coerce.number().int().positive().default(100 * 1024 * 1024),
   HTTP_USER_AGENT: z.string().default('AfricaFundsMarketCollector/0.1'),
   SCHEDULER_TIMEZONE: z.string().default('Europe/Paris'),
-  ENABLE_SCHEDULER: z.coerce.boolean().default(true),
+  ENABLE_SCHEDULER: schedulerEnabledSchema,
   DAILY_INGEST_CRON: z.string().default('30 21 * * 1-5'),
   WEEKLY_DISCOVERY_CRON: z.string().default('15 2 * * 0'),
   MONTHLY_SOURCE_AUDIT_CRON: z.string().default('0 3 1 * *'),
