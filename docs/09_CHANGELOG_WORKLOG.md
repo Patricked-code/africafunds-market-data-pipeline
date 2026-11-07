@@ -2,6 +2,16 @@
 
 Ce journal décrit les travaux réellement effectués. Ajouter les nouvelles entrées en tête.
 
+## 2026-11-07 — Validation HEAD exact de PR #18, nouveaux candidats officiels et risque de visibilité
+
+- **HEAD de la PR [#18](https://github.com/Patricked-code/africafunds-market-data-pipeline/pull/18)** : `2808fcb2ffa74e69fb8ea297f8565bd5ca5278d1`, Draft sur `fix/ci-baseline-20261106`. Les deux workflows sont **SUCCESS sur le HEAD exact** : [source qualification 42314998004](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/42314998004) et [CI générale 42314998003](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/42314998003). Aucun merge ni production.
+- **Preuve de sondage durable** : `docs/SOURCE_AUDIT_RUN_42314547906.md` sur la branche #18 reproduit les 44 statuts du premier run [42314547906](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/42314547906) : 14 HEAD 200, 7 HEAD 403, 1 HEAD 404 GSE, 22 NOT_PROBED (robots complexe/non accessible). Artefact GitHub `13549179118`. Le premier run a été exécuté à l'ancien SHA `da1e669531ba7533df412b4f2d889374a66128e7`, puis documents ajoutés. Ce sont des contrôles d'accessibilité seulement : aucune couverture historique validée.
+- **Nouvelles pistes vérifiées publiquement** (non activées dans le registre) : Ghana Stock Exchange `/trading-and-data/` et `/market-reports/` candidats pour remplacer `/market-data/` HEAD 404 ; BCT Tunisie TMM historique sur `www.bct.gov.tn/bct/siteprod/tableau_statistique_a.jsp?params=PL203105`, TUNIBOR et FX ; CBE Égypte FX/inflation historiques ; AMMC Maroc statistiques OPCVM hebdomadaires XLS/XLSX. Les pages ont été documentées dans les issues #13, #14 et #16, mais ni droits, ni formats internes, ni profondeur des historiques, ni champs VL individuels ne sont certifiés.
+- **Risque gouvernance** : API REST GitHub actuelle renvoie `private=false`, `visibility=public` pour le repo contrairement à l'ancien journal le qualifiant de privé ; branche `main` `protected=false`. Alerte déposée en issue #3. Aucune modification de visibilité ni de protection.
+- **Continuité récurrente** : l'automatisation existante `Automation_a523352a7c448191a41080097ce8b01f` a été mise à jour en conservant son rythme horaire et sa mission : prendre en compte les étapes #13→#14→#5→#15→#16→#17, les preuves et les gates, sans registre parallèle.
+- **NEXT_ACTION** : reprendre d'abord les travaux ouverts, conserver l'audit 44/44 comme baseline et compléter par source sans bypass ; qualifier le GSE candidat et les 7 restrictions, préparer adapters officiels CBE/BCT et sources manquantes ; poursuivre backfill #5 (fenêtres/lease/recovery), normalisation #15 et validations #17. Ne déclarer DONE ni HISTORY_COMPLETE sans tests réels, document témoins et publication contrôlée.
+
+---
 ## 2026-11-07 — Qualification officielle des 44 sources PR #18
 
 - **MANDAT** : exécuter les six étapes demandées dans le pipeline existant, sans recréation : audit 44 sources (#13) → 6 adaptateurs CBE/BCT + parseurs (#14) → backfill vrai (#5) → normalisation/qualité (#15) → FX/inflation/fonds/VL (#16) → validation marché et publication (#17). Ces issues sont reliées aux 14 lots existants ; aucun programme parallèle.
