@@ -1,5 +1,18 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-07 — Issue #5 / PR #22 : récupération expirée raccordée avant claim (continuation)
+
+- **RECONCILIATION** : PR #1 fusionnée, instructions AGENTS.md et contrat 15 lus sur main ; PR #22 Draft HEAD initial `5422847cc436e190cabe1b98d19838bdcdff8fe0` ; dépôt privé ; journal de la branche PR #22 relu. Les autres chantiers S1 sont séparés. Aucune autorisation de fusion ou de déploiement déduite.
+- **CODE** : `processBackfillJobs()` appelle désormais `RECOVER_EXPIRED_BACKFILLS_SQL` avant `CLAIM_PENDING_BACKFILLS_SQL`, avec TTL conservateur 900 secondes, lot borné à 100 et journalisation du nombre récupéré. Commit `9e0fbba8481c8bc0977645fde46af5f978e02dae`. Aucune migration, aucun SUCCESS artificiel, aucun nouveau registre.
+- **TEST** : cas PostgreSQL de TTL nul non récupérable ajouté au test de fencing ; commit `94935f0d9be115c108ba2cc8452a2727dbd9b918`. **NOT_RUN** localement ; CI sur HEAD exact à confirmer. Les scénarios de concurrence et d'effets externes restent incomplets.
+- **LIMITES** : le heartbeat périodique et l'annulation d'un traitement en cours en cas de perte de claim ne sont pas raccordés. Un adaptateur qui dépasse 900 s peut encore être repris en parallèle : **ne pas activer la collecte historique réelle tant que cette condition n'est pas corrigée et validée**. Pas de données réelles certifiées, pas de S1.
+- **BLOCK_REASON** : CI PostgreSQL sur nouveau HEAD non attestée ; heartbeat/abort et fencing des effets externes manquants ; revue/protections avant merge non attestées.
+- **NEXT_ACTION** : contrôler la CI sur HEAD exact de PR #22 ; introduire une boucle de renouvellement fiable (jeton de possession actualisé à chaque heartbeat), arrêter le traitement lors d'une perte de claim et refuser tout SUCCESS après perte de lease ; tests PostgreSQL A/B, expiration et crash. Si PR #22 est possédée par une autre exécution, sélectionner une issue indépendante parmi #13–#17. Ne pas fusionner ni déployer sans gates.
+- **ROLLBACK** : revert ciblé des deux commits sur la branche Draft, sans effet S1.
+
+---
+
+
 ## 2026-11-07 — Issue #5 / PR #22 : primitive de récupération atomique des baux expirés
 
 - **RECONCILIATION** : AGENTS.md, contrat 15, worklog de main, PR #22 et code de la branche relus. Dépôt privé au contrôle. PR #22 Draft, HEAD de départ `6698e2064e1cc7821f2cd9e7888bae40baaa5fc1`. Recherche GitHub Actions filtrée aux runs pull_request sur ce SHA : liste vide, **pas de conclusion CI**. Travaux S1 parallèles séparés.
