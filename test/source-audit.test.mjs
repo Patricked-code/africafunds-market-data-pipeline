@@ -125,3 +125,48 @@ test('only explicit approval plus adapter, historical, financial and evidence ga
   assert.equal(sourceReadiness({ ...assessed, evidenceReferences: [] }).eligibleForPublication, false);
   assert.equal(sourceReadiness({ ...assessed, historicalCoverage: 'NOT_VERIFIED' }).eligibleForPublication, false);
 });
+
+test('disabled source is inventoried but never contacted, even for robots.txt', async () => {
+  const disabled = {
+    endpointId: 'gha-gse-market',
+    url: 'https://gse.com.gh/market-data/',
+    urlPolicy: 'APPROVED_HOST',
+    configured: false,
+    qualification: 'REGISTERED_ONLY',
+    historicalCoverage: 'NOT_VERIFIED',
+  };
+  let calls = 0;
+  const result = await probeInventory({
+    registeredMarkets: 1, registeredEndpoints: 1, endpoints: [disabled],
+  }, async () => {
+    calls += 1;
+    throw new Error('Network must never be accessed for disabled source');
+  });
+  assert.equal(calls, 0);
+  assert.equal(result.registeredEndpoints, 1);
+  assert.equal(result.endpoints[0].response.status, 'NOT_PROBED');
+  assert.equal(result.endpoints[0].response.reason, 'ENDPOINT_DISABLED');
+  assert.equal(result.endpoints[0].configured, false);
+  assert.equal(result.endpoints[0].historicalCoverage, 'NOT_VERIFIED');
+  assert.equal(sourceReadiness(result.endpoints[0]).eligibleForPublication, false);
+});
+
+test('explicitly enabled endpoint still uses the original robots-gated probe', async () => {
+  const enabled = {
+    endpointId: 'uemoa-brvm-indices',
+    url: 'https://www.brvm.org/fr/indices',
+    urlPolicy: 'APPROVED_HOST', configured: true,
+    historicalCoverage: 'NOT_VERIFIED',
+  };
+  const calls = [];
+  const result = await probeInventory({
+    registeredMarkets: 1, registeredEndpoints: 1, endpoints: [enabled],
+  }, async (url, options) => {
+    calls.push({ url, method: options.method });
+    if (url.endsWith('/robots.txt')) return new Response('', { status: 404 });
+    return new Response(null, { status: 200 });
+  });
+  assert.deepEqual(calls.map(c => c.method), ['GET', 'HEAD']);
+  assert.equal(result.endpoints[0].response.status, 'HTTP_OK_UNVERIFIED_CONTENT');
+  assert.equal(result.endpoints[0].historicalCoverage, 'NOT_VERIFIED');
+});
