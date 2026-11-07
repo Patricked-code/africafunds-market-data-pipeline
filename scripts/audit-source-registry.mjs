@@ -216,6 +216,12 @@ export async function probeInventory(inventory, fetcher = fetch) {
  */
 export function sourceReadiness(endpoint) {
   const blockers = [];
+  // Explicitly disabled endpoints and endpoints failing URL policy are never
+  // publishable, even when stale external metadata says other gates passed.
+  if (endpoint.configured === false) blockers.push('ENDPOINT_DISABLED');
+  if (endpoint.urlPolicy && endpoint.urlPolicy !== 'APPROVED_HOST') {
+    blockers.push('URL_POLICY_NOT_APPROVED');
+  }
   if (endpoint.rightsStatus !== 'APPROVED') blockers.push('RIGHTS_NOT_APPROVED');
   if (endpoint.sourceFormatStatus !== 'VALIDATED') blockers.push('SOURCE_FORMAT_NOT_VALIDATED');
   if (endpoint.historicalAdapterStatus !== 'TESTED') blockers.push('ADAPTER_NOT_TESTED');
