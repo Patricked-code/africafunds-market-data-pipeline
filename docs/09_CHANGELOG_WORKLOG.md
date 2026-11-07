@@ -2,6 +2,17 @@
 
 Ce journal décrit les travaux réellement effectués. Ajouter les nouvelles entrées en tête.
 
+## 2026-11-07 02:30 Europe/Paris — PR #18 : aucun sondage réseau sur source désactivée
+
+- **RECONCILIATION** : GitHub main `fb7ec155fc748b133a771564bbd4510e1546fc68`, `protected=false` ; API dépôt `visibility=public` (écart avec ancien libellé privé, issue #3 ouverte). PR #1 HEAD `5ff56f3a03330d44ee13f0267507a96a446f9952` avant ce checkpoint ; PR #12 HEAD `ab45f3ffe175f69e45ba3f06ffe3b033185c6e3e` avec CI `42313428780` SUCCESS ; PR #18 avant correction `0ae361968b5fe7870c456d1f083597fb1fd9311c` avec CI `42322814867` SUCCESS et audit `42322814792` SUCCESS. Issues #3, #5–#9, #13–#17 ouvertes. Aucune fusion.
+- **ANOMALIE CORRIGÉE / #13** : `buildInventory()` enregistrait `configured=false` pour les sources désactivées, mais `probeInventory()` ignorait ce drapeau et pouvait lancer des requêtes `robots.txt` et `HEAD` malgré une désactivation. Correction minimale additive dans `scripts/audit-source-registry.mjs` : court-circuit `NOT_PROBED / ENDPOINT_DISABLED` avant toute opération réseau, sans effacer la source du catalogue et sans modifier la qualification métier.
+- **CODE/TEST** : PR [#18](https://github.com/Patricked-code/africafunds-market-data-pipeline/pull/18), commits `79411ab06545ef4424d301184d081f1640cb93f7` et `dcbb1d4d5f8d5b48f89d0d27b9213951bf82edf7` (HEAD à la fin des écritures techniques). Deux tests ajoutés dans `test/source-audit.test.mjs` : zéro appel réseau pour une source désactivée et conservation du sondage robots-gated pour une source activée. Le test vérifie aussi qu'aucune couverture historique ni autorisation de publication n'est accordée implicitement.
+- **CI** : runs initialement observés `42324477390` (audit) et `42324477309` (CI) au commit intermédiaire `79411ab0`, `queued` au contrôle ; **ils ne valident pas encore le HEAD final avec tests**. Vérifier les nouveaux runs sur HEAD exact `dcbb1d4d5f8d5b48f89d0d27b9213951bf82edf7` ; résultats non attestés à ce checkpoint.
+- **BLOCK_REASON** : les 22 `NOT_PROBED` historiques (robots), 7 HEAD 403 et 1 HEAD 404 ne sont pas résolus par ce correctif ; droits, formats, fenêtres et couverture restent non attestés. Les 6 adaptateurs CBE/BCT n'ont pas encore de fixtures et contrats officiels suffisants pour certification. Protection `main` absente et visibilité publique signalée issue #3.
+- **NEXT_ACTION** : contrôler CI et audit au HEAD exact PR #18, puis reprendre #13 avec qualification officielle robots/403/404 sans bypass ; obtenir fixtures et droits pour #14 ; poursuivre indépendamment #5/PR #12 sur fenêtres historiques, leases et crash recovery avec claim explicite avant modification concurrente ; ensuite #15→#17. Aucun merge, aucun déploiement S1.
+
+---
+
 ## 2026-11-07 — SadiaAF réaffirmé et source-qualification durcie (PR #18)
 
 - **Clarification de périmètre** : SadiaAF est la plateforme centrale de données financières africaines. `Patricked-code/africafunds-market-data-pipeline` est le nom historique de son dépôt technique et AfricaFunds une application consommatrice possible ; aucune refonte, renommage cassant ou réduction du périmètre. Entrées documentaires sur PR #1 : `AGENTS.md` (SHA commit `10f9234e96b00e7b3cac6d6e0bb7f5f812e41846`), `docs/01_PRODUCT_VISION_SCOPE.md` (`5b4dfd9fcaa66910206c4a083231da2daa4af7c5`), ADR-013 dans `docs/08_DECISION_LOG.md` (`a4a00bbcf7ae34c06ecb47fa229674a150c42489`).
