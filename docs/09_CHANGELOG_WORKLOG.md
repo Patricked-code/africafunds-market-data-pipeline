@@ -1,5 +1,18 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-07 — Audit live S1 réitéré, staging en lecture seule et protection image Docker
+
+- **MANDAT** : conserver exactement les domaines `sadiaaf.wealthtechinnovations.com` et `api.sadiaaf.wealthtechinnovations.com` ; vérifier si serveur et composants sont réellement prêts/installés, puis poursuivre l'étape admissible suivante sans destruction ni reconfiguration anticipée.
+- **RÉSULTATS LIVE S1** : bridge MCP disponible ; les deux domaines HTTP 500 ; racines vhosts présentes mais sans dépôt Git ; Docker n'affiche que `wealthtech_mcp_ssh_bridge` actif, PM2 n'affiche pas SadiaAF ; `df -h` 77 Go/54 Go utilisés/20 Go disponibles. Aucun PostgreSQL SadiaAF Docker actif ni job de collecte attestés. Ce constat n'exclut pas les volumes ou moteurs hors Docker arrêtés. `sadiaaf_status_s1` et `inspect_sadiaaf_s1` bloqués par le filtre read-only sur `echo`. `deploy_sadiaaf_s1(allow_write=false)` refuse l'exécution ; pas de dry-run serveur via cet outil.
+- **RISQUE SÉCURITÉ COMPLÉMENTAIRE** : présence d'un `Dockerfile` avec `COPY . .` mais absence de `.dockerignore` au contrôle ; danger d'intégration de secrets .env et des archives raw dans le contexte de build. Aucun build de production S1 effectué.
+- **ACTION CODE ADDITIVE** : branche `fix/sadiaaf-s1-staging-preflight-docker-context-20261107` depuis `main` SHA `d323eab41845841d5cf13453d7193500bc18793b` ; création `.dockerignore` (exclusion secrets/raw/git/backups), `deploy/s1/staging-preflight.sh` strictement read-only (SHA exact, Docker Compose, daemon, mémoire/disque, ports 18991/18992, vhosts, git propre), tests `test/s1-staging-preflight.test.mjs`, vérification modèle Docker Compose en CI, mise à jour du dossier d'audit `docs/S1_DEPLOYMENT_READINESS_20261107.md`.
+- **TESTS ATTENDUS** : `bash -n`, Node tests invariants, CI typecheck+unit+build+PostgreSQL migrations/seed/integ, `docker compose config` sans création de conteneur. Tant que CI non terminée, ne pas déclarer DONE.
+- **LIMITES ET RISQUES** : préflight pas exécuté sur S1 ; mémoire disponible en RAM, plugins Docker Compose, certificats Plesk, ports, snapshots PostgreSQL/raw et restoration non attestés. Collecteur rester opt-in tant que licences/protocoles des sources absents.
+- **ROLLBACK** : revert ciblé des commits de branche (aucune écriture S1), conserver `main` et vhosts. Pas de `docker compose down -v`, purge vhost ou reset.
+- **NEXT_ACTION** : CI verte → PR/revue → merge si admissible → créer/habiliter l'action spécifique de précontrôle staging sur S1 et la lancer en lecture seule → staging PostgreSQL isolé → API locale → archive pilote source autorisée → sauvegarde/restauration avant tout cutover public.
+
+---
+
 ## 2026-11-07 — Mandat S1 : dépôt Git → PostgreSQL interne → collecte persistante SadiaAF (audit sans écriture)
 
 - **CLARIFICATION DU MANDAT** : l'utilisateur demande le fonctionnement autonome de SadiaAF sur S1 : deux domaines existants, code GitHub canonique, base PostgreSQL interne, archives raw sur S1 et collecteur permanent. Il ne demande pas une collecte ponctuelle manuelle par ChatGPT. Les lots 12/13 existants s'appliquent.

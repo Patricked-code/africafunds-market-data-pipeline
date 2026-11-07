@@ -56,6 +56,38 @@ jobs:
         run: |
           bash -n deploy/s1/preflight.sh deploy/s1/deploy.sh deploy/s1/rollback.sh
           node --test test/s1-deployment-safety.test.mjs
+      - name: S1 staging read-only preflight and image context safety
+        run: |
+          bash -n deploy/s1/staging-preflight.sh
+          node --test test/s1-staging-preflight.test.mjs
+      - name: Validate Docker Compose model without starting containers
+        run: |
+          printf '%s\n' \
+            'POSTGRES_DB=africafunds_ci' \
+            'POSTGRES_USER=africafunds_ci' \
+            'POSTGRES_PASSWORD=ci-only-not-for-production' \
+            'DATABASE_URL=postgresql://africafunds_ci:ci-only-not-for-production@postgres:5432/africafunds_ci' \
+            'ENABLE_SCHEDULER=false' \
+            'API_BIND_PORT=18991' \
+            'WEB_BIND_PORT=18992' > .env
+          trap 'rm -f .env' EXIT
+          docker compose config --quiet
+          if docker compose config --services | grep -qx collector; then
+            echo 'Collector unexpectedly enabled in default Compose profile' >&2
+            exit 1
+          fi
+          docker compose --profile collection config --format json > /tmp/sadiaaf-compose.json
+          node --input-type=module <<'NODE'
+          import { readFileSync } from 'node:fs';
+          import assert from 'node:assert/strict';
+          const services = JSON.parse(readFileSync('/tmp/sadiaaf-compose.json','utf8')).services;
+          assert.equal(services.collector.profiles?.[0], 'collection');
+          assert.ok(services.postgres.volumes?.some(v => v.target === '/var/lib/postgresql/data' && v.type === 'volume'));
+          assert.equal(services.api.ports?.[0]?.host_ip, '127.0.0.1');
+          assert.equal(services.web.ports?.[0]?.host_ip, '127.0.0.1');
+          assert.ok(!services.postgres.ports?.length, 'PostgreSQL must not be publicly port-mapped');
+          console.log('Validated isolated DB volume, loopback API/web ports and opt-in collector profile');
+          NODE
       - name: Build
         run: npm run build
       - name: Apply PostgreSQL migrations
