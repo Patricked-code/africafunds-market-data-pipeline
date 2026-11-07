@@ -96,6 +96,7 @@ export async function processBackfillJobs(limit = 10): Promise<void> {
     // external effects; full cancellation requires adapter-level AbortSignal support.
     let ownedAt = job.claim_locked_at;
     let leaseLost = false;
+    const abortController = new AbortController();
     let renewing: Promise<void> = Promise.resolve();
     const renew = async (): Promise<void> => {
       if (leaseLost) return;
@@ -106,12 +107,14 @@ export async function processBackfillJobs(limit = 10): Promise<void> {
         );
         if (result.rowCount !== 1 || !result.rows[0]) {
           leaseLost = true;
+          abortController.abort(new Error('Backfill lease ownership lost'));
           logger.error({ jobId: job.backfill_job_id }, 'Backfill lease ownership lost');
           return;
         }
         ownedAt = result.rows[0].claim_locked_at;
       } catch (error) {
         leaseLost = true;
+        abortController.abort(error);
         logger.error({ jobId: job.backfill_job_id, error }, 'Backfill lease renewal failed');
       }
     };
@@ -120,7 +123,7 @@ export async function processBackfillJobs(limit = 10): Promise<void> {
     }, 60_000);
     try {
       const window = { endpointCode: job.endpoint_code, from: job.window_from, to: job.window_to };
-      const evidence = await adapter.ingestWindow(window);
+      const evidence = await adapter.ingestWindow(window, abortController.signal);
       assertHistoricalWindowEvidence(window, evidence);
       clearInterval(timer);
       await renewing;
