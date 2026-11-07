@@ -29,13 +29,27 @@ test('a stale backfill worker cannot finalize after another worker owns the job'
     const a = first.rows.find(row => row.backfill_job_id === jobId);
     assert.ok(a, 'first worker must own the test job');
 
-    // The current owner may renew its lease, while an obsolete timestamp may not.\n    const renewed = await client.query<{ claim_locked_at: string }>(\n      RENEW_BACKFILL_LEASE_SQL, [jobId, a.claim_attempt, a.claim_locked_at],\n    );\n    assert.equal(renewed.rowCount, 1);\n    const oldLease = await client.query(\n      RENEW_BACKFILL_LEASE_SQL, [jobId, a.claim_attempt - 1, a.claim_locked_at],\n    );\n    assert.equal(oldLease.rowCount, 0, 'a stale generation cannot renew');\n\n    // Simulate a recovery that explicitly revokes A and increments the generation.
+    // The current owner may renew its lease, while an obsolete timestamp may not.
+    const renewed = await client.query<{ claim_locked_at: string }>(
+      RENEW_BACKFILL_LEASE_SQL, [jobId, a.claim_attempt, a.claim_locked_at],
+    );
+    assert.equal(renewed.rowCount, 1);
+    const oldLease = await client.query(
+      RENEW_BACKFILL_LEASE_SQL, [jobId, a.claim_attempt - 1, a.claim_locked_at],
+    );
+    assert.equal(oldLease.rowCount, 0, 'a stale generation cannot renew');
+
+    // Simulate a recovery that explicitly revokes A and increments the generation.
     await client.query(
       `UPDATE ops.backfill_jobs
           SET attempts=attempts+1, locked_at=now()+interval '1 second', status='RUNNING'
         WHERE backfill_job_id=$1`, [jobId],
     );
-    const staleRenew = await client.query(\n      RENEW_BACKFILL_LEASE_SQL, [jobId, a.claim_attempt, renewed.rows[0]!.claim_locked_at],\n    );\n    assert.equal(staleRenew.rowCount, 0, 'A cannot renew after B takes ownership');\n    const staleSuccess = await client.query(
+    const staleRenew = await client.query(
+      RENEW_BACKFILL_LEASE_SQL, [jobId, a.claim_attempt, renewed.rows[0]!.claim_locked_at],
+    );
+    assert.equal(staleRenew.rowCount, 0, 'A cannot renew after B takes ownership');
+    const staleSuccess = await client.query(
       `UPDATE ops.backfill_jobs SET status='SUCCESS'
         WHERE backfill_job_id=$1 AND status='RUNNING'
           AND attempts=$2 AND locked_at::text=$3`,
