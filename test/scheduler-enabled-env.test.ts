@@ -20,6 +20,6 @@ test('missing scheduler switch defaults to disabled', () => {
 
 test('malformed scheduler switch fails closed', () => {
   for (const raw of ['enabled', 'disable', 'maybe', '', 2, -1, null, {}]) {
-    assert.throws(() => schedulerEnabledSchema.parse(raw), undefined, String(raw));
+    assert.throws(() => schedulerEnabledSchema.parse(raw), { name: 'ZodError' }, String(raw));
   }
 });
