@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import pg from 'pg';
-import { CLAIM_PENDING_BACKFILLS_SQL, RENEW_BACKFILL_LEASE_SQL } from '../../src/jobs/backfillClaim.js';
+import { CLAIM_PENDING_BACKFILLS_SQL, RENEW_BACKFILL_LEASE_SQL, RECOVER_EXPIRED_BACKFILLS_SQL } from '../../src/jobs/backfillClaim.js';
 
 // Exercise the same attempt + locked_at ownership predicate as backfill.ts.
 test('a stale backfill worker cannot finalize after another worker owns the job', async () => {
@@ -78,6 +78,46 @@ test('a stale backfill worker cannot finalize after another worker owns the job'
       'SELECT status FROM ops.backfill_jobs WHERE backfill_job_id=$1', [jobId],
     );
     assert.equal(final.rows[0]!.status, 'SUCCESS');
+  } finally {
+    if (jobId) await client.query('DELETE FROM ops.backfill_jobs WHERE backfill_job_id=$1', [jobId]);
+    await client.end();
+  }
+});
+
+test('expired RUNNING lease is recovered, but a live lease is not stolen', async () => {
+  assert.ok(process.env.DATABASE_URL, 'Use an isolated PostgreSQL test database');
+  const client = new pg.Client({ connectionString: process.env.DATABASE_URL });
+  await client.connect();
+  let jobId: string | undefined;
+  try {
+    const endpoint = await client.query<{ endpoint_code: string }>(
+      'SELECT endpoint_code FROM source.source_endpoints ORDER BY endpoint_code LIMIT 1',
+    );
+    assert.ok(endpoint.rows[0], 'source registry must be seeded');
+    const created = await client.query<{ backfill_job_id: string }>(
+      `INSERT INTO ops.backfill_jobs(endpoint_code, window_from, window_to, status, attempts, locked_at)
+       VALUES ($1, '1838-01-01', '1838-01-02', 'RUNNING', 1, now())
+       ON CONFLICT(endpoint_code, window_from, window_to)
+       DO UPDATE SET status='RUNNING', attempts=1, locked_at=now()
+       RETURNING backfill_job_id`,
+      [endpoint.rows[0]!.endpoint_code],
+    );
+    jobId = created.rows[0]!.backfill_job_id;
+    const live = await client.query(RECOVER_EXPIRED_BACKFILLS_SQL, [900, 10]);
+    assert.ok(!live.rows.some(row => row.backfill_job_id === jobId), 'live lease must not be stolen');
+    await client.query(
+      "UPDATE ops.backfill_jobs SET locked_at=now()-interval '20 minutes' WHERE backfill_job_id=$1",
+      [jobId],
+    );
+    const recovered = await client.query(RECOVER_EXPIRED_BACKFILLS_SQL, [900, 10]);
+    assert.ok(recovered.rows.some(row => row.backfill_job_id === jobId), 'expired lease must be recovered');
+    const state = await client.query<{ status: string; locked_at: Date | null }>(
+      'SELECT status, locked_at FROM ops.backfill_jobs WHERE backfill_job_id=$1', [jobId],
+    );
+    assert.equal(state.rows[0]!.status, 'RETRY');
+    assert.equal(state.rows[0]!.locked_at, null);
+    const duplicate = await client.query(RECOVER_EXPIRED_BACKFILLS_SQL, [900, 10]);
+    assert.ok(!duplicate.rows.some(row => row.backfill_job_id === jobId), 'recovery must be idempotent');
   } finally {
     if (jobId) await client.query('DELETE FROM ops.backfill_jobs WHERE backfill_job_id=$1', [jobId]);
     await client.end();
