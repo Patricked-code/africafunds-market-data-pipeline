@@ -114,7 +114,7 @@ test('an HTTP 200 cannot bypass license, adapter, backfill or publication gates'
 
 test('only explicit approval plus adapter, historical, financial and evidence gates makes a source audit-eligible', () => {
   const assessed = {
-    endpointId: 'fixture',
+    endpointId: 'fixture', configured: true, urlPolicy: 'APPROVED_HOST',
     rightsStatus: 'APPROVED', sourceFormatStatus: 'VALIDATED',
     historicalAdapterStatus: 'TESTED', historicalCoverage: 'VALIDATED',
     normalizationStatus: 'VALIDATED', publicationStatus: 'APPROVED',
@@ -207,10 +207,33 @@ test('publication readiness fails closed for disabled sources and unapproved URL
   assert.equal(sourceReadiness(verified).eligibleForPublication, true);
   const disabled = sourceReadiness({ ...verified, configured: false });
   assert.equal(disabled.eligibleForPublication, false);
-  assert.ok(disabled.blockers.includes('ENDPOINT_DISABLED'));
+  assert.ok(disabled.blockers.includes('ENDPOINT_NOT_ENABLED'));
   const unsafe = sourceReadiness({ ...verified, urlPolicy: 'UNAPPROVED_HOST' });
   assert.equal(unsafe.eligibleForPublication, false);
   assert.ok(unsafe.blockers.includes('URL_POLICY_NOT_APPROVED'));
   const both = sourceReadiness({ ...verified, configured: false, urlPolicy: 'INVALID_URL' });
-  assert.deepEqual(both.blockers, ['ENDPOINT_DISABLED', 'URL_POLICY_NOT_APPROVED']);
+  assert.deepEqual(both.blockers, ['ENDPOINT_NOT_ENABLED', 'URL_POLICY_NOT_APPROVED']);
+});
+
+test('publication readiness rejects missing or ambiguous endpoint enablement and host approval', () => {
+  const valid = {
+    configured: true, urlPolicy: 'APPROVED_HOST',
+    rightsStatus: 'APPROVED', sourceFormatStatus: 'VALIDATED',
+    historicalAdapterStatus: 'TESTED', historicalCoverage: 'VALIDATED',
+    normalizationStatus: 'VALIDATED', publicationStatus: 'APPROVED',
+    evidenceReferences: ['fixture:reproducible-evidence'],
+  };
+  assert.equal(sourceReadiness(valid).eligibleForPublication, true);
+  for (const configured of [undefined, null, false, 'true', 1]) {
+    const readiness = sourceReadiness({ ...valid, configured });
+    assert.equal(readiness.eligibleForPublication, false);
+    assert.ok(readiness.blockers.includes('ENDPOINT_NOT_ENABLED'));
+  }
+  for (const urlPolicy of [undefined, null, '', 'UNAPPROVED_HOST']) {
+    const readiness = sourceReadiness({ ...valid, urlPolicy });
+    assert.equal(readiness.eligibleForPublication, false);
+    assert.ok(readiness.blockers.includes('URL_POLICY_NOT_APPROVED'));
+  }
+  assert.deepEqual(sourceReadiness({ ...valid, configured: undefined, urlPolicy: undefined }).blockers,
+    ['ENDPOINT_NOT_ENABLED', 'URL_POLICY_NOT_APPROVED']);
 });
