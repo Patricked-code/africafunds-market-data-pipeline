@@ -255,3 +255,50 @@ test('probe rejects absent, null and ambiguous enabled flags without any network
     assert.equal(result.endpoints[0].historicalCoverage, 'NOT_VERIFIED');
   }
 });
+
+test('network boundary rejects a forged APPROVED_HOST label on an unsafe endpoint URL', async () => {
+  for (const url of [
+    'http://www.brvm.org/fr/indices',
+    'https://localhost/internal',
+    'https://127.0.0.1/admin',
+    'https://user:secret@www.brvm.org/fr/indices',
+    'https://www.brvm.org:8443/fr/indices',
+    'https://unapproved.example.net/indices',
+    'not a URL',
+  ]) {
+    let calls = 0;
+    const result = await probeInventory({
+      registeredMarkets: 1, registeredEndpoints: 1,
+      endpoints: [{
+        endpointId: 'untrusted-import', configured: true,
+        urlPolicy: 'APPROVED_HOST', url,
+        historicalCoverage: 'NOT_VERIFIED',
+      }],
+    }, async () => {
+      calls += 1;
+      throw new Error('No request should be made to an unapproved URL');
+    });
+    assert.equal(calls, 0, `Unexpected network call for ${url}`);
+    assert.equal(result.endpoints[0].response.status, 'BLOCKED_BY_URL_POLICY');
+    assert.equal(result.endpoints[0].historicalCoverage, 'NOT_VERIFIED');
+  }
+});
+
+test('network boundary preserves an explicitly approved HTTPS endpoint', async () => {
+  const calls = [];
+  const result = await probeInventory({
+    registeredMarkets: 1, registeredEndpoints: 1,
+    endpoints: [{
+      endpointId: 'uemoa-brvm-indices', configured: true,
+      urlPolicy: 'APPROVED_HOST', url: 'https://www.brvm.org/fr/indices',
+      historicalCoverage: 'NOT_VERIFIED',
+    }],
+  }, async (url, init) => {
+    calls.push([url, init.method]);
+    if (url.endsWith('/robots.txt')) return new Response('', { status: 404 });
+    return new Response(null, { status: 200 });
+  });
+  assert.deepEqual(calls.map(([, method]) => method), ['GET', 'HEAD']);
+  assert.equal(result.endpoints[0].response.status, 'HTTP_OK_UNVERIFIED_CONTENT');
+  assert.equal(result.endpoints[0].historicalCoverage, 'NOT_VERIFIED');
+});
