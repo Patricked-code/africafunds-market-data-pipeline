@@ -22,5 +22,5 @@ UPDATE ops.backfill_jobs AS jobs
  WHERE jobs.backfill_job_id=candidates.backfill_job_id
 RETURNING jobs.backfill_job_id, jobs.endpoint_code,
           jobs.window_from::text, jobs.window_to::text,
-          candidates.attempts
+          candidates.attempts, jobs.attempts AS claim_attempt, jobs.locked_at::text AS claim_locked_at
 `;
