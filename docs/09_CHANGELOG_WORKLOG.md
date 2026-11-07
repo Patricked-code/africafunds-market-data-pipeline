@@ -1,5 +1,18 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-07 — Issue #5 / PR #22 : réparation du test de lease (contrôle de reprise)
+
+- **RECONCILIATION** : AGENTS.md et contrat d'exécution relus sur main (PR #1 déjà fusionnée) ; PR #22 toujours traitée comme Draft ; branche de travail existante réutilisée. Le checkpoint le plus récent de la branche était « première primitive de renouvellement de lease » ; aucune preuve CI associée au HEAD documentaire précédent n'a été retournée par la recherche limitée aux workflows pull_request.
+- **DÉFAUT CONSTATÉ** : le fichier `test/integration/backfill-fencing.test.ts` contenait 14 séquences littérales `\\n` introduites dans le code TypeScript, hors chaîne ; cela invalide la syntaxe et empêche la validation PostgreSQL attendue. Vérification par lecture exacte du fichier sur la branche avant écriture.
+- **CORRECTION** : remplacement ciblé des 14 séquences littérales par des fins de ligne réelles, sans modifier la logique de production, les tables, les sources ou les fixtures métier. Commit technique `053557d5e66b752bf5a6f8f04cd4aacab3d6829c`.
+- **TESTS** : NOT_RUN localement ; CI sur nouveau HEAD NON ATTESTÉ à ce checkpoint. Une absence de run dans la recherche PR limitée n'est pas preuve d'absence de tout workflow.
+- **BLOCK_REASON** : CI et test PostgreSQL de la branche corrigée à contrôler ; heartbeat réellement branché au worker, TTL et récupération atomique des RUNNING expirés encore absents ; données historiques autorisées non attestées.
+- **NEXT_ACTION** : vérifier les workflows sur SHA exact `053557d5e66b752bf5a6f8f04cd4aacab3d6829c`, corriger toute régression, puis raccorder le renouvellement au worker avec perte de possession fail-closed et ajouter la récupération atomique des RUNNING expirés avec test A→B ; conserver PR Draft et aucun déploiement S1.
+- **ROLLBACK** : revert ciblé du commit technique sur la branche PR #22 ; aucun changement main ni S1.
+
+---
+
+
 ## 2026-11-07 — Issue #5 : CI fencing et première primitive de renouvellement de lease
 
 - **RECONCILIATION** : PR #22 Draft, HEAD initial vérifié `bc26d61e4e57ae59618e8575a535c43b1d6e0317`. CI GitHub run 42392572629 = SUCCESS pour ce HEAD antérieur uniquement ; la PR #1 est fusionnée et les instructions canoniques sont sur main.
