@@ -97,8 +97,17 @@ export function robotsDecision(content, path, agent = AGENT) {
   }
   flush();
   const userAgent = agent.toLowerCase().split('/')[0];
-  const specific = groups.filter((g) => g.agents.some((a) => a && a !== '*' && userAgent.includes(a)));
-  const applicable = specific.length ? specific : groups.filter((g) => g.agents.includes('*'));
+  // Match the most specific product token, not arbitrary substrings.
+  // A short unrelated token must not override a matching wildcard group.
+  const specific = groups.map((g) => ({
+    group: g,
+    specificity: Math.max(0, ...g.agents.filter((a) =>
+      a !== '*' && userAgent.startsWith(a)).map((a) => a.length)),
+  })).filter((entry) => entry.specificity > 0);
+  const longest = Math.max(0, ...specific.map((entry) => entry.specificity));
+  const applicable = longest
+    ? specific.filter((entry) => entry.specificity === longest).map((entry) => entry.group)
+    : groups.filter((g) => g.agents.includes('*'));
   const matches = applicable.flatMap((g) => g.rules).filter((r) => r.value);
   if (matches.some((r) => r.value.includes('*') || r.value.includes('$'))) {
     return { allowed: false, reason: 'ROBOTS_COMPLEX_RULE_UNVERIFIED' };
