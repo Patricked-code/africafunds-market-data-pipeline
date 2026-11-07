@@ -144,12 +144,19 @@ export async function probeInventory(inventory, fetcher = fetch) {
       checked.push(record);
       continue;
     }
-    if (e.urlPolicy !== 'APPROVED_HOST') {
-      record.response = { status: 'BLOCKED_BY_URL_POLICY' };
+    // Revalidate the actual URL at the network boundary. The cached
+    // urlPolicy label is audit metadata, not a security authority: an imported
+    // or stale inventory could claim APPROVED_HOST for an unsafe URL.
+    const checkedUrl = validateEndpointUrl(e.url);
+    if (e.urlPolicy !== 'APPROVED_HOST' || !checkedUrl.valid) {
+      record.response = {
+        status: 'BLOCKED_BY_URL_POLICY',
+        reason: checkedUrl.valid ? 'URL_POLICY_NOT_APPROVED' : checkedUrl.reason,
+      };
       checked.push(record);
       continue;
     }
-    const url = new URL(e.url);
+    const url = checkedUrl.url;
     const host = url.hostname;
     if (!robotsCache.has(host)) {
       try {
