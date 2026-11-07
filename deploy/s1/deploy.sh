@@ -1,6 +1,25 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# Safeguard: never modify live SadiaAF/Plesk domains unless the owner has
+# explicitly approved the cutover after the staging, security, database backup
+# and restoration gates. This check executes before any filesystem mutation.
+if [[ "${SADIAAF_PRODUCTION_CUTOVER_APPROVED:-}" != "YES" ||
+      "${SADIAAF_PRODUCTION_GATES_ATTESTED:-}" != "YES" ]]; then
+  echo "BLOCKED: S1 public cutover requires explicit approval AND attested deployment gates." >&2
+  echo "This script has performed no deployment or modification." >&2
+  exit 3
+fi
+
+# Release directories change on every deployment. The Compose project name
+# MUST NOT change or Docker would create a fresh PostgreSQL named volume,
+# making existing data appear lost even though the old volume still exists.
+export COMPOSE_PROJECT_NAME="${SADIAAF_COMPOSE_PROJECT_NAME:-sadiaaf-market-data}"
+[[ "$COMPOSE_PROJECT_NAME" =~ ^[a-z][a-z0-9_-]*$ ]] || {
+  echo "Invalid stable COMPOSE_PROJECT_NAME" >&2
+  exit 3
+}
+
 [[ "${EUID:-$(id -u)}" -eq 0 ]] || { echo "Ce script doit être exécuté en root." >&2; exit 2; }
 
 FRONT_DOMAIN="${FRONT_DOMAIN:-sadiaaf.wealthtechinnovations.com}"
@@ -44,6 +63,14 @@ backup_dir() {
 
 backup_dir "$FRONT_VHOST" "$BACKUP_DIR/frontend-content.tar.gz"
 backup_dir "$API_VHOST" "$BACKUP_DIR/api-content.tar.gz"
+# Verify archived contents and record checksums before changing the release.
+tar -tzf "$BACKUP_DIR/frontend-content.tar.gz" >/dev/null
+tar -tzf "$BACKUP_DIR/api-content.tar.gz" >/dev/null
+(
+  cd "$BACKUP_DIR"
+  sha256sum frontend-content.tar.gz api-content.tar.gz > backup-checksums.sha256
+  sha256sum -c backup-checksums.sha256 >/dev/null
+)
 
 for domain in "$FRONT_DOMAIN" "$API_DOMAIN"; do
   conf_dir="/var/www/vhosts/system/$domain/conf"
@@ -79,7 +106,9 @@ for _ in $(seq 1 40); do
 done
 docker compose run --rm migrate
 docker compose run --rm seed
-docker compose up -d api collector web
+# Start only the local API and supervision. The collector is deliberately
+# excluded until source rights, formats and ingestion acceptance tests pass.
+docker compose up -d api web
 
 curl -fsS --retry 20 --retry-delay 2 "http://127.0.0.1:$API_BIND_PORT/health" >/dev/null
 curl -fsS --retry 20 --retry-delay 2 "http://127.0.0.1:$WEB_BIND_PORT/health" >/dev/null
@@ -103,12 +132,10 @@ for spec in "$FRONT_DOMAIN:$WEB_BIND_PORT" "$API_DOMAIN:$API_BIND_PORT"; do
   plesk sbin httpdmng --reconfigure-domain "$domain"
 done
 
-# L’utilisateur a demandé de retirer les anciennes applications. On conserve seulement
-# les logs et les challenges ACME après sauvegarde complète dans BACKUP_DIR.
-for target in "$FRONT_VHOST" "$API_VHOST"; do
-  find "$target" -mindepth 1 -maxdepth 1 ! -name logs ! -name '.well-known' -exec rm -rf -- {} +
-  printf '%s\n' "Ce domaine est désormais servi par le stack Docker AfricaFunds Market Data." > "$target/DEPLOYED_FROM_DOCKER.txt"
-done
+# IMPORTANT: Plesk vhost files and existing applications are never erased.
+# The HTTP reverse proxy controls traffic; source content remains on disk.
+# Record the release state under the isolated app root, not in either vhost.
+printf '%s\n' "Legacy SadiaAF vhost content preserved (no deletion or replacement)." > "$APP_ROOT/LEGACY_VHOSTS_PRESERVED.txt"
 
 curl -fsS --retry 10 --retry-delay 3 "https://$API_DOMAIN/health" >/dev/null
 curl -fsS --retry 10 --retry-delay 3 "https://$FRONT_DOMAIN/health" >/dev/null
