@@ -58,7 +58,7 @@ jobs:
           node --test test/s1-deployment-safety.test.mjs
       - name: S1 staging read-only preflight and image context safety
         run: |
-          bash -n deploy/s1/staging-preflight.sh deploy/s1/staging-provision.sh
+          bash -n deploy/s1/staging-preflight.sh deploy/s1/staging-provision.sh deploy/s1/staging-secrets-init.sh
           node --test test/s1-staging-preflight.test.mjs test/s1-staging-provision.test.mjs
       - name: Validate Docker Compose model without starting containers
         run: |
