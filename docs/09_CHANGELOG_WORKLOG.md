@@ -1,5 +1,16 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-07 08:40 Europe/Paris — Refus des pages HTML de challenge robots (#13 / PR #18)
+
+- **RECONCILIATION** : branche documentaire PR #1 relue (AGENTS, worklog, checkpoint 2026-11-06, contrat 15). Dépôt GitHub déclaré public ; alerte #3 conservée. La CI #42347592300 et l'audit #42347592309 ont été vérifiés SUCCESS sur l'ancien HEAD PR #18 `5dfb789978fdfee182c51cab28951e0c12b8f2d2` ; aucune conclusion sur les nouveaux commits.
+- **DÉFAUT** : une page HTML de protection/connexion répondant HTTP 200 à /robots.txt était analysée comme un fichier robots sans règles, ce qui autorisait un HEAD sans politique réellement lisible.
+- **CODE** : fail-closed sur réponse robots HTTP 200 dont Content-Type n'est pas text/plain ; statut `NOT_PROBED / ROBOTS_UNEXPECTED_CONTENT_TYPE`, sans requête HEAD. Commits PR #18 `adbeaff775e5b6655a3a78049c97b1acd41db90c`, correction de contrôle de flux `5cfcdcf986c97951d71334f8b7bc16e023ed4eda`.
+- **TEST** : fixture HTML 200, vérification un seul GET, aucun HEAD, endpoint conservé et historique NOT_VERIFIED ; commit `9cf54fad84c8ca76ed678a727f741a43e2a86dfe`. Tests locaux NOT_RUN ; contrôler les workflows du HEAD exact avant tout SUCCESS.
+- **BLOCK_REASON** : absence de protection et de revue pour main ; visibilité publique contradictoire ; accès/licences et fixtures historiques insuffisants pour #13/#14 ; backfill #5 incomplet. Aucune fusion ni S1.
+- **NEXT_ACTION** : vérifier CI et audit sur `9cf54fad84c8ca76ed678a727f741a43e2a86dfe`, corriger si rouge ; poursuivre qualification autorisée #13, puis #14 et #5 après vérification des claims ; #15–#17 restent soumis à preuves métier.
+
+---
+
 Ce journal décrit les travaux réellement effectués. Ajouter les nouvelles entrées en tête.
 
 ## 2026-11-07 07:33 Europe/Paris — URL réellement revalidée avant tout réseau (#13 / PR #18)
