@@ -1,5 +1,29 @@
 # AfricaFunds Market Data Pipeline
 
+## Intégrations GitHub vérifiées — 7 novembre 2026
+
+**SadiaAF** est la plateforme financière africaine centrale ; le nom historique de ce dépôt ne limite pas la plateforme à l'application AfricaFunds. Les 14 lots existants restent le programme canonique. GitHub est la source d'autorité pour les SHAs, PR et conclusions de CI ; les statuts ci-dessous sont des points datés, non des déclarations de déploiement S1.
+
+- **Dépôt : privé** ; `main` sans protection GitHub **sur décision du propriétaire** (ADR-014), sans exemption des contrôles de développement.
+- **Socle intégré sur `main`** le 7 novembre : PR [#4](https://github.com/Patricked-code/africafunds-market-data-pipeline/pull/4) (CI PostgreSQL/Node), [#11](https://github.com/Patricked-code/africafunds-market-data-pipeline/pull/11) (HTTP), [#12](https://github.com/Patricked-code/africafunds-market-data-pipeline/pull/12) (contrat backfill bloquant les faux historiques), [#18](https://github.com/Patricked-code/africafunds-market-data-pipeline/pull/18) (qualifications 44 endpoints, preuves) et [#10](https://github.com/Patricked-code/africafunds-market-data-pipeline/pull/10) (unicité des lignes brutes avec migration préflight), sous réserve de l'état GitHub et des CI post-fusion.
+- **Preuve de sauvegarde de l'état antérieur** : [`backup/main-before-pr-integration-20261107`](https://github.com/Patricked-code/africafunds-market-data-pipeline/tree/backup/main-before-pr-integration-20261107), SHA `fb7ec155fc748b133a771564bbd4510e1546fc68`.
+- **Autorité documentaire** : PR #1, avec `AGENTS.md`, le journal, les ADR, les 14 lots et l'annexe historique fidèle à PR #2 (`docs/PROJECT_MEMORY.md`) ; ne pas fusionner les deux versions concurrentes de mémoire sans contrôle de convergence.
+- **Limites non levées** : droits de réutilisation des 44 sources, adaptateurs datés Égypte/Tunisie, historique effectif, reprises RUNNING expirées, normalisation financière, calculs, publication/API métier, staging et production S1. Aucune présence de code dans `main` ne prouve ces réalisations.
+- **Migration SQL PR #10** : l'application sur une base existante exige inventaire des doublons, sauvegarde et restauration testée ; la migration refuse les doublons au lieu de supprimer des données.
+- **NEXT_ACTION** : continuer la qualification des contrats officiels et les adaptateurs historiques (#14), compléter les reprises sûres backfill (#5), puis la qualité (#15), les sources manquantes (#16) et les recettes par marché (#17), sans nouvelle chaîne parallèle.
+
+> **État vérifié au 6 novembre 2026 : socle v0.2.0, plateforme cible SadiaAF non terminée, aucune attestation de déploiement de ce dépôt sur S1.** La présence de scripts Plesk ne constitue pas une autorisation de production. Le moteur est distinct du produit AfricaFunds, qui est un de ses consommateurs futurs.
+
+### Point d'entrée pour Claude, ChatGPT et toute reprise
+
+1. Lire [`AGENTS.md`](AGENTS.md) et [`docs/00_PROJECT_MEMORY.md`](docs/00_PROJECT_MEMORY.md) pour la mission et l'autorité documentaire.
+2. Lire le [journal de continuité](docs/09_CHANGELOG_WORKLOG.md), le dernier checkpoint daté et [l'état réel](docs/06_CURRENT_STATUS_AND_GAPS.md) ; **revérifier les SHAs, PR et CI sur GitHub avant de reprendre**.
+3. Reprendre le [plan canonique de 14 lots](docs/13_MODE_DE_REALISATION_ET_PLAN_DE_LOTS.md) et la [matrice d'exigences/recette](docs/14_MATRICE_EXIGENCES_RECETTE.md), sans plan parallèle.
+4. Pour un agent codeur Claude ou ChatGPT, suivre [le contrat d'exécution continue](docs/15_AUTONOMOUS_AGENT_EXECUTION.md) et [le protocole de transmission](docs/07_AI_HANDOFF_PROTOCOL.md). Les spécifications n'attestent pas un exécuteur autonome 24 h/24 ; le véritable raccordement reste à démontrer.
+5. Aucun push direct sur `main`, aucun déploiement S1 sans [gates](docs/10_DEPLOYMENT_GATES.md), revue et autorisations applicables. Les décisions durables sont dans [`docs/08_DECISION_LOG.md`](docs/08_DECISION_LOG.md).
+
+**Photographie des travaux du 6 novembre (à vérifier à chaque reprise) :** PR #1 (mémoire), PR #2 (mémoire annexée à #1 sans fusion), PR #4 (CI reproductible), PR #10 (idempotence SQL), PR #11 (traitement HTTP) ; issues #3 (protection de `main`), #5 (backfill historique), #7 (sécurité HTTP), #9 (vrai exécuteur codeur). Le code `main` demeure la référence livrée jusqu'à fusion effective.
+
 Pipeline autonome d’ingestion, d’archivage et de normalisation des données officielles nécessaires aux indices AfricaFunds.
 
 ## Périmètre v0.1
@@ -87,7 +111,7 @@ docker compose run --rm collector node dist/src/cli/index.js backfill --list=tru
 docker compose run --rm collector node dist/src/cli/index.js backfill --work=true --limit=10
 ```
 
-Les pages reposant sur une API dynamique inconnue passent en `BLOCKED_ADAPTER`. Cela évite de déclarer un historique terminé alors que l’API ou la pagination n’est pas encore comprise.
+Les adaptateurs explicitement déclarés `MANUAL_API_DISCOVERY` sont marqués `BLOCKED_ADAPTER`. **Attention** : l'audit du 6 novembre montre que les autres tâches de backfill n'appliquent pas encore nécessairement leurs fenêtres `window_from/window_to` ; leur succès ne doit pas être interprété comme la preuve d'une reconstitution historique. Voir l'issue #5 et les tests de recette à réaliser.
 
 ## Planification
 
@@ -118,7 +142,7 @@ scheduler
 ## Ce qui fonctionne dans le socle
 
 - registre des 11 marchés et de leurs institutions ;
-- 45+ endpoints officiels initiaux ;
+- 44 endpoints configurés sur 11 marchés au contrôle du 6 novembre 2026 ; configuration ne prouvant pas une ingestion réelle réussie ;
 - téléchargement avec redirections, délai maximal et reprises ;
 - archivage local par marché/source/date/empreinte ;
 - extraction générique des tableaux HTML ;
@@ -160,7 +184,7 @@ La version 0.2 ajoute :
 - un stack Docker PostgreSQL/API/collector/web ;
 - des scripts Plesk de sauvegarde, remplacement et rollback.
 
-Documentation : `docs/S1_DEPLOYMENT.md`.
+Documentation : `docs/S1_DEPLOYMENT.md`. **Les commandes ci-dessous sont historiques et informatives : elles ne doivent pas être exécutées sur S1 avant sauvegarde PostgreSQL/archives brutes, staging, restauration, rollback testé et autorisation explicite.**
 
 ```bash
 sudo ./deploy/s1/preflight.sh
