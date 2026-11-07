@@ -1,5 +1,17 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-07 — Issue #5 / PR #22 : primitive de récupération atomique des baux expirés
+
+- **RECONCILIATION** : AGENTS.md, contrat 15, worklog de main, PR #22 et code de la branche relus. Dépôt privé au contrôle. PR #22 Draft, HEAD de départ `6698e2064e1cc7821f2cd9e7888bae40baaa5fc1`. Recherche GitHub Actions filtrée aux runs pull_request sur ce SHA : liste vide, **pas de conclusion CI**. Travaux S1 parallèles séparés.
+- **CODE** : `src/jobs/backfillClaim.ts` ajoute `RECOVER_EXPIRED_BACKFILLS_SQL`, sélection bornée des `RUNNING` expirés avec `FOR UPDATE SKIP LOCKED`, transition atomique vers `RETRY`, remise à NULL du verrou, sans succès fictif. Délai strictement positif ; aucune migration ni création de registre. Commit `351c1173e812d004f8ad40f05aabff5ef83db9d9`.
+- **TEST** : `test/integration/backfill-fencing.test.ts` couvre non-récupération du lease vivant, récupération d'un lease expiré et idempotence de la récupération. Commit `6ee2302892e134358f4a6e2a3ce0bbc2aab77bf0`. **NOT_RUN** localement, CI sur ce HEAD non encore attestée ; test à exécuter sur PostgreSQL isolé.
+- **LIMITES** : primitive SQL non raccordée au worker ; aucun heartbeat périodique, aucune récupération planifiée ni garantie de fencing des effets externes. Le test utilise une fixture PostgreSQL isolée ; ne jamais l'exécuter sur une DB de production. Issue #5 **PARTIAL**, pas de S1.
+- **BLOCK_REASON** : absence de preuve CI/PostgreSQL sur HEAD exact, pas de boucle heartbeat/recovery, risque de double effet externe non levé. Fusion interdite sans checks/revue/protections.
+- **NEXT_ACTION** : vérifier CI et logs du HEAD exact ; raccorder le renouvellement au worker avec arrêt sur perte de claim, puis déclencher la récupération bornée avant claim, tester concurrence/expiration/reprise et rollback ; poursuivre les adaptateurs officiels indépendants si la PR est détenue par un autre agent.
+
+---
+
+
 ## 2026-11-07 — Issue #5 / PR #22 : réparation du test de lease (contrôle de reprise)
 
 - **RECONCILIATION** : AGENTS.md et contrat d'exécution relus sur main (PR #1 déjà fusionnée) ; PR #22 toujours traitée comme Draft ; branche de travail existante réutilisée. Le checkpoint le plus récent de la branche était « première primitive de renouvellement de lease » ; aucune preuve CI associée au HEAD documentaire précédent n'a été retournée par la recherche limitée aux workflows pull_request.
