@@ -302,3 +302,23 @@ test('network boundary preserves an explicitly approved HTTPS endpoint', async (
   assert.equal(result.endpoints[0].response.status, 'HTTP_OK_UNVERIFIED_CONTENT');
   assert.equal(result.endpoints[0].historicalCoverage, 'NOT_VERIFIED');
 });
+
+
+test('HTML challenge returned for robots.txt blocks HEAD without dropping endpoint', async () => {
+  const inventory = { registeredMarkets: 1, registeredEndpoints: 1, endpoints: [{
+    endpointId: 'fixture', configured: true, urlPolicy: 'APPROVED_HOST',
+    url: 'https://www.brvm.org/fr/indices', historicalCoverage: 'NOT_VERIFIED',
+  }] };
+  const methods = [];
+  const result = await probeInventory(inventory, async (_url, init) => {
+    methods.push(init.method);
+    return new Response('<html>Access challenge</html>', {
+      status: 200, headers: { 'content-type': 'text/html' },
+    });
+  });
+  assert.deepEqual(methods, ['GET']);
+  assert.equal(result.endpoints.length, 1);
+  assert.deepEqual(result.endpoints[0].response,
+    { status: 'NOT_PROBED', reason: 'ROBOTS_UNEXPECTED_CONTENT_TYPE' });
+  assert.equal(result.endpoints[0].historicalCoverage, 'NOT_VERIFIED');
+});
