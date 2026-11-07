@@ -233,7 +233,10 @@ export function sourceReadiness(endpoint) {
   // Missing fields are not approval. A partial/stale fixture must not bypass
   // an explicit enabled state or the validated HTTPS host policy.
   if (endpoint.configured !== true) blockers.push('ENDPOINT_NOT_ENABLED');
-  if (endpoint.urlPolicy !== 'APPROVED_HOST') {
+  // A cached approval label alone is not sufficient for publication. Recheck
+  // the actual URL when present, just as the live network boundary does.
+  // Missing URLs are also unverified: metadata must never grant access.
+  if (endpoint.urlPolicy !== 'APPROVED_HOST' || !validateEndpointUrl(endpoint.url).valid) {
     blockers.push('URL_POLICY_NOT_APPROVED');
   }
   if (endpoint.rightsStatus !== 'APPROVED') blockers.push('RIGHTS_NOT_APPROVED');
