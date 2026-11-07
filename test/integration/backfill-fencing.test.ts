@@ -109,6 +109,8 @@ test('expired RUNNING lease is recovered, but a live lease is not stolen', async
       "UPDATE ops.backfill_jobs SET locked_at=now()-interval '20 minutes' WHERE backfill_job_id=$1",
       [jobId],
     );
+    const disabled = await client.query(RECOVER_EXPIRED_BACKFILLS_SQL, [0, 10]);
+    assert.ok(!disabled.rows.some(row => row.backfill_job_id === jobId), 'zero TTL must not recover a job');
     const recovered = await client.query(RECOVER_EXPIRED_BACKFILLS_SQL, [900, 10]);
     assert.ok(recovered.rows.some(row => row.backfill_job_id === jobId), 'expired lease must be recovered');
     const state = await client.query<{ status: string; locked_at: Date | null }>(
