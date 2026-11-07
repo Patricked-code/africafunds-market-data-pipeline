@@ -1,5 +1,18 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-07 — Mandat S1 : dépôt Git → PostgreSQL interne → collecte persistante SadiaAF (audit sans écriture)
+
+- **CLARIFICATION DU MANDAT** : l'utilisateur demande le fonctionnement autonome de SadiaAF sur S1 : deux domaines existants, code GitHub canonique, base PostgreSQL interne, archives raw sur S1 et collecteur permanent. Il ne demande pas une collecte ponctuelle manuelle par ChatGPT. Les lots 12/13 existants s'appliquent.
+- **RECONCILIATION GITHUB** : `main` vérifié au SHA `d12a440b37972756105218335671002fe1dfd11a`, dépôt `private` ; code `docker-compose.yml`, `deploy/s1/{preflight,deploy,rollback}.sh`, Node/TypeScript, PostgreSQL 16, API et scheduler déjà présents. Pas de second pipeline ni d'effacement des schémas.
+- **PREUVES S1 READ-ONLY** : bridge MCP `ping` OK, présence des deux vhosts SadiaAF mais aucune racine Git, `curl -I` HTTP 500 sur les deux domaines, `docker ps` uniquement bridge MCP (pas de conteneur postgres/collector), stockage racine S1 77 Go / 54 Go utilisés / 20 Go libres. Les fonctions `inspect_sadiaaf_s1` et `sadiaaf_status_s1` échouent actuellement sur garde read-only (`echo`) ; ne pas interpréter comme preuve d'absence d'apps.
+- **RISQUES STATIQUES MAJEURS SUR MAIN** : script `deploy.sh` supprimait les fichiers des deux vhosts, `rollback.sh` idem ; projet Docker Compose non stabilisé entre releases (donc volume PG potentiellement différent), lancement collector avant contrats/licences source, API sans sécurité RBAC publique attestée. Le merge du code ne prouve pas que PostgreSQL est provisionné S1.
+- **TESTS RED observés avant patch** : contrôle des invariants fail-closed — 0/6 protections présentes : cutover sous double attestation, projet Docker stable, préservation de vhosts deploy/rollback, collecte opt-in, scheduler désactivé. Tests `test/s1-deployment-safety.test.mjs` ajoutés.
+- **CHANGEMENTS ADDITIFS SUR BRANCHE DÉDIÉE** `fix/sadiaaf-s1-stable-db-safe-rollout-20261107` : garde avant modification production, `COMPOSE_PROJECT_NAME` stable, archives vérifiées SHA-256, aucune suppression des vhosts, rollback non destructif, profil `collector` opt-in, template `ENABLE_SCHEDULER=false`, gate CI Node/bashtest ; détail et recette dans `docs/S1_DEPLOYMENT_READINESS_20261107.md`.
+- **LIMITES** : code préparé dans GitHub seulement ; **pas de S1 PostgreSQL créé**, pas de container appliqué, pas de domaine modifié, pas de source collectée, pas de déploiement ou de réussite de recette attesté. La CI/PR du HEAD et le test réel de staging sont les prochaines preuves attendues.
+- **NEXT_ACTION** : obtenir CI verte + PR vérifiée, conserver `main` intact jusqu'à fusion gouvernée ; débloquer accès d'installation staging non destructive (pas de shell libre via bridge actuel), provisionner DB/volume isolés après backup, seed/migrations et API locale, ensuite source pilote légalement qualifiée, monitoring/sauvegarde/restauration, puis seulement basculement Plesk.
+
+---
+
 ## 2026-11-07 — Réconciliation post-fusions et diagnostic backfill lease/fencing (issue #5)
 
 - **SOURCE DE VÉRITÉ** : `get_repo` Patricked-code confirme `visibility=private` (ancienne alerte publique dépassée), `main` possède désormais le code de la PR #12 ; journal de fusion précédent : PR #4/#11/#12/#18/#10 intégrées avec preuves CI citées plus haut. Les PR #1/#2 restent ouvertes selon la recherche GitHub ; aucune nouvelle fusion ici.
