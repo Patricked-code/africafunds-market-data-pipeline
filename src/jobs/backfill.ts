@@ -62,6 +62,8 @@ export async function processBackfillJobs(limit = 10): Promise<void> {
     window_from: string;
     window_to: string;
     attempts: number;
+    claim_attempt: number;
+    claim_locked_at: string;
   }>(CLAIM_PENDING_BACKFILLS_SQL, [limit]);
 
   for (const job of jobs.rows) {
@@ -73,9 +75,10 @@ export async function processBackfillJobs(limit = 10): Promise<void> {
     if (!adapter) {
       await pool.query(
         `UPDATE ops.backfill_jobs
-            SET status='BLOCKED_ADAPTER', finished_at=now(), last_error=$2
-          WHERE backfill_job_id=$1 AND status='RUNNING'`,
-        [job.backfill_job_id,
+            SET status='BLOCKED_ADAPTER', finished_at=now(), last_error=$4
+          WHERE backfill_job_id=$1 AND status='RUNNING'
+            AND attempts=$2 AND locked_at::text=$3`,
+        [job.backfill_job_id, job.claim_attempt, job.claim_locked_at,
           `No qualified date-bounded adapter for ${job.endpoint_code} (collector=${collector ?? 'UNKNOWN'}, window=${job.window_from}..${job.window_to})`],
       );
       continue;
@@ -86,16 +89,19 @@ export async function processBackfillJobs(limit = 10): Promise<void> {
       assertHistoricalWindowEvidence(window, evidence);
       await pool.query(
         `UPDATE ops.backfill_jobs SET status='SUCCESS', finished_at=now(), last_error=NULL
-          WHERE backfill_job_id=$1 AND status='RUNNING'`,
-        [job.backfill_job_id],
+          WHERE backfill_job_id=$1 AND status='RUNNING'
+            AND attempts=$2 AND locked_at::text=$3`,
+        [job.backfill_job_id, job.claim_attempt, job.claim_locked_at],
       );
     } catch (error) {
       const attempts = job.attempts + 1;
       await pool.query(
         `UPDATE ops.backfill_jobs
-            SET status=$2, finished_at=now(), last_error=$3
-          WHERE backfill_job_id=$1`,
-        [job.backfill_job_id, attempts >= 4 ? 'FAILED' : 'RETRY', error instanceof Error ? error.message : String(error)],
+            SET status=$4, finished_at=now(), last_error=$5
+          WHERE backfill_job_id=$1 AND status='RUNNING'
+            AND attempts=$2 AND locked_at::text=$3`,
+        [job.backfill_job_id, job.claim_attempt, job.claim_locked_at,
+          attempts >= 4 ? 'FAILED' : 'RETRY', error instanceof Error ? error.message : String(error)],
       );
     }
   }
