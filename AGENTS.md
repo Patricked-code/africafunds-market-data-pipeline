@@ -2,6 +2,14 @@
 
 Ce dépôt est la mémoire technique et fonctionnelle du projet **AfricaFunds Market Data / SadiaAF**.
 
+## Nomenclature canonique : plateforme SadiaAF et application AfricaFunds
+
+- **SadiaAF** = plateforme centrale de données financières africaines à achever, indépendante de ses applications consommatrices. C'est l'objet du programme des 14 lots.
+- **`Patricked-code/africafunds-market-data-pipeline`** = dépôt GitHub technique historique hébergeant le socle de SadiaAF. Son nom n'autorise aucune réduction du périmètre produit.
+- **AfricaFunds** = application consommatrice possible, au même titre que BRVM ChainSolutions et les partenaires ; **ne jamais la confondre avec la plateforme SadiaAF**.
+- Ne pas renommer le dépôt, les modules, les schémas ou les identifiants pour des motifs rédactionnels ; conserver leurs contrats et leur rétrocompatibilité. Les nouveaux documents fonctionnels doivent utiliser *SadiaAF* pour désigner la plateforme.
+- Les usines de programmes/tâches et de développement autonome organisent **l'achèvement de SadiaAF** ; elles ne constituent ni un nouveau pipeline de données ni un projet de développement de la seule application AfricaFunds.
+
 ## Lecture obligatoire avant toute modification
 
 Lire dans cet ordre :
