@@ -5,7 +5,7 @@ import { toIsoDate } from '../utils/dates.js';
 import { logger } from '../config/logger.js';
 import { loadRegistry } from '../config/registry.js';
 import { assertHistoricalWindowEvidence, findHistoricalWindowAdapter } from './historicalWindowAdapter.js';
-import { CLAIM_PENDING_BACKFILLS_SQL, RECOVER_EXPIRED_BACKFILLS_SQL } from './backfillClaim.js';
+import { CLAIM_PENDING_BACKFILLS_SQL, RECOVER_EXPIRED_BACKFILLS_SQL, RENEW_BACKFILL_LEASE_SQL } from './backfillClaim.js';
 
 export async function enqueueBackfill(input: { market?: string; family?: string; from: string; to: string }): Promise<number> {
   const endpoints = await listEndpoints({
@@ -90,26 +90,62 @@ export async function processBackfillJobs(limit = 10): Promise<void> {
       );
       continue;
     }
+    // Heartbeat only while the adapter is active. The mutable timestamp is the
+    // fencing token: terminal writes must use the last successfully renewed value.
+    // If renewal fails, do not write a terminal state. The adapter may still have
+    // external effects; full cancellation requires adapter-level AbortSignal support.
+    let ownedAt = job.claim_locked_at;
+    let leaseLost = false;
+    let renewing: Promise<void> = Promise.resolve();
+    const renew = async (): Promise<void> => {
+      if (leaseLost) return;
+      try {
+        const result = await pool.query<{ claim_locked_at: string }>(
+          RENEW_BACKFILL_LEASE_SQL,
+          [job.backfill_job_id, job.claim_attempt, ownedAt],
+        );
+        if (result.rowCount !== 1 || !result.rows[0]) {
+          leaseLost = true;
+          logger.error({ jobId: job.backfill_job_id }, 'Backfill lease ownership lost');
+          return;
+        }
+        ownedAt = result.rows[0].claim_locked_at;
+      } catch (error) {
+        leaseLost = true;
+        logger.error({ jobId: job.backfill_job_id, error }, 'Backfill lease renewal failed');
+      }
+    };
+    const timer = setInterval(() => {
+      renewing = renewing.then(renew);
+    }, 60_000);
     try {
       const window = { endpointCode: job.endpoint_code, from: job.window_from, to: job.window_to };
       const evidence = await adapter.ingestWindow(window);
       assertHistoricalWindowEvidence(window, evidence);
+      clearInterval(timer);
+      await renewing;
+      if (leaseLost) continue;
       await pool.query(
         `UPDATE ops.backfill_jobs SET status='SUCCESS', finished_at=now(), last_error=NULL
           WHERE backfill_job_id=$1 AND status='RUNNING'
             AND attempts=$2 AND locked_at::text=$3`,
-        [job.backfill_job_id, job.claim_attempt, job.claim_locked_at],
+        [job.backfill_job_id, job.claim_attempt, ownedAt],
       );
     } catch (error) {
+      clearInterval(timer);
+      await renewing;
+      if (leaseLost) continue;
       const attempts = job.attempts + 1;
       await pool.query(
         `UPDATE ops.backfill_jobs
             SET status=$4, finished_at=now(), last_error=$5
           WHERE backfill_job_id=$1 AND status='RUNNING'
             AND attempts=$2 AND locked_at::text=$3`,
-        [job.backfill_job_id, job.claim_attempt, job.claim_locked_at,
+        [job.backfill_job_id, job.claim_attempt, ownedAt,
           attempts >= 4 ? 'FAILED' : 'RETRY', error instanceof Error ? error.message : String(error)],
       );
+    } finally {
+      clearInterval(timer);
     }
   }
 }
