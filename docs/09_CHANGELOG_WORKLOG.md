@@ -1,5 +1,16 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-07 — Décision propriétaire : dépôt privé, main sans protection GitHub
+
+- **INSTRUCTION PROPRIÉTAIRE EXPLICITE** : « J'ai mis en privé et j'ai supprimé la protection branche ». Maintenir ce choix ; **ne pas réactiver** la protection de `main` ni modifier la visibilité.
+- **VÉRIFICATION GITHUB** : `GET /repos/Patricked-code/africafunds-market-data-pipeline` → `visibility=private`, identité connectée avec `admin=true`. `GET /branches/main` → `protected=false`, contrôles requis `off` et SHA `fb7ec155fc748b133a771564bbd4510e1546fc68`. `GET /rulesets` → 403, plan GitHub ne donnant pas l'accès aux rulesets privés dans cette configuration.
+- **ISSUE #3 — TRAÇABILITÉ** : [commentaire d'arbitrage et preuve](https://github.com/Patricked-code/africafunds-market-data-pipeline/issues/3#issuecomment-6708610431). Historique du P0 conservé ; ancienne exigence « protéger main » supplantée par le choix actuel du propriétaire. Confidentialité `DONE`, branche sans protection volontaire `DONE`, garanties automatisées avant merge `NEEDS_REVIEW` car non enforced.
+- **CONTRÔLES COMPENSATOIRES** : branches/PR, CI sur SHA exact, tests/qualité/revue de diff/dépendances, contrôle des migrations, sauvegardes, rollback et checkpoints exigés par les règles du chantier ; ces procédures n'impliquent **aucune protection GitHub effective**. Aucune fusion et aucun déploiement n'ont été autorisés ou exécutés du seul fait de ce changement.
+- **CONTINUITÉ** : reprendre les travaux admissibles #13/#14, #5, #15–#17 et les PR Draft, sans nouveau programme. Les dernières preuves CI de PR #18 restent les runs `42383683367` et `42383683377` sur HEAD `cc05846f59254ec5ee9ac15e4d6303b4fcfdd96b`, à recontrôler si le HEAD change.
+- **ROLLBACK** : mise à jour documentaire additive sur PR #1 uniquement ; revert de ce commit possible, aucune modification de production/paramètres GitHub.
+
+---
+
 ## 2026-11-07 15:55 Europe/Paris — Réconciliation P0, preuves source-audit et vérificateur fail-closed (#3/#13/#14, PR #18)
 
 - **ADMISSION/RECONCILIATION** : GitHub connecté au compte `Patricked-code`, droits administrateur affichés. `main` SHA `fb7ec155fc748b133a771564bbd4510e1546fc68`; `main.protected=false`, required checks `off`, rulesets `[]`, lecture détaillée protection GET refusée HTTP 403 (`Resource not accessible by integration`). `get_repo` confirme **`visibility=public`**, contradiction avec la politique privée de l'issue #3. Sept PR (#1, #2, #4, #10, #11, #12, #18) toutes Draft et non fusionnées ; #10/#11/#12/#18 sont empilées sur PR #4.
