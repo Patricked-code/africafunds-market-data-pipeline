@@ -218,8 +218,10 @@ export function sourceReadiness(endpoint) {
   const blockers = [];
   // Explicitly disabled endpoints and endpoints failing URL policy are never
   // publishable, even when stale external metadata says other gates passed.
-  if (endpoint.configured === false) blockers.push('ENDPOINT_DISABLED');
-  if (endpoint.urlPolicy && endpoint.urlPolicy !== 'APPROVED_HOST') {
+  // Missing fields are not approval. A partial/stale fixture must not bypass
+  // an explicit enabled state or the validated HTTPS host policy.
+  if (endpoint.configured !== true) blockers.push('ENDPOINT_NOT_ENABLED');
+  if (endpoint.urlPolicy !== 'APPROVED_HOST') {
     blockers.push('URL_POLICY_NOT_APPROVED');
   }
   if (endpoint.rightsStatus !== 'APPROVED') blockers.push('RIGHTS_NOT_APPROVED');
