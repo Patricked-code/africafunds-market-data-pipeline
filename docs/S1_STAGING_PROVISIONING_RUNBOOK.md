@@ -2,6 +2,10 @@
 
 **Statut : DESIGNED / NOT_DEPLOYED sur S1**. Ce document ne vaut ni ordre de basculement des domaines, ni attestation de base PostgreSQL réelle sur S1.
 
+**Autorisation propriétaire complémentaire (7 novembre 2026)** : modification des contenus des deux vhosts SadiaAF autorisée ; suppression d'une archive autorisée **uniquement après identification univoque de l'archive SadiaAF visée** et validation d'un rollback. L'inventaire live des deux vhosts ne montre aucune archive : uniquement `index.html` Plesk et dossiers historiques. Les sauvegardes système Plesk, les archives AMF-UMOA et les archives financières raw hors de ces deux répertoires sont donc **hors périmètre de suppression**. Les gates techniques de mise en production publique restent applicables même si la modification des domaines est autorisée.
+
+**Règle de migration** : aucun remplacement du `index.html` actuel pendant que les deux sites répondent HTTP 500 et que l'API SadiaAF n'est pas déployée. Préparer d'abord la nouvelle application en staging, assurer la récupération des fichiers vhosts, puis effectuer un cutover atomique attesté ; une page statique provisoire ne remplace pas une API fonctionnelle.
+
 ## 0. Mandat et séparation
 
 Le code canonique vient de `Patricked-code/africafunds-market-data-pipeline`. Le runtime cible est **SadiaAF** ; AfricaFunds n'est qu'un consommateur aval. Les domaines retenus et inchangés sont `sadiaaf.wealthtechinnovations.com` et `api.sadiaaf.wealthtechinnovations.com`. Le staging ne change ni ces domaines ni le serveur MCP.
