@@ -164,7 +164,14 @@ export async function probeInventory(inventory, fetcher = fetch) {
         if (robots.status === 404 || robots.status === 410) {
           robotsCache.set(host, { text: '', valid: true, reason: 'ROBOTS_NOT_PRESENT' });
         } else if (robots.status === 200) {
+          const contentType = robots.headers?.get?.('content-type') || '';
           const body = await robots.text();
+          // An HTML challenge/login page is not a valid robots policy.
+          // Fail closed rather than treating an unrelated 200 as permission.
+          if (contentType && !/^text\/plain(?:\s*;|\s*$)/i.test(contentType)) {
+            robotsCache.set(host, { valid: false, reason: 'ROBOTS_UNEXPECTED_CONTENT_TYPE' });
+            continue;
+          }
           robotsCache.set(host, body.length <= 100000
             ? { text: body, valid: true, reason: 'ROBOTS_RECEIVED' }
             : { valid: false, reason: 'ROBOTS_TOO_LARGE' });
