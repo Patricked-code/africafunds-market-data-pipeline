@@ -82,3 +82,20 @@
 ## Prochaine action
 
 Exécuter et analyser le workflow de qualification sur la PR de ce travail, récupérer les preuves source par source et ouvrir les sous-tâches nécessaires *dans les issues existantes*, sans modifier la configuration de 44 endpoints jusqu'à validation. Poursuivre en parallèle les PR de correction de backfill (#12) et de sécurité HTTP (#11), sans les fusionner ni déployer sans gates.
+
+## Règle de publication — SadiaAF et non application AfricaFunds
+
+**Portée du chantier :** SadiaAF est la plateforme centrale indépendante de données financières africaines ; `africafunds-market-data-pipeline` est le nom historique de son dépôt technique. AfricaFunds est une application consommatrice possible, non l'unique finalité de la collecte. Il ne faut pas rétrécir le modèle canonique, les droits d'accès ou la publication à cette application.
+
+Les rapports d'audit JSON contiennent désormais, pour les 44 endpoints, des **gates négatifs par défaut** (`rightsStatus`, `sourceFormatStatus`, `historicalAdapterStatus`, `normalizationStatus`, `historicalCoverage`, `publicationEligible`). Seule une preuve documentée des autorisations de réutilisation, des adaptateurs et des résultats financiers peut lever un gate. Une réponse HTTP 2xx ne modifie jamais automatiquement ces critères. `sourceReadiness()` exige droits, format, adaptateur, historique, normalisation, preuve et validation de publication. Ce calcul de qualification n'est pas un service de publication et ne remplace pas les gates S1.
+
+### Diligence documentaire Ghana GSE (à dater et renouveler)
+
+- Page officielle des rapports par année : https://gse.com.gh/market-reports/ ; cela établit l'existence d'un index public de rapports, **pas** le droit de les intégrer ou redistribuer commercialement.
+- Barème officiel GSE d'**avril 2024** (historique, non preuve des tarifs en vigueur) : https://gse.com.gh/wp-content/uploads/2025/01/GSE-Market-Price-List-2024.pdf ; il différencie notamment historique, données de fin de journée, usages non-display, calcul d'indices et distribution sur sites. La qualification des droits actuels et du périmètre d'utilisation doit être obtenue avant automatisation commerciale.
+- Endpoint existant `gha-gse-market` : conserver la configuration tant que URL exacte, contrat d'accès, licences, couverture et tests ne sont pas validés. Le HEAD 404 constaté ne prouve ni l'indisponibilité du service ni la permission d'utiliser un autre chemin.
+
+### Égypte et Tunisie — mécanismes officiels à approfondir
+
+- Banque centrale d'Égypte : CONIA O/N https://www.cbe.org.eg/en/economic-research/statistics/conia/historical-data et CONIA Index https://www.cbe.org.eg/en/economic-research/statistics/conia/index-historical-data : les pages exigent la sélection de la période. **L'API et la pagination sont non vérifiées**, aucun bypass des protections d'accès.
+- BCT Tunisie GOSDMX https://gosdmx.bct.gov.tn/ : portail référençant notamment taux d'intérêt, indices boursiers et téléchargements SDMX pour des séries ; paramètres d'API, droits d'utilisation et fixtures de résultats à établir.
