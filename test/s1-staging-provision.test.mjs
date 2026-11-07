@@ -87,3 +87,27 @@ test('runtime workflow uses only disposable GitHub-hosted runner, not S1', async
   assert.match(workflow, /docker compose down --remove-orphans --volumes/);
   assert.doesNotMatch(workflow, /runs-on: self-hosted/);
 });
+
+test('staging credential generator is read-only by default and refuses unapproved writes', () => {
+  const secretScript = new URL('../deploy/s1/staging-secrets-init.sh', import.meta.url).pathname;
+  const plan = spawnSync('bash', [secretScript, '--plan'], { encoding: 'utf8' });
+  assert.equal(plan.status, 0, plan.stderr);
+  assert.match(plan.stdout, /PLAN ONLY/);
+  const denied = spawnSync('bash', [secretScript, '--apply'], {
+    encoding: 'utf8',
+    env: { PATH: process.env.PATH ?? '/usr/bin:/bin', SADIAAF_STAGING_SECRETS_APPROVED: 'NO' },
+  });
+  assert.equal(denied.status, 3, denied.stderr);
+  assert.match(denied.stderr, /approval required/i);
+});
+
+test('credential initializer writes only new root-owned staging secrets with no process-list leak', async () => {
+  const c = await read('deploy/s1/staging-secrets-init.sh');
+  assert.match(c, /openssl rand -hex 32/);
+  assert.match(c, /ln -- "\$TMP" "\$ENV_FILE"/);
+  assert.match(c, /umask 077/);
+  assert.match(c, /chmod 600 "\$TMP"/);
+  assert.doesNotMatch(c, /sed "s\/REPLACE_WITH_64_LOWERCASE_HEX_CHARACTERS\/\$PASSWORD/);
+  assert.doesNotMatch(c, /\/var\/www\/vhosts\//);
+  assert.doesNotMatch(c, /\b(?:docker compose|plesk sbin|docker volume rm)\b/);
+});
