@@ -5,7 +5,7 @@ import { toIsoDate } from '../utils/dates.js';
 import { logger } from '../config/logger.js';
 import { loadRegistry } from '../config/registry.js';
 import { assertHistoricalWindowEvidence, findHistoricalWindowAdapter } from './historicalWindowAdapter.js';
-import { CLAIM_PENDING_BACKFILLS_SQL } from './backfillClaim.js';
+import { CLAIM_PENDING_BACKFILLS_SQL, RECOVER_EXPIRED_BACKFILLS_SQL } from './backfillClaim.js';
 
 export async function enqueueBackfill(input: { market?: string; family?: string; from: string; to: string }): Promise<number> {
   const endpoints = await listEndpoints({
@@ -53,6 +53,13 @@ export async function listPendingBackfills(limit = 100): Promise<void> {
 export async function processBackfillJobs(limit = 10): Promise<void> {
   const registry = await loadRegistry();
   const collectors = new Map(registry.markets.flatMap((market) => market.endpoints.map((endpoint) => [endpoint.id, endpoint.collector] as const)));
+  // Recover only expired RUNNING claims before selecting new work. Recovery and
+  // claim each use bounded, atomic SKIP LOCKED statements; never mark SUCCESS.
+  // Keep the lease conservative until periodic renewal and cancellation are wired.
+  const recovery = await pool.query(RECOVER_EXPIRED_BACKFILLS_SQL, [900, Math.max(0, Math.min(limit, 100))]);
+  if (recovery.rowCount) {
+    logger.warn({ recoveredJobs: recovery.rowCount }, 'Expired backfill claims requeued');
+  }
   // Atomic claim: row locks and RUNNING transitions occur in the same SQL statement.
   // A plain SELECT ... FOR UPDATE through pool.query releases its lock before
   // the subsequent UPDATE, allowing two workers to process the same job.
