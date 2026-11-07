@@ -83,7 +83,9 @@ rsync -a --delete \
   --exclude='.git' --exclude='node_modules' --exclude='dist' --exclude='data/raw/*' --exclude='.env' \
   "$SOURCE_DIR/" "$RELEASE_DIR/"
 ln -sfn "$RELEASE_DIR" "$APP_ROOT/current"
-ln -sfn "$APP_ROOT/shared/raw" "$RELEASE_DIR/data/raw"
+# Bind the release-independent host directory directly into the collector;
+# do not create a symlink under a tracked/existing data/raw directory.
+export SADIAAF_RAW_HOST_DIR="$APP_ROOT/shared/raw"
 
 if [[ ! -f "$ENV_FILE" ]]; then
   password="$(openssl rand -hex 24)"
