@@ -2,6 +2,16 @@
 
 Ce journal décrit les travaux réellement effectués. Ajouter les nouvelles entrées en tête.
 
+## 2026-11-07 04:37 Europe/Paris — Publication refusée pour source désactivée ou URL non approuvée (#13 / PR #18)
+
+- **RECONCILIATION** : `main` `fb7ec155fc748b133a771564bbd4510e1546fc68`, `protected=false`, dépôt `visibility=public` malgré mention privée historique (issue #3). PR ouvertes #1/#2/#4/#10/#11/#12/#18 ; issues ouvertes #3/#5–#9/#13–#17. PR #1 au départ `1026a5fb85f6cf08f71bc789606c9c6d4b14d3c0`; PR #12 `ab45f3ffe175f69e45ba3f06ffe3b033185c6e3e`; PR #18 au départ `008937c5457f02d19a2db401fa5017101769f6ba`, CI `42329899523` SUCCESS et audit `42329899500` SUCCESS sur ce SHA antérieur.
+- **BUG / CODE** : `sourceReadiness()` pouvait déclarer admissible une source explicitement désactivée ou portant `urlPolicy=UNAPPROVED_HOST` si ses autres métadonnées de validation étaient positives. La correction additive de `scripts/audit-source-registry.mjs` ajoute les blocages `ENDPOINT_DISABLED` et `URL_POLICY_NOT_APPROVED` ; aucune modification des 44 endpoints ni de la collecte. Commit `895dc3ad43077787553bd292b510574baf7ef6b9`.
+- **TEST** : ajout dans `test/source-audit.test.mjs` d'un test avec fixture de qualification positive et trois refus (disabled, URL non approuvée, les deux), commit `88113d5fc9235156ab4c86a05e0d5873db5d2e99` ; attendre les deux GitHub Actions sur ce SHA exact avant de déclarer la validation. Le test n'accorde aucun droit réel à une source.
+- **BLOCK_REASON** : les 22 `NOT_PROBED`, 7 `HEAD 403`, 1 `HEAD 404` de la matrice du run `42314547906` restent non résolus faute de protocoles/licences/fixtures attestés ; aucune série `HISTORY_COMPLETE`. Les 6 adaptateurs #14 et le backfill complet #5 restent à terminer. `main` non protégée ; aucune fusion ou déploiement S1 autorisés.
+- **NEXT_ACTION** : vérifier les CI et audit du HEAD exact `88113d5fc9235156ab4c86a05e0d5873db5d2e99` ; poursuivre #13 avec tests de robots/URLs et preuves officielles sans bypass ; préparer #14 sur contrats officiels ; reprendre #5/PR #12 avec claim explicite et vérification du HEAD avant tout changement ; puis #15–#17. Aucune fusion.
+
+---
+
 ## 2026-11-07 03:33 Europe/Paris — Robots.txt : sélection du groupe User-agent le plus spécifique (#13 / PR #18)
 
 - **RECONCILIATION** : main `fb7ec155fc748b133a771564bbd4510e1546fc68`, `protected=false`; PR #1 `df999a541cf6e6a3c4d11cbcd2dd6b162994f94b` au départ, PR #12 `ab45f3ffe175f69e45ba3f06ffe3b033185c6e3e`, PR #18 `dcbb1d4d5f8d5b48f89d0d27b9213951bf82edf7` au départ. PR #18 CI `42324487253` SUCCESS et audit `42324487153` SUCCESS sur ce dernier HEAD précédent ; nouvelles modifications non couvertes par ces runs. PR #1/#2/#4/#10/#11/#12/#18 ouvertes. Issues #3/#5–#9/#13–#17 ouvertes.
