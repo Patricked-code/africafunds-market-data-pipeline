@@ -87,6 +87,16 @@ Utiliser ce fichier pour les décisions durables. Ne pas supprimer les anciennes
 - Conséquences : le succès n'est ni le nombre de PR, ni l'adoption d'un nouveau framework, mais l'achèvement vérifié de la chaîne industrielle prévue, avec provenance, sécurité, fiabilité et interopérabilité. La conservation de `main` n'implique pas à elle seule que tous les comportements sont déjà validés en production.
 - Remplace / remplacée par : aucune ; complète ADR-003, ADR-010 et ADR-011.
 
+## ADR-013 — SadiaAF : plateforme centrale ; AfricaFunds : application consommatrice
+
+- Date : 2026-11-07
+- Statut : ACCEPTED (clarification documentaire, aucun changement de runtime)
+- Contexte : des références historiques `AfricaFunds Market Data Pipeline` dans le dépôt et ses fichiers risquent d'être interprétées à tort comme un périmètre limité à l'application AfricaFunds.
+- Décision : **SadiaAF est la plateforme centrale indépendante à achever et industrialiser sur le socle du dépôt historique `Patricked-code/africafunds-market-data-pipeline`**. AfricaFunds est une application consommatrice, au même titre que les autres usages et partenaires autorisés. Les 14 lots, le registre des sources, le modèle canonique et la publication API sont prévus pour SadiaAF, et non pour une application unique.
+- Non-régression : conserver les identifiants historiques techniques, les URL, les données, le schéma SQL et les contrats ; aucune stratégie de renommage massive ou recréation de dépôt.
+- Conséquences : utiliser le nom SadiaAF dans les nouvelles décisions de périmètre ; conserver les noms historiques lorsqu'ils désignent précisément des artefacts existants. Les règles de licences et permissions de sources se qualifient pour les usages de SadiaAF et de ses consommateurs, pas seulement pour AfricaFunds.
+- Remplace / remplacée par : complète ADR-004 et ADR-012, sans effacer leurs références historiques.
+
 ## Modèle d’entrée
 
 ```markdown
