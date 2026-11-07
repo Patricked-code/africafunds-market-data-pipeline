@@ -2,6 +2,16 @@
 
 Ce journal décrit les travaux réellement effectués. Ajouter les nouvelles entrées en tête.
 
+## 2026-11-07 03:33 Europe/Paris — Robots.txt : sélection du groupe User-agent le plus spécifique (#13 / PR #18)
+
+- **RECONCILIATION** : main `fb7ec155fc748b133a771564bbd4510e1546fc68`, `protected=false`; PR #1 `df999a541cf6e6a3c4d11cbcd2dd6b162994f94b` au départ, PR #12 `ab45f3ffe175f69e45ba3f06ffe3b033185c6e3e`, PR #18 `dcbb1d4d5f8d5b48f89d0d27b9213951bf82edf7` au départ. PR #18 CI `42324487253` SUCCESS et audit `42324487153` SUCCESS sur ce dernier HEAD précédent ; nouvelles modifications non couvertes par ces runs. PR #1/#2/#4/#10/#11/#12/#18 ouvertes. Issues #3/#5–#9/#13–#17 ouvertes.
+- **CODE** : PR #18 branche `audit/official-source-qualification-20261107` ; `scripts/audit-source-registry.mjs` corrigé : la sélection de règles robots respecte désormais le token de produit en préfixe et choisit le groupe `User-agent` correspondant le plus long. Le code précédent utilisait `includes`, autorisant une correspondance partielle non pertinente à supplanter le groupe wildcard, ou mélangeait des groupes de spécificité différente. Aucun téléchargement financier ni contournement robots. Commit code `4d9b4208b8cedfc401d102e8c14c404c49c9ecee`.
+- **TESTS** : deux tests ajoutés pour groupes de spécificités différentes, token sans correspondance, groupes égaux ; commits `1915222aa6cb1f9c4748eb287082fbb338ce2fc5` puis correction de fixture `008937c5457f02d19a2db401fa5017101769f6ba`. **VALIDATION** : attendre les GitHub Actions sur HEAD exact `008937c5457f02d19a2db401fa5017101769f6ba` ; ne pas inférer SUCCESS des runs précédents.
+- **BLOCK_REASON** : la correction des règles robots n'est pas une preuve d'accès aux 22 endpoints non sondés, 7 réponses 403 ou 1 réponse 404. Aucun droit, protocole, historique, adaptateur CBE/BCT ni publication attestés. `main` sans protection ; visibilité du dépôt précédemment retournée `public`, alerte issue #3.
+- **NEXT_ACTION** : vérifier CI/audit du nouveau HEAD PR #18 ; en cas de succès, qualifier les règles robots réelles sans bypass et les contrats officiels #13/#14 ; continuer #5 sur fenêtres historiques, leases et reprise crash après vérification de claim ; puis #15–#17. Aucun merge ni déploiement S1.
+
+---
+
 ## 2026-11-07 02:30 Europe/Paris — PR #18 : aucun sondage réseau sur source désactivée
 
 - **RECONCILIATION** : GitHub main `fb7ec155fc748b133a771564bbd4510e1546fc68`, `protected=false` ; API dépôt `visibility=public` (écart avec ancien libellé privé, issue #3 ouverte). PR #1 HEAD `5ff56f3a03330d44ee13f0267507a96a446f9952` avant ce checkpoint ; PR #12 HEAD `ab45f3ffe175f69e45ba3f06ffe3b033185c6e3e` avec CI `42313428780` SUCCESS ; PR #18 avant correction `0ae361968b5fe7870c456d1f083597fb1fd9311c` avec CI `42322814867` SUCCESS et audit `42322814792` SUCCESS. Issues #3, #5–#9, #13–#17 ouvertes. Aucune fusion.
