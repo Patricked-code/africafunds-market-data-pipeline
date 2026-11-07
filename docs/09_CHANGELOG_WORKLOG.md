@@ -1,5 +1,17 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-07 — SadiaAF S1 : recette Docker intégrale isolée et correction du flag scheduler
+
+- **MANDAT** : continuer le déploiement SadiaAF en préservant les deux domaines historiques, les services MCP et le code canonique déjà fusionné ; aucun nouveau projet de collecte ni partage d'image Docker avec MCP.
+- **RÉCONCILIATION** : `main=d61fe17a6d038de00c06ea1d78ed20cf05e3c5c8`, CI main #42391464201 SUCCESS, zéro PR ouverte au départ ; S1 `docker ps` bridge MCP unique et sain, `df -h` environ 20 Go libres. `get_write_tools_context` confirme absence de shell arbitraire et d'action d'installation staging autorisée : ne pas lancer le déploiement public pour contourner le blocage.
+- **DÉFAUT P0 DÉCOUVERT** : `ENABLE_SCHEDULER: z.coerce.boolean().default(true)` dans `src/config/env.ts`, ce qui convertit `"false"` en `true` ; risque de collecte non autorisée même avec `ENABLE_SCHEDULER=false` dans `.env.production.example`.
+- **CORRECTION ADDITIVE** : `src/config/schedulerEnabled.ts`, branche `feat/sadiaaf-isolated-compose-runtime-smoke-20261107`, activation uniquement explicite, valeur absente = false, valeurs ambiguës rejetées. Tests `test/scheduler-enabled-env.test.ts` (false, true, absente et invalide).
+- **NOUVELLE PREUVE RUNTIME** : `.github/workflows/staging-runtime-smoke.yml` lance le vrai Compose en runner GitHub éphémère, construit les images, initialise PostgreSQL avec migrations/seed, démarre API/web loopback, vérifie `/health` + statut + absence de worker collector, détruit puis recrée **les conteneurs sans supprimer le volume**, réinterroge le nombre de migrations et n'efface à la fin que les ressources de CI. **Aucune écriture S1**.
+- **GATES** : CI sur HEAD exact et revue de diff obligatoires avant fusion. Un smoke Docker hébergé sur GitHub ne qualifie pas l'hébergement S1, ses sauvegardes, sa mémoire ni les licences des sources. Aucun cutover Plesk autorisé.
+- **NEXT_ACTION** : obtenir la CI réelle du runtime, corriger tout écart du Dockerfile/Compose additivement, fusionner seulement si contrôles positifs ; puis action MCP bornée pour le précontrôle et provisioning de staging PostgreSQL local S1, puis pilote officiel légalement autorisé et restauration testée.
+
+---
+
 ## 2026-11-07 — Audit live S1 réitéré, staging en lecture seule et protection image Docker
 
 - **MANDAT** : conserver exactement les domaines `sadiaaf.wealthtechinnovations.com` et `api.sadiaaf.wealthtechinnovations.com` ; vérifier si serveur et composants sont réellement prêts/installés, puis poursuivre l'étape admissible suivante sans destruction ni reconfiguration anticipée.
