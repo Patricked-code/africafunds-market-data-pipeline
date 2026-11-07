@@ -125,3 +125,46 @@ test('expired RUNNING lease is recovered, but a live lease is not stolen', async
     await client.end();
   }
 });
+
+
+test('expired owner cannot finalize after recovery and a fresh claim', async () => {
+  assert.ok(process.env.DATABASE_URL, 'Use an isolated PostgreSQL test database');
+  const client = new pg.Client({ connectionString: process.env.DATABASE_URL });
+  await client.connect();
+  let jobId: string | undefined;
+  try {
+    const endpoint = await client.query<{ endpoint_code: string }>(
+      'SELECT endpoint_code FROM source.source_endpoints ORDER BY endpoint_code LIMIT 1',
+    );
+    assert.ok(endpoint.rows[0], 'source registry must be seeded');
+    const created = await client.query<{ backfill_job_id: string }>(
+      `INSERT INTO ops.backfill_jobs(endpoint_code, window_from, window_to, status, attempts, locked_at)
+       VALUES ($1, '1837-01-01', '1837-01-02', 'RUNNING', 1, now()-interval '20 minutes')
+       ON CONFLICT(endpoint_code, window_from, window_to)
+       DO UPDATE SET status='RUNNING', attempts=1, locked_at=now()-interval '20 minutes'
+       RETURNING backfill_job_id`,
+      [endpoint.rows[0]!.endpoint_code],
+    );
+    jobId = created.rows[0]!.backfill_job_id;
+    const stale = await client.query<{ attempts: number; locked_at: string }>(
+      'SELECT attempts, locked_at::text FROM ops.backfill_jobs WHERE backfill_job_id=$1', [jobId],
+    );
+    const recovered = await client.query(RECOVER_EXPIRED_BACKFILLS_SQL, [900, 10]);
+    assert.ok(recovered.rows.some(row => row.backfill_job_id === jobId));
+    const oldSuccess = await client.query(
+      `UPDATE ops.backfill_jobs SET status='SUCCESS'
+        WHERE backfill_job_id=$1 AND status='RUNNING'
+          AND attempts=$2 AND locked_at::text=$3`,
+      [jobId, stale.rows[0]!.attempts, stale.rows[0]!.locked_at],
+    );
+    assert.equal(oldSuccess.rowCount, 0, 'recovered claim must reject stale SUCCESS');
+    const current = await client.query<{ status: string; attempts: number }>(
+      'SELECT status, attempts FROM ops.backfill_jobs WHERE backfill_job_id=$1', [jobId],
+    );
+    assert.equal(current.rows[0]!.status, 'RETRY');
+    assert.equal(current.rows[0]!.attempts, 1, 'recovery must not consume another attempt');
+  } finally {
+    if (jobId) await client.query('DELETE FROM ops.backfill_jobs WHERE backfill_job_id=$1', [jobId]);
+    await client.end();
+  }
+});
