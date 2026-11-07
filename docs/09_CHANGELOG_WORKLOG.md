@@ -1,5 +1,16 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-07 — Issue #5 / PR #22 : heartbeat conditionnel du backfill (continuation)
+
+- **RÉCONCILIATION** : dépôt privé ; PR #22 ouverte Draft, HEAD avant écriture `a8eb6a9ea5b6d46141e4c15d746dd3be6eeaad37`. PR #1 documentaire fusionnée, instructions de main et checkpoint relus. La dernière entrée de main concerne séparément le staging S1 ; aucune écriture S1 ni modification de ce chantier.
+- **CODE EFFECTIF** : commit `759172b1298a30c8a93d9d40fd3cd41d4cfa1252` dans `src/jobs/backfill.ts` : renouvellement conditionnel toutes les 60 secondes via la primitive SQL existante, sérialisation des renouvellements, conservation du dernier `locked_at` pour les UPDATE terminaux, abandon des transitions terminales si possession perdue ou renouvellement échoué, arrêt du timer en `finally`. Aucun nouveau schéma ni ordonnanceur.
+- **PREUVES / LIMITES** : code committé GitHub ; CI et test PostgreSQL sur HEAD nouveau NON ATTESTÉS. La recherche des runs PR sur HEAD antérieur a retourné vide (périmètre limité). Les adaptateurs ne reçoivent pas encore d'AbortSignal : leurs effets externes ne sont pas interrompus à la perte du lease ; ne pas déclarer reprise crash totalement sûre ni collecte réelle autorisée. L'arrêt du timer n'annule pas un appel réseau en cours.
+- **BLOCK_REASON** : tests CI/PostgreSQL et scénario de renouvellement long non attestés ; cancellation coopérative des adaptateurs et garantie d'absence de doubles effets externes non implémentées ; qualifications de sources historiques incomplètes.
+- **NEXT_ACTION** : vérifier les runs et jobs GitHub Actions sur le HEAD exact de la PR #22, corriger toute CI rouge ; ajouter des tests de heartbeat et de perte de possession, introduire un contrat AbortSignal compatible avec les adaptateurs existants avant toute collecte réelle, et vérifier l'absence de faux SUCCESS après recovery concurrente. Maintenir PR Draft, ne pas fusionner ni déployer S1.
+- **ROLLBACK** : revert ciblé du commit heartbeat sur la branche ; conserver les tables et les archives existantes.
+
+---
+
 ## 2026-11-07 — Issue #5 / PR #22 : récupération expirée raccordée avant claim (continuation)
 
 - **RECONCILIATION** : PR #1 fusionnée, instructions AGENTS.md et contrat 15 lus sur main ; PR #22 Draft HEAD initial `5422847cc436e190cabe1b98d19838bdcdff8fe0` ; dépôt privé ; journal de la branche PR #22 relu. Les autres chantiers S1 sont séparés. Aucune autorisation de fusion ou de déploiement déduite.
