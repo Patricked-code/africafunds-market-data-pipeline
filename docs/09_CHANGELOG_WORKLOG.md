@@ -1,5 +1,17 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-07 — Issue #5 : CI fencing et première primitive de renouvellement de lease
+
+- **RECONCILIATION** : PR #22 Draft, HEAD initial vérifié `bc26d61e4e57ae59618e8575a535c43b1d6e0317`. CI GitHub run 42392572629 = SUCCESS pour ce HEAD antérieur uniquement ; la PR #1 est fusionnée et les instructions canoniques sont sur main.
+- **CODE** : ajout de `RENEW_BACKFILL_LEASE_SQL` dans `src/jobs/backfillClaim.ts` : renouvellement de `locked_at` uniquement pour `RUNNING`, `attempts` et horodatage de possession correspondants ; aucune nouvelle table/migration. Commit `3ce5ae155ffe761213fbd5e20bd304a227b91ff0`.
+- **TEST** : scénario PostgreSQL enrichi : propriétaire renouvelle, génération périmée rejetée, puis ancien propriétaire ne peut plus renouveler après réattribution. Commit `c091c2ac13086876706fb42059e8a7b9fcfe651d`. Tests locaux NOT_RUN ; CI de ce nouveau HEAD à contrôler.
+- **LIMITES** : primitive SQL non encore appelée périodiquement par l'exécuteur ; pas de TTL, heartbeat opérationnel, recovery atomique, ni fencing des effets externes. Ne pas déclarer la reprise crash terminée.
+- **BLOCK_REASON** : validation CI du nouveau HEAD attendue ; absence de protocole opérationnel de renouvellement et reprise des leases ; données historiques officielles non attestées.
+- **NEXT_ACTION** : vérifier CI du commit `c091c2ac13086876706fb42059e8a7b9fcfe651d` ; raccorder le heartbeat au worker avec annulation sûre en cas de perte de possession, puis implémenter reprise atomique des RUNNING expirés avec tests de concurrence, sans faux SUCCESS. Garder PR #22 Draft jusqu'aux gates.
+- **ROLLBACK** : revert ciblé des commits de PR #22 ; aucune écriture S1 ni fusion.
+
+---
+
 ## 2026-11-07 — Issue #5 : fencing additif des transitions terminales backfill (PR en validation)
 
 - **RECONCILIATION** : GitHub indique dépôt privé, PR #1 fusionnée et PR #2 close sans merge ; PR #4/#10/#11/#12/#18/#19/#21 fusionnées. Le travail est repris sur une branche dédiée issue de main, sans écriture directe sur main ni S1.
