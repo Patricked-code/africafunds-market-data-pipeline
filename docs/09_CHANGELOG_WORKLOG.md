@@ -1,5 +1,18 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-07 — Issue #5 : fencing additif des transitions terminales backfill (PR en validation)
+
+- **RECONCILIATION** : GitHub indique dépôt privé, PR #1 fusionnée et PR #2 close sans merge ; PR #4/#10/#11/#12/#18/#19/#21 fusionnées. Le travail est repris sur une branche dédiée issue de main, sans écriture directe sur main ni S1.
+- **DÉFAUT CONSTATÉ** : les trois UPDATE terminaux de `src/jobs/backfill.ts` ne vérifiaient pas la génération de claim ; la voie catch ne vérifiait même pas `status='RUNNING'`. Un ancien worker pouvait modifier le statut après réattribution.
+- **CORRECTION ADDITIVE** : `CLAIM_PENDING_BACKFILLS_SQL` retourne désormais `claim_attempt` et `claim_locked_at` (les colonnes `attempts` et `locked_at` existaient déjà). Les sorties `BLOCKED_ADAPTER`, `SUCCESS`, `FAILED/RETRY` vérifient `status='RUNNING' AND attempts=claim_attempt AND locked_at::text=claim_locked_at`. Aucune migration ni altération du registre des 44 sources.
+- **TEST** : `test/integration/backfill-fencing.test.ts` reproduit A revendique → génération réattribuée à B → UPDATE SUCCESS/FAILED de A refusés → B seul conclut. Test PostgreSQL ajouté ; **NOT_RUN localement**. La CI sur HEAD exact et la revue restent à contrôler.
+- **LIMITE** : ceci est un premier garde de fencing et **non** une implémentation complète de lease, heartbeat, reprise automatique des RUNNING expirés ou garanties sur effets externes d'adaptateurs. L'issue #5 demeure PARTIAL.
+- **BLOCK_REASON** : CI/recette PostgreSQL sur HEAD exact non encore attestées ; protocole complet de lease/heartbeat/recovery à développer ; zéro adaptateur historique officiellement qualifié.
+- **NEXT_ACTION** : examiner la CI et les tests de la PR de fencing, corriger toute régression ; implémenter ensuite expiration/heartbeat/recovery transactionnels et démontrer A expiré → B reprend → A refusé, sans faux SUCCESS ni duplication d'effets. Poursuivre #14/#15/#16/#17 sur tâches indépendantes si les preuves de source bloquent.
+- **ROLLBACK** : revert ciblé des commits de la PR, sans reset ni migration ni mutation S1.
+
+---
+
 ## 2026-11-07 — Audit live S1 réitéré, staging en lecture seule et protection image Docker
 
 - **MANDAT** : conserver exactement les domaines `sadiaaf.wealthtechinnovations.com` et `api.sadiaaf.wealthtechinnovations.com` ; vérifier si serveur et composants sont réellement prêts/installés, puis poursuivre l'étape admissible suivante sans destruction ni reconfiguration anticipée.
