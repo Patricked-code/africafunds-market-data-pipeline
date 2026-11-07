@@ -170,3 +170,28 @@ test('explicitly enabled endpoint still uses the original robots-gated probe', a
   assert.equal(result.endpoints[0].response.status, 'HTTP_OK_UNVERIFIED_CONTENT');
   assert.equal(result.endpoints[0].historicalCoverage, 'NOT_VERIFIED');
 });
+
+test('robots groups use the longest matching product token, not an unrelated substring', () => {
+  const robots = [
+    'User-agent: *', 'Disallow: /blocked',
+    'User-agent: market', 'Allow: /blocked',
+    'User-agent: africafunds', 'Disallow: /blocked',
+    'User-agent: africafundsmarketcollector', 'Allow: /blocked',
+  ].join('\n');
+  assert.deepEqual(robotsDecision(robots, '/blocked'), {
+    allowed: true, reason: 'ROBOTS_PERMIT',
+  });
+  const unrelated = 'User-agent: *\\nDisallow: /private\\nUser-agent: market\\nAllow: /private';
+  assert.deepEqual(robotsDecision(unrelated, '/private'), {
+    allowed: false, reason: 'ROBOTS_DISALLOW',
+  });
+});
+
+test('robots equal-specificity groups combine rules conservatively', () => {
+  const robots = [
+    'User-agent: africafundsmarketcollector', 'Disallow: /restricted',
+    'User-agent: africafundsmarketcollector', 'Allow: /public',
+  ].join('\n');
+  assert.equal(robotsDecision(robots, '/restricted').allowed, false);
+  assert.equal(robotsDecision(robots, '/public').allowed, true);
+});
