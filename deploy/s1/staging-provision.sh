@@ -128,6 +128,11 @@ RELEASE_DIR="$ROOT/releases/$RELEASE_ID"
 # A fresh staging root guarantees that these directories cannot overwrite
 # another application or any previous SadiaAF release.
 install -d -m 0700 "$ROOT" "$ROOT/releases" "$ROOT/shared" "$RAW_HOST_DIR"
+# Official Node 22 runtime image runs as UID:GID 1000:1000 (USER node).
+# Only the dedicated raw archive directory is assigned to that identity;
+# release and secrets directories remain root-owned.
+chown 1000:1000 "$RAW_HOST_DIR"
+chmod 0700 "$RAW_HOST_DIR"
 install -d -m 0700 "$RELEASE_DIR"
 rsync -a --safe-links   --exclude='/.git/' --exclude='/node_modules/' --exclude='/dist/'   --exclude='/.env' --exclude='/.env.*' --exclude='/data/raw/'   "$SOURCE_DIR/" "$RELEASE_DIR/"
 ln -s "$ENV_FILE" "$RELEASE_DIR/.env"
