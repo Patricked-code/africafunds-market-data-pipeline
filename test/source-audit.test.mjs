@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
   APPROVED_HOSTS, buildInventory, probeInventory,
-  robotsDecision, summarise, validateEndpointUrl,
+  robotsDecision, summarise, validateEndpointUrl, sourceReadiness,
 } from '../scripts/audit-source-registry.mjs';
 
 test('the historic source registry retains exactly 11 markets and 44 distinct endpoints', async () => {
@@ -87,4 +87,41 @@ test('robots denial prevents endpoint probes', async () => {
   assert.deepEqual(calls, ['GET']);
   assert.equal(result.endpoints[0].response.reason, 'ROBOTS_DISALLOW');
   assert.equal(result.endpoints[0].response.status, 'NOT_PROBED');
+});
+
+test('44 registered SadiaAF source endpoints remain unpublished without verified usage rights and data evidence', async () => {
+  const inventory = await buildInventory();
+  assert.equal(summarise(inventory).byRightsStatus.NOT_VERIFIED, 44);
+  assert.equal(summarise(inventory).byPublicationEligibility.NOT_ELIGIBLE, 44);
+  assert.equal(inventory.endpoints.filter(e => e.publicationEligible).length, 0);
+  assert.equal(inventory.endpoints.filter(e => e.historicalAdapterStatus === 'BLOCKED_ADAPTER').length, 6);
+  assert.ok(inventory.endpoints.every(e => sourceReadiness(e).blockers.includes('RIGHTS_NOT_APPROVED')));
+});
+
+test('an HTTP 200 cannot bypass license, adapter, backfill or publication gates', () => {
+  const assessed = {
+    endpointId: 'gha-gse-market',
+    response: { status: 'HTTP_OK_UNVERIFIED_CONTENT', httpStatus: 200 },
+    rightsStatus: 'NOT_VERIFIED', sourceFormatStatus: 'NOT_VERIFIED',
+    historicalAdapterStatus: 'NOT_VERIFIED', historicalCoverage: 'NOT_VERIFIED',
+    normalizationStatus: 'NOT_VERIFIED', publicationStatus: 'NOT_VERIFIED',
+  };
+  const r = sourceReadiness(assessed);
+  assert.equal(r.eligibleForPublication, false);
+  assert.ok(r.blockers.includes('RIGHTS_NOT_APPROVED'));
+  assert.ok(r.blockers.includes('MISSING_REPRODUCIBLE_EVIDENCE'));
+});
+
+test('only explicit approval plus adapter, historical, financial and evidence gates makes a source audit-eligible', () => {
+  const assessed = {
+    endpointId: 'fixture',
+    rightsStatus: 'APPROVED', sourceFormatStatus: 'VALIDATED',
+    historicalAdapterStatus: 'TESTED', historicalCoverage: 'VALIDATED',
+    normalizationStatus: 'VALIDATED', publicationStatus: 'APPROVED',
+    evidenceReferences: ['fixture:reproducible-evidence'],
+  };
+  assert.deepEqual(sourceReadiness(assessed), { eligibleForPublication: true, blockers: [] });
+  assert.equal(sourceReadiness({ ...assessed, publicationStatus: 'NOT_VERIFIED' }).eligibleForPublication, false);
+  assert.equal(sourceReadiness({ ...assessed, evidenceReferences: [] }).eligibleForPublication, false);
+  assert.equal(sourceReadiness({ ...assessed, historicalCoverage: 'NOT_VERIFIED' }).eligibleForPublication, false);
 });
