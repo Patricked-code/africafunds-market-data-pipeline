@@ -62,6 +62,12 @@ export async function buildInventory(manifestPath = 'config/sources.json') {
       configured: e.enabled !== false, qualification: 'REGISTERED_ONLY',
       urlPolicy: validation.valid ? 'APPROVED_HOST' : validation.reason,
       historicalCoverage: 'NOT_VERIFIED', firstDate: null, lastDate: null,
+      // Access to a public page does not establish rights to archive or redistribute data.
+      rightsStatus: 'NOT_VERIFIED',
+      sourceFormatStatus: 'NOT_VERIFIED',
+      normalizationStatus: 'NOT_VERIFIED',
+      historicalAdapterStatus: e.collector === 'MANUAL_API_DISCOVERY' ? 'BLOCKED_ADAPTER' : 'NOT_VERIFIED',
+      publicationEligible: false,
       response: null,
     };
   }));
@@ -188,6 +194,28 @@ export async function probeInventory(inventory, fetcher = fetch) {
   };
 }
 
+/**
+ * Fail closed: a successful HTTP HEAD is not proof of source certification.
+ * This is an audit classification, not a permission grant or production publish gate.
+ */
+export function sourceReadiness(endpoint) {
+  const blockers = [];
+  if (endpoint.rightsStatus !== 'APPROVED') blockers.push('RIGHTS_NOT_APPROVED');
+  if (endpoint.sourceFormatStatus !== 'VALIDATED') blockers.push('SOURCE_FORMAT_NOT_VALIDATED');
+  if (endpoint.historicalAdapterStatus !== 'TESTED') blockers.push('ADAPTER_NOT_TESTED');
+  if (endpoint.historicalCoverage !== 'VALIDATED') blockers.push('HISTORY_NOT_VALIDATED');
+  if (endpoint.normalizationStatus !== 'VALIDATED') blockers.push('NORMALIZATION_NOT_VALIDATED');
+  if (!Array.isArray(endpoint.evidenceReferences) || endpoint.evidenceReferences.length === 0) {
+    blockers.push('MISSING_REPRODUCIBLE_EVIDENCE');
+  }
+  // Explicit publication approval is separate from access rights.
+  if (endpoint.publicationStatus !== 'APPROVED') blockers.push('PUBLICATION_NOT_APPROVED');
+  return {
+    eligibleForPublication: blockers.length === 0,
+    blockers,
+  };
+}
+
 export function summarise(inventory) {
   const count = (field) => inventory.endpoints.reduce((acc, e) => {
     const value = field(e);
@@ -199,6 +227,9 @@ export function summarise(inventory) {
     byMarket: count((e) => e.market), byFamily: count((e) => e.family),
     byCollector: count((e) => e.collector),
     byProbeStatus: count((e) => e.response?.status || 'NOT_TESTED'),
+    byRightsStatus: count((e) => e.rightsStatus || 'NOT_VERIFIED'),
+    byPublicationEligibility: count((e) =>
+      sourceReadiness(e).eligibleForPublication ? 'ELIGIBLE_ON_EVIDENCE' : 'NOT_ELIGIBLE'),
   };
 }
 
