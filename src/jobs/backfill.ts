@@ -4,7 +4,7 @@ import { env } from '../config/env.js';
 import { toIsoDate } from '../utils/dates.js';
 import { logger } from '../config/logger.js';
 import { loadRegistry } from '../config/registry.js';
-import { runIngestion } from './ingest.js';
+import { assertHistoricalWindowEvidence, findHistoricalWindowAdapter } from './historicalWindowAdapter.js';
 import { CLAIM_PENDING_BACKFILLS_SQL } from './backfillClaim.js';
 
 export async function enqueueBackfill(input: { market?: string; family?: string; from: string; to: string }): Promise<number> {
@@ -66,19 +66,27 @@ export async function processBackfillJobs(limit = 10): Promise<void> {
 
   for (const job of jobs.rows) {
     const collector = collectors.get(job.endpoint_code);
-    if (collector === 'MANUAL_API_DISCOVERY') {
+    // Generic discover/ingest reads the present page; it DOES NOT honour
+    // window_from/window_to. Prevent a historical false SUCCESS for all
+    // unqualified sources (including those not marked MANUAL_API_DISCOVERY).
+    const adapter = findHistoricalWindowAdapter(job.endpoint_code);
+    if (!adapter) {
       await pool.query(
         `UPDATE ops.backfill_jobs
-            SET status='BLOCKED_ADAPTER', finished_at=now(), last_error='Adaptateur API spécifique requis'
-          WHERE backfill_job_id=$1`,
-        [job.backfill_job_id],
+            SET status='BLOCKED_ADAPTER', finished_at=now(), last_error=$2
+          WHERE backfill_job_id=$1 AND status='RUNNING'`,
+        [job.backfill_job_id,
+          `No qualified date-bounded adapter for ${job.endpoint_code} (collector=${collector ?? 'UNKNOWN'}, window=${job.window_from}..${job.window_to})`],
       );
       continue;
     }
     try {
-      await runIngestion({ endpointCode: job.endpoint_code, mode: 'discover', failOnEndpointError: true });
+      const window = { endpointCode: job.endpoint_code, from: job.window_from, to: job.window_to };
+      const evidence = await adapter.ingestWindow(window);
+      assertHistoricalWindowEvidence(window, evidence);
       await pool.query(
-        `UPDATE ops.backfill_jobs SET status='SUCCESS', finished_at=now(), last_error=NULL WHERE backfill_job_id=$1`,
+        `UPDATE ops.backfill_jobs SET status='SUCCESS', finished_at=now(), last_error=NULL
+          WHERE backfill_job_id=$1 AND status='RUNNING'`,
         [job.backfill_job_id],
       );
     } catch (error) {
