@@ -5,6 +5,7 @@ import {
   assertHistoricalWindowEvidence,
   type HistoricalWindow,
   type HistoricalWindowEvidence,
+  type HistoricalWindowAdapter,
 } from '../src/jobs/historicalWindowAdapter.js';
 
 const window: HistoricalWindow = {
@@ -67,4 +68,26 @@ test('faked generic-page date range never satisfies historical evidence contract
     () => assertHistoricalWindowEvidence(window, genericCurrentPage),
     /does not match/,
   );
+});
+
+
+test('historical adapter contract accepts cooperative cancellation without requiring legacy adapters to change', async () => {
+  const controller = new AbortController();
+  const cooperative: HistoricalWindowAdapter = {
+    endpointCode: window.endpointCode,
+    async ingestWindow(requested, signal) {
+      assert.equal(requested, window);
+      assert.equal(signal, controller.signal);
+      if (signal?.aborted) throw new Error('Historical ingestion aborted');
+      return evidence;
+    },
+  };
+  assert.deepEqual(await cooperative.ingestWindow(window, controller.signal), evidence);
+  controller.abort();
+  await assert.rejects(cooperative.ingestWindow(window, controller.signal), /aborted/);
+  const legacy: HistoricalWindowAdapter = {
+    endpointCode: window.endpointCode,
+    async ingestWindow() { return evidence; },
+  };
+  assert.deepEqual(await legacy.ingestWindow(window), evidence);
 });
