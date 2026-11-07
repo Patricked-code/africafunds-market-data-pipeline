@@ -1,5 +1,17 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-07 12:33 Europe/Paris — Correction CI rouge robots User-agent (#13 / PR #18)
+
+- **RECONCILIATION** : AGENTS.md, docs/09_CHANGELOG_WORKLOG.md et docs/15_AUTONOMOUS_AGENT_EXECUTION.md relus sur PR #1 ; dernier checkpoint documentaire du 06/11 et dernière entrée du 07/11 conservés. PR #1 HEAD `20aec333d30eea04e73475cb55158e2dcbdb648e`, PR #18 HEAD avant correction `4f5bb61e7081c5bfa6a28fcdc3f6deec66d65187`, PR #12 HEAD `ab45f3ffe175f69e45ba3f06ffe3b033185c6e3e` (non modifiée). Aucune fusion ni déploiement.
+- **PREUVES CI** : pour l'ancien HEAD PR #18 `4f5bb61e7081c5bfa6a28fcdc3f6deec66d65187`, CI générale [42364760488](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/42364760488) = completed/success ; qualification des sources [42364760480](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/42364760480) = completed/failure. Logs du job `128380407489` : test `robots denial prevents endpoint probes` attendait `ROBOTS_DISALLOW` mais recevait `ROBOTS_UNPARSEABLE` ; 20 tests passés, 1 échoué, artifact absent car étape d'inventaire ignorée.
+- **CAUSE ET CORRECTION** : la regex de reconnaissance d'un robots.txt non vide utilisait les séquences littérales `\\s` au lieu de la classe whitespace `\s` ; elle rejetait même `User-agent: *`. Correction minimale dans `scripts/audit-source-registry.mjs`, commit `6165f6382926ab8778d92286b4592e2d75c0d50a`. Test additionnel de règle robots valide avec espaces initiaux et refus HEAD dans `test/source-audit.test.mjs`, commit `eec00076dd58ef3a7ef7e98de10d617f3b5481fc` (HEAD technique).
+- **VALIDATION** : CI et audit sur le nouveau HEAD à vérifier ; aucun test local exécuté, aucun SUCCESS déclaré pour le nouveau commit. Aucune modification des 44 sources, ni contournement robots, ni requête réseau manuelle.
+- **BLOCK_REASON** : qualification précédente rouge ; protection de main et revues non attestées, visibilité publique historiquement contradictoire (issue #3), 22 NOT_PROBED/7 HEAD 403/1 HEAD 404 historiques non résolus, licences/fixtures #14 non prouvées ; PR #12 non touchée sans claim.
+- **NEXT_ACTION** : contrôler les deux workflows sur `eec00076dd58ef3a7ef7e98de10d617f3b5481fc`, lire les logs et corriger si rouge ; poursuivre qualification officielle #13 sans bypass ; #14 adaptateurs sur contrats/fixtures autorisés ; #5 backfill après claim ; #15–#17 uniquement avec preuves. Maintenir toutes les PR Draft ; aucune fusion, secret ni S1.
+
+---
+
+
 ## 2026-11-07 11:37 Europe/Paris — Robots plaintext non interprétable : refus conservateur (#13 / PR #18)
 
 - **RECONCILIATION** : AGENTS.md, journal canonique, checkpoint du 06/11 et contrat docs/15 relus sur PR #1. GitHub REST : main `fb7ec155fc748b133a771564bbd4510e1546fc68` (protected=false), dépôt public (private=false), PR #1/#2/#4/#10/#11/#12/#18 Draft. PR #18 HEAD initial `c6ba7f42a1047cc773d3e0547ed3e04fd2fc60e5`, base PR #4 `fix/ci-baseline-20261106`. PR #12 HEAD `ab45f3ffe175f69e45ba3f06ffe3b033185c6e3e`, non modifiée.
