@@ -423,3 +423,33 @@ test('robots rate-limit and redirect responses never authorize a source HEAD', a
     assert.equal(sourceReadiness(result.endpoints[0]).eligibleForPublication, false);
   }
 });
+
+test('HEAD restrictions and unsupported methods remain unverified, never publication evidence', async () => {
+  const classifications = new Map([
+    [301, 'REDIRECT_NOT_FOLLOWED'],
+    [403, 'RESTRICTED'],
+    [404, 'NOT_FOUND'],
+    [405, 'HEAD_UNSUPPORTED'],
+    [501, 'HEAD_UNSUPPORTED'],
+  ]);
+  for (const [status, expected] of classifications) {
+    const calls = [];
+    const inventory = { registeredMarkets: 1, registeredEndpoints: 1, endpoints: [{
+      endpointId: 'head-status-' + status, configured: true,
+      urlPolicy: 'APPROVED_HOST', url: 'https://www.brvm.org/fr/indices',
+      qualification: 'REGISTERED_ONLY', historicalCoverage: 'NOT_VERIFIED',
+    }] };
+    const result = await probeInventory(inventory, async (url, init) => {
+      calls.push({ method: init.method, redirect: init.redirect });
+      if (url.endsWith('/robots.txt')) return new Response('', { status: 404 });
+      return new Response(null, { status });
+    });
+    assert.deepEqual(calls.map(c => c.method), ['GET', 'HEAD']);
+    assert.ok(calls.every(c => c.redirect === 'manual'));
+    assert.equal(result.endpoints[0].response.status, expected);
+    assert.equal(result.endpoints[0].response.httpStatus, status);
+    assert.equal(result.endpoints[0].historicalCoverage, 'NOT_VERIFIED');
+    assert.equal(result.endpoints[0].qualification, 'REGISTERED_ONLY');
+    assert.equal(sourceReadiness(result.endpoints[0]).eligibleForPublication, false);
+  }
+});
