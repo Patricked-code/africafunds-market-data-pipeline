@@ -1,5 +1,17 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-07 10:39 Europe/Paris — Contrôle HTML robots sans en-tête MIME (#13 / PR #18)
+
+- **RECONCILIATION** : documents AGENTS.md, worklog, checkpoint 2026-11-06 et contrat 15 relus sur PR #1 (HEAD avant écriture `e7168155ad23b880fb8781bfe60170bf360a2e51`). PR #12 Draft HEAD `ab45f3ffe175f69e45ba3f06ffe3b033185c6e3e`, non modifiée. PR #18 Draft HEAD initial `a0bf1bef042906d08de2827a9a19392c13c47552`. Dépôt `visibility=public` via get_repo, anomalie déjà suivie issue #3. Les PR/ issues ouvertes ont été réinterrogées ; aucune fusion autorisée.
+- **PREUVES CI** : les workflows [CI 42356083174](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/42356083174) et [audit 42356083122](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/42356083122) sont `completed/success` pour l'**ancien HEAD exact** `a0bf1bef042906d08de2827a9a19392c13c47552`. Ils ne valident pas les nouveaux commits.
+- **DÉFAUT ET CORRECTION** : robots.txt HTTP 200 sans Content-Type pouvait contenir une page HTML de challenge et être traité comme permission robots vide. Détection fail-closed du préfixe HTML même sans en-tête MIME dans `scripts/audit-source-registry.mjs`, sans contournement ni requête HEAD subséquente ; commits `bdbdc378ff0245dd9ddfddbde5afd13bc9412353` puis correction de syntaxe `c6ba7f42a1047cc773d3e0547ed3e04fd2fc60e5`. Aucun changement des 44 sources.
+- **TEST** : scénario simulé `test/source-audit.test.mjs` pour page HTML robots sans Content-Type, zéro HEAD, `NOT_PROBED / ROBOTS_UNEXPECTED_CONTENT_TYPE`, couverture `NOT_VERIFIED` ; commit `3852adc0d8144355363b7ab803054e21ab3ce9f9`. Tests locaux NOT_RUN ; CI sur HEAD technique final `c6ba7f42a1047cc773d3e0547ed3e04fd2fc60e5` à contrôler.
+- **BLOCK_REASON** : protection/revue main non attestées ; dépôt déclaré public contrairement à l'ancienne mémoire ; 22 NOT_PROBED, 7 HEAD 403 et 1 HEAD 404 historiques non résolus par ce test ; licences et fixtures #14 absentes ; backfill #5 incomplet. Pas de merge, S1, secrets ni HISTORY_COMPLETE.
+- **NEXT_ACTION** : contrôler les deux GitHub Actions au HEAD exact `c6ba7f42a1047cc773d3e0547ed3e04fd2fc60e5`, corriger toute CI rouge ; poursuivre qualification officielle #13 sans bypass, puis adaptateurs #14 sur contrats autorisés ; reprendre #5 seulement après claim et vérification du HEAD ; #15–#17 selon preuves. Maintenir PR Draft et le journal comme autorité unique.
+
+---
+
+
 ## 2026-11-07 09:34 Europe/Paris — Validation URL réelle au gate de publication (#13 / PR #18)
 
 - **RECONCILIATION** : AGENTS.md, worklog et contrat 15 relus dans PR #1 ; PR #1/#12/#18 ouvertes Draft. PR #18 base PR #4 (branche CI), non main. Runs antérieurs #42352277555 (CI) et #42352277554 (audit) : jobs terminés SUCCESS sur ancien HEAD `9cf54fad84c8ca76ed678a727f741a43e2a86dfe`. Cela ne valide pas les nouveaux commits.
