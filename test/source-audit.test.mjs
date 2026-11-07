@@ -181,7 +181,7 @@ test('robots groups use the longest matching product token, not an unrelated sub
   assert.deepEqual(robotsDecision(robots, '/blocked'), {
     allowed: true, reason: 'ROBOTS_PERMIT',
   });
-  const unrelated = 'User-agent: *\\nDisallow: /private\\nUser-agent: market\\nAllow: /private';
+  const unrelated = 'User-agent: *\nDisallow: /private\nUser-agent: market\nAllow: /private';
   assert.deepEqual(robotsDecision(unrelated, '/private'), {
     allowed: false, reason: 'ROBOTS_DISALLOW',
   });
