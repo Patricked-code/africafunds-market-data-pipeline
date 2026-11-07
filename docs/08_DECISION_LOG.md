@@ -97,6 +97,17 @@ Utiliser ce fichier pour les décisions durables. Ne pas supprimer les anciennes
 - Conséquences : utiliser le nom SadiaAF dans les nouvelles décisions de périmètre ; conserver les noms historiques lorsqu'ils désignent précisément des artefacts existants. Les règles de licences et permissions de sources se qualifient pour les usages de SadiaAF et de ses consommateurs, pas seulement pour AfricaFunds.
 - Remplace / remplacée par : complète ADR-004 et ADR-012, sans effacer leurs références historiques.
 
+## ADR-014 — Dépôt privé, branche principale sans protection et intégration vérifiée
+
+- Date : 2026-11-07
+- Statut : ACCEPTED (décision explicite du propriétaire, configuration GitHub relue)
+- Contexte : le dépôt avait été identifié public pendant la réconciliation #3, puis le propriétaire a demandé et réalisé le retour au statut privé et la suppression volontaire de la protection de branche. Il a ensuite demandé de fusionner les travaux testés sur `main` pour ne pas bloquer l'achèvement du programme SadiaAF et préserver tout le code.
+- Décision : garder `Patricked-code/africafunds-market-data-pipeline` **privé** ; conserver `main` **sans protection GitHub**, conformément au choix propriétaire. Ne pas réactiver de protection ni rendre le dépôt public sans une nouvelle décision explicite. Autoriser l'intégration graduelle par PR des travaux réellement admissibles, avec commit HEAD exact, contrôles CI et comparaison des différences, sans utiliser le retrait de protection comme exemption des vérifications.
+- Garanties compensatoires : (1) branche Git de sauvegarde de `main` avant la série d'intégrations et conservation des branches PR ; (2) aucun push direct sur `main` ; (3) CI et tests sur SHA exact, comparaison des changements, contrôle des conflits/dépendances et des migrations ; (4) fusion `merge` avec garde sur HEAD attendu et contrôle de la CI sur `main` après chaque fusion ; (5) journal, statuts, preuves et rollback ciblé.
+- Limites : une convention d'agent et la CI ne remplacent pas une protection obligatoire imposée par GitHub. Les migrations touchant une base existante exigent audit des données, sauvegardes/restauration et dry-run **avant leur application**, même si le code de migration est fusionné. Un merge de code ne vaut pas mise en production ni certification des séries historiques.
+- Conséquences : l'issue #3 passe d'un projet de protection GitHub à un registre historique de décision et de risques, sans masquer que les contrôles serveur restent non enforced. Les gates de production S1 de l'ADR-002 restent pleinement applicables ; aucun déploiement implicite.
+- Remplace / remplacée par : supplanter uniquement les exigences antérieures de **réactivation obligatoire de la protection GitHub** ; ne remplace pas ADR-002 ni les tests, revues de différences et exigences métier.
+
 ## Modèle d’entrée
 
 ```markdown
