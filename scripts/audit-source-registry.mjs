@@ -139,8 +139,8 @@ export async function probeInventory(inventory, fetcher = fetch) {
     const record = { ...e };
     // A disabled registry endpoint is inventory-only. Never send even a robots
     // request for a source deliberately disabled by the source owner.
-    if (e.configured === false) {
-      record.response = { status: 'NOT_PROBED', reason: 'ENDPOINT_DISABLED' };
+    if (e.configured !== true) {
+      record.response = { status: 'NOT_PROBED', reason: 'ENDPOINT_NOT_ENABLED' };
       checked.push(record);
       continue;
     }
