@@ -58,8 +58,8 @@ jobs:
           node --test test/s1-deployment-safety.test.mjs
       - name: S1 staging read-only preflight and image context safety
         run: |
-          bash -n deploy/s1/staging-preflight.sh
-          node --test test/s1-staging-preflight.test.mjs
+          bash -n deploy/s1/staging-preflight.sh deploy/s1/staging-provision.sh
+          node --test test/s1-staging-preflight.test.mjs test/s1-staging-provision.test.mjs
       - name: Validate Docker Compose model without starting containers
         run: |
           printf '%s\n' \
@@ -86,6 +86,7 @@ jobs:
           assert.equal(services.api.ports?.[0]?.host_ip, '127.0.0.1');
           assert.equal(services.web.ports?.[0]?.host_ip, '127.0.0.1');
           assert.ok(!services.postgres.ports?.length, 'PostgreSQL must not be publicly port-mapped');
+          assert.equal(services.collector.volumes?.find(v => v.target === '/app/data/raw')?.type, 'bind');
           console.log('Validated isolated DB volume, loopback API/web ports and opt-in collector profile');
           NODE
       - name: Build
