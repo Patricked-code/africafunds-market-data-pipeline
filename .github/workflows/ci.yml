@@ -89,6 +89,17 @@ jobs:
           assert.equal(services.collector.volumes?.find(v => v.target === '/app/data/raw')?.type, 'bind');
           console.log('Validated isolated DB volume, loopback API/web ports and opt-in collector profile');
           NODE
+          SADIAAF_RAW_HOST_DIR=/tmp/sadiaaf-ci-stable-raw \
+            docker compose --profile collection config --format json > /tmp/sadiaaf-compose-raw.json
+          node --input-type=module <<'NODE'
+          import { readFileSync } from 'node:fs';
+          import assert from 'node:assert/strict';
+          const services = JSON.parse(readFileSync('/tmp/sadiaaf-compose-raw.json','utf8')).services;
+          const raw = services.collector.volumes?.find(v => v.target === '/app/data/raw');
+          assert.equal(raw?.type, 'bind');
+          assert.equal(raw?.source, '/tmp/sadiaaf-ci-stable-raw');
+          console.log('Validated stable raw archive mount outside the release directory');
+          NODE
       - name: Build
         run: npm run build
       - name: Apply PostgreSQL migrations
