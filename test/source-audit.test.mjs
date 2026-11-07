@@ -392,7 +392,7 @@ test('valid plaintext robots directives are recognized with leading whitespace a
   const calls = [];
   const result = await probeInventory(inventory, async (_url, init) => {
     calls.push(init.method);
-    return new Response('  User-agent : *\\n  Disallow: /', {
+    return new Response('  User-agent : *\n  Disallow: /', {
       status: 200, headers: { 'content-type': 'text/plain' },
     });
   });
