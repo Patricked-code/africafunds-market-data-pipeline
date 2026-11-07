@@ -1,10 +1,10 @@
 # 06 — État réel et écarts
 
-## Backfill issue #5 — garde de fencing en PR (2026-11-07)
+## Backfill issue #5 — fencing, recovery et annulation coopérative en PR (2026-11-08)
 
-- **PARTIAL / CI non attestée sur ce HEAD** : les transitions terminales RUNNING sont conditionnées à la génération `attempts` et au `locked_at` retournés au claim ; test d'intégration PostgreSQL ajouté.
-- **NON TERMINÉ** : lease expirant, heartbeat, reprise transactionnelle des RUNNING abandonnés, fencing des effets externes, historiques réels autorisés et données témoins. Aucune migration ni déploiement S1.
-- **NEXT_ACTION** : vérifier CI du correctif, compléter lease/recovery avec preuve PostgreSQL et absence de faux SUCCESS. Voir `docs/09_CHANGELOG_WORKLOG.md`.
+- **PARTIAL / CI non attestée sur ce HEAD** : transitions terminales conditionnées au claim ; récupération atomique de leases expirés, heartbeat conditionnel 60 s et contrat optionnel `AbortSignal` ajoutés dans la PR #22. Tests PostgreSQL et contrat d'annulation ajoutés mais NON ATTESTÉS sur HEAD actuel.
+- **NON TERMINÉ** : preuve de concurrence/heartbeat sur PostgreSQL isolé, arrêt effectif des effets externes dans des adaptateurs qualifiés, historiques réels autorisés et données témoins. Aucun adaptateur historique qualifié enregistré ; aucune migration ni déploiement S1.
+- **NEXT_ACTION** : vérifier CI sur HEAD exact PR #22, valider heartbeat/recovery/AbortSignal sur PostgreSQL isolé, puis qualifier les adaptateurs officiels avant toute collecte. Voir `docs/09_CHANGELOG_WORKLOG.md`.
 
 ## Audit S1 et sécurité de déploiement — 2026-11-07
 
