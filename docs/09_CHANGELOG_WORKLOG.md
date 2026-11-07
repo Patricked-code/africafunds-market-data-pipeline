@@ -1,5 +1,17 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-07 11:37 Europe/Paris — Robots plaintext non interprétable : refus conservateur (#13 / PR #18)
+
+- **RECONCILIATION** : AGENTS.md, journal canonique, checkpoint du 06/11 et contrat docs/15 relus sur PR #1. GitHub REST : main `fb7ec155fc748b133a771564bbd4510e1546fc68` (protected=false), dépôt public (private=false), PR #1/#2/#4/#10/#11/#12/#18 Draft. PR #18 HEAD initial `c6ba7f42a1047cc773d3e0547ed3e04fd2fc60e5`, base PR #4 `fix/ci-baseline-20261106`. PR #12 HEAD `ab45f3ffe175f69e45ba3f06ffe3b033185c6e3e`, non modifiée.
+- **PREUVES** : CI [42360684852](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/42360684852) et audit [42360684804](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/42360684804) = completed/success sur l'ancien HEAD exact `c6ba7f42a1047cc773d3e0547ed3e04fd2fc60e5` ; ces runs ne valident pas les nouveaux commits.
+- **TDD / CODE** : un robots.txt HTTP 200 text/plain contenant un message de challenge non HTML sans directive User-agent était interprété comme une autorisation implicite. Test de refus sans HEAD ajouté commit `e1933b2aac4b5cfde2b71c6e6ae0a5c5d3bb0503` (RED prévu, non exécuté localement). Correction minimale fail-closed `ROBOTS_UNPARSEABLE` pour contenu non vide sans directive User-agent, préservant robots vide/404 et les règles valides : commit `4f5bb61e7081c5bfa6a28fcdc3f6deec66d65187` (GREEN à vérifier en CI). Aucune source historique ni donnée modifiée.
+- **VALIDATION** : tests locaux NOT_RUN ; nouveaux GitHub Actions sur HEAD `4f5bb61e7081c5bfa6a28fcdc3f6deec66d65187` à contrôler avant toute déclaration SUCCESS.
+- **BLOCK_REASON** : main non protégée, visibilité publique divergente de l'ancien checkpoint privé, aucune autorisation de fusion ; 22 NOT_PROBED, 7 HEAD 403 et 1 HEAD 404 de la matrice historique non résolus ; licences et données témoins #14 non attestées ; #5/PR #12 en cours sans claim exclusif attesté. Aucune fusion ni S1.
+- **NEXT_ACTION** : vérifier CI générale et source-audit au HEAD exact `4f5bb61e7081c5bfa6a28fcdc3f6deec66d65187`, corriger tout échec ; poursuivre l'audit #13 avec preuves officielles sans contournement ; qualifier les six adaptateurs #14 sur contrats et fixtures autorisés ; reprendre #5 seulement après réconciliation de propriétaire/claim ; #15–#17 selon données témoins et preuves. Conserver toutes les PR Draft.
+
+---
+
+
 ## 2026-11-07 10:39 Europe/Paris — Contrôle HTML robots sans en-tête MIME (#13 / PR #18)
 
 - **RECONCILIATION** : documents AGENTS.md, worklog, checkpoint 2026-11-06 et contrat 15 relus sur PR #1 (HEAD avant écriture `e7168155ad23b880fb8781bfe60170bf360a2e51`). PR #12 Draft HEAD `ab45f3ffe175f69e45ba3f06ffe3b033185c6e3e`, non modifiée. PR #18 Draft HEAD initial `a0bf1bef042906d08de2827a9a19392c13c47552`. Dépôt `visibility=public` via get_repo, anomalie déjà suivie issue #3. Les PR/ issues ouvertes ont été réinterrogées ; aucune fusion autorisée.
