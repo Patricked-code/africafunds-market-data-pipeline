@@ -1,5 +1,17 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-07 14:34 Europe/Paris — Validation CI et tests HTTP robots supplémentaires (#13 / PR #18)
+
+- **RECONCILIATION** : AGENTS.md, documents maîtres 00–15, journal et contrat autonome lus sur la branche documentaire PR #1 ; issue #13, PR #18, code et tests de sa branche consultés. GitHub REST confirme visibilité `public`. Les HEAD de toutes les PR et la protection main ne sont pas intégralement attestés ici ; ne pas réutiliser d'anciens SHA comme actuels.
+- **PREUVE CI** : sur le commit exact `3a9a7805687ffdd70b3c19e2cf90fe78cf5db417`, workflow CI `42373313240` = completed/success et workflow Source Qualification `42373313194` = completed/success (résultats du connecteur GitHub). Ce succès ne prouve pas la disponibilité des sources ni les historiques.
+- **TRAVAIL CONCRET** : ajout d'un test paramétré sur robots.txt HTTP 301/302/401/403/429/500/503 : une réponse non autorisante doit produire `NOT_PROBED / ROBOTS_HTTP_<status>`, zéro HEAD, aucun statut de publication admissible et couverture `NOT_VERIFIED`. Commit de test `5c652ece870e5970150de18d59c0ca2be96de660` sur `audit/official-source-qualification-20261107`, PR #18. Aucune URL ni source historique modifiée.
+- **VALIDATION** : test local NOT_RUN ; CI du nouveau commit à vérifier, aucun SUCCESS anticipé. Pas de fusion ni S1.
+- **BLOCK_REASON** : preuves de droits/contrats et données historiques non obtenues pour #13/#14 ; 22 NOT_PROBED, 7 HEAD 403, 1 HEAD 404 historiques à requalifier ; PR #12 sans claim non touchée ; protections/revues de main non réattestées, visibilité publique à traiter dans issue #3.
+- **NEXT_ACTION** : vérifier les workflows du commit `5c652ece870e5970150de18d59c0ca2be96de660`, corriger tout échec ; lire artefacts de l'audit 42314547906 et requalifier légalement chaque source ; développer ensuite les adaptateurs #14 avec contrats et fixtures autorisés, poursuivre #5 seulement après claim, puis #15–#17 selon les preuves. Aucune fusion implicite.
+
+---
+
+
 ## 2026-11-07 13:36 Europe/Paris — Correction fixture robots et reprise CI (#13 / PR #18)
 
 - **RECONCILIATION** : instructions AGENTS.md, documents maîtres 00–15, journal et contrat autonome relus sur la branche PR #1 ; issue #13 et PR #18 consultées ; branche technique confirmée `audit/official-source-qualification-20261107`. L'état de `main`, protections et l'ensemble des HEAD PR ne sont pas intégralement réattestés pendant ce passage ; les anciens SHA restent historiques.
