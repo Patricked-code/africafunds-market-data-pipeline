@@ -171,9 +171,15 @@ export async function probeInventory(inventory, fetcher = fetch) {
           if ((contentType && !/^text\/plain(?:\s*;|\s*$)/i.test(contentType)) ||
               /^\s*(?:<!doctype\s+html\b|<html(?:\s|>))/i.test(body)) {
             robotsCache.set(host, { valid: false, reason: 'ROBOTS_UNEXPECTED_CONTENT_TYPE' });
-          } else robotsCache.set(host, body.length <= 100000
-            ? { text: body, valid: true, reason: 'ROBOTS_RECEIVED' }
-            : { valid: false, reason: 'ROBOTS_TOO_LARGE' });
+          } else if (body.length > 100000) {
+            robotsCache.set(host, { valid: false, reason: 'ROBOTS_TOO_LARGE' });
+          } else if (body.trim() && !/^\\s*user-agent\\s*:/im.test(body)) {
+            // A nonempty plaintext challenge or unrelated document is not a
+            // robots policy. Empty policies remain valid (including HTTP 404).
+            robotsCache.set(host, { valid: false, reason: 'ROBOTS_UNPARSEABLE' });
+          } else {
+            robotsCache.set(host, { text: body, valid: true, reason: 'ROBOTS_RECEIVED' });
+          }
         } else {
           robotsCache.set(host, { valid: false, reason: 'ROBOTS_HTTP_' + robots.status });
         }
