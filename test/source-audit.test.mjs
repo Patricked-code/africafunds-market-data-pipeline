@@ -341,3 +341,24 @@ test('publication readiness rejects a forged host approval label and missing URL
     assert.ok(decision.blockers.includes('URL_POLICY_NOT_APPROVED'));
   }
 });
+
+test('HTML robots challenge without Content-Type fails closed before HEAD', async () => {
+  const inventory = {
+    registeredMarkets: 1, registeredEndpoints: 1,
+    endpoints: [{
+      endpointId: 'fixture-robots-html', url: 'https://www.brvm.org/fr/indices',
+      configured: true, urlPolicy: 'APPROVED_HOST',
+      historicalCoverage: 'NOT_VERIFIED', qualification: 'REGISTERED_ONLY',
+    }],
+  };
+  const methods = [];
+  const result = await probeInventory(inventory, async (_url, init) => {
+    methods.push(init.method);
+    return new Response('<!DOCTYPE html><html><body>Challenge</body></html>', { status: 200 });
+  });
+  assert.deepEqual(methods, ['GET']);
+  assert.deepEqual(result.endpoints[0].response, {
+    status: 'NOT_PROBED', reason: 'ROBOTS_UNEXPECTED_CONTENT_TYPE',
+  });
+  assert.equal(result.endpoints[0].historicalCoverage, 'NOT_VERIFIED');
+});
