@@ -168,7 +168,8 @@ export async function probeInventory(inventory, fetcher = fetch) {
           const body = await robots.text();
           // An HTML challenge/login page is not a valid robots policy.
           // Fail closed rather than treating an unrelated 200 as permission.
-          if ((contentType && !/^text\/plain(?:\s*;|\s*$)/i.test(contentType)) ||\n              /^(?:\\s|\\uFEFF)*(?:<!doctype\\s+html\\b|<html(?:\\s|>))/i.test(body)) {
+          if ((contentType && !/^text\/plain(?:\s*;|\s*$)/i.test(contentType)) ||
+              /^\s*(?:<!doctype\s+html\b|<html(?:\s|>))/i.test(body)) {
             robotsCache.set(host, { valid: false, reason: 'ROBOTS_UNEXPECTED_CONTENT_TYPE' });
           } else robotsCache.set(host, body.length <= 100000
             ? { text: body, valid: true, reason: 'ROBOTS_RECEIVED' }
