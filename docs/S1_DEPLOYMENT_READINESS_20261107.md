@@ -1,4 +1,51 @@
 # SadiaAF — S1 : audit d'hébergement et voie de déploiement non destructive
+
+## Audit complémentaire de prérequis S1 — contrôle du 7 novembre 2026
+
+**Décision propriétaire confirmée : conserver sans changement** les deux domaines historiques `sadiaaf.wealthtechinnovations.com` et `api.sadiaaf.wealthtechinnovations.com`. L'installation du pipeline ne doit ni créer un domaine alternatif ni écraser le contenu du vhost.
+
+### Contrôles réellement répétés sur S1, sans écriture
+
+| Vérification | Preuve live | Statut |
+|---|---|---|
+| MCP SSH Bridge | `ping` = `wealthtech_ssh_bridge_ok` ; `docker ps` bridge healthy au second sondage | DONE (connexion) |
+| Frontend HTTPS | `curl -I https://sadiaaf.wealthtechinnovations.com` = HTTP 500 | BLOCKED |
+| API HTTPS | `curl -I https://api.sadiaaf.wealthtechinnovations.com` = HTTP 500 | BLOCKED |
+| Dossiers SadiaAF/Plesk | Deux vhosts présents, `index.html` anciens et fichiers historiques à conserver | DONE (existence) |
+| Dépôt Git sur vhosts | `sadiaaf_git_status_s1` : aucun `.git` à la racine, aucun dépôt imbriqué à profondeur 2 | NOT_STARTED pour checkout |
+| Docker runtime SadiaAF | Seul `wealthtech_mcp_ssh_bridge` dans `docker ps` ; aucun postgres/collector/api SadiaAF **actif** | NOT_STARTED (runtime observé) |
+| PM2 SadiaAF | Aucun service SadiaAF dans `pm2 list` observé | NOT_STARTED (runtime observé) |
+| Stockage | `df -h` : 77 Go, 54 Go utilisés, environ 20 Go libres | NEEDS_REVIEW (rétention/backups) |
+| Sauvegardes | Fichiers Plesk/MySQL et archives diverses ; **aucun backup PostgreSQL SadiaAF restaurable attesté** | BLOCKED |
+| Docker Compose v2, ports, mémoire disponible, certificats Plesk | Non attestés par outils read-only exposés | NEEDS_REVIEW |
+| Audit avancé | `sadiaaf_status_s1` / `inspect_sadiaaf_s1` refusent `echo` via garde read-only du bridge | BLOCKED par outillage |
+| Précontrôle de déploiement | `deploy_sadiaaf_s1(allow_write=false)` retourne `Écriture refusée` ; **aucun dry-run autorisé sur S1** | BLOCKED par outillage |
+
+**Limite essentielle :** `docker ps` n'énumère que les conteneurs en cours ; il ne prouve pas l'absence de volumes Docker arrêtés, ni d'un PostgreSQL installé en dehors de Docker. Les sondes de domaine indiquent un dysfonctionnement HTTP, sans établir sa cause.
+
+### Nouvelle préparation GitHub en lecture seule (sans modification S1)
+
+La branche de sécurité complémentaire `fix/sadiaaf-s1-staging-preflight-docker-context-20261107` apporte :
+
+- un `.dockerignore` absent jusque-là : exclut `.env`, secrets privés, référentiels Git, données brutes et sauvegardes du contexte `Dockerfile` ; **conserve** SQL, source TypeScript, configurations, tests et documentation requis par le build ;
+- `deploy/s1/staging-preflight.sh --check-only` : contrôle uniquement, par commande déterministe, le SHA Git fourni (`SADIAAF_EXPECTED_GIT_SHA`), l'état propre du dépôt, Docker et Compose, les ressources mémoire/disque, les ports staging loopback 18991/18992, les domaines historiques et les prérequis. **Aucune mutation** des vhosts, bases, conteneurs ou proxy ;
+- CI renforcée : contrôle `bash -n`, tests Node des invariants de sécurité et vérification du modèle Docker Compose (volume PostgreSQL non exposé, API/web localhost, collecteur opt-in sans démarrage).
+
+**Ces vérifications sont préparées dans GitHub : elles n'ont pas encore été exécutées sur S1**. La future exécution du script exige un checkout exact du dépôt dans un emplacement distinct des anciens vhosts et une voie d'exécution en lecture seule autorisée par le connecteur.
+
+### Ordre d'admission vers la suite
+
+1. Qualifier en CI la branche complémentaire et l'intégrer sur `main` après contrôle du SHA exact.
+2. Remédier à l'absence de l'outil `S1 staging preflight` autorisé et corriger le garde read-only du bridge **sans** ouvrir un shell général incontrôlé.
+3. Exécuter le vrai précontrôle S1 et attester `docker compose version`, `docker info`, ports, mémoire, espace et identité du checkout Git.
+4. Après attestation CPU/RAM/disque, volumes existants, backups et absence de collisions, habiliter un **provisioning de staging isolé**, avec validation et reprise, sans proxy Plesk.
+5. Créer PostgreSQL staging, appliquer migrations/seeds, API loopback, vérifier la persistance lors d'une seconde release et tester la restauration.
+6. Qualifier la première source autorisée pour lancer une collecte réelle datée et son archive brute. **Aucun droit source présumé**.
+
+**Statut aujourd'hui : PARTIAL** pour la préparation du dépôt, **BLOCKED** pour le déploiement S1. Les domaines retenus restent inchangés.
+
+---
+
 Date de constat : 2026-11-07. **Périmètre : lots 11 (CI), 12 (staging) et 13 (production S1) du plan existant.**
 Statut global : **PARTIAL / NEEDS_REVIEW**. Ce document ne constitue **pas** une attestation de déploiement.
 
