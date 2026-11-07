@@ -104,10 +104,277 @@ grep -Eq '^API_BIND_PORT=18991$' "$ENV_FILE" || blocked "staging API port mismat
 grep -Eq '^WEB_BIND_PORT=18992$' "$ENV_FILE" || blocked "staging web port mismatch"
 grep -Eq '^DATABASE_URL=postgresql://[^[:space:]]+@postgres:5432/' "$ENV_FILE" ||
   blocked "DB hostname must refer to the isolated Compose postgres service"
-grep -Eq '^POSTGRES_PASSWORD=[^[:space:]]{18,}$' "$ENV_FILE" ||
-  blocked "missing or insufficiently long PostgreSQL password"
-grep -Eq '^POSTGRES_DB=[a-zA-Z0-9_]+$' "$ENV_FILE" || blocked "missing database name"
-grep -Eq '^POSTGRES_USER=[a-zA-Z0-9_]+$' "$ENV_FILE" || blocked "missing database user"
+# Require generated non-placeholder secrets and a distinct staging DB.
+grep -Eq '^POSTGRES_PASSWORD=[a-f0-9]{64}
+# A S1 preflight PASS checks memory, disk, ports, Docker and exact Git SHA.
+SADIAAF_EXPECTED_GIT_SHA="$SADIAAF_EXPECTED_GIT_SHA"   "$SOURCE_DIR/deploy/s1/staging-preflight.sh" --check-only ||
+  blocked "S1 read-only staging preflight did not pass"
+
+git -C "$SOURCE_DIR" diff --quiet && git -C "$SOURCE_DIR" diff --cached --quiet ||
+  blocked "dirty source checkout"
+[[ -z "$(git -C "$SOURCE_DIR" status --porcelain)" ]] || blocked "untracked files in source checkout"
+ACTUAL_SHA="$(git -C "$SOURCE_DIR" rev-parse HEAD)"
+[[ "$ACTUAL_SHA" == "$SADIAAF_EXPECTED_GIT_SHA" ]] || blocked "Git SHA diverged after preflight"
+
+export COMPOSE_PROJECT_NAME="$PROJECT"
+export SADIAAF_RAW_HOST_DIR="$RAW_HOST_DIR"
+export API_BIND_PORT="$API_PORT"
+export WEB_BIND_PORT="$WEB_PORT"
+export COMPOSE_PROFILES=""
+umask 077
+RELEASE_ID="$(date -u +%Y%m%dT%H%M%SZ)-${ACTUAL_SHA:0:12}"
+RELEASE_DIR="$ROOT/releases/$RELEASE_ID"
+
+# A fresh staging root guarantees that these directories cannot overwrite
+# another application or any previous SadiaAF release.
+install -d -m 0700 "$ROOT" "$ROOT/releases" "$ROOT/shared" "$RAW_HOST_DIR"
+install -d -m 0700 "$RELEASE_DIR"
+rsync -a --safe-links   --exclude='/.git/' --exclude='/node_modules/' --exclude='/dist/'   --exclude='/.env' --exclude='/.env.*' --exclude='/data/raw/'   "$SOURCE_DIR/" "$RELEASE_DIR/"
+ln -s "$ENV_FILE" "$RELEASE_DIR/.env"
+cd "$RELEASE_DIR"
+COMPOSE=(docker compose --env-file "$ENV_FILE" -f "$RELEASE_DIR/docker-compose.yml")
+
+"${COMPOSE[@]}" config --quiet
+if "${COMPOSE[@]}" config --services | grep -qx collector; then
+  blocked "collector service should not start from default profile"
+fi
+
+# No auto-rollback with down -v: retain all state on failures for diagnosis.
+"${COMPOSE[@]}" build api migrate seed
+"${COMPOSE[@]}" up -d postgres
+"${COMPOSE[@]}" run --rm migrate
+"${COMPOSE[@]}" run --rm seed
+"${COMPOSE[@]}" up -d api web
+
+wait_http() {
+  local url="$1"
+  for _ in $(seq 1 30); do
+    if curl --fail --silent --show-error --max-time 5 "$url" >/dev/null 2>&1; then return 0; fi
+    sleep 2
+  done
+  blocked "staging HTTP endpoint failed: $url"
+}
+wait_http "http://127.0.0.1:$API_PORT/health"
+wait_http "http://127.0.0.1:$WEB_PORT/health"
+[[ -z "$("${COMPOSE[@]}" ps -q collector)" ]] ||
+  blocked "collector unexpectedly active"
+
+# Only after first successful health checks is a new release pointer published.
+ln -s "$RELEASE_DIR" "$ROOT/current"
+printf 'git_sha=%s\nrelease_id=%s\n' "$ACTUAL_SHA" "$RELEASE_ID" > "$ROOT/DEPLOYMENT_CHECKPOINT.txt"
+echo "DONE: isolated SadiaAF S1 STAGING installed (not publicly exposed)"
+echo "Project=$PROJECT"
+echo "Git SHA=$ACTUAL_SHA"
+echo "API=http://127.0.0.1:$API_PORT/health"
+echo "Web=http://127.0.0.1:$WEB_PORT/health"
+echo "PostgreSQL and raw volumes preserved; collector disabled"
+ "$ENV_FILE" ||
+  blocked "PostgreSQL password must be a 64-character lowercase random hex secret"
+grep -Eq '^POSTGRES_DB=sadiaaf_market_staging
+# A S1 preflight PASS checks memory, disk, ports, Docker and exact Git SHA.
+SADIAAF_EXPECTED_GIT_SHA="$SADIAAF_EXPECTED_GIT_SHA"   "$SOURCE_DIR/deploy/s1/staging-preflight.sh" --check-only ||
+  blocked "S1 read-only staging preflight did not pass"
+
+git -C "$SOURCE_DIR" diff --quiet && git -C "$SOURCE_DIR" diff --cached --quiet ||
+  blocked "dirty source checkout"
+[[ -z "$(git -C "$SOURCE_DIR" status --porcelain)" ]] || blocked "untracked files in source checkout"
+ACTUAL_SHA="$(git -C "$SOURCE_DIR" rev-parse HEAD)"
+[[ "$ACTUAL_SHA" == "$SADIAAF_EXPECTED_GIT_SHA" ]] || blocked "Git SHA diverged after preflight"
+
+export COMPOSE_PROJECT_NAME="$PROJECT"
+export SADIAAF_RAW_HOST_DIR="$RAW_HOST_DIR"
+export API_BIND_PORT="$API_PORT"
+export WEB_BIND_PORT="$WEB_PORT"
+export COMPOSE_PROFILES=""
+umask 077
+RELEASE_ID="$(date -u +%Y%m%dT%H%M%SZ)-${ACTUAL_SHA:0:12}"
+RELEASE_DIR="$ROOT/releases/$RELEASE_ID"
+
+# A fresh staging root guarantees that these directories cannot overwrite
+# another application or any previous SadiaAF release.
+install -d -m 0700 "$ROOT" "$ROOT/releases" "$ROOT/shared" "$RAW_HOST_DIR"
+install -d -m 0700 "$RELEASE_DIR"
+rsync -a --safe-links   --exclude='/.git/' --exclude='/node_modules/' --exclude='/dist/'   --exclude='/.env' --exclude='/.env.*' --exclude='/data/raw/'   "$SOURCE_DIR/" "$RELEASE_DIR/"
+ln -s "$ENV_FILE" "$RELEASE_DIR/.env"
+cd "$RELEASE_DIR"
+COMPOSE=(docker compose --env-file "$ENV_FILE" -f "$RELEASE_DIR/docker-compose.yml")
+
+"${COMPOSE[@]}" config --quiet
+if "${COMPOSE[@]}" config --services | grep -qx collector; then
+  blocked "collector service should not start from default profile"
+fi
+
+# No auto-rollback with down -v: retain all state on failures for diagnosis.
+"${COMPOSE[@]}" build api migrate seed
+"${COMPOSE[@]}" up -d postgres
+"${COMPOSE[@]}" run --rm migrate
+"${COMPOSE[@]}" run --rm seed
+"${COMPOSE[@]}" up -d api web
+
+wait_http() {
+  local url="$1"
+  for _ in $(seq 1 30); do
+    if curl --fail --silent --show-error --max-time 5 "$url" >/dev/null 2>&1; then return 0; fi
+    sleep 2
+  done
+  blocked "staging HTTP endpoint failed: $url"
+}
+wait_http "http://127.0.0.1:$API_PORT/health"
+wait_http "http://127.0.0.1:$WEB_PORT/health"
+[[ -z "$("${COMPOSE[@]}" ps -q collector)" ]] ||
+  blocked "collector unexpectedly active"
+
+# Only after first successful health checks is a new release pointer published.
+ln -s "$RELEASE_DIR" "$ROOT/current"
+printf 'git_sha=%s\nrelease_id=%s\n' "$ACTUAL_SHA" "$RELEASE_ID" > "$ROOT/DEPLOYMENT_CHECKPOINT.txt"
+echo "DONE: isolated SadiaAF S1 STAGING installed (not publicly exposed)"
+echo "Project=$PROJECT"
+echo "Git SHA=$ACTUAL_SHA"
+echo "API=http://127.0.0.1:$API_PORT/health"
+echo "Web=http://127.0.0.1:$WEB_PORT/health"
+echo "PostgreSQL and raw volumes preserved; collector disabled"
+ "$ENV_FILE" ||
+  blocked "database name must be reserved to SadiaAF staging"
+grep -Eq '^POSTGRES_USER=sadiaaf_staging
+# A S1 preflight PASS checks memory, disk, ports, Docker and exact Git SHA.
+SADIAAF_EXPECTED_GIT_SHA="$SADIAAF_EXPECTED_GIT_SHA"   "$SOURCE_DIR/deploy/s1/staging-preflight.sh" --check-only ||
+  blocked "S1 read-only staging preflight did not pass"
+
+git -C "$SOURCE_DIR" diff --quiet && git -C "$SOURCE_DIR" diff --cached --quiet ||
+  blocked "dirty source checkout"
+[[ -z "$(git -C "$SOURCE_DIR" status --porcelain)" ]] || blocked "untracked files in source checkout"
+ACTUAL_SHA="$(git -C "$SOURCE_DIR" rev-parse HEAD)"
+[[ "$ACTUAL_SHA" == "$SADIAAF_EXPECTED_GIT_SHA" ]] || blocked "Git SHA diverged after preflight"
+
+export COMPOSE_PROJECT_NAME="$PROJECT"
+export SADIAAF_RAW_HOST_DIR="$RAW_HOST_DIR"
+export API_BIND_PORT="$API_PORT"
+export WEB_BIND_PORT="$WEB_PORT"
+export COMPOSE_PROFILES=""
+umask 077
+RELEASE_ID="$(date -u +%Y%m%dT%H%M%SZ)-${ACTUAL_SHA:0:12}"
+RELEASE_DIR="$ROOT/releases/$RELEASE_ID"
+
+# A fresh staging root guarantees that these directories cannot overwrite
+# another application or any previous SadiaAF release.
+install -d -m 0700 "$ROOT" "$ROOT/releases" "$ROOT/shared" "$RAW_HOST_DIR"
+install -d -m 0700 "$RELEASE_DIR"
+rsync -a --safe-links   --exclude='/.git/' --exclude='/node_modules/' --exclude='/dist/'   --exclude='/.env' --exclude='/.env.*' --exclude='/data/raw/'   "$SOURCE_DIR/" "$RELEASE_DIR/"
+ln -s "$ENV_FILE" "$RELEASE_DIR/.env"
+cd "$RELEASE_DIR"
+COMPOSE=(docker compose --env-file "$ENV_FILE" -f "$RELEASE_DIR/docker-compose.yml")
+
+"${COMPOSE[@]}" config --quiet
+if "${COMPOSE[@]}" config --services | grep -qx collector; then
+  blocked "collector service should not start from default profile"
+fi
+
+# No auto-rollback with down -v: retain all state on failures for diagnosis.
+"${COMPOSE[@]}" build api migrate seed
+"${COMPOSE[@]}" up -d postgres
+"${COMPOSE[@]}" run --rm migrate
+"${COMPOSE[@]}" run --rm seed
+"${COMPOSE[@]}" up -d api web
+
+wait_http() {
+  local url="$1"
+  for _ in $(seq 1 30); do
+    if curl --fail --silent --show-error --max-time 5 "$url" >/dev/null 2>&1; then return 0; fi
+    sleep 2
+  done
+  blocked "staging HTTP endpoint failed: $url"
+}
+wait_http "http://127.0.0.1:$API_PORT/health"
+wait_http "http://127.0.0.1:$WEB_PORT/health"
+[[ -z "$("${COMPOSE[@]}" ps -q collector)" ]] ||
+  blocked "collector unexpectedly active"
+
+# Only after first successful health checks is a new release pointer published.
+ln -s "$RELEASE_DIR" "$ROOT/current"
+printf 'git_sha=%s\nrelease_id=%s\n' "$ACTUAL_SHA" "$RELEASE_ID" > "$ROOT/DEPLOYMENT_CHECKPOINT.txt"
+echo "DONE: isolated SadiaAF S1 STAGING installed (not publicly exposed)"
+echo "Project=$PROJECT"
+echo "Git SHA=$ACTUAL_SHA"
+echo "API=http://127.0.0.1:$API_PORT/health"
+echo "Web=http://127.0.0.1:$WEB_PORT/health"
+echo "PostgreSQL and raw volumes preserved; collector disabled"
+ "$ENV_FILE" ||
+  blocked "database user must be reserved to SadiaAF staging"
+for critical in POSTGRES_PASSWORD DATABASE_URL POSTGRES_DB POSTGRES_USER ENABLE_SCHEDULER API_BIND_PORT WEB_BIND_PORT; do
+  [[ "$(grep -c "^$critical=" "$ENV_FILE" || true)" == "1" ]] ||
+    blocked "duplicate or missing critical env key: $critical"
+done
+# Read secrets only into process memory for consistency comparison.
+DB_PASSWORD="$(sed -n 's/^POSTGRES_PASSWORD=//p' "$ENV_FILE")"
+DB_URL="$(sed -n 's/^DATABASE_URL=//p' "$ENV_FILE")"
+[[ "$DB_URL" == "postgresql://sadiaaf_staging:$DB_PASSWORD@postgres:5432/sadiaaf_market_staging" ]] ||
+  blocked "DATABASE_URL credentials or database do not match isolated PostgreSQL staging"
+unset DB_PASSWORD DB_URL
+grep -Eq '^RAW_ARCHIVE_DIR=/app/data/raw
+# A S1 preflight PASS checks memory, disk, ports, Docker and exact Git SHA.
+SADIAAF_EXPECTED_GIT_SHA="$SADIAAF_EXPECTED_GIT_SHA"   "$SOURCE_DIR/deploy/s1/staging-preflight.sh" --check-only ||
+  blocked "S1 read-only staging preflight did not pass"
+
+git -C "$SOURCE_DIR" diff --quiet && git -C "$SOURCE_DIR" diff --cached --quiet ||
+  blocked "dirty source checkout"
+[[ -z "$(git -C "$SOURCE_DIR" status --porcelain)" ]] || blocked "untracked files in source checkout"
+ACTUAL_SHA="$(git -C "$SOURCE_DIR" rev-parse HEAD)"
+[[ "$ACTUAL_SHA" == "$SADIAAF_EXPECTED_GIT_SHA" ]] || blocked "Git SHA diverged after preflight"
+
+export COMPOSE_PROJECT_NAME="$PROJECT"
+export SADIAAF_RAW_HOST_DIR="$RAW_HOST_DIR"
+export API_BIND_PORT="$API_PORT"
+export WEB_BIND_PORT="$WEB_PORT"
+export COMPOSE_PROFILES=""
+umask 077
+RELEASE_ID="$(date -u +%Y%m%dT%H%M%SZ)-${ACTUAL_SHA:0:12}"
+RELEASE_DIR="$ROOT/releases/$RELEASE_ID"
+
+# A fresh staging root guarantees that these directories cannot overwrite
+# another application or any previous SadiaAF release.
+install -d -m 0700 "$ROOT" "$ROOT/releases" "$ROOT/shared" "$RAW_HOST_DIR"
+install -d -m 0700 "$RELEASE_DIR"
+rsync -a --safe-links   --exclude='/.git/' --exclude='/node_modules/' --exclude='/dist/'   --exclude='/.env' --exclude='/.env.*' --exclude='/data/raw/'   "$SOURCE_DIR/" "$RELEASE_DIR/"
+ln -s "$ENV_FILE" "$RELEASE_DIR/.env"
+cd "$RELEASE_DIR"
+COMPOSE=(docker compose --env-file "$ENV_FILE" -f "$RELEASE_DIR/docker-compose.yml")
+
+"${COMPOSE[@]}" config --quiet
+if "${COMPOSE[@]}" config --services | grep -qx collector; then
+  blocked "collector service should not start from default profile"
+fi
+
+# No auto-rollback with down -v: retain all state on failures for diagnosis.
+"${COMPOSE[@]}" build api migrate seed
+"${COMPOSE[@]}" up -d postgres
+"${COMPOSE[@]}" run --rm migrate
+"${COMPOSE[@]}" run --rm seed
+"${COMPOSE[@]}" up -d api web
+
+wait_http() {
+  local url="$1"
+  for _ in $(seq 1 30); do
+    if curl --fail --silent --show-error --max-time 5 "$url" >/dev/null 2>&1; then return 0; fi
+    sleep 2
+  done
+  blocked "staging HTTP endpoint failed: $url"
+}
+wait_http "http://127.0.0.1:$API_PORT/health"
+wait_http "http://127.0.0.1:$WEB_PORT/health"
+[[ -z "$("${COMPOSE[@]}" ps -q collector)" ]] ||
+  blocked "collector unexpectedly active"
+
+# Only after first successful health checks is a new release pointer published.
+ln -s "$RELEASE_DIR" "$ROOT/current"
+printf 'git_sha=%s\nrelease_id=%s\n' "$ACTUAL_SHA" "$RELEASE_ID" > "$ROOT/DEPLOYMENT_CHECKPOINT.txt"
+echo "DONE: isolated SadiaAF S1 STAGING installed (not publicly exposed)"
+echo "Project=$PROJECT"
+echo "Git SHA=$ACTUAL_SHA"
+echo "API=http://127.0.0.1:$API_PORT/health"
+echo "Web=http://127.0.0.1:$WEB_PORT/health"
+echo "PostgreSQL and raw volumes preserved; collector disabled"
+ "$ENV_FILE" ||
+  blocked "RAW_ARCHIVE_DIR must point to the collector mounted raw archive"
 
 # A S1 preflight PASS checks memory, disk, ports, Docker and exact Git SHA.
 SADIAAF_EXPECTED_GIT_SHA="$SADIAAF_EXPECTED_GIT_SHA"   "$SOURCE_DIR/deploy/s1/staging-preflight.sh" --check-only ||
