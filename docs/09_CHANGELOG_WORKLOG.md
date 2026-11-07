@@ -1,5 +1,17 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-07 — Issue #5 / PR #22 : stale SUCCESS après recovery
+
+- RECONCILIATION : PR #1 fusionnée, PR #22 Draft ; HEAD avant intervention 185e834001cbc94fbb78b07507b8141c955da147 ; dépôt privé ; AGENTS.md, contrat 15 et dernier NEXT_ACTION relus.
+- TEST : commit 13da2d95d3da2fc05dedc2e015f470d3ac44e9d6 ajoute le cas PostgreSQL RUNNING expiré → RETRY après recovery → ancien SUCCESS rejeté ; attempts conservé. Aucune modification des 44 sources.
+- PREUVES : commit GitHub confirmé. Test PostgreSQL NOT_RUN ; CI sur HEAD exact NON ATTESTÉ.
+- BLOCK_REASON : preuve CI/PostgreSQL absente ; AbortSignal et arrêt des effets externes des adaptateurs manquants ; historique réel non qualifié.
+- NEXT_ACTION : vérifier CI et exécuter test sur PostgreSQL isolé ; corriger toute régression, puis implémenter annulation coopérative et tests heartbeat/concurrence. PR Draft, pas de fusion ni S1.
+- ROLLBACK : revert ciblé du test sur branche PR #22.
+
+---
+
+
 ## 2026-11-07 — Issue #5 / PR #22 : heartbeat conditionnel du backfill (continuation)
 
 - **RÉCONCILIATION** : dépôt privé ; PR #22 ouverte Draft, HEAD avant écriture `a8eb6a9ea5b6d46141e4c15d746dd3be6eeaad37`. PR #1 documentaire fusionnée, instructions de main et checkpoint relus. La dernière entrée de main concerne séparément le staging S1 ; aucune écriture S1 ni modification de ce chantier.
