@@ -1,5 +1,11 @@
 # 01 — Vision produit et périmètre
 
+## Dénomination et séparation du périmètre
+
+La **plateforme SadiaAF** est la cible du socle technique actuellement hébergé dans le dépôt historique `Patricked-code/africafunds-market-data-pipeline`. Le nom de ce dépôt, ainsi que certains noms internes historiques comme « modèle canonique AfricaFunds », ne changent **ni la responsabilité ni la cible** de la plateforme. **AfricaFunds** désigne un consommateur éventuel de ses données, parmi d'autres ; la plateforme centrale doit rester indépendante et servir plusieurs applications et partenaires.
+
+Cette clarification est documentaire et ne demande **aucun renommage cassant** de module, API, table, domaine ou dépôt.
+
 ## Le produit
 
 SadiaAF n’est pas seulement un site web. C’est une **plateforme de données financières africaines** qui sert de source de vérité technique à plusieurs applications.
