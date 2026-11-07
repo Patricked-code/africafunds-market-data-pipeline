@@ -1,0 +1,85 @@
+name: CI — AfricaFunds Market Data Pipeline
+
+on:
+  pull_request:  # Validate stacked PRs and ordinary PRs with the same gate
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    name: validate
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          PGUSER: africafunds
+          POSTGRES_USER: africafunds
+          POSTGRES_PASSWORD: ci-only-not-for-production
+          POSTGRES_DB: africafunds_ci
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 15
+    env:
+      NODE_ENV: test
+      DATABASE_URL: postgresql://africafunds:ci-only-not-for-production@localhost:5432/africafunds_ci
+      RAW_ARCHIVE_DIR: ./data/raw
+      ENABLE_SCHEDULER: 'false'
+      LOG_LEVEL: warn
+    steps:
+      - name: Checkout the exact PR revision
+        uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install exact reviewed dependency tree
+        run: npm ci --no-audit --no-fund
+      - name: Verify TypeScript types
+        run: npm run typecheck
+      - name: Unit tests
+        run: npm run test:ci
+      - name: Build
+        run: npm run build
+      - name: Apply PostgreSQL migrations
+        run: npm run db:migrate
+      - name: Reapply migrations (idempotency)
+        run: npm run db:migrate
+      - name: Seed source registry
+        run: npm run db:seed
+      - name: Verify migration registry matches SQL files
+        run: |
+          node --input-type=module <<'NODE'
+          import { readdir } from 'node:fs/promises';
+          import pg from 'pg';
+          const expected = (await readdir('sql/migrations')).filter(f => f.endsWith('.sql')).length;
+          const client = new pg.Client({ connectionString: process.env.DATABASE_URL });
+          await client.connect();
+          try {
+            const { rows } = await client.query('SELECT count(*)::int AS n FROM public.schema_migrations');
+            const actual = rows[0].n;
+            if (actual !== expected) throw new Error(`Expected ${expected} migrations, got ${actual}`);
+            console.log(`Verified ${actual} recorded migrations`);
+          } finally {
+            await client.end();
+          }
+          NODE
+      - name: Record smoke-check outcome
+        if: always()
+        run: |
+          echo 'CI run: ${{ github.run_id }}' >> "$GITHUB_STEP_SUMMARY"
+          echo 'Head SHA: ${{ github.sha }}' >> "$GITHUB_STEP_SUMMARY"
+          echo 'The result is authoritative only in GitHub Actions.' >> "$GITHUB_STEP_SUMMARY"

@@ -122,7 +122,10 @@ async function ingestEndpoint(endpoint: SourceEndpoint, mode: 'ingest' | 'discov
 
 export async function runIngestion(input: { market?: string; family?: string; endpointCode?: string; mode?: 'ingest' | 'discover' } = {}): Promise<void> {
   const mode = input.mode ?? 'ingest';
-  const endpoints = (await listEndpoints({ market: input.market, family: input.family }))
+  const endpoints = (await listEndpoints({
+    ...(input.market !== undefined ? { market: input.market } : {}),
+    ...(input.family !== undefined ? { family: input.family } : {}),
+  }))
     .filter((endpoint) => !input.endpointCode || endpoint.id === input.endpointCode);
   const runId = await startRun({ jobType: mode.toUpperCase(), scope: input });
   const summary = { endpoints: endpoints.length, success: 0, failed: 0, artifacts: 0, rows: 0, links: 0 };

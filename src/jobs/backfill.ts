@@ -7,7 +7,10 @@ import { loadRegistry } from '../config/registry.js';
 import { runIngestion } from './ingest.js';
 
 export async function enqueueBackfill(input: { market?: string; family?: string; from: string; to: string }): Promise<number> {
-  const endpoints = await listEndpoints({ market: input.market, family: input.family });
+  const endpoints = await listEndpoints({
+    ...(input.market !== undefined ? { market: input.market } : {}),
+    ...(input.family !== undefined ? { family: input.family } : {}),
+  });
   const start = new Date(`${toIsoDate(input.from)}T00:00:00Z`);
   const end = new Date(`${toIsoDate(input.to)}T00:00:00Z`);
   if (start > end) throw new Error('La date de début doit précéder la date de fin');
