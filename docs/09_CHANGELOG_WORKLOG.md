@@ -2,6 +2,15 @@
 
 Ce journal décrit les travaux réellement effectués. Ajouter les nouvelles entrées en tête.
 
+## 2026-11-07 — Réconciliation des gates et CI audit, alerte visibilité issue #3
+
+- **RECONCILIATION** : GitHub `get_repo` sous identité Patricked-code renvoie `visibility=public` ; la PR #1 reste Draft ouverte, la PR #18 reste Draft ouverte sur `audit/official-source-qualification-20261107`, HEAD exact `2808fcb2ffa74e69fb8ea297f8565bd5ca5278d1`, base `fix/ci-baseline-20261106`. Les issues #13–#17 sont ouvertes. Aucune modification de visibilité, aucune fusion.
+- **TEST_EVIDENCE** : inspection directe des jobs Actions : CI [42314998003](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/42314998003) job `validate` `completed/success`; audit [42314998004](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/42314998004) job `qualify-44-endpoints` `completed/success`. Les tests de workflow et sondages HEAD ne certifient pas les séries ni les historiques. Matrice `docs/SOURCE_AUDIT_RUN_42314547906.md` lue sur branche PR #18 : 14 HEAD 200, 7 HEAD 403, 1 HEAD 404, 22 NOT_PROBED ; aucun HISTORY_COMPLETE.
+- **ACTION_EFFECTIVE** : alerte complémentaire déposée dans [issue #3](https://github.com/Patricked-code/africafunds-market-data-pipeline/issues/3) concernant l'incohérence `privé`/`public` et les protections non attestées. Aucune écriture sur PR #12/#18 possiblement possédées par une autre exécution ; pas de nouveau runner ni registre.
+- **BLOCK_REASON** : protection main non attestée à cette exécution, statut public contraire au texte historique #3 ; droits d'accès et formats des sources restreintes non validés ; aucune preuve de couverture historique.
+- **NEXT_ACTION** : poursuivre #13 sur preuves de robots/contrats sans bypass et qualification GSE, puis #14 fixtures officielles et #5 fenêtres/leases avec claim explicite avant toute écriture concurrente ; traiter #15–#17 par incréments testés. Contrôler les protections via endpoint GitHub admin avant toute fusion. Aucune fusion ni déploiement S1.
+
+---
 ## 2026-11-07 — Validation HEAD exact de PR #18, nouveaux candidats officiels et risque de visibilité
 
 - **HEAD de la PR [#18](https://github.com/Patricked-code/africafunds-market-data-pipeline/pull/18)** : `2808fcb2ffa74e69fb8ea297f8565bd5ca5278d1`, Draft sur `fix/ci-baseline-20261106`. Les deux workflows sont **SUCCESS sur le HEAD exact** : [source qualification 42314998004](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/42314998004) et [CI générale 42314998003](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/42314998003). Aucun merge ni production.
