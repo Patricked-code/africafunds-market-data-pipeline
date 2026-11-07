@@ -1,5 +1,11 @@
 # 06 — État réel et écarts
 
+## Backfill issue #5 — garde de fencing en PR (2026-11-07)
+
+- **PARTIAL / CI non attestée sur ce HEAD** : les transitions terminales RUNNING sont conditionnées à la génération `attempts` et au `locked_at` retournés au claim ; test d'intégration PostgreSQL ajouté.
+- **NON TERMINÉ** : lease expirant, heartbeat, reprise transactionnelle des RUNNING abandonnés, fencing des effets externes, historiques réels autorisés et données témoins. Aucune migration ni déploiement S1.
+- **NEXT_ACTION** : vérifier CI du correctif, compléter lease/recovery avec preuve PostgreSQL et absence de faux SUCCESS. Voir `docs/09_CHANGELOG_WORKLOG.md`.
+
 ## Audit S1 et sécurité de déploiement — 2026-11-07
 
 - **PREUVE SERVEUR READ-ONLY** : les domaines `sadiaaf.wealthtechinnovations.com` et `api.sadiaaf.wealthtechinnovations.com` existent et répondent tous deux **HTTP 500** à `curl -I` depuis S1 ; aucun dépôt Git racine dans leurs vhosts ; le seul conteneur Docker actif observé est le bridge MCP. Cela n'atteste pas l'absence d'autres bases/service hors Docker.
