@@ -24,3 +24,18 @@ RETURNING jobs.backfill_job_id, jobs.endpoint_code,
           jobs.window_from::text, jobs.window_to::text,
           candidates.attempts, jobs.attempts AS claim_attempt, jobs.locked_at::text AS claim_locked_at
 `;
+
+/**
+ * Renew only the currently owned RUNNING claim. The attempt generation is
+ * immutable during a heartbeat; stale workers cannot renew a replacement.
+ * The caller must stop processing when rowCount is zero.
+ */
+export const RENEW_BACKFILL_LEASE_SQL = `
+UPDATE ops.backfill_jobs
+   SET locked_at=now()
+ WHERE backfill_job_id=$1
+   AND status='RUNNING'
+   AND attempts=$2
+   AND locked_at::text=$3
+RETURNING locked_at::text AS claim_locked_at
+`;
