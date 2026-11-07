@@ -39,3 +39,31 @@ UPDATE ops.backfill_jobs
    AND locked_at::text=$3
 RETURNING locked_at::text AS claim_locked_at
 `;
+
+/**
+ * Requeue abandoned RUNNING jobs without stealing live leases. PostgreSQL
+ * locks and updates the same bounded candidate set atomically; a concurrent
+ * heartbeat changes locked_at and cannot be silently overwritten.
+ * This is a recovery primitive, not an active scheduler or proof of recovery.
+ * $1 = minimum age in seconds (strictly positive), $2 = batch limit.
+ */
+export const RECOVER_EXPIRED_BACKFILLS_SQL = `
+WITH expired AS (
+  SELECT backfill_job_id
+    FROM ops.backfill_jobs
+   WHERE status='RUNNING'
+     AND locked_at IS NOT NULL
+     AND locked_at < now() - ($1::double precision * interval '1 second')
+     AND $1::double precision > 0
+   ORDER BY locked_at, backfill_job_id
+   FOR UPDATE SKIP LOCKED
+   LIMIT $2
+)
+UPDATE ops.backfill_jobs AS jobs
+   SET status='RETRY', locked_at=NULL, finished_at=NULL,
+       last_error='Lease expired; awaiting a new atomic claim'
+  FROM expired
+ WHERE jobs.backfill_job_id=expired.backfill_job_id
+   AND jobs.status='RUNNING'
+RETURNING jobs.backfill_job_id
+`;
