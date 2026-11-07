@@ -1,5 +1,15 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-07 — Réconciliation post-fusions et diagnostic backfill lease/fencing (issue #5)
+
+- **SOURCE DE VÉRITÉ** : `get_repo` Patricked-code confirme `visibility=private` (ancienne alerte publique dépassée), `main` possède désormais le code de la PR #12 ; journal de fusion précédent : PR #4/#11/#12/#18/#10 intégrées avec preuves CI citées plus haut. Les PR #1/#2 restent ouvertes selon la recherche GitHub ; aucune nouvelle fusion ici.
+- **LECTURE DU CODE MAIN** : `src/jobs/backfillClaim.ts` revendique atomiquement `PENDING/RETRY` et enregistre `locked_at`, mais ne définit ni `lease_until` ni token de fencing. `src/jobs/backfill.ts` n'applique pas de token de possession lors de ses mises à jour terminales. Risque de course en cas de reprise d'un `RUNNING` expiré : **constat statique**, pas incident observé.
+- **ACTION GITHUB EFFECTIVE** : diagnostic et critères de recette ajoutés à [issue #5, commentaire 6709067230](https://github.com/Patricked-code/africafunds-market-data-pipeline/issues/5#issuecomment-6709067230). Aucun test local, CI nouvelle ou commit de code dans cette intervention ; ne pas présenter les travaux de lease comme DONE.
+- **BLOCK_REASON** : absence de protocole de lease/fencing validé et de tests PostgreSQL crash/reprise ; absence d'adaptateur historique autorisé. La prochaine correction doit être développée sur branche distincte depuis le main actuel et validée en CI.
+- **NEXT_ACTION** : issue #5 : migration additive lease/token, claim/heartbeat/recovery, UPDATE terminaux protégés par token, tests PostgreSQL worker A expiré → B reprend → A refusé → B seul conclut. Ensuite issue #14 adaptateurs autorisés, #15 normalisation, #16 nouvelles sources, #17 recette ; CI et revue avant merge, aucun S1.
+
+---
+
 ## 2026-11-07 — Intégration GitHub gouvernée des cinq PR de code, sans perte de branches ni déploiement
 
 - **MANDAT PROPRIÉTAIRE** : intégrer rapidement les travaux GitHub sur `main` en préservant la continuité et le code existant. La visibilité du dépôt reste **privée** ; `main` demeure sans protection GitHub sur décision expresse. L'ADR-014 en conserve les conséquences et contrôles compensatoires.
