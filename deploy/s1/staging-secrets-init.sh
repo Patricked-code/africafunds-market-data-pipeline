@@ -47,7 +47,12 @@ cleanup() {
 trap cleanup EXIT
 PASSWORD="$(openssl rand -hex 32)"
 [[ "$PASSWORD" =~ ^[a-f0-9]{64}$ ]] || blocked "random credential generation failed"
-sed "s/REPLACE_WITH_64_LOWERCASE_HEX_CHARACTERS/$PASSWORD/g" "$TEMPLATE" > "$TMP"
+# Bash substitution avoids exposing the secret through a sed command-line
+# argument visible in the process list.
+TEMPLATE_CONTENT="$(cat "$TEMPLATE")"
+TEMPLATE_CONTENT="${TEMPLATE_CONTENT//REPLACE_WITH_64_LOWERCASE_HEX_CHARACTERS/$PASSWORD}"
+printf '%s\n' "$TEMPLATE_CONTENT" > "$TMP"
+unset TEMPLATE_CONTENT
 chmod 600 "$TMP"
 [[ "$(grep -c "^POSTGRES_PASSWORD=$PASSWORD$" "$TMP")" == "1" ]] ||
   blocked "password substitution failed"
