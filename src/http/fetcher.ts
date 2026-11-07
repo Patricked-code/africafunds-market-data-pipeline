@@ -9,6 +9,57 @@ export interface FetchResult {
   fetchedAt: string;
 }
 
+/** A non-2xx response must never be archived as a successful source artifact. */
+export class HttpResponseError extends Error {
+  constructor(public readonly status: number) {
+    super(`Réponse HTTP non valide (statut ${status})`);
+    this.name = 'HttpResponseError';
+  }
+}
+
+/** Large or infinite responses are rejected before they can exhaust worker memory. */
+export class HttpBodyTooLargeError extends Error {
+  constructor(public readonly maxBytes: number) {
+    super(`Réponse HTTP trop volumineuse (limite ${maxBytes} octets)`);
+    this.name = 'HttpBodyTooLargeError';
+  }
+}
+
+async function readLimitedBody(response: Response, maxBytes: number): Promise<Uint8Array> {
+  const declared = Number(response.headers.get('content-length'));
+  if (Number.isFinite(declared) && declared > maxBytes) {
+    throw new HttpBodyTooLargeError(maxBytes);
+  }
+  if (!response.body) return new Uint8Array();
+
+  const reader = response.body.getReader();
+  const chunks: Uint8Array[] = [];
+  let total = 0;
+  try {
+    while (true) {
+      const next = await reader.read();
+      if (next.done) break;
+      if (!next.value) continue;
+      total += next.value.byteLength;
+      if (total > maxBytes) {
+        await reader.cancel();
+        throw new HttpBodyTooLargeError(maxBytes);
+      }
+      chunks.push(next.value);
+    }
+  } finally {
+    reader.releaseLock();
+  }
+
+  const body = new Uint8Array(total);
+  let offset = 0;
+  for (const chunk of chunks) {
+    body.set(chunk, offset);
+    offset += chunk.byteLength;
+  }
+  return body;
+}
+
 export async function fetchWithRetry(url: string, init: RequestInit = {}): Promise<FetchResult> {
   let lastError: unknown;
   for (let attempt = 0; attempt <= env.HTTP_MAX_RETRIES; attempt += 1) {
@@ -25,25 +76,27 @@ export async function fetchWithRetry(url: string, init: RequestInit = {}): Promi
         redirect: 'follow',
         signal: controller.signal,
       });
-      const body = new Uint8Array(await response.arrayBuffer());
-      if (!response.ok && response.status >= 500 && attempt < env.HTTP_MAX_RETRIES) {
-        await delay(500 * (2 ** attempt));
-        continue;
+      if (!response.ok) {
+        // 4xx fails immediately, except retryable 429; 5xx retries within policy.
+        // Do not read or persist error bodies as market data.
+        throw new HttpResponseError(response.status);
       }
       return {
         url: response.url,
         status: response.status,
         headers: Object.fromEntries(response.headers.entries()),
-        body,
+        body: await readLimitedBody(response, env.HTTP_MAX_RESPONSE_BYTES),
         fetchedAt: new Date().toISOString(),
       };
     } catch (error) {
       lastError = error;
-      if (attempt >= env.HTTP_MAX_RETRIES) break;
+      const isTerminalClientError = error instanceof HttpResponseError
+        && error.status >= 400 && error.status < 500 && error.status !== 429;
+      if (isTerminalClientError || error instanceof HttpBodyTooLargeError || attempt >= env.HTTP_MAX_RETRIES) break;
       await delay(500 * (2 ** attempt));
     } finally {
       clearTimeout(timer);
     }
   }
-  throw lastError instanceof Error ? lastError : new Error(`Échec HTTP: ${url}`);
+  throw lastError instanceof Error ? lastError : new Error('Échec HTTP');
 }
