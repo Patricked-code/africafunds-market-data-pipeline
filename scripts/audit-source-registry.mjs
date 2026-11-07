@@ -170,9 +170,7 @@ export async function probeInventory(inventory, fetcher = fetch) {
           // Fail closed rather than treating an unrelated 200 as permission.
           if (contentType && !/^text\/plain(?:\s*;|\s*$)/i.test(contentType)) {
             robotsCache.set(host, { valid: false, reason: 'ROBOTS_UNEXPECTED_CONTENT_TYPE' });
-            continue;
-          }
-          robotsCache.set(host, body.length <= 100000
+          } else robotsCache.set(host, body.length <= 100000
             ? { text: body, valid: true, reason: 'ROBOTS_RECEIVED' }
             : { valid: false, reason: 'ROBOTS_TOO_LARGE' });
         } else {
