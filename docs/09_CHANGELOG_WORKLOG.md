@@ -1,5 +1,17 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-07 13:36 Europe/Paris — Correction fixture robots et reprise CI (#13 / PR #18)
+
+- **RECONCILIATION** : instructions AGENTS.md, documents maîtres 00–15, journal et contrat autonome relus sur la branche PR #1 ; issue #13 et PR #18 consultées ; branche technique confirmée `audit/official-source-qualification-20261107`. L'état de `main`, protections et l'ensemble des HEAD PR ne sont pas intégralement réattestés pendant ce passage ; les anciens SHA restent historiques.
+- **PREUVE CI ANTÉRIEURE** : la recherche de runs pour l'ancien SHA `eec00076dd58ef3a7ef7e98de10d617f3b5481fc` a retourné uniquement CI `42368710321` = SUCCESS et source-audit `42368710264` = FAILURE ; ces résultats ne valident pas le commit de correction.
+- **DÉFAUT ET CODE** : le test final de `test/source-audit.test.mjs` utilisait un séparateur littéral `\\n` dans la fixture robots espacée, au lieu d'un saut de ligne interprété par JavaScript ; ce cas ne représentait pas deux directives robots. Correction minimale sur la branche de PR #18, commit `3a9a7805687ffdd70b3c19e2cf90fe78cf5db417`, sans modifier les 44 sources ni la logique réseau.
+- **VALIDATION** : tests locaux NOT_RUN. La requête des workflow runs associés au nouveau commit a renvoyé une liste vide à ce contrôle ; aucune CI sur ce SHA n'est attestée SUCCESS. Aucun accès réseau source ni déploiement.
+- **BLOCK_REASON** : CI de source-audit antérieure rouge ; validation du nouveau commit en attente ; 22 NOT_PROBED, 7 HEAD 403 et 1 HEAD 404 historiques non résolus ; licences et fixtures #14 non attestées ; protections, revues et visibilité à réconcilier avec issue #3 ; PR #12 non modifiée sans claim.
+- **NEXT_ACTION** : relever les nouveaux runs GitHub Actions du commit `3a9a7805687ffdd70b3c19e2cf90fe78cf5db417` et leurs logs ; corriger tout échec réel. Vérifier ensuite HEAD de toutes les PR et main, matrice d'audit, puis poursuivre #13 et #14 sans bypass ; #5 uniquement après claim ; #15–#17 selon preuves. Pas de fusion ni S1.
+
+---
+
+
 ## 2026-11-07 12:33 Europe/Paris — Correction CI rouge robots User-agent (#13 / PR #18)
 
 - **RECONCILIATION** : AGENTS.md, docs/09_CHANGELOG_WORKLOG.md et docs/15_AUTONOMOUS_AGENT_EXECUTION.md relus sur PR #1 ; dernier checkpoint documentaire du 06/11 et dernière entrée du 07/11 conservés. PR #1 HEAD `20aec333d30eea04e73475cb55158e2dcbdb648e`, PR #18 HEAD avant correction `4f5bb61e7081c5bfa6a28fcdc3f6deec66d65187`, PR #12 HEAD `ab45f3ffe175f69e45ba3f06ffe3b033185c6e3e` (non modifiée). Aucune fusion ni déploiement.
