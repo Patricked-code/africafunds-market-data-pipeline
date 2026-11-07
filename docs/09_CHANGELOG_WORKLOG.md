@@ -1,5 +1,16 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-07 09:34 Europe/Paris — Validation URL réelle au gate de publication (#13 / PR #18)
+
+- **RECONCILIATION** : AGENTS.md, worklog et contrat 15 relus dans PR #1 ; PR #1/#12/#18 ouvertes Draft. PR #18 base PR #4 (branche CI), non main. Runs antérieurs #42352277555 (CI) et #42352277554 (audit) : jobs terminés SUCCESS sur ancien HEAD `9cf54fad84c8ca76ed678a727f741a43e2a86dfe`. Cela ne valide pas les nouveaux commits.
+- **DÉFAUT** : `sourceReadiness()` acceptait une étiquette `urlPolicy=APPROVED_HOST` sans revérifier l'URL réelle, alors que `probeInventory()` effectuait déjà ce contrôle. Un inventaire importé ou obsolète pouvait ainsi franchir le gate de qualification à la publication.
+- **CODE** : réutilisation additive de `validateEndpointUrl(endpoint.url)` dans `sourceReadiness()`, refus `URL_POLICY_NOT_APPROVED` pour URL absente, invalide ou non autorisée. Commit `dbcf01dd4c656162152a232e8c5501904c6f4274` sur PR #18.
+- **TEST** : fixtures positives enrichies avec URL HTTPS approuvée ; nouveau test pour URL absente, HTTP, localhost, port personnalisé, domaine non approuvé et URL invalide, malgré label forgé. Commit `a0bf1bef042906d08de2827a9a19392c13c47552`. Validation CI sur ce HEAD : PENDING à ce checkpoint, tests locaux NOT_RUN.
+- **BLOCK_REASON** : protections/revues main non attestées, visibilité publique à réconcilier avec issue #3 ; 22 NOT_PROBED, 7 HEAD 403, 1 HEAD 404 historiques non résolus ; licences et données témoins manquantes. Pas de fusion, ni S1, ni certification HISTORY_COMPLETE.
+- **NEXT_ACTION** : vérifier CI et source-audit sur HEAD `a0bf1bef042906d08de2827a9a19392c13c47552` et corriger tout échec ; reprendre #13 qualification autorisée puis #14 adaptateurs et #5 backfill après coordination de propriété ; #15–#17 sur preuves réelles uniquement.
+
+---
+
 ## 2026-11-07 08:40 Europe/Paris — Refus des pages HTML de challenge robots (#13 / PR #18)
 
 - **RECONCILIATION** : branche documentaire PR #1 relue (AGENTS, worklog, checkpoint 2026-11-06, contrat 15). Dépôt GitHub déclaré public ; alerte #3 conservée. La CI #42347592300 et l'audit #42347592309 ont été vérifiés SUCCESS sur l'ancien HEAD PR #18 `5dfb789978fdfee182c51cab28951e0c12b8f2d2` ; aucune conclusion sur les nouveaux commits.
