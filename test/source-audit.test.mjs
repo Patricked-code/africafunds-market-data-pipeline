@@ -75,7 +75,7 @@ test('robots denial prevents endpoint probes', async () => {
     registeredMarkets: 1, registeredEndpoints: 1,
     endpoints: [{
       endpointId: 'blocked-test', url: 'https://www.brvm.org/fr/indices',
-      urlPolicy: 'APPROVED_HOST', qualification: 'REGISTERED_ONLY',
+      urlPolicy: 'APPROVED_HOST', configured: true, qualification: 'REGISTERED_ONLY',
       historicalCoverage: 'NOT_VERIFIED',
     }],
   };
@@ -145,7 +145,7 @@ test('disabled source is inventoried but never contacted, even for robots.txt', 
   assert.equal(calls, 0);
   assert.equal(result.registeredEndpoints, 1);
   assert.equal(result.endpoints[0].response.status, 'NOT_PROBED');
-  assert.equal(result.endpoints[0].response.reason, 'ENDPOINT_DISABLED');
+  assert.equal(result.endpoints[0].response.reason, 'ENDPOINT_NOT_ENABLED');
   assert.equal(result.endpoints[0].configured, false);
   assert.equal(result.endpoints[0].historicalCoverage, 'NOT_VERIFIED');
   assert.equal(sourceReadiness(result.endpoints[0]).eligibleForPublication, false);
@@ -236,4 +236,22 @@ test('publication readiness rejects missing or ambiguous endpoint enablement and
   }
   assert.deepEqual(sourceReadiness({ ...valid, configured: undefined, urlPolicy: undefined }).blockers,
     ['ENDPOINT_NOT_ENABLED', 'URL_POLICY_NOT_APPROVED']);
+});
+
+test('probe rejects absent, null and ambiguous enabled flags without any network call', async () => {
+  for (const configured of [undefined, null, false, 'true', 1]) {
+    let calls = 0;
+    const result = await probeInventory({
+      registeredMarkets: 1, registeredEndpoints: 1,
+      endpoints: [{
+        endpointId: 'fixture', url: 'https://www.brvm.org/fr/indices',
+        urlPolicy: 'APPROVED_HOST', configured,
+        historicalCoverage: 'NOT_VERIFIED',
+      }],
+    }, async () => { calls += 1; throw new Error('network must be blocked'); });
+    assert.equal(calls, 0);
+    assert.deepEqual(result.endpoints[0].response,
+      { status: 'NOT_PROBED', reason: 'ENDPOINT_NOT_ENABLED' });
+    assert.equal(result.endpoints[0].historicalCoverage, 'NOT_VERIFIED');
+  }
 });
