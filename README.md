@@ -1,5 +1,17 @@
 # AfricaFunds Market Data Pipeline
 
+## Intégrations GitHub vérifiées — 7 novembre 2026
+
+**SadiaAF** est la plateforme financière africaine centrale ; le nom historique de ce dépôt ne limite pas la plateforme à l'application AfricaFunds. Les 14 lots existants restent le programme canonique. GitHub est la source d'autorité pour les SHAs, PR et conclusions de CI ; les statuts ci-dessous sont des points datés, non des déclarations de déploiement S1.
+
+- **Dépôt : privé** ; `main` sans protection GitHub **sur décision du propriétaire** (ADR-014), sans exemption des contrôles de développement.
+- **Socle intégré sur `main`** le 7 novembre : PR [#4](https://github.com/Patricked-code/africafunds-market-data-pipeline/pull/4) (CI PostgreSQL/Node), [#11](https://github.com/Patricked-code/africafunds-market-data-pipeline/pull/11) (HTTP), [#12](https://github.com/Patricked-code/africafunds-market-data-pipeline/pull/12) (contrat backfill bloquant les faux historiques), [#18](https://github.com/Patricked-code/africafunds-market-data-pipeline/pull/18) (qualifications 44 endpoints, preuves) et [#10](https://github.com/Patricked-code/africafunds-market-data-pipeline/pull/10) (unicité des lignes brutes avec migration préflight), sous réserve de l'état GitHub et des CI post-fusion.
+- **Preuve de sauvegarde de l'état antérieur** : [`backup/main-before-pr-integration-20261107`](https://github.com/Patricked-code/africafunds-market-data-pipeline/tree/backup/main-before-pr-integration-20261107), SHA `fb7ec155fc748b133a771564bbd4510e1546fc68`.
+- **Autorité documentaire** : PR #1, avec `AGENTS.md`, le journal, les ADR, les 14 lots et l'annexe historique fidèle à PR #2 (`docs/PROJECT_MEMORY.md`) ; ne pas fusionner les deux versions concurrentes de mémoire sans contrôle de convergence.
+- **Limites non levées** : droits de réutilisation des 44 sources, adaptateurs datés Égypte/Tunisie, historique effectif, reprises RUNNING expirées, normalisation financière, calculs, publication/API métier, staging et production S1. Aucune présence de code dans `main` ne prouve ces réalisations.
+- **Migration SQL PR #10** : l'application sur une base existante exige inventaire des doublons, sauvegarde et restauration testée ; la migration refuse les doublons au lieu de supprimer des données.
+- **NEXT_ACTION** : continuer la qualification des contrats officiels et les adaptateurs historiques (#14), compléter les reprises sûres backfill (#5), puis la qualité (#15), les sources manquantes (#16) et les recettes par marché (#17), sans nouvelle chaîne parallèle.
+
 > **État vérifié au 6 novembre 2026 : socle v0.2.0, plateforme cible SadiaAF non terminée, aucune attestation de déploiement de ce dépôt sur S1.** La présence de scripts Plesk ne constitue pas une autorisation de production. Le moteur est distinct du produit AfricaFunds, qui est un de ses consommateurs futurs.
 
 ### Point d'entrée pour Claude, ChatGPT et toute reprise
