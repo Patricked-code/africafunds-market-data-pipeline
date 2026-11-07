@@ -1,0 +1,138 @@
+name: SadiaAF — isolated Docker runtime and PostgreSQL persistence smoke
+
+on:
+  pull_request:
+    paths:
+      - 'Dockerfile'
+      - '.dockerignore'
+      - 'docker-compose.yml'
+      - '.github/workflows/staging-runtime-smoke.yml'
+      - 'src/**'
+      - 'config/**'
+      - 'sql/**'
+      - 'web/**'
+      - 'package.json'
+      - 'package-lock.json'
+  push:
+    branches: [main]
+    paths:
+      - 'Dockerfile'
+      - '.dockerignore'
+      - 'docker-compose.yml'
+      - '.github/workflows/staging-runtime-smoke.yml'
+      - 'src/**'
+      - 'config/**'
+      - 'sql/**'
+      - 'web/**'
+      - 'package.json'
+      - 'package-lock.json'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: sadiaaf-runtime-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  isolated-runtime:
+    name: Build, boot, migrate and verify persistent PostgreSQL
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    env:
+      COMPOSE_PROJECT_NAME: sadiaaf-smoke-${{ github.run_id }}
+      DOCKER_BUILDKIT: '1'
+      COMPOSE_DOCKER_CLI_BUILD: '1'
+    steps:
+      - name: Checkout exact tested revision
+        uses: actions/checkout@v4
+      - name: Run isolated Docker stack, verify DB persistence, clean CI resources
+        shell: bash
+        run: |
+          set -euo pipefail
+          # GitHub-hosted runner only. Never point this workflow at S1.
+          # This password exists solely on the disposable CI runner.
+          cat > .env <<'ENV'
+          NODE_ENV=test
+          POSTGRES_DB=africafunds_smoke
+          POSTGRES_USER=africafunds_smoke
+          POSTGRES_PASSWORD=ci-only-smoke-do-not-reuse
+          DATABASE_URL=postgresql://africafunds_smoke:ci-only-smoke-do-not-reuse@postgres:5432/africafunds_smoke
+          RAW_ARCHIVE_DIR=/app/data/raw
+          SOURCE_REGISTRY_PATH=/app/config/sources.json
+          LOG_LEVEL=warn
+          ENABLE_SCHEDULER=false
+          API_HOST=0.0.0.0
+          API_PORT=8080
+          API_BIND_PORT=18991
+          WEB_BIND_PORT=18992
+          DASHBOARD_ORIGINS=http://127.0.0.1:18992
+          ENV
+          chmod 600 .env
+
+          cleanup() {
+            result=$?
+            if [ "$result" -ne 0 ]; then
+              docker compose ps || true
+              docker compose logs --tail=70 postgres api web migrate seed || true
+            fi
+            # Destruction is scoped STRICTLY to this disposable GitHub-runner
+            # Compose project and its test volume; never execute this on S1.
+            docker compose down --remove-orphans --volumes || true
+            rm -f .env
+            exit "$result"
+          }
+          trap cleanup EXIT
+
+          docker compose config --quiet
+          if docker compose config --services | grep -qx collector; then
+            echo 'FAIL: collector was enabled without explicit source approval' >&2
+            exit 1
+          fi
+          docker compose build api migrate seed
+          docker compose up -d postgres
+          docker compose run --rm migrate
+          docker compose run --rm seed
+          docker compose up -d api web
+
+          check_http() {
+            local url="$1"
+            for i in $(seq 1 60); do
+              if curl --fail --silent --show-error --max-time 3 "$url" >/dev/null 2>&1; then
+                return 0
+              fi
+              sleep 2
+            done
+            echo "FAIL: local HTTP endpoint unhealthy: $url" >&2
+            return 1
+          }
+
+          check_http http://127.0.0.1:18991/health
+          check_http http://127.0.0.1:18992/health
+
+          curl --fail --silent http://127.0.0.1:18991/health |
+            node -e "let s='';process.stdin.on('data',c=>s+=c);process.stdin.on('end',()=>{const x=JSON.parse(s);if(x.ok!==true||x.database!=='up')process.exit(1);console.log('API can query PostgreSQL')})"
+          curl --fail --silent http://127.0.0.1:18991/api/v1/status |
+            node -e "let s='';process.stdin.on('data',c=>s+=c);process.stdin.on('end',()=>{const x=JSON.parse(s);if(x.ok!==true||!(x.counts.markets>0)||!(x.counts.enabled_sources>0))process.exit(1);console.log('Seeded markets and endpoints:',x.counts.markets,x.counts.enabled_sources)})"
+
+          if [ -n "$(docker compose ps -q collector)" ]; then
+            echo 'FAIL: unauthorized collector started in CI' >&2
+            exit 1
+          fi
+          test "$(docker volume inspect "${COMPOSE_PROJECT_NAME}_postgres_data" --format '{{.Name}}')" = "${COMPOSE_PROJECT_NAME}_postgres_data"
+          before="$(docker compose exec -T postgres sh -c 'psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -Atqc "SELECT count(*) FROM public.schema_migrations"')"
+          test "$before" -ge 6
+          printf 'Migration count before container recreation: %s\n' "$before"
+
+          # Recreate the same project: volumes are NEVER removed here.
+          docker compose down --remove-orphans
+          test "$(docker volume inspect "${COMPOSE_PROJECT_NAME}_postgres_data" --format '{{.Name}}')" = "${COMPOSE_PROJECT_NAME}_postgres_data"
+          docker compose up -d postgres api web
+          check_http http://127.0.0.1:18991/health
+          check_http http://127.0.0.1:18992/health
+
+          after="$(docker compose exec -T postgres sh -c 'psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -Atqc "SELECT count(*) FROM public.schema_migrations"')"
+          test "$after" = "$before"
+          printf 'PASS: PostgreSQL migrations persisted after full container recreation (%s)\n' "$after"
+          echo 'PASS: API and static web healthy on localhost, collector disabled, PG volume preserved.'
