@@ -1,0 +1,51 @@
+# Keep the reproducible Docker build context minimal and free of secrets.
+# Dockerfile requires src/, test/, config/, sql/, docs/ and package*.json.
+
+.git
+.git/**
+.gitignore
+
+# Never follow or bundle host secrets or runtime credentials.
+.env
+.env.*
+**/.env
+**/.env.*
+**/.env/**
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx
+**/*.pem
+**/*.key
+**/*.crt
+**/*.p12
+**/*.pfx
+
+# Data, volumes, backups and runtime artefacts stay outside the image.
+data/raw
+data/raw/**
+node_modules
+**/node_modules
+dist
+coverage
+*.log
+*.dump
+*.bak
+*.tar
+*.tar.gz
+*.tgz
+*.zip
+**/*.dump
+**/*.bak
+**/*.tar
+**/*.tar.gz
+**/*.tgz
+**/*.zip
+
+# Exclude local editor and temporary artefacts.
+.DS_Store
+.idea
+.vscode
+tmp
+temp
