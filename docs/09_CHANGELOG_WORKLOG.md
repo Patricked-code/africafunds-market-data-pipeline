@@ -1,5 +1,18 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-08 — Issue #5 / PR #22 : contrat d'annulation coopérative (continuité)
+
+- **RECONCILIATION** : PR #1 fusionnée, dépôt privé, PR #22 ouverte Draft au HEAD initial `fa524d73cd5ea106e5b551cf7a8bb4d20120a69f` ; AGENTS.md, contrat 15, journal et fichiers métier relus. PR #23/#24 concernent S1 et restent séparées. Recherche GitHub Actions PR sur ce HEAD : liste vide, périmètre limité, **CI NON ATTESTÉE**.
+- **CODE** : `15620dc39e4a20de10170a56d6b4a28bd6a631b6` ajoute un paramètre `AbortSignal` optionnel à `HistoricalWindowAdapter.ingestWindow` ; `58f948d3df0280fb40290c9eea78c042743a4c44` passe le signal depuis le worker et l'annule sur perte de lease ou erreur de renouvellement. Signature antérieure à un argument toujours compatible ; aucune implémentation qualifiée n'est enregistrée.
+- **TEST** : `f458f84e9ee1f4b8958461788c3c2b30017e610f` couvre l'interface optionnelle, le signal annulé et la compatibilité des adaptateurs anciens. **NOT_RUN** localement ; CI PostgreSQL/Node sur nouveau HEAD **NON ATTESTÉE**.
+- **LIMITES** : annulation uniquement coopérative ; aucun adaptateur réel qualifié n'utilise encore le signal ; aucune preuve que des effets externes déjà déclenchés sont interrompus. Pas de collecte, migration, fusion ni S1. Issue #5 **PARTIAL**.
+- **BLOCK_REASON** : CI et tests sur HEAD exact à attester ; adapter-level cancellation, effets externes, heartbeat/concurrence PostgreSQL et historiques officiels restent à prouver.
+- **NEXT_ACTION** : vérifier CI exacte PR #22 ; corriger tout échec ; compléter tests de heartbeat/perte de possession et s'assurer que chaque adaptateur historique futur contrôle AbortSignal avant effets externes, puis poursuivre sources officielles #13/#14 sans contourner licences ou robots. Pas de merge sans gates.
+- **ROLLBACK** : revert ciblé des trois commits sur branche Draft ; aucune donnée ni runtime S1 modifié.
+
+---
+
+
 ## 2026-11-07 — Issue #5 / PR #22 : stale SUCCESS après recovery
 
 - RECONCILIATION : PR #1 fusionnée, PR #22 Draft ; HEAD avant intervention 185e834001cbc94fbb78b07507b8141c955da147 ; dépôt privé ; AGENTS.md, contrat 15 et dernier NEXT_ACTION relus.
