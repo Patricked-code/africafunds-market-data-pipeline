@@ -362,3 +362,23 @@ test('HTML robots challenge without Content-Type fails closed before HEAD', asyn
   });
   assert.equal(result.endpoints[0].historicalCoverage, 'NOT_VERIFIED');
 });
+
+
+test('unparseable nonempty robots response cannot silently authorize a HEAD', async () => {
+  const inventory = { registeredMarkets: 1, registeredEndpoints: 1, endpoints: [{
+    endpointId: 'fixture-robots-garbage', configured: true,
+    urlPolicy: 'APPROVED_HOST', url: 'https://www.brvm.org/fr/indices',
+    historicalCoverage: 'NOT_VERIFIED',
+  }] };
+  const calls = [];
+  const result = await probeInventory(inventory, async (_url, init) => {
+    calls.push(init.method);
+    return new Response('Please enable JavaScript to continue', {
+      status: 200, headers: { 'content-type': 'text/plain' },
+    });
+  });
+  assert.deepEqual(calls, ['GET']);
+  assert.deepEqual(result.endpoints[0].response,
+    { status: 'NOT_PROBED', reason: 'ROBOTS_UNPARSEABLE' });
+  assert.equal(result.endpoints[0].historicalCoverage, 'NOT_VERIFIED');
+});
