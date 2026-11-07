@@ -195,3 +195,22 @@ test('robots equal-specificity groups combine rules conservatively', () => {
   assert.equal(robotsDecision(robots, '/restricted').allowed, false);
   assert.equal(robotsDecision(robots, '/public').allowed, true);
 });
+
+test('publication readiness fails closed for disabled sources and unapproved URL policy', () => {
+  const verified = {
+    endpointId: 'test-official', configured: true, urlPolicy: 'APPROVED_HOST',
+    rightsStatus: 'APPROVED', sourceFormatStatus: 'VALIDATED',
+    historicalAdapterStatus: 'TESTED', historicalCoverage: 'VALIDATED',
+    normalizationStatus: 'VALIDATED', publicationStatus: 'APPROVED',
+    evidenceReferences: ['fixture:official-licensed-source'],
+  };
+  assert.equal(sourceReadiness(verified).eligibleForPublication, true);
+  const disabled = sourceReadiness({ ...verified, configured: false });
+  assert.equal(disabled.eligibleForPublication, false);
+  assert.ok(disabled.blockers.includes('ENDPOINT_DISABLED'));
+  const unsafe = sourceReadiness({ ...verified, urlPolicy: 'UNAPPROVED_HOST' });
+  assert.equal(unsafe.eligibleForPublication, false);
+  assert.ok(unsafe.blockers.includes('URL_POLICY_NOT_APPROVED'));
+  const both = sourceReadiness({ ...verified, configured: false, urlPolicy: 'INVALID_URL' });
+  assert.deepEqual(both.blockers, ['ENDPOINT_DISABLED', 'URL_POLICY_NOT_APPROVED']);
+});
