@@ -1,5 +1,17 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-08 — Issue #13 / PR #25 : CI SUCCESS sur HEAD documentaire exact (run #91)
+
+- **RECONCILIATION** : AGENTS.md, docs/15, checkpoint du 06/11, journal de branche et audit historique relus ; PR #1 fusionnée, PR #22 Draft isolée, PR #25 Draft HEAD `14af521b2fa317d585655f5222b15f37ccca0279` avant écriture. Issue #13 OPEN. Aucune écriture sur main ni sur PR #22.
+- **PREUVE CI EXACTE** : [GitHub Actions run 42505719515](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/42505719515), workflow CI run #91, job [validate 128807789289](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/42505719515/job/128807789289), `completed/success` sur le HEAD précédent `14af521b2fa317d585655f5222b15f37ccca0279`. Les 19 étapes de validation métier listées, dont snapshot offline 44 sources, typecheck, unit, build, migrations/seed et PostgreSQL, sont SUCCESS. Cela ne certifie pas accès réseau, licences, contenu, historique ou S1.
+- **ACTION** : attestation persistante du run exact dans le journal de PR #25 ; aucun changement aux 44 sources, tests, workflows ou code de production. La présente écriture documentaire avance le HEAD et nécessite donc une nouvelle vérification CI sur le nouveau SHA.
+- **BLOCK_REASON** : revue indépendante/gates de fusion non attestées ; 22 NOT_PROBED, 7 RESTRICTED, 1 NOT_FOUND sans qualification officielle ; pas de données témoins ni historique complet. Aucune fusion autorisée.
+- **NEXT_ACTION** : vérifier les checks sur le HEAD documentaire résultant, obtenir la revue indépendante, puis instruire les accès robots/contrats officiels des 22/7/1 sans bypass ; poursuivre issue #14 sur un chantier indépendant uniquement avec formats et échantillons autorisés. Ne pas modifier PR #22 simultanément.
+- **ROLLBACK** : revert de cette seule entrée de journal sur la branche PR #25 ; aucune action S1.
+
+---
+
+
 ## 2026-11-08 — Issue #13 / PR #25 : CI de correction attestée, audit statique validé
 
 - **RECONCILIATION** : PR #25 indépendante de PR #22 ; reprise du NEXT_ACTION de vérification de la CI du correctif de parseur Markdown. HEAD documentaire avant ce checkpoint : `de3b418d04ac7130e060d2882eee683233518a9d` (à recontrôler après écriture). Contrat AGENTS.md et docs/15 relus ; aucune mutation des 44 endpoints.
