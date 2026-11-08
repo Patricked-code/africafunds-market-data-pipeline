@@ -1,5 +1,17 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-08 — Issue #5 / PR #22 : borne négative de normalisation sans erreur SQL
+
+- **RECONCILIATION** : AGENTS.md, docs/15, journal le plus récent, checkpoint du 06/11 et SQL/tests concernés relus sur branche Draft ; issue #5 et PR #22 ouvertes au contrôle GitHub ; PR #1 documentaire déjà fusionnée d'après continuité précédente. CI pull_request filtrée sur HEAD antérieur `8209f5a5641e0a91cb4caef52890cef5f5447cc0` : zéro résultat, périmètre limité ; aucune CI réussie attestée. Les métadonnées de protection de main et les revues restent à vérifier avant intégration.
+- **DÉFAUT** : `FAIL_EXHAUSTED_BACKFILLS_SQL` vérifiait `$1 > 0` dans WHERE mais passait `LIMIT $1` directement à PostgreSQL : un argument négatif pouvait déclencher une erreur SQL plutôt que retourner zéro ligne. Aucun appel production avec limite négative n'a été attesté.
+- **CODE** : commit `26ca0acf5cf493ac6eb1d6c70ff9aef0146a45f8` remplace uniquement cette borne par `LIMIT GREATEST($1::integer, 0)`. Le traitement nominal positif et les exclusions RUNNING restent inchangés ; aucune migration, source ou donnée réelle modifiée.
+- **TEST** : commit `647ec28f70bd499ce5bd8695eb0ee684909f2f5b` étend le test PostgreSQL de normalisation : limite -1 retourne zéro ligne, en complément de la limite 0 et des fixtures RUNNING/RETRY/PENDING. **NOT_RUN** : aucune exécution PostgreSQL ou CI sur le nouveau HEAD attestée.
+- **BLOCK_REASON** : preuve CI/PostgreSQL isolée et revue indépendante manquantes ; heartbeat et annulation d'effets externes encore non certifiés ; gates de fusion et de S1 non satisfaits.
+- **NEXT_ACTION** : vérifier CI/check-runs sur HEAD exact de PR #22, exécuter les tests PostgreSQL isolés et corriger toute régression ; tester course heartbeat/recovery/AbortSignal. Si PR #22 est revendiquée concurremment, reprendre issue #13/#14 sur branche distincte. Aucun merge ni déploiement S1.
+- **ROLLBACK** : revert ciblé des deux commits de code/test et de cette entrée documentaire sur branche Draft.
+
+---
+
 ## 2026-11-08 — Issue #5 / PR #22 : concurrence de normalisation des jobs épuisés (suite)
 
 - **RECONCILIATION** : PR #22 OPEN/Draft, HEAD vérifié avant intervention `aba774b168e59ef80b056f1cde8982b831c4d614`, base `main` selon GitHub ; AGENTS.md, docs/15, journal courant, checkpoint historique et SQL/tests concernés relus. PR #1 documentaire fusionnée selon GitHub. Aucun claim concurrent explicite relevé dans les derniers commentaires consultés.
