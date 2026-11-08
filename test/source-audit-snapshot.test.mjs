@@ -25,7 +25,15 @@ test('the historical 44-endpoint audit snapshot reconciles exactly with the orig
   for (const row of rows) {
     const cells = row.split('|').slice(1, -1).map(cell => cell.trim());
     assert.equal(cells.length, 4, 'malformed audit row: ' + row);
-    const [market, endpointCell, statusCell] = cells;
+    const [market, endpointCell, statusCell, reason] = cells;
+    assert.match(endpointCell, /^`[a-z0-9-]+`$/, 'malformed endpoint cell: ' + endpointCell);
+    assert.ok(reason.length > 0, 'missing historical audit reason for ' + endpointCell);
+    const expectedReason = {
+      RESTRICTED: /^HEAD 403$/,
+      NOT_FOUND: /^HEAD 404$/,
+      HTTP_OK_UNVERIFIED_CONTENT: /^HEAD 200$/,
+      NOT_PROBED: /^ROBOTS_(NETWORK_UNVERIFIED|HTTP_403|COMPLEX_RULE_UNVERIFIED)$/,
+    };
     assert.match(statusCell, /^`[A-Z_]+`$/, 'malformed status cell for ' + endpointCell);
     const status = statusCell.slice(1, -1);
     const id = endpointCell.slice(1, -1);
@@ -33,6 +41,7 @@ test('the historical 44-endpoint audit snapshot reconciles exactly with the orig
     assert.equal(market, expected.get(id), 'wrong market for ' + id);
     assert.ok(!observed.has(id), 'duplicate audit row: ' + id);
     assert.ok(allowed.has(status), 'unknown status for ' + id);
+    assert.match(reason, expectedReason[status], 'status/reason mismatch for ' + id);
     observed.set(id, status);
   }
   assert.equal(observed.size, expected.size, 'missing or additional audit rows');
