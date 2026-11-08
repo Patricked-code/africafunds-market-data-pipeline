@@ -1,5 +1,16 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-08 — Issue #13 / PR #25 : CI de correction attestée, audit statique validé
+
+- **RECONCILIATION** : PR #25 indépendante de PR #22 ; reprise du NEXT_ACTION de vérification de la CI du correctif de parseur Markdown. HEAD documentaire avant ce checkpoint : `de3b418d04ac7130e060d2882eee683233518a9d` (à recontrôler après écriture). Contrat AGENTS.md et docs/15 relus ; aucune mutation des 44 endpoints.
+- **PREUVE CI GREEN** : run GitHub Actions [42500344667](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/42500344667), job `validate` [128791540744](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/42500344667/job/128791540744), conclusion **SUCCESS**. L'étape `Source audit snapshot integrity (offline, 44 original endpoints)` est SUCCESS ; typecheck, unit tests, build, migrations PostgreSQL, seed et tests d'intégration PostgreSQL du job sont SUCCESS. Ce résultat est limité à la révision exécutée ; il ne certifie pas les 44 accès réseau ni les licences. Un run précédent 42500330156 a été annulé, non assimilé à un PASS.
+- **BLOCK_REASON** : 22 NOT_PROBED, 7 RESTRICTED, 1 NOT_FOUND non qualifiés ; contrats officiels, robots, licences et données témoins manquants. Revue indépendante et gates de fusion non attestés ; PR reste Draft. Toute nouvelle écriture requiert CI sur le nouveau HEAD exact.
+- **NEXT_ACTION** : vérifier la CI de ce checkpoint sur son HEAD exact et la revue indépendante, puis qualifier les accès officiels des 22/7/1 sans contourner robots ; préparer les adaptateurs de l'issue #14 uniquement avec preuve de contrat et échantillons autorisés. Conserver PR #22 intacte et poursuivre une tâche indépendante si revue en attente.
+- **ROLLBACK** : revert de cette entrée documentaire sur la branche PR #25 uniquement ; aucune écriture S1, aucun changement de source ou de données financières.
+
+---
+
+
 ## 2026-11-08 — Issue #13 / PR #25 : CI rouge reproduite, correction du parseur de statut Markdown
 
 - **RECONCILIATION** : PR #1 fusionnée ; PR #22 Draft indépendante préservée ; PR #25 Draft. Instructions AGENTS.md, docs/15, dernier worklog de la branche, checkpoint 2026-11-06 et matrice docs/SOURCE_AUDIT_RUN_42314547906.md relus. Le document historique est immuable.
