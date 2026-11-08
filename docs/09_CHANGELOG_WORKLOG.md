@@ -1,5 +1,18 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-08 — Issue #5 / PR #22 : garde anti-cinquième claim sur RETRY historique
+
+- **RECONCILIATION** : dépôt privé, PR #1 fusionnée ; PR #22 OPEN/Draft au HEAD de départ `16b414e553331b16d16e664a85c49f583febb01f`. AGENTS.md, docs/00–15, checkpoint 2026-11-06, issue #5, commentaires de PR et SQL/tests lus. La recherche GitHub Actions `pull_request` sur ce HEAD ne retourne aucun run (périmètre limité), **CI NON ATTESTÉE**. Le HEAD de main et les gates doivent être revérifiés avant toute intégration.
+- **DÉFAUT** : `CLAIM_PENDING_BACKFILLS_SQL` sélectionnait les lignes `RETRY` même avec `attempts >= 4` ; une ligne historique/legacy dans cet état pouvait donc recevoir une cinquième attribution, malgré la borne de recovery ajoutée précédemment.
+- **CODE** : commit `e30322897df962091c1a17292af0963f81157be1` ajoute `AND attempts < 4` à la sélection atomique existante, sans changer tables, contrats, ordonnancement ou source registry.
+- **TEST** : commit `8b1f0ca8624421ac394d6d3947ee30033c1b72dd` ajoute le scénario PostgreSQL d'une ligne `RETRY` à quatre tentatives qui ne peut plus être revendiquée. **NOT_RUN** localement ; aucune CI verte revendiquée. Le test utilise une base isolée avec seed et nettoie sa fixture.
+- **LIMITE** : la garde empêche la cinquième attribution mais laisse une ancienne ligne `RETRY` épuisée dans cet état ; la normalisation de ces lignes doit être traitée séparément avec migration/transition sûre et testée. Le test peut revendiquer une autre tâche si la base d'intégration n'est pas isolée : ne jamais l'exécuter en production.
+- **BLOCK_REASON** : CI et PostgreSQL non attestés sur le nouveau HEAD ; normalisation des `RETRY` épuisés et tests intégrés timer/AbortSignal encore incomplets ; revue indépendante non attestée.
+- **NEXT_ACTION** : contrôler CI/check-runs sur HEAD exact et exécuter les tests sur PostgreSQL isolé ; corriger les échecs. Ajouter ensuite une transition atomique bornée des `RETRY` épuisés vers `FAILED` si admissible, et vérifier le timer de heartbeat/annulation. En cas de claim concurrent sur PR #22, poursuivre une tâche indépendante #13/#14. Pas de merge ni S1.
+- **ROLLBACK** : revert ciblé des deux commits sur la branche Draft, aucune migration ni modification de données réelles.
+
+---
+
 ## 2026-11-08 — Issue #5 / PR #22 : test de frontière du budget de reprise
 
 - **RECONCILIATION** : PR #1 fusionnée ; PR #22 OPEN/Draft, base main d61fe17a6d038de00c06ea1d78ed20cf05e3c5c8, HEAD avant écriture 0f0ac31904f9abe4e17a70cd4717e0248fb5a745. AGENTS.md, docs/15, dernier journal, checkpoint historique et instructions documentaires consultés ; les autres lots restent séparés.
