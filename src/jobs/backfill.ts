@@ -5,7 +5,7 @@ import { toIsoDate } from '../utils/dates.js';
 import { logger } from '../config/logger.js';
 import { loadRegistry } from '../config/registry.js';
 import { assertHistoricalWindowEvidence, findHistoricalWindowAdapter } from './historicalWindowAdapter.js';
-import { CLAIM_PENDING_BACKFILLS_SQL, RECOVER_EXPIRED_BACKFILLS_SQL, RENEW_BACKFILL_LEASE_SQL } from './backfillClaim.js';
+import { CLAIM_PENDING_BACKFILLS_SQL, FAIL_EXHAUSTED_BACKFILLS_SQL, RECOVER_EXPIRED_BACKFILLS_SQL, RENEW_BACKFILL_LEASE_SQL } from './backfillClaim.js';
 
 export async function enqueueBackfill(input: { market?: string; family?: string; from: string; to: string }): Promise<number> {
   const endpoints = await listEndpoints({
@@ -56,6 +56,12 @@ export async function processBackfillJobs(limit = 10): Promise<void> {
   // Recover only expired RUNNING claims before selecting new work. Recovery and
   // claim each use bounded, atomic SKIP LOCKED statements; never mark SUCCESS.
   // Keep the lease conservative until periodic renewal and cancellation are wired.
+  // Retire exhausted legacy PENDING/RETRY rows before any new claims.
+  // This is bounded and idempotent; it never changes RUNNING or financial data.
+  const exhausted = await pool.query(FAIL_EXHAUSTED_BACKFILLS_SQL, [Math.max(0, Math.min(limit, 100))]);
+  if (exhausted.rowCount) {
+    logger.warn({ exhaustedJobs: exhausted.rowCount }, 'Exhausted legacy backfill jobs marked FAILED');
+  }
   const recovery = await pool.query(RECOVER_EXPIRED_BACKFILLS_SQL, [900, Math.max(0, Math.min(limit, 100))]);
   if (recovery.rowCount) {
     logger.warn({ recoveredJobs: recovery.rowCount }, 'Expired backfill claims requeued');
