@@ -1,5 +1,17 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-08 — Issue #13 : garde de cohérence du snapshot officiel 44 sources (branche indépendante)
+
+- **RECONCILIATION** : GitHub Patricked-code, dépôt privé ; PR #22 Draft et travail backfill concurrent préservés. AGENTS.md, docs/15, worklog le plus récent de PR #22, checkpoint 2026-11-06 et audit historique docs/SOURCE_AUDIT_RUN_42314547906.md consultés. Le snapshot d'audit annonce 14 HEAD 200 non qualifiés, 7 HEAD 403, 1 HEAD 404 et 22 NOT_PROBED ; ces chiffres ne prouvent ni licences, ni formats, ni historique.
+- **TRAVAIL INDÉPENDANT #13** : branche `test/source-audit-snapshot-integrity-20261108` créée depuis main ; commit `1db9e228ffd92cb82697b5fb99aad8a6f315a41b` ajoute `test/source-audit-snapshot.test.mjs` : vérifie 11 fichiers de marché, 44 identifiants uniques, correspondance exacte marché/endpoint et 44 lignes de preuve, sans réseau et sans modifier les sources ni l'artefact historique. Toute requalification devra produire une nouvelle preuve et non réécrire le snapshot.
+- **VALIDATION** : commit GitHub attesté ; exécution locale **NOT_RUN** ; CI sur HEAD **NON ATTESTÉE** avant ouverture PR. Aucune amélioration de disponibilité, licence ou couverture réelle revendiquée.
+- **BLOCK_REASON** : les 22 robots non qualifiés, 7 restrictions et le 404 demandent une preuve d'accès officiel autorisé ; le nouveau test statique ne résout pas ces gates. La PR #22 attend toujours ses preuves PostgreSQL/CI et ne doit pas être modifiée simultanément.
+- **NEXT_ACTION** : obtenir les checks CI du test statique sur son HEAD exact et corriger les échecs ; poursuivre #13 par qualification légale des 22 NOT_PROBED et protocole officiel des 7 RESTRICTED/1 NOT_FOUND, sans bypass ; ensuite #14 adaptateurs sous contrat documenté. Ne pas fusionner sans revue/checks, ni déployer S1.
+- **ROLLBACK** : revert du test et de cette entrée sur la branche indépendante ; aucune donnée financière ni source initiale modifiée.
+
+---
+
+
 ## 2026-11-07 — SadiaAF S1 : première installation staging gouvernée, archives persistantes et autorisation des vhosts
 
 - **MANDAT** : l'utilisateur autorise désormais la modification des deux vhosts `sadiaaf.wealthtechinnovations.com` et `api.sadiaaf.wealthtechinnovations.com`, et la suppression d'une archive identifiable. Audit S1 répété : API vhost 16 Ko, frontend 36 Ko ; uniquement pages Plesk d'origine, dossiers historiques `.well-known`, `e-vote`, `sadiaaf_project-v2` ; **aucune archive détectée dans ces vhosts**. Les archives AMF-UMOA, sauvegardes Plesk et autres données hors vhosts ne sont pas autorisées à suppression indifférenciée. Aucune suppression S1 effectuée.
