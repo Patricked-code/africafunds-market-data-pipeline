@@ -1,5 +1,17 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-08 — Issue #5 / PR #22 : preuve SQL heartbeat versus recovery (continuité)
+
+- **RECONCILIATION** : dépôt privé vérifié par get_repo ; PR #1 fusionnée ; PR #22 OPEN/DRAFT au HEAD initial `8fe1fd60725e34add9e184c116ebc93a8c0575b2` ; PR #23/#24 fusionnées (chantier staging indépendant). AGENTS.md, contrat 15, dernier worklog et checkpoint historique relus ; aucune fusion ni intervention S1.
+- **TEST AJOUTÉ** : commit `f7fdb28f2a3e9b9481ce34290cf244a68c821daa`, `test/integration/backfill-fencing.test.ts`. Un RUNNING artificiellement âgé de 20 minutes est renouvelé par le propriétaire ; l'ancien token ne peut plus renouveler ; la récupération TTL 900 s ne peut pas voler le lease rafraîchi ; seul le dernier token peut finaliser SUCCESS. Aucune donnée financière réelle et aucune source originelle modifiées.
+- **VALIDATION** : écriture GitHub confirmée. Test PostgreSQL **NOT_RUN**, CI du nouveau HEAD **NON ATTESTÉE** ; aucune déclaration PASS. Revue indépendante non attestée.
+- **BLOCK_REASON** : absence de preuve PostgreSQL/CI sur le HEAD exact, absence de test end-to-end du timer 60 s et des effets externes des adaptateurs ; sources officielles et historique réel non qualifiés.
+- **NEXT_ACTION** : obtenir CI et exécution PostgreSQL isolée sur PR #22, corriger tout échec, compléter test du timer réel et concurrence A/B ; poursuivre les adaptateurs #14 et l'audit #13 si la validation reste bloquée. Ne pas fusionner, ne pas déployer S1.
+- **ROLLBACK** : revert ciblé du test et du checkpoint sur la branche Draft.
+
+---
+
+
 ## 2026-11-08 — Issue #5 / PR #22 : test d'annulation en cours de traitement (continuité)
 
 - **RECONCILIATION** : lecture de `AGENTS.md`, documents maîtres `docs/00` à `docs/15`, checkpoint `docs/CONTINUITY_CHECKPOINT_2026-11-06.md` et dernier worklog ; dépôt privé, PR #22 OPEN/DRAFT HEAD avant intervention `13921ef50595e7eae9d554610f82db1f4c37eea1`. Les travaux S1 restent indépendants. Aucune fusion ni écriture main.
