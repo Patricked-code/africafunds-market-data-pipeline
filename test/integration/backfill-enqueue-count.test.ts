@@ -18,7 +18,8 @@ test('enqueueBackfill reports only newly created windows on repeat calls', async
   await client.connect();
   const ids: string[] = [];
   const from = '1691-02-03';
-  const to = '1691-02-04';
+  // One day guarantees one window per endpoint for any BACKFILL_BATCH_DAYS.
+  const to = '1691-02-03';
   try {
     const preexisting = await client.query(
       'SELECT backfill_job_id FROM ops.backfill_jobs WHERE window_from=$1 AND window_to=$2 AND endpoint_code=ANY($3::text[])',
