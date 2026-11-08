@@ -7,10 +7,14 @@ const read = (path) => readFileSync(new URL(path, import.meta.url), 'utf8');
 test('the historical 44-endpoint audit snapshot reconciles exactly with the original registry', () => {
   const manifest = JSON.parse(read('../config/sources.json'));
   assert.equal(manifest.marketFiles.length, 11, 'original market-file count changed');
+  assert.equal(new Set(manifest.marketFiles).size, manifest.marketFiles.length, 'duplicate market-file reference');
   const expected = new Map();
+  const marketCodes = new Set();
   for (const file of manifest.marketFiles) {
     assert.match(file, /^sources\/[A-Z]+\.json$/, 'unexpected registry path');
     const market = JSON.parse(read('../config/' + file));
+    assert.ok(!marketCodes.has(market.code), 'duplicate market code: ' + market.code);
+    marketCodes.add(market.code);
     for (const endpoint of market.endpoints) {
       assert.ok(!expected.has(endpoint.id), 'duplicate registry endpoint: ' + endpoint.id);
       expected.set(endpoint.id, market.code);
