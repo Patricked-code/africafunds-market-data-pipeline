@@ -19,10 +19,13 @@ test('the historical 44-endpoint audit snapshot reconciles exactly with the orig
   assert.equal(expected.size, 44, 'original endpoint inventory changed');
 
   const report = read('../docs/SOURCE_AUDIT_RUN_42314547906.md');
-  const rows = report.split('\n').filter(line => /^\| [A-Z]+ \| `[^\x60]+` \|/.test(line));
+  // Do not silently skip a malformed endpoint row: the historical table is evidence.
+  const rows = report.split('\n').filter(line => line.startsWith('| ') && !line.startsWith('| Marché |'));
+  assert.equal(rows.length, expected.size, 'historical audit table row count changed');
   const observed = new Map();
   const allowed = new Set(['NOT_PROBED', 'RESTRICTED', 'NOT_FOUND', 'HTTP_OK_UNVERIFIED_CONTENT']);
   for (const row of rows) {
+    assert.match(row, /^\| [A-Z]+ \| `[a-z0-9-]+` \|/, 'malformed historical audit table row');
     const cells = row.split('|').slice(1, -1).map(cell => cell.trim());
     assert.equal(cells.length, 4, 'malformed audit row: ' + row);
     const [market, endpointCell, statusCell, reason] = cells;
