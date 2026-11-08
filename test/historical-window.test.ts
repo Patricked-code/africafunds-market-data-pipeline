@@ -91,3 +91,28 @@ test('historical adapter contract accepts cooperative cancellation without requi
   };
   assert.deepEqual(await legacy.ingestWindow(window), evidence);
 });
+
+
+test('cooperative historical adapter rejects an in-flight request when its lease signal is aborted', async () => {
+  const controller = new AbortController();
+  let started = false;
+  const cooperative: HistoricalWindowAdapter = {
+    endpointCode: window.endpointCode,
+    async ingestWindow(_requested, signal) {
+      assert.equal(signal, controller.signal);
+      started = true;
+      await new Promise<void>((_resolve, reject) => {
+        if (signal?.aborted) {
+          reject(signal.reason);
+          return;
+        }
+        signal?.addEventListener('abort', () => reject(signal.reason), { once: true });
+      });
+      return evidence;
+    },
+  };
+  const pending = cooperative.ingestWindow(window, controller.signal);
+  assert.equal(started, true);
+  controller.abort(new Error('Backfill lease ownership lost'));
+  await assert.rejects(pending, /Backfill lease ownership lost/);
+});
