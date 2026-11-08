@@ -1,5 +1,16 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-08 — Issue #5 / PR #22 : concurrence de récupération PostgreSQL
+
+- **RECONCILIATION** : instructions AGENTS.md, contrat docs/15, journal récent et checkpoint 2026-11-06 relus sur la branche Draft ; issue #5 et PR #22 OPEN consultées ; aucune preuve de possession simultanée explicite dans les commentaires consultés. Aucun changement de main/S1.
+- **TEST ADDITIF** : commit `882fc107b53aed4189b0c919e855861bcdac7e04` ; deux connexions PostgreSQL indépendantes déclenchent simultanément `RECOVER_EXPIRED_BACKFILLS_SQL` sur un job RUNNING expiré. Assertion : un seul résultat de récupération pour cet ID, état final RETRY, locked_at NULL et attempts inchangé. Fixture datée 1835 pour limiter les collisions ; nettoyage ciblé. Test ajouté, **NOT_RUN** ; n'atteste pas à lui seul l'exécution d'un worker réel.
+- **BLOCK_REASON** : exécution PostgreSQL isolée et CI sur le nouveau HEAD non attestées ; tests du timer de 60 secondes et effets externes des adaptateurs non validés ; qualification des sources #13/#14 encore requise.
+- **NEXT_ACTION** : vérifier GitHub Actions sur HEAD exact, exécuter les tests PostgreSQL avec seed isolé, corriger tout échec ; ensuite tester le heartbeat réel et l'annulation d'un adaptateur coopératif pendant une récupération concurrente. Si PR #22 est revendiquée par un autre agent, se déplacer vers une tâche indépendante #13–#17. Pas de merge ni S1.
+- **ROLLBACK** : revert ciblé du test et de cette entrée sur la branche Draft ; aucun schéma, source ou runtime modifié.
+
+---
+
+
 ## 2026-11-08 — Issue #5 / PR #22 : preuve SQL heartbeat versus recovery (continuité)
 
 - **RECONCILIATION** : dépôt privé vérifié par get_repo ; PR #1 fusionnée ; PR #22 OPEN/DRAFT au HEAD initial `8fe1fd60725e34add9e184c116ebc93a8c0575b2` ; PR #23/#24 fusionnées (chantier staging indépendant). AGENTS.md, contrat 15, dernier worklog et checkpoint historique relus ; aucune fusion ni intervention S1.
