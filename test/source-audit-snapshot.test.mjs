@@ -25,7 +25,9 @@ test('the historical 44-endpoint audit snapshot reconciles exactly with the orig
   for (const row of rows) {
     const cells = row.split('|').slice(1, -1).map(cell => cell.trim());
     assert.equal(cells.length, 4, 'malformed audit row: ' + row);
-    const [market, endpointCell, status] = cells;
+    const [market, endpointCell, statusCell] = cells;
+    assert.match(statusCell, /^`[A-Z_]+`$/, 'malformed status cell for ' + endpointCell);
+    const status = statusCell.slice(1, -1);
     const id = endpointCell.slice(1, -1);
     assert.ok(expected.has(id), 'unregistered endpoint in report: ' + id);
     assert.equal(market, expected.get(id), 'wrong market for ' + id);
