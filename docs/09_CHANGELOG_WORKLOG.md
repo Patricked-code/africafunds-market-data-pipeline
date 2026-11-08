@@ -1,5 +1,18 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-08 — Issue #5 / PR #22 : normalisation bornée des anciens RETRY épuisés
+
+- **RECONCILIATION** : dépôt privé, main `73256f48d81d38ce8ff6f51be9e024b25cf5dadb` (non protégé), PR #22 OPEN/Draft au HEAD initial `78ab825863f56a4970b7c6a033ffb89d1314c778`; AGENTS.md, documents maîtres 00–15, dernier checkpoint, issue #5, SQL et tests relus. Les PR de staging restent indépendantes. Aucun claim concurrent explicite constaté ; recontrôler avant chaque écriture.
+- **CODE** : `126c3b9f0cae42ee4a0aaafde19e9e93b2185614` ajoute `FAIL_EXHAUSTED_BACKFILLS_SQL` : transition atomique et bornée des anciennes lignes PENDING/RETRY avec attempts >= 4 vers FAILED, `finished_at` et motif, sans incrémenter attempts ni toucher RUNNING ; `1b4ede54ba3a49e5f6c06e34f3bda9d041ba6c81` raccorde cette primitive avant recovery/claim dans le worker existant. Pas de migration, de nouveau registre ni de données financières touchées.
+- **TEST** : `a1b9b68ce08468448835917862d4c478e2257673` ajoute un test PostgreSQL vérifiant FAILED, compteur inchangé, absence de nouveau claim et idempotence. **NOT_RUN** : aucune preuve d'exécution PostgreSQL locale. Le test requiert une DB isolée et seedée.
+- **CI** : interrogation Actions filtrée sur HEAD initial = 0 run ; cela ne prouve pas l'absence générale de CI. **CI du nouveau HEAD NON ATTESTÉE**. Aucune revue indépendante attestée ; PR reste Draft.
+- **BLOCK_REASON** : validation CI/PostgreSQL et revue absentes sur HEAD exact ; tests de timer heartbeat, course recovery et effets externes des adaptateurs officiels non certifiés. Le passage FAILED des anciennes lignes n'a pas été testé sur données réelles et ne doit pas être appliqué à la production sans gates.
+- **NEXT_ACTION** : vérifier les check-runs/actions du HEAD exact de PR #22 et exécuter la suite PostgreSQL en environnement isolé, corriger toute régression ; puis couvrir le timer heartbeat et annulation pendant ingestion. Si PR #22 est réclamée par un autre agent, sélectionner issue #13/#14 sans écriture concurrente. Aucun merge, aucun S1.
+- **ROLLBACK** : revert ciblé des trois commits de code/test sur la branche Draft ; aucune migration ni écriture de données réelles.
+
+---
+
+
 ## 2026-11-08 — Issue #5 / PR #22 : garde anti-cinquième claim sur RETRY historique
 
 - **RECONCILIATION** : dépôt privé, PR #1 fusionnée ; PR #22 OPEN/Draft au HEAD de départ `16b414e553331b16d16e664a85c49f583febb01f`. AGENTS.md, docs/00–15, checkpoint 2026-11-06, issue #5, commentaires de PR et SQL/tests lus. La recherche GitHub Actions `pull_request` sur ce HEAD ne retourne aucun run (périmètre limité), **CI NON ATTESTÉE**. Le HEAD de main et les gates doivent être revérifiés avant toute intégration.
