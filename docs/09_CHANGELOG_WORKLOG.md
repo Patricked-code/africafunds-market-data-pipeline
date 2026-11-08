@@ -1,5 +1,17 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-08 — Issue #5 / PR #22 : test des exclusions de normalisation des jobs épuisés
+
+- **RECONCILIATION** : dépôt privé confirmé par GitHub, PR #22 seule PR ouverte (Draft selon dernier état documentaire, vérifier métadonnées avant merge), issue #5 ouverte ; AGENTS.md, contrat docs/15, documents maîtres 00–14, dernier checkpoint et SQL/tests du worker consultés sur la branche. Dernier HEAD documentaire précédent : `201a8d334f370ceae125dcbd7c589d862999ea62`. Recherche GitHub Actions filtrée sur ce SHA : aucun run retourné (interface limitée aux événements pull_request/première page, donc absence de CI non démontrée). Pas de claim concurrent explicite dans les commentaires de PR consultés.
+- **TEST ADDITIF** : commit `6532ebfe97d098c4b47fd7b0958ab1866d736733` dans `test/integration/backfill-expired-budget.test.ts`. Trois fixtures isolées : PENDING/4 doit devenir FAILED ; RUNNING/4 doit rester RUNNING ; RETRY/3 doit rester RETRY ; une limite de 0 ne doit modifier aucune ligne ; compteurs conservés. Réutilise `FAIL_EXHAUSTED_BACKFILLS_SQL`, sans migration, changement de source, nouveau moteur ou opération S1.
+- **VALIDATION** : commit GitHub confirmé ; test PostgreSQL **NOT_RUN** ; CI du nouveau HEAD **NON ATTESTÉE** ; aucune revendication de PASS, revue ou déploiement.
+- **BLOCK_REASON** : accès à une base PostgreSQL de test isolée et preuve de CI sur HEAD exact non obtenus ; tests end-to-end heartbeat/AbortSignal et effets externes des adaptateurs toujours incomplets. Protection main à contrôler et respecter avant toute intégration.
+- **NEXT_ACTION** : obtenir une exécution CI et PostgreSQL isolée sur le HEAD exact de PR #22, corriger les éventuelles régressions, tester timer de renouvellement/annulation pendant concurrence ; si PR #22 revendiquée par un autre agent, sélectionner un travail indépendant des issues #13–#17. Ne pas fusionner, ne pas déployer S1.
+- **ROLLBACK** : revert ciblé du commit de test et de cette entrée sur la branche Draft ; aucun effet sur les données financières ni sur main.
+
+---
+
+
 ## 2026-11-08 — Issue #5 / PR #22 : normalisation bornée des anciens RETRY épuisés
 
 - **RECONCILIATION** : dépôt privé, main `73256f48d81d38ce8ff6f51be9e024b25cf5dadb` (non protégé), PR #22 OPEN/Draft au HEAD initial `78ab825863f56a4970b7c6a033ffb89d1314c778`; AGENTS.md, documents maîtres 00–15, dernier checkpoint, issue #5, SQL et tests relus. Les PR de staging restent indépendantes. Aucun claim concurrent explicite constaté ; recontrôler avant chaque écriture.
