@@ -60,8 +60,12 @@ WITH expired AS (
    LIMIT $2
 )
 UPDATE ops.backfill_jobs AS jobs
-   SET status='RETRY', locked_at=NULL, finished_at=NULL,
-       last_error='Lease expired; awaiting a new atomic claim'
+   SET status=CASE WHEN jobs.attempts >= 4 THEN 'FAILED' ELSE 'RETRY' END,
+       locked_at=NULL,
+       finished_at=CASE WHEN jobs.attempts >= 4 THEN now() ELSE NULL END,
+       last_error=CASE WHEN jobs.attempts >= 4
+         THEN 'Lease expired; retry budget exhausted'
+         ELSE 'Lease expired; awaiting a new atomic claim' END
   FROM expired
  WHERE jobs.backfill_job_id=expired.backfill_job_id
    AND jobs.status='RUNNING'
