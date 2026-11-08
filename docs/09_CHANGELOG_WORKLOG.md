@@ -1,5 +1,17 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-08 — Issue #13 / PR #25 : CI rouge reproduite, correction du parseur de statut Markdown
+
+- **RECONCILIATION** : PR #1 fusionnée ; PR #22 Draft indépendante préservée ; PR #25 Draft. Instructions AGENTS.md, docs/15, dernier worklog de la branche, checkpoint 2026-11-06 et matrice docs/SOURCE_AUDIT_RUN_42314547906.md relus. Le document historique est immuable.
+- **PREUVE CI RED** : GitHub Actions run [42495873780](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/42495873780), job validate 128777996513, conclusion FAILURE : étape « Source audit snapshot integrity », `unknown status for mar-bvc-indices`. Les étapes Node typecheck et unit tests précédentes ont réussi ; les étapes suivantes ont été sautées.
+- **CAUSE ET CORRECTION** : le document d'audit stocke le statut dans une cellule Markdown avec backticks (ex. `\`NOT_PROBED\``), mais le test comparait cette cellule brute à la valeur sans backticks. Correction ciblée dans `test/source-audit-snapshot.test.mjs` : validation du format de la cellule, extraction du contenu entre backticks, puis contrôle du statut canonique. Commit [17e98e1b3251d8e080070cf8c86602c4d18329ca](https://github.com/Patricked-code/africafunds-market-data-pipeline/commit/17e98e1b3251d8e080070cf8c86602c4d18329ca). Aucune modification des 44 sources, de l'artefact d'audit ou de l'accès réseau.
+- **VALIDATION** : CI précédente **FAILURE** attestée ; nouvelle exécution sur HEAD corrigé **NON ATTESTÉE** au moment de ce checkpoint ; pas de PASS anticipé.
+- **BLOCK_REASON** : attente de la nouvelle CI sur HEAD corrigé ; 22 NOT_PROBED, 7 RESTRICTED, 1 NOT_FOUND toujours non qualifiés juridiquement et techniquement.
+- **NEXT_ACTION** : vérifier le run CI associé au HEAD corrigé, inspecter tous les jobs et corriger tout nouvel échec. Puis qualifier les accès officiels autorisés sans contourner robots ; poursuivre les adaptateurs #14 uniquement avec contrats et données témoins. PR #22 doit rester isolée.
+- **ROLLBACK** : revert ciblé du correctif du test et de cette entrée sur PR #25 ; aucune mutation S1 ni de données financières.
+
+---
+
 ## 2026-11-08 — Issue #13 : garde de cohérence du snapshot officiel 44 sources (branche indépendante)
 
 - **RECONCILIATION** : GitHub Patricked-code, dépôt privé ; PR #22 Draft et travail backfill concurrent préservés. AGENTS.md, docs/15, worklog le plus récent de PR #22, checkpoint 2026-11-06 et audit historique docs/SOURCE_AUDIT_RUN_42314547906.md consultés. Le snapshot d'audit annonce 14 HEAD 200 non qualifiés, 7 HEAD 403, 1 HEAD 404 et 22 NOT_PROBED ; ces chiffres ne prouvent ni licences, ni formats, ni historique.
