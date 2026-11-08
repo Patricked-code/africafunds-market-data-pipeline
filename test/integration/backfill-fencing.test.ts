@@ -168,3 +168,50 @@ test('expired owner cannot finalize after recovery and a fresh claim', async () 
     await client.end();
   }
 });
+
+
+test('heartbeat refresh prevents premature recovery and stale timestamp renewal', async () => {
+  assert.ok(process.env.DATABASE_URL, 'Use an isolated PostgreSQL test database');
+  const client = new pg.Client({ connectionString: process.env.DATABASE_URL });
+  await client.connect();
+  let jobId: string | undefined;
+  try {
+    const endpoint = await client.query<{ endpoint_code: string }>(
+      'SELECT endpoint_code FROM source.source_endpoints ORDER BY endpoint_code LIMIT 1',
+    );
+    assert.ok(endpoint.rows[0], 'source registry must be seeded');
+    const created = await client.query<{ backfill_job_id: string }>(
+      `INSERT INTO ops.backfill_jobs(endpoint_code, window_from, window_to, status, attempts, locked_at)
+       VALUES ($1, '1836-01-01', '1836-01-02', 'RUNNING', 1, now()-interval '20 minutes')
+       ON CONFLICT(endpoint_code, window_from, window_to)
+       DO UPDATE SET status='RUNNING', attempts=1, locked_at=now()-interval '20 minutes'
+       RETURNING backfill_job_id`,
+      [endpoint.rows[0]!.endpoint_code],
+    );
+    jobId = created.rows[0]!.backfill_job_id;
+    const before = await client.query<{ locked_at: string }>(
+      'SELECT locked_at::text FROM ops.backfill_jobs WHERE backfill_job_id=$1', [jobId],
+    );
+    const heartbeat = await client.query<{ claim_locked_at: string }>(
+      RENEW_BACKFILL_LEASE_SQL, [jobId, 1, before.rows[0]!.locked_at],
+    );
+    assert.equal(heartbeat.rowCount, 1, 'the current owner renews an expired timestamp before recovery');
+    const stale = await client.query(
+      RENEW_BACKFILL_LEASE_SQL, [jobId, 1, before.rows[0]!.locked_at],
+    );
+    assert.equal(stale.rowCount, 0, 'old heartbeat token must not renew again');
+    const recovered = await client.query(RECOVER_EXPIRED_BACKFILLS_SQL, [900, 10]);
+    assert.ok(!recovered.rows.some(row => row.backfill_job_id === jobId),
+      'recovery must not steal a freshly renewed lease');
+    const terminal = await client.query(
+      `UPDATE ops.backfill_jobs SET status='SUCCESS'
+        WHERE backfill_job_id=$1 AND status='RUNNING'
+          AND attempts=$2 AND locked_at::text=$3`,
+      [jobId, 1, heartbeat.rows[0]!.claim_locked_at],
+    );
+    assert.equal(terminal.rowCount, 1, 'renewed owner can finalize with latest token');
+  } finally {
+    if (jobId) await client.query('DELETE FROM ops.backfill_jobs WHERE backfill_job_id=$1', [jobId]);
+    await client.end();
+  }
+});
