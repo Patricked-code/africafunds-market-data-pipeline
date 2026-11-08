@@ -1,5 +1,18 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-08 — Issue #13 / PR #25 : CI #98 attestée et extraction bornée du tableau historique
+
+- **RÉCONCILIATION** : PR #25 OPEN/Draft HEAD initial `1c9485dfd9f6a6be0591807f0ad47658d03287ff`, PR #22 laissée intacte, issue #13 OPEN ; AGENTS.md, docs/15, journal de branche, audit 42314547906 et commentaires de claim lus. Réservation bornée PR #25 à 23:00 UTC.
+- **PREUVE CI** : [run #98 42526316334](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/42526316334) completed/SUCCESS sur HEAD initial ; job validate `128870640991` SUCCESS (snapshot offline, typecheck, unit, build, migrations PostgreSQL et intégration). Reviews : aucune. Cette preuve ne couvre pas le nouveau code.
+- **CODE/TEST ADDITIF** : commit `508d8f1161e4e77d0e9d8534924d2519f1130609` : extraction du tableau strictement bornée entre ses deux titres ; comptabilisation des lignes avec pipe sans espace et contrôle strict de leur format, au lieu d'ignorer silencieusement les lignes malformées. Les 44 sources et l'artefact historique restent inchangés.
+- **VALIDATION** : nouveau test local NOT_RUN ; CI sur HEAD résultant NON ATTESTÉE à l'instant de l'écriture. Aucune preuve de disponibilité réseau, licence, données témoins ou HISTORY_COMPLETE.
+- **BLOCK_REASON** : CI sur HEAD résultant, revue/gates et qualifications officielles des 22 NOT_PROBED, 7 RESTRICTED, 1 NOT_FOUND non attestées.
+- **NEXT_ACTION** : contrôler CI/checks exacts de PR #25 après ce checkpoint, corriger toute régression ; faire qualifier l'accès officiel et les formats témoins sans bypass ; poursuivre issue #14 indépendamment si les contrats/échantillons sont disponibles. Préserver PR #22. Aucune fusion ni déploiement S1.
+- **ROLLBACK** : revert ciblé du test et de ce checkpoint sur la branche Draft.
+
+---
+
+
 ## 2026-11-08 — Issue #13 / PR #25 : CI #96 et garde des marchés du registre
 
 - **RECONCILIATION** : AGENTS.md, docs/15 et dernier worklog lus sur la branche PR #25 ; issue #13 et PR #25 ouvertes ; claim borné PR #25, PR #22 préservée. Historique main/PR à revérifier avant toute fusion.
