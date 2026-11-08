@@ -1,5 +1,17 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-08 — Issue #5 / PR #22 : borne des tentatives lors de la récupération après crash
+
+- **RECONCILIATION** : AGENTS.md, contrat docs/15, dernier journal sur branche Draft, checkpoint historique, issue #5 et PR #22 consultés. Le HEAD historique du précédent checkpoint est une référence et non une preuve de CI. La recherche des runs pull_request pour `7026e3c496633e3dd2516e0ce082a7901e3e7b41` ne retourne aucun résultat (outil limité à la première page et à cet événement).
+- **DÉFAUT STATIQUE** : la récupération des leases expirés remettait systématiquement RUNNING en RETRY, même après quatre claims, permettant des reprises infinies après crash sans passer par la branche d'échec normal.
+- **CODE** : `954383882b13cb78b3f682a9229999c299724b95` corrige `RECOVER_EXPIRED_BACKFILLS_SQL` : les tâches expirées avec attempts >= 4 passent à FAILED, finished_at est fixé, last_error explicite ; les autres continuent en RETRY sans incrémenter attempts. Aucun schéma modifié.
+- **TEST** : `ef9ce189ffe184f88c1616f991811249c1fd30d7` ajoute un scénario PostgreSQL isolé à quatre tentatives, vérifiant FAILED, compteur stable, libération du verrou, finished_at, motif et non-récupération répétée. **NOT_RUN** localement ; aucune réussite CI/PostgreSQL revendiquée.
+- **BLOCK_REASON** : aucune preuve CI/PostgreSQL sur le HEAD des nouveaux commits ; timer de heartbeat, annulation des effets externes et qualification des sources réelles encore à démontrer. Revue indépendante non attestée.
+- **NEXT_ACTION** : vérifier CI du nouveau HEAD, exécuter la suite PostgreSQL sur DB isolée avec seed et corriger tout échec ; ajouter ensuite un test de course heartbeat/recovery et de perte de possession dans le worker. Si PR #22 est revendiquée concurremment, travailler sur issue #13 ou #14 sans écraser ses fichiers. Ne pas fusionner ni déployer S1.
+- **ROLLBACK** : revert ciblé des deux commits sur branche Draft ; aucune écriture main/S1 ni données officielles modifiées.
+
+---
+
 ## 2026-11-08 — Issue #5 / PR #22 : concurrence de récupération PostgreSQL
 
 - **RECONCILIATION** : instructions AGENTS.md, contrat docs/15, journal récent et checkpoint 2026-11-06 relus sur la branche Draft ; issue #5 et PR #22 OPEN consultées ; aucune preuve de possession simultanée explicite dans les commentaires consultés. Aucun changement de main/S1.
