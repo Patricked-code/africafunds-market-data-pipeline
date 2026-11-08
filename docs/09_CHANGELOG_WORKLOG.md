@@ -1,5 +1,17 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-08 — Issue #5 / PR #22 : test de frontière du budget de reprise
+
+- **RECONCILIATION** : PR #1 fusionnée ; PR #22 OPEN/Draft, base main d61fe17a6d038de00c06ea1d78ed20cf05e3c5c8, HEAD avant écriture 0f0ac31904f9abe4e17a70cd4717e0248fb5a745. AGENTS.md, docs/15, dernier journal, checkpoint historique et instructions documentaires consultés ; les autres lots restent séparés.
+- **CI** : recherche des workflows pull_request du HEAD précédent = liste vide ; statuts combinés = liste vide. Ces interfaces sont incomplètes (première page, événement pull_request seulement) : aucun PASS ou absence générale de CI n'est déduit. Le workflow ci.yml existe et inclut PostgreSQL et test:integration.
+- **TEST AJOUTÉ** : commit `92877060951efb71ee6f6c047577dba7fd4a5205` ; `test/integration/backfill-expired-budget.test.ts` couvre le cas complémentaire attempts=3, lease expiré : récupération unique en RETRY, compteur inchangé, verrou libéré, finished_at NULL, motif explicite, seconde récupération impossible. Complète le cas attempts=4 → FAILED. Test écrit, **NOT_RUN** ; pas de preuve de réussite PostgreSQL.
+- **BLOCK_REASON** : aucun check/run CI attesté sur HEAD exact ; exécution PostgreSQL isolée indisponible via ce connecteur ; test timer de heartbeat/perte de possession et effets externes réels non certifiés. PR Draft et revue non attestée.
+- **NEXT_ACTION** : contrôler les check-runs GitHub Actions sur le HEAD exact et exécuter test:integration sur PostgreSQL isolé ; corriger les échecs. Ensuite tester la course heartbeat/recovery et l'annulation pendant ingestion. Ne pas fusionner ni déployer S1 sans gates.
+- **ROLLBACK** : revert ciblé du commit de test, sans migration, modification des 44 sources ni donnée de production.
+
+---
+
+
 ## 2026-11-08 — Issue #5 / PR #22 : borne des tentatives lors de la récupération après crash
 
 - **RECONCILIATION** : AGENTS.md, contrat docs/15, dernier journal sur branche Draft, checkpoint historique, issue #5 et PR #22 consultés. Le HEAD historique du précédent checkpoint est une référence et non une preuve de CI. La recherche des runs pull_request pour `7026e3c496633e3dd2516e0ce082a7901e3e7b41` ne retourne aucun résultat (outil limité à la première page et à cet événement).
