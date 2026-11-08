@@ -1,5 +1,17 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-08 — Issue #5 / PR #22 : concurrence de normalisation des jobs épuisés (suite)
+
+- **RECONCILIATION** : PR #22 OPEN/Draft, HEAD vérifié avant intervention `aba774b168e59ef80b056f1cde8982b831c4d614`, base `main` selon GitHub ; AGENTS.md, docs/15, journal courant, checkpoint historique et SQL/tests concernés relus. PR #1 documentaire fusionnée selon GitHub. Aucun claim concurrent explicite relevé dans les derniers commentaires consultés.
+- **TEST ADDITIF** : commit `5d6ddf6223728e5a1008c2a6ef67ef02cea5cbba` ajoute `test/integration/backfill-exhausted-concurrency.test.ts` : deux connexions PostgreSQL lancent simultanément `FAIL_EXHAUSTED_BACKFILLS_SQL` sur une fixture RETRY/4, vérifient une seule transition observée, FAILED, attempts=4 et finished_at non nul. Utilise la primitive et les tables existantes ; base isolée et registre seedé obligatoires. Aucun code de production, migration ou source historique modifié.
+- **VALIDATION** : commit GitHub confirmé ; test PostgreSQL **NOT_RUN**. Recherche Actions pull_request sur HEAD précédent : aucun run retourné, interface limitée à la première page/événement ; **CI NON ATTESTÉE**, pas de PASS revendiqué. PR Draft, pas de merge ni S1.
+- **BLOCK_REASON** : preuve CI/PostgreSQL isolée sur HEAD exact manquante ; heartbeat timer et effets externes d'adaptateurs non certifiés ; protection/revue de main à vérifier avant toute fusion.
+- **NEXT_ACTION** : obtenir CI et exécuter la suite d'intégration sur PostgreSQL isolé, corriger tout échec ; tester la course heartbeat/recovery et l'annulation coopérative. En cas de claim concurrent, basculer vers un travail indépendant #13/#14. Ne pas fusionner ni déployer S1.
+- **ROLLBACK** : revert ciblé du commit de test et de cette entrée sur branche Draft ; aucune donnée financière modifiée.
+
+---
+
+
 ## 2026-11-08 — Issue #5 / PR #22 : test des exclusions de normalisation des jobs épuisés
 
 - **RECONCILIATION** : dépôt privé confirmé par GitHub, PR #22 seule PR ouverte (Draft selon dernier état documentaire, vérifier métadonnées avant merge), issue #5 ouverte ; AGENTS.md, contrat docs/15, documents maîtres 00–14, dernier checkpoint et SQL/tests du worker consultés sur la branche. Dernier HEAD documentaire précédent : `201a8d334f370ceae125dcbd7c589d862999ea62`. Recherche GitHub Actions filtrée sur ce SHA : aucun run retourné (interface limitée aux événements pull_request/première page, donc absence de CI non démontrée). Pas de claim concurrent explicite dans les commentaires de PR consultés.
