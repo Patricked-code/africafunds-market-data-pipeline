@@ -8,6 +8,7 @@ WITH candidates AS (
   SELECT backfill_job_id, attempts
     FROM ops.backfill_jobs
    WHERE status IN ('PENDING', 'RETRY')
+     AND attempts < 4
    ORDER BY window_from, endpoint_code
    FOR UPDATE SKIP LOCKED
    LIMIT $1
