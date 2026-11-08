@@ -215,3 +215,43 @@ test('heartbeat refresh prevents premature recovery and stale timestamp renewal'
     await client.end();
   }
 });
+
+
+test('two concurrent recovery workers cannot both recover the same expired job', async () => {
+  assert.ok(process.env.DATABASE_URL, 'Use an isolated PostgreSQL test database');
+  const a = new pg.Client({ connectionString: process.env.DATABASE_URL });
+  const b = new pg.Client({ connectionString: process.env.DATABASE_URL });
+  await Promise.all([a.connect(), b.connect()]);
+  let jobId: string | undefined;
+  try {
+    const endpoint = await a.query<{ endpoint_code: string }>(
+      'SELECT endpoint_code FROM source.source_endpoints ORDER BY endpoint_code LIMIT 1',
+    );
+    assert.ok(endpoint.rows[0], 'source registry must be seeded');
+    const created = await a.query<{ backfill_job_id: string }>(
+      `INSERT INTO ops.backfill_jobs(endpoint_code, window_from, window_to, status, attempts, locked_at)
+       VALUES ($1, '1835-01-01', '1835-01-02', 'RUNNING', 1, now()-interval '20 minutes')
+       ON CONFLICT(endpoint_code, window_from, window_to)
+       DO UPDATE SET status='RUNNING', attempts=1, locked_at=now()-interval '20 minutes'
+       RETURNING backfill_job_id`,
+      [endpoint.rows[0]!.endpoint_code],
+    );
+    jobId = created.rows[0]!.backfill_job_id;
+    // The two statements run through independent connections, competing for the same row.
+    const [left, right] = await Promise.all([
+      a.query<{ backfill_job_id: string }>(RECOVER_EXPIRED_BACKFILLS_SQL, [900, 100]),
+      b.query<{ backfill_job_id: string }>(RECOVER_EXPIRED_BACKFILLS_SQL, [900, 100]),
+    ]);
+    const recoveries = [...left.rows, ...right.rows].filter(row => row.backfill_job_id === jobId);
+    assert.equal(recoveries.length, 1, 'exactly one recovery worker may claim the expired row');
+    const state = await a.query<{ status: string; locked_at: Date | null; attempts: number }>(
+      'SELECT status, locked_at, attempts FROM ops.backfill_jobs WHERE backfill_job_id=$1', [jobId],
+    );
+    assert.equal(state.rows[0]!.status, 'RETRY');
+    assert.equal(state.rows[0]!.locked_at, null);
+    assert.equal(state.rows[0]!.attempts, 1, 'recovery must not increment the attempt generation');
+  } finally {
+    if (jobId) await a.query('DELETE FROM ops.backfill_jobs WHERE backfill_job_id=$1', [jobId]);
+    await Promise.all([a.end(), b.end()]);
+  }
+});
