@@ -1,5 +1,18 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-08 — Issue #5 / PR #22 : fixture heartbeat non destructive (continuité)
+
+- **RECONCILIATION** : lecture GitHub des AGENTS.md, docs/15, dernier worklog et checkpoint historique, issue #5, PR #1/#12/#18/#22, code du worker et du claim, test de concurrence et commentaires PR #22. PR #22 toujours OPEN/Draft ; la recherche limitée des runs pull_request pour HEAD antérieur `e1247eb5e6e0bf4b90c2472c07d44bfb0cea3d8f` renvoie zéro résultat : **CI NON ATTESTÉE**, pas une preuve d'absence de checks.
+- **DÉFAUT STATIQUE** : le test `backfill-heartbeat-recovery-race.test.ts` utilisait `ON CONFLICT ... DO UPDATE` pour sa fixture historique ; en cas de collision avec une ligne préexistante, il pouvait modifier puis supprimer un job qui ne lui appartenait pas. Cette anomalie concerne le test, pas un incident de production observé.
+- **CORRECTION** : commit `e1606b39bf871d56f6cac7bdf637735c2c435980` remplace l'upsert destructif par `ON CONFLICT ... DO NOTHING` et exige une insertion effective avant toute manipulation/nettoyage. Aucune modification de code métier, migration, source ou donnée financière.
+- **VALIDATION** : écriture GitHub confirmée ; PostgreSQL **NOT_RUN**, CI sur nouveau HEAD **NON ATTESTÉE**. L'absence de collision reste un prérequis explicite du test ; un schéma de fixtures entièrement isolées doit être privilégié pour l'exécution.
+- **BLOCK_REASON** : exécution PostgreSQL isolée, checks CI complets, revue indépendante, timer heartbeat réel et annulation coopérative non attestés ; ne pas fusionner ni déployer.
+- **NEXT_ACTION** : vérifier le HEAD et les checks complets de PR #22 ; lancer PostgreSQL isolé et corriger les tests ; couvrir le timer réel et la perte de possession en cours d'adaptateur, puis avancer #13/#14 sur branche indépendante si collision de possession.
+- **ROLLBACK** : revert ciblé du commit de test et de cette entrée sur la branche Draft.
+
+---
+
+
 ## 2026-11-08 — Issue #5 / PR #22 : course heartbeat vs recovery sous verrou PostgreSQL
 
 - **RECONCILIATION** : GitHub Patricked-code vérifié ; dépôt privé ; PR #1 fusionnée ; PR #22 OPEN/Draft, HEAD initial `f5c89ed3b76b8d0e19991ad0f547f9179b12e950`, base main `d61fe17a6d038de00c06ea1d78ed20cf05e3c5c8` selon PR. AGENTS.md, docs/15, dernier journal, checkpoint historique, code SQL et tests existants relus. Statuts combinés sur HEAD initial : liste vide ; cela ne prouve pas l'absence de workflows/check-runs. Aucune fusion ni déploiement.
