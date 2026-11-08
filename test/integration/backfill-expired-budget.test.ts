@@ -194,6 +194,8 @@ test('exhausted-job retirement excludes active RUNNING and eligible RETRY jobs',
     }
     const zero = await client.query<{ backfill_job_id: string }>(FAIL_EXHAUSTED_BACKFILLS_SQL, [0]);
     assert.equal(zero.rows.length, 0, 'zero limit must not mutate any row');
+    const negative = await client.query<{ backfill_job_id: string }>(FAIL_EXHAUSTED_BACKFILLS_SQL, [-1]);
+    assert.equal(negative.rows.length, 0, 'negative batch limit must be a safe no-op');
     const retired = await client.query<{ backfill_job_id: string }>(FAIL_EXHAUSTED_BACKFILLS_SQL, [100]);
     assert.equal(retired.rows.filter(row => ids.includes(row.backfill_job_id)).length, 1);
     assert.equal(retired.rows.find(row => ids.includes(row.backfill_job_id))?.backfill_job_id, ids[0]);
