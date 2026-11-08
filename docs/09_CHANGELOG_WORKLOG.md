@@ -1,5 +1,18 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-08 — Issue #5 / PR #22 : comptage idempotent des fenêtres de backfill
+
+- **RECONCILIATION** : AGENTS.md, docs/15, worklog de la branche PR #22 et checkpoint historique lus ; PR #1/#12/#18 fusionnées, PR #22 OPEN/Draft au HEAD initial `59ff0b6a7aaece46d625b707969ef5a944675311` (vérification GitHub). Aucune autorisation de fusion ou de déploiement implicite.
+- **DÉFAUT STATIQUE** : `enqueueBackfill()` incrémentait `count` pour chaque fenêtre tentée, même si `INSERT ... ON CONFLICT DO NOTHING` n'insérait rien. Une reprise identique pouvait donc annoncer de fausses nouvelles fenêtres. Aucune anomalie de données financières en production n'est attestée.
+- **CODE** : commit `bda9eb0a1e514c74222c74349b05188ea5a265ee` utilise le `rowCount` réel de l'INSERT pour compter seulement les fenêtres créées ; aucune migration, changement de schéma, source ou ordonnanceur.
+- **TEST** : commit `b86b2a96deddb46118236b434875a2da86c45279` crée `test/integration/backfill-enqueue-count.test.ts` : fenêtre de fixture inutilisée, première insertion, seconde invocation idempotente (retour 0), absence de doublons, nettoyage par IDs créés uniquement. PostgreSQL isolé requis. **NOT_RUN** : aucun PASS PostgreSQL ou CI attesté sur ces commits.
+- **BLOCK_REASON** : checks GitHub Actions/PostgreSQL sur HEAD final et revue indépendante non attestés ; heartbeat réel/AbortSignal et protections de main non certifiés ; les adaptateurs historiques restent partiellement non qualifiés.
+- **NEXT_ACTION** : contrôler CI/check-runs sur le HEAD exact de PR #22 et exécuter les tests PostgreSQL isolés ; corriger les éventuels échecs ; couvrir perte de possession pendant adaptateur et annulation coopérative. Si PR #22 revendiquée par un autre agent, continuer indépendamment #13/#14 sans toucher à ses fichiers.
+- **ROLLBACK** : revert ciblé des deux commits code/test et de cette entrée, sans suppression de données ni écriture S1.
+
+---
+
+
 ## 2026-11-08 — Issue #5 / PR #22 : fixture heartbeat non destructive (continuité)
 
 - **RECONCILIATION** : lecture GitHub des AGENTS.md, docs/15, dernier worklog et checkpoint historique, issue #5, PR #1/#12/#18/#22, code du worker et du claim, test de concurrence et commentaires PR #22. PR #22 toujours OPEN/Draft ; la recherche limitée des runs pull_request pour HEAD antérieur `e1247eb5e6e0bf4b90c2472c07d44bfb0cea3d8f` renvoie zéro résultat : **CI NON ATTESTÉE**, pas une preuve d'absence de checks.
