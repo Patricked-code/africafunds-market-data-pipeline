@@ -1,5 +1,17 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-08 — Issue #13 / PR #25 : preuve CI #92 et cohérence des motifs du snapshot
+
+- **RECONCILIATION** : PR #1 fusionnée, PR #22 Draft préservée, PR #25 Draft sur base main ; AGENTS.md, docs/00–15 selon ordre prescrit, checkpoint du 06/11, worklog et matrice SOURCE_AUDIT_RUN_42314547906.md relus. PR #25 HEAD initial vérifié `1e7e1c6784066f800cabe4a2df67c68326fc14e5` ; claim borné consigné en commentaire PR #25.
+- **PREUVE CI** : [run 42510745996](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/42510745996) (#92) `completed/success` associé au HEAD initial ; ne pas étendre cette preuve au nouveau commit.
+- **CODE/TEST** : commit [925055b82139ea2cb33231417bfc54d057745237](https://github.com/Patricked-code/africafunds-market-data-pipeline/commit/925055b82139ea2cb33231417bfc54d057745237) renforce le test offline de la matrice : identifiant Markdown strict, motif non vide, concordance entre statuts et motifs historiques `HEAD 200/403/404` ou `ROBOTS_*`. Aucune requête réseau, aucune altération des 44 sources ni de l'artefact historique.
+- **VALIDATION** : code enregistré sur GitHub ; CI du nouveau HEAD **NON ATTESTÉE** à l'instant du checkpoint. Les 22 NOT_PROBED, 7 RESTRICTED, 1 NOT_FOUND et 14 HEAD 200 non qualifiés restent historiques et non certifiés.
+- **BLOCK_REASON** : CI du HEAD résultant à vérifier, revue indépendante et gates non attestées ; contrats/licences/robots et formats témoins manquants pour qualification réelle.
+- **NEXT_ACTION** : contrôler les check-runs de PR #25 sur HEAD exact après ce checkpoint, corriger tout échec ; obtenir revue indépendante ; poursuivre les qualifications officielles des 22/7/1 sans bypass, ou tâche indépendante #14 avec échantillons autorisés. Ne pas modifier PR #22 simultanément. Aucun merge ni déploiement S1.
+- **ROLLBACK** : revert ciblé du test et de cette entrée sur la seule branche PR #25.
+
+---
+
 ## 2026-11-08 — Issue #13 / PR #25 : CI SUCCESS sur HEAD documentaire exact (run #91)
 
 - **RECONCILIATION** : AGENTS.md, docs/15, checkpoint du 06/11, journal de branche et audit historique relus ; PR #1 fusionnée, PR #22 Draft isolée, PR #25 Draft HEAD `14af521b2fa317d585655f5222b15f37ccca0279` avant écriture. Issue #13 OPEN. Aucune écriture sur main ni sur PR #22.
