@@ -1,5 +1,17 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-08 — Issue #13 / PR #25 : CI #96 et garde des marchés du registre
+
+- **RECONCILIATION** : AGENTS.md, docs/15 et dernier worklog lus sur la branche PR #25 ; issue #13 et PR #25 ouvertes ; claim borné PR #25, PR #22 préservée. Historique main/PR à revérifier avant toute fusion.
+- **PREUVE CI EXACTE DU HEAD PRECEDENT** : [run 42521181478](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/42521181478), run #96 completed/SUCCESS, job validate 128854818772 SUCCESS, étapes offline snapshot, typecheck, unit, build, migrations, seed, PostgreSQL SUCCESS. Run lié au HEAD précédent `4a243a3994d988f122ecf81ac2f2b9d6726f4316`, pas au nouveau code.
+- **TEST ADDITIF** : commit `3e0066f82280f88d28dd73814569a722a438186a` : le test d'intégrité refuse désormais les références répétées aux fichiers de marchés et les codes marché dupliqués, en plus des 44 identifiants uniques. Aucun endpoint, résultat historique ou code métier modifié.
+- **VALIDATION** : nouveau test NOT_RUN localement ; CI du HEAD résultant NON ATTESTÉE à cette écriture. Aucune certification réseau, licence, contenu ou HISTORY_COMPLETE.
+- **BLOCK_REASON** : CI sur nouveau HEAD et revue/gates non attestés ; 22 NOT_PROBED, 7 RESTRICTED, 1 NOT_FOUND sans qualification officielle et échantillons autorisés.
+- **NEXT_ACTION** : contrôler les runs/checks de la PR #25 sur le HEAD résultant, corriger les échecs ; obtenir revue et gates, puis qualifier les sources par canaux officiels. Reprendre #14 indépendamment avec contrats et données témoins. Préserver PR #22 ; aucun merge ni S1.
+- **ROLLBACK** : revert ciblé du test et de ce checkpoint sur PR #25 uniquement.
+
+---
+
 ## 2026-11-08 — Issue #13 / PR #25 : CI #94 attestée et contrôle des lignes Markdown malformées
 
 - **RECONCILIATION** : lecture AGENTS.md, documents maîtres docs/00–15 dans l'ordre prescrit, dernier journal/checkpoint et matrice SOURCE_AUDIT_RUN_42314547906.md ; PR #25 ouverte, issue #13 ouverte, PR #22 préservée. Main comparé : `73256f48d81d38ce8ff6f51be9e024b25cf5dadb`, branche PR #25 ahead 10 / behind 0 avant écriture. Claim borné dans la discussion PR #25.
