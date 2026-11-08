@@ -72,3 +72,31 @@ UPDATE ops.backfill_jobs AS jobs
    AND jobs.status='RUNNING'
 RETURNING jobs.backfill_job_id
 `;
+
+/**
+ * Retire legacy PENDING/RETRY rows whose attempt budget is already exhausted.
+ * This bounded transition never claims or retries work and is safe to repeat.
+ * $1 = maximum number of rows to normalize (positive integer).
+ */
+export const FAIL_EXHAUSTED_BACKFILLS_SQL = `
+WITH exhausted AS (
+  SELECT backfill_job_id
+    FROM ops.backfill_jobs
+   WHERE status IN ('PENDING', 'RETRY')
+     AND attempts >= 4
+     AND $1::integer > 0
+   ORDER BY window_from, endpoint_code, backfill_job_id
+   FOR UPDATE SKIP LOCKED
+   LIMIT $1
+)
+UPDATE ops.backfill_jobs AS jobs
+   SET status='FAILED',
+       locked_at=NULL,
+       finished_at=now(),
+       last_error='Retry budget exhausted before atomic claim'
+  FROM exhausted
+ WHERE jobs.backfill_job_id=exhausted.backfill_job_id
+   AND jobs.status IN ('PENDING', 'RETRY')
+   AND jobs.attempts >= 4
+RETURNING jobs.backfill_job_id
+`;
