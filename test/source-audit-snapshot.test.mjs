@@ -13,6 +13,7 @@ test('the historical 44-endpoint audit snapshot reconciles exactly with the orig
   for (const file of manifest.marketFiles) {
     assert.match(file, /^sources\/[A-Z]+\.json$/, 'unexpected registry path');
     const market = JSON.parse(read('../config/' + file));
+    assert.equal(market.code, file.slice('sources/'.length, -'.json'.length), 'market code/file mismatch: ' + file);
     assert.ok(!marketCodes.has(market.code), 'duplicate market code: ' + market.code);
     marketCodes.add(market.code);
     for (const endpoint of market.endpoints) {
