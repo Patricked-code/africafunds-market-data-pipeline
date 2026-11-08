@@ -1,5 +1,17 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-08 — Issue #5 / PR #22 : fixture d'idempotence indépendante de BACKFILL_BATCH_DAYS
+
+- **RECONCILIATION** : AGENTS.md et docs/15 lus sur main (PR #1 fusionnée) ; journal courant sur PR #22 et checkpoint docs/CONTINUITY_CHECKPOINT_2026-11-06.md relus ; issue #5 et PR #22 OPEN/Draft vérifiées. Branche PR #22 comparée au SHA historique bc94dcc0b3d8475f16c6568aedc4f79cc21c01a5 : identical avant modification. Aucun claim concurrent récent visible dans les commentaires récupérés ; absence de preuve de verrou exclusif.
+- **DÉFAUT DE TEST** : test/integration/backfill-enqueue-count.test.ts utilisait deux jours et attendait une fenêtre par endpoint. Si BACKFILL_BATCH_DAYS=1, deux fenêtres sont créées : assertion fragile dépendant de la configuration, sans défaut métier démontré.
+- **TEST CORRIGÉ** : commit `377ddab330b0ff4008f8a57ca45bf727054238cc` utilise une seule date de fixture (1691-02-03) : une fenêtre par endpoint quelle que soit la taille de lot positive. Le test conserve les assertions d'insertion réelle, de répétition idempotente et le nettoyage limité aux IDs créés. Aucun code métier, migration, source ni donnée financière modifié.
+- **VALIDATION** : écriture GitHub attestée ; PostgreSQL **NOT_RUN**. Recherche des runs GitHub Actions pull_request sur le HEAD précédent bc94dcc0b3d8475f16c6568aedc4f79cc21c01a5 : zéro résultat dans l'interface limitée, **CI NON ATTESTÉE** (ne prouve pas absence de check-runs). Aucune revendication de PASS.
+- **BLOCK_REASON** : PostgreSQL isolé et CI/check-runs complets sur HEAD exact non attestés ; revue indépendante et gates de fusion non validés ; timer heartbeat réel et AbortSignal d'adaptateurs non certifiés.
+- **NEXT_ACTION** : vérifier checks CI du nouveau HEAD et exécuter PostgreSQL isolé, corriger les échecs ; compléter test de perte de possession/annulation coopérative, ou poursuivre les issues #13/#14 sur branche distincte si PR #22 revendiquée par une autre exécution. Aucun merge, push main ou S1.
+- **ROLLBACK** : revert ciblé du commit de test et de cette entrée documentaire ; aucun effacement de données.
+
+---
+
 ## 2026-11-08 — Issue #5 / PR #22 : comptage idempotent des fenêtres de backfill
 
 - **RECONCILIATION** : AGENTS.md, docs/15, worklog de la branche PR #22 et checkpoint historique lus ; PR #1/#12/#18 fusionnées, PR #22 OPEN/Draft au HEAD initial `59ff0b6a7aaece46d625b707969ef5a944675311` (vérification GitHub). Aucune autorisation de fusion ou de déploiement implicite.
