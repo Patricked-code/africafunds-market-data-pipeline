@@ -162,3 +162,52 @@ test('legacy exhausted RETRY is atomically FAILED and never reclaimed', async ()
     await client.end();
   }
 });
+
+
+test('exhausted-job retirement excludes active RUNNING and eligible RETRY jobs', async () => {
+  assert.ok(process.env.DATABASE_URL, 'Use an isolated PostgreSQL test database');
+  const client = new pg.Client({ connectionString: process.env.DATABASE_URL });
+  await client.connect();
+  const ids: string[] = [];
+  try {
+    const endpoint = await client.query<{ endpoint_code: string }>(
+      'SELECT endpoint_code FROM source.source_endpoints ORDER BY endpoint_code LIMIT 1',
+    );
+    assert.ok(endpoint.rows[0], 'source registry must be seeded');
+    const fixtures = [
+      { year: '1691', status: 'PENDING', attempts: 4 },
+      { year: '1692', status: 'RUNNING', attempts: 4 },
+      { year: '1693', status: 'RETRY', attempts: 3 },
+    ] as const;
+    for (const fixture of fixtures) {
+      const created = await client.query<{ backfill_job_id: string }>(
+        `INSERT INTO ops.backfill_jobs(endpoint_code, window_from, window_to, status, attempts, locked_at, finished_at)
+         VALUES ($1, $2::date, $3::date, $4, $5, CASE WHEN $4='RUNNING' THEN now() ELSE NULL END, NULL)
+         ON CONFLICT(endpoint_code, window_from, window_to)
+         DO UPDATE SET status=EXCLUDED.status, attempts=EXCLUDED.attempts,
+                       locked_at=EXCLUDED.locked_at, finished_at=NULL
+         RETURNING backfill_job_id`,
+        [endpoint.rows[0]!.endpoint_code, `${fixture.year}-01-01`, `${fixture.year}-01-02`,
+          fixture.status, fixture.attempts],
+      );
+      ids.push(created.rows[0]!.backfill_job_id);
+    }
+    const zero = await client.query<{ backfill_job_id: string }>(FAIL_EXHAUSTED_BACKFILLS_SQL, [0]);
+    assert.equal(zero.rows.length, 0, 'zero limit must not mutate any row');
+    const retired = await client.query<{ backfill_job_id: string }>(FAIL_EXHAUSTED_BACKFILLS_SQL, [100]);
+    assert.equal(retired.rows.filter(row => ids.includes(row.backfill_job_id)).length, 1);
+    assert.equal(retired.rows.find(row => ids.includes(row.backfill_job_id))?.backfill_job_id, ids[0]);
+    const states = await client.query<{ backfill_job_id: string; status: string; attempts: number }>(
+      'SELECT backfill_job_id, status, attempts FROM ops.backfill_jobs WHERE backfill_job_id = ANY($1::uuid[])',
+      [ids],
+    );
+    const byId = new Map(states.rows.map(row => [row.backfill_job_id, row]));
+    assert.equal(byId.get(ids[0]!)?.status, 'FAILED');
+    assert.equal(byId.get(ids[1]!)?.status, 'RUNNING', 'an active claim must not be retired');
+    assert.equal(byId.get(ids[2]!)?.status, 'RETRY', 'remaining budget must be preserved');
+    assert.deepEqual(ids.map(id => byId.get(id)?.attempts), [4, 4, 3]);
+  } finally {
+    if (ids.length) await client.query('DELETE FROM ops.backfill_jobs WHERE backfill_job_id = ANY($1::uuid[])', [ids]);
+    await client.end();
+  }
+});
