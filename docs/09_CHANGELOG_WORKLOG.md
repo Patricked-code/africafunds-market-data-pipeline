@@ -1,5 +1,16 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-08 — Issue #5 / PR #22 : course heartbeat vs recovery sous verrou PostgreSQL
+
+- **RECONCILIATION** : GitHub Patricked-code vérifié ; dépôt privé ; PR #1 fusionnée ; PR #22 OPEN/Draft, HEAD initial `f5c89ed3b76b8d0e19991ad0f547f9179b12e950`, base main `d61fe17a6d038de00c06ea1d78ed20cf05e3c5c8` selon PR. AGENTS.md, docs/15, dernier journal, checkpoint historique, code SQL et tests existants relus. Statuts combinés sur HEAD initial : liste vide ; cela ne prouve pas l'absence de workflows/check-runs. Aucune fusion ni déploiement.
+- **TEST ADDITIF** : commit `65c0117d08f864726a320391f8762df70d8633f8` crée `test/integration/backfill-heartbeat-recovery-race.test.ts`. Deux connexions PostgreSQL : renouvellement du lease dans une transaction qui conserve le verrou ; recovery concurrente avec SKIP LOCKED doit ignorer la ligne ; après COMMIT, le lease rafraîchi reste non récupérable, ancien token refusé, statut RUNNING/attempts conservés. Timeout de statement borné et nettoyage de fixture ; aucune migration ni modification des sources.
+- **VALIDATION** : commit enregistré par GitHub ; exécution PostgreSQL **NOT_RUN**, CI du nouveau HEAD **NON ATTESTÉE** ; aucune affirmation de PASS. Test de verrouillage SQL seulement, **pas** une preuve du timer de 60 s ni d'AbortSignal réel.
+- **BLOCK_REASON** : environnement PostgreSQL isolé et preuves CI/check-runs sur HEAD exact non obtenus ; comportement timer/annulation et effets externes non certifiés ; revue/protections à satisfaire avant merge.
+- **NEXT_ACTION** : vérifier le HEAD exact et les exécutions CI complètes, lancer la suite PostgreSQL isolée et corriger les échecs ; ajouter test du timer heartbeat et de perte de possession pendant un adaptateur coopératif ; reprendre #13/#14 sur branche indépendante si collision de claim. Ne pas fusionner ni déployer S1.
+- **ROLLBACK** : revert ciblé du commit de test et de cette entrée documentaire ; aucune donnée financière ni infrastructure modifiée.
+
+---
+
 ## 2026-11-08 — Issue #5 / PR #22 : limites négatives de claim et recovery sécurisées
 
 - **RECONCILIATION** : dépôt privé confirmé via GitHub ; PR #1 fusionnée ; PR #22 OPEN/Draft, HEAD initial vérifié `7a2e977dd498badb51627af66c9cc16902d7893a`. AGENTS.md, docs/00–15, journal courant, checkpoint du 06/11, issue #5 et commentaires de PR #22 consultés. Recherche GitHub Actions pull_request sur HEAD initial : zéro run retourné (filtre et première page seulement) ; CI non attestée. Aucun claim concurrent explicite dans les commentaires consultés.
