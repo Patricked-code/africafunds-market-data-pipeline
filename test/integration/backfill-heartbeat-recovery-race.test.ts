@@ -23,11 +23,11 @@ test('heartbeat transaction excludes concurrent recovery and preserves ownership
     const fixture = await owner.query<{ backfill_job_id: string }>(
       `INSERT INTO ops.backfill_jobs(endpoint_code, window_from, window_to, status, attempts, locked_at)
        VALUES ($1, '1627-01-01', '1627-01-02', 'RUNNING', 1, now()-interval '20 minutes')
-       ON CONFLICT(endpoint_code, window_from, window_to)
-       DO UPDATE SET status='RUNNING', attempts=1, locked_at=now()-interval '20 minutes'
+       ON CONFLICT(endpoint_code, window_from, window_to) DO NOTHING
        RETURNING backfill_job_id`,
       [endpoint.rows[0]!.endpoint_code],
     );
+    assert.equal(fixture.rowCount, 1, 'fixture date window must be unused; never overwrite an existing job');
     jobId = fixture.rows[0]!.backfill_job_id;
     const old = await owner.query<{ locked_at: string }>(
       'SELECT locked_at::text FROM ops.backfill_jobs WHERE backfill_job_id=$1', [jobId],
