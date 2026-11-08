@@ -24,7 +24,12 @@ test('the historical 44-endpoint audit snapshot reconciles exactly with the orig
 
   const report = read('../docs/SOURCE_AUDIT_RUN_42314547906.md');
   // Do not silently skip a malformed endpoint row: the historical table is evidence.
-  const rows = report.split('\n').filter(line => line.startsWith('| ') && !line.startsWith('| Marché |'));
+  const section = report.split('## Statuts observés pour chacun des 44 endpoints')[1]?.split('## Suites gouvernées à exécuter')[0];
+  assert.ok(section, 'historical audit table section missing');
+  // Parse the whole evidence table, including rows with missing spaces after pipes.
+  const rows = section.split('\n').filter(line => line.trimStart().startsWith('|')
+    && !/^\|\s*Marché\s*\|/.test(line.trimStart())
+    && !/^\|\s*:?-{3,}/.test(line.trimStart()));
   assert.equal(rows.length, expected.size, 'historical audit table row count changed');
   const observed = new Map();
   const allowed = new Set(['NOT_PROBED', 'RESTRICTED', 'NOT_FOUND', 'HTTP_OK_UNVERIFIED_CONTENT']);
