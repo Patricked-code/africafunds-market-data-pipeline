@@ -1,5 +1,17 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-08 — Issue #5 / PR #22 : limites négatives de claim et recovery sécurisées
+
+- **RECONCILIATION** : dépôt privé confirmé via GitHub ; PR #1 fusionnée ; PR #22 OPEN/Draft, HEAD initial vérifié `7a2e977dd498badb51627af66c9cc16902d7893a`. AGENTS.md, docs/00–15, journal courant, checkpoint du 06/11, issue #5 et commentaires de PR #22 consultés. Recherche GitHub Actions pull_request sur HEAD initial : zéro run retourné (filtre et première page seulement) ; CI non attestée. Aucun claim concurrent explicite dans les commentaires consultés.
+- **DÉFAUT ET CODE** : `CLAIM_PENDING_BACKFILLS_SQL` et `RECOVER_EXPIRED_BACKFILLS_SQL` utilisaient `LIMIT $1` et `LIMIT $2` sans borne non négative, contrairement à la normalisation déjà corrigée. Une limite négative pouvait déclencher une erreur PostgreSQL. Commit `8cac94ec61b208e27523941f6a1a6f66d57e377f` utilise `GREATEST(param::integer, 0)` pour ces deux sélections, sans changer les limites positives, les critères, les locks ou les données.
+- **TEST** : commit `fc3e343f2438fa6e25e115d82a1524a07ddfc17f` ajoute `test/integration/backfill-negative-limits.test.ts`, couvrant -1 et 0 pour claim et recovery dans PostgreSQL isolé ; aucun write de fixture. **NOT_RUN** : ni exécution PostgreSQL ni CI verte sur le nouveau HEAD attestée.
+- **BLOCK_REASON** : CI/check-runs et PostgreSQL isolé non attestés ; revue indépendante et protections main à vérifier ; course heartbeat/recovery/AbortSignal et effets externes des adaptateurs non certifiés.
+- **NEXT_ACTION** : vérifier les CI et checks sur HEAD exact de PR #22, exécuter PostgreSQL isolé, corriger toute régression, tester heartbeat/recovery/annulation coopérative ; poursuivre #13/#14 indépendamment si #22 est revendiquée. Aucun merge, S1, source modifiée ou registre parallèle.
+- **ROLLBACK** : revert ciblé des deux commits de code/test et de cette entrée de journal ; aucune donnée financière ou infrastructure modifiée.
+
+---
+
+
 ## 2026-11-08 — Issue #5 / PR #22 : borne négative de normalisation sans erreur SQL
 
 - **RECONCILIATION** : AGENTS.md, docs/15, journal le plus récent, checkpoint du 06/11 et SQL/tests concernés relus sur branche Draft ; issue #5 et PR #22 ouvertes au contrôle GitHub ; PR #1 documentaire déjà fusionnée d'après continuité précédente. CI pull_request filtrée sur HEAD antérieur `8209f5a5641e0a91cb4caef52890cef5f5447cc0` : zéro résultat, périmètre limité ; aucune CI réussie attestée. Les métadonnées de protection de main et les revues restent à vérifier avant intégration.
