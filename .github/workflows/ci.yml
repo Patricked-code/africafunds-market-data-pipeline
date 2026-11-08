@@ -52,6 +52,8 @@ jobs:
         run: npm run typecheck
       - name: Unit tests
         run: npm run test:ci
+      - name: Source audit snapshot integrity (offline, 44 original endpoints)
+        run: node --test test/source-audit-snapshot.test.mjs
       - name: S1 deployment safety and shell syntax
         run: |
           bash -n deploy/s1/preflight.sh deploy/s1/deploy.sh deploy/s1/rollback.sh
