@@ -1,5 +1,17 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-08 — Issue #5 / PR #22 : test d'annulation en cours de traitement (continuité)
+
+- **RECONCILIATION** : lecture de `AGENTS.md`, documents maîtres `docs/00` à `docs/15`, checkpoint `docs/CONTINUITY_CHECKPOINT_2026-11-06.md` et dernier worklog ; dépôt privé, PR #22 OPEN/DRAFT HEAD avant intervention `13921ef50595e7eae9d554610f82db1f4c37eea1`. Les travaux S1 restent indépendants. Aucune fusion ni écriture main.
+- **TEST AJOUTÉ** : commit `54cd00312d371c982af5182e12439dfa1bbd95fe` dans `test/historical-window.test.ts` : adaptateur coopératif déjà en cours d'attente, propagation de `AbortSignal`, annulation pour perte de possession, rejet de la promesse sans résultat historique. Ce test complète le cas précédent où le signal était déjà annulé avant l'appel ; il ne prouve pas que les adaptateurs officiels futurs annulent leurs effets externes.
+- **VALIDATION** : écriture GitHub confirmée ; test Node local **NOT_RUN** ; CI et PostgreSQL sur ce nouveau HEAD **NON ATTESTÉS**. La recherche des runs PR est limitée et une réponse vide n'est pas un PASS.
+- **BLOCK_REASON** : absence de preuve CI sur HEAD exact, absence de tests intégrés du heartbeat/lease pendant un traitement réel, aucun adaptateur officiel date-borné qualifié, absence de garantie sur les effets externes non coopératifs ; revue et gates non attestés.
+- **NEXT_ACTION** : contrôler les runs/étapes CI du HEAD de PR #22, corriger les erreurs éventuelles ; ajouter un test intégré du heartbeat/perte de lease avec PostgreSQL isolé et vérifier que les transitions terminales restent interdites après expiration/récupération ; qualifier les adaptateurs officiels #14 après autorisation et fixtures, puis poursuivre #13/#15–#17. PR Draft, aucun merge, aucun S1.
+- **ROLLBACK** : revert ciblé du test et de ce checkpoint sur branche PR #22 ; aucune donnée ni runtime modifié.
+
+---
+
+
 ## 2026-11-08 — Issue #5 / PR #22 : contrat d'annulation coopérative (continuité)
 
 - **RECONCILIATION** : PR #1 fusionnée, dépôt privé, PR #22 ouverte Draft au HEAD initial `fa524d73cd5ea106e5b551cf7a8bb4d20120a69f` ; AGENTS.md, contrat 15, journal et fichiers métier relus. PR #23/#24 concernent S1 et restent séparées. Recherche GitHub Actions PR sur ce HEAD : liste vide, périmètre limité, **CI NON ATTESTÉE**.
