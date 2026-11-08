@@ -23,13 +23,15 @@ export async function enqueueBackfill(input: { market?: string; family?: string;
         end.getTime(),
         batchStart.getTime() + (env.BACKFILL_BATCH_DAYS - 1) * 86_400_000,
       ));
-      await pool.query(
+      const inserted = await pool.query(
         `INSERT INTO ops.backfill_jobs(endpoint_code, window_from, window_to, status)
          VALUES ($1,$2,$3,'PENDING')
          ON CONFLICT(endpoint_code, window_from, window_to) DO NOTHING`,
         [endpoint.id, toIsoDate(batchStart), toIsoDate(batchEnd)],
       );
-      count += 1;
+      // Idempotent enqueue must report rows actually inserted, not attempted
+      // windows that already exist (including jobs owned by another worker).
+      count += inserted.rowCount ?? 0;
       cursor = new Date(batchEnd.getTime() + 86_400_000);
     }
   }
