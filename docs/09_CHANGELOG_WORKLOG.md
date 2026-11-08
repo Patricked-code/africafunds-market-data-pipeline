@@ -1,5 +1,18 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-09 — Issue #13 / PR #25 : CI #100 sur HEAD antérieur, cohérence fichier/code marché
+
+- **RECONCILIATION** : AGENTS.md et docs/15 relus ; worklog et NEXT_ACTION de PR #25 relus ; issue #13 OPEN ; PR #25 et PR #22 indépendantes ; HEAD initial PR #25 `0652aae2779082a01052fb91927d9fca0dbacf1e` confirmé identique à la branche avant écriture. Aucun merge ni S1.
+- **PREUVE CI** : GitHub Actions run [42530781345](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/42530781345), #100, completed/SUCCESS, trouvé pour le HEAD initial exact via la recherche des runs associés au commit. Ne prouve ni accès/licences, ni historiques complets.
+- **TEST ADDITIF** : commit `8eb827a338b263b2fc633077ad9ba64365e4512c` : le test offline du snapshot vérifie désormais que le code marché interne de chaque fichier correspond au nom de fichier déclaré dans le manifeste, en plus de l'unicité des codes, identifiants et des 44 lignes historiques. Préserve le catalogue et les observations originales.
+- **VALIDATION** : modification enregistrée sur branche Draft ; exécution locale du nouveau test NOT_RUN et CI du HEAD résultant NON ATTESTÉE. Aucune donnée témoin ni validation de disponibilité réseau ajoutée.
+- **BLOCK_REASON** : CI du nouveau HEAD et revue indépendante/gates non attestés ; 22 NOT_PROBED, 7 RESTRICTED et 1 NOT_FOUND restent à qualifier par canaux officiels, sans bypass ; issue #14 dépend des contrats et formats témoins.
+- **NEXT_ACTION** : vérifier CI/checks exacts sur HEAD final de PR #25 et corriger si échec ; solliciter revue indépendante ; avancer l'issue #14 sur branche indépendante seulement avec données officielles autorisées ; préserver PR #22 et ses claims ; pas de fusion ni de déploiement S1.
+- **ROLLBACK** : revert ciblé du commit test et de cette entrée sur la branche Draft.
+
+---
+
+
 ## 2026-11-08 — Issue #13 / PR #25 : CI #98 attestée et extraction bornée du tableau historique
 
 - **RÉCONCILIATION** : PR #25 OPEN/Draft HEAD initial `1c9485dfd9f6a6be0591807f0ad47658d03287ff`, PR #22 laissée intacte, issue #13 OPEN ; AGENTS.md, docs/15, journal de branche, audit 42314547906 et commentaires de claim lus. Réservation bornée PR #25 à 23:00 UTC.
