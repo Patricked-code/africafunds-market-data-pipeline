@@ -87,7 +87,7 @@ WITH exhausted AS (
      AND $1::integer > 0
    ORDER BY window_from, endpoint_code, backfill_job_id
    FOR UPDATE SKIP LOCKED
-   LIMIT $1
+   LIMIT GREATEST($1::integer, 0)
 )
 UPDATE ops.backfill_jobs AS jobs
    SET status='FAILED',
