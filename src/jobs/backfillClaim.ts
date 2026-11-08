@@ -11,7 +11,7 @@ WITH candidates AS (
      AND attempts < 4
    ORDER BY window_from, endpoint_code
    FOR UPDATE SKIP LOCKED
-   LIMIT $1
+   LIMIT GREATEST($1::integer, 0)
 )
 UPDATE ops.backfill_jobs AS jobs
    SET status='RUNNING',
@@ -58,7 +58,7 @@ WITH expired AS (
      AND $1::double precision > 0
    ORDER BY locked_at, backfill_job_id
    FOR UPDATE SKIP LOCKED
-   LIMIT $2
+   LIMIT GREATEST($2::integer, 0)
 )
 UPDATE ops.backfill_jobs AS jobs
    SET status=CASE WHEN jobs.attempts >= 4 THEN 'FAILED' ELSE 'RETRY' END,
