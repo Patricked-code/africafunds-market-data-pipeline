@@ -1,5 +1,17 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-08 — Issue #13 / PR #25 : CI #94 attestée et contrôle des lignes Markdown malformées
+
+- **RECONCILIATION** : lecture AGENTS.md, documents maîtres docs/00–15 dans l'ordre prescrit, dernier journal/checkpoint et matrice SOURCE_AUDIT_RUN_42314547906.md ; PR #25 ouverte, issue #13 ouverte, PR #22 préservée. Main comparé : `73256f48d81d38ce8ff6f51be9e024b25cf5dadb`, branche PR #25 ahead 10 / behind 0 avant écriture. Claim borné dans la discussion PR #25.
+- **PREUVE CI DU HEAD PRECEDENT** : [run 42516155061](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/42516155061) (#94) `completed/success`, job validate `128839525878` SUCCESS, dont typecheck, unit, test snapshot 44 sources, build, migrations PostgreSQL, seed et intégrations. Cette preuve porte sur le HEAD précédent `1581e3fcd15b1ee236defd6fe70d57d14a95fafd` et non sur les commits ci-dessous. Reviews PR #25 : aucune.
+- **CODE/TEST** : commit [e78d93054ec9eba87e794421848ef52888e03854](https://github.com/Patricked-code/africafunds-market-data-pipeline/commit/e78d93054ec9eba87e794421848ef52888e03854) : le test offline ne filtre plus silencieusement les lignes de table dont l'identifiant/format Markdown est malformé ; toutes les lignes de données de la table sont comptées et soumises à une assertion stricte. Aucune modification des 44 sources, du snapshot historique ni du réseau.
+- **VALIDATION** : commit enregistré ; tests locaux NOT_RUN, CI du HEAD résultant NON ATTESTÉE à cet instant. Pas de certification de droits/licences, de formats, de séries ou de HISTORY_COMPLETE.
+- **BLOCK_REASON** : CI du HEAD final et revue indépendante à vérifier ; 22 NOT_PROBED, 7 RESTRICTED, 1 NOT_FOUND non qualifiés, droits/robots et documents témoins non attestés.
+- **NEXT_ACTION** : vérifier CI/check-runs sur le HEAD exact résultant de PR #25, corriger tout échec, obtenir revue/gates ; poursuivre #13 par preuves d'accès officiel et formats témoins, ou #14 sur branche indépendante avec sources autorisées. Ne pas intervenir sur PR #22 concurrente ; pas de merge ni S1.
+- **ROLLBACK** : revert ciblé des commits de test et de journal sur PR #25, sans modifier main, catalogue ou données financières.
+
+---
+
 ## 2026-11-08 — Issue #13 / PR #25 : preuve CI #92 et cohérence des motifs du snapshot
 
 - **RECONCILIATION** : PR #1 fusionnée, PR #22 Draft préservée, PR #25 Draft sur base main ; AGENTS.md, docs/00–15 selon ordre prescrit, checkpoint du 06/11, worklog et matrice SOURCE_AUDIT_RUN_42314547906.md relus. PR #25 HEAD initial vérifié `1e7e1c6784066f800cabe4a2df67c68326fc14e5` ; claim borné consigné en commentaire PR #25.
