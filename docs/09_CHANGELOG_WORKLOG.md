@@ -1,5 +1,18 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-09 — Issue #14 / PR #26 : injection de panne à la frontière d'écriture terminale
+
+- **RECONCILIATION** : dépôt GitHub privé, PR #1 fusionnée ; PR #26 OPEN/Draft, HEAD initial `7fc6280f9b07399e3fdc74da782d0f69fd75665b`, base main `73256f48d81d38ce8ff6f51be9e024b25cf5dadb` ; AGENTS.md, docs/00–15, dernier checkpoint et worklog relus. PR #22/#25 non modifiées ; claim commentaire #6734844111.
+- **CI HEAD INITIAL** : [CI #119 run 42573713178](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/42573713178) SUCCESS ; [Docker #22 run 42573713159](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/42573713159) SUCCESS. Ces runs précèdent les commits de cette tranche.
+- **CODE** : ajout de `src/jobs/terminalWrite.ts` (frontière de persistance sans retry), branchement des deux écritures terminales de `src/jobs/ingest.ts` ; commits `0da51c3a1c2ed80f2b0320a211f275e4ef012029`, `42ade9a4996238b7d667d99b8052a2f6d6d3d6bf`.
+- **TEST** : `test/ingestion-terminal-write.test.ts` injecte une exception simulée de `finishRun` et vérifie une seule invocation et la propagation de l'erreur ; cas nominal également couvert. Commit `a0f082cca178d53cf846024e3d71253a8913a199`. Test unitaire isolé, **pas** une preuve d'intégration PostgreSQL réelle. Tests locaux NOT_RUN ; CI sur HEAD résultant NON_ATTESTÉE.
+- **BLOCK_REASON** : nouvelle CI/revue en attente ; test d'intégration PostgreSQL avec panne réelle non effectué ; six contrats/fixtures CBE/GOSDMX non attestés ; audit 44 sources incomplet.
+- **NEXT_ACTION** : contrôler CI/Docker sur HEAD exact de PR #26 et corriger tout échec ; compléter une recette PostgreSQL d'injection de panne sur `finishRun` si admissible, puis poursuivre adaptateurs officiels ou tâche indépendante #13/#15. Ne pas fusionner ni déployer S1.
+- **ROLLBACK** : revert ciblé des trois commits code/test de cette tranche et de cette entrée, sans changement de schéma ni de données.
+
+---
+
+
 ## 2026-11-09 — Issue #14 / PR #26 : écriture terminale unique si finishRun échoue
 
 - **RECONCILIATION** : PR #1 fusionnée, PR #26 OPEN/Draft, HEAD initial `a4ac317ab56e2118612a779ac7e298c19e8af271` ; AGENTS.md, docs/15, journal et code ingestion relus. PR #22/#25 préservées ; claim PR #26 commentaire `6733846780`.
