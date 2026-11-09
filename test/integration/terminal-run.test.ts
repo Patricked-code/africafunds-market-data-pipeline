@@ -206,3 +206,30 @@ test('FAILED terminal status persists diagnostic and rejects a later PARTIAL ove
     await pool.query('DELETE FROM ops.ingestion_runs WHERE ingestion_run_id=$1', [runId]);
   }
 });
+
+
+test('SUCCESS terminal write persists no error and rejects a later FAILED diagnostic', async () => {
+  assert.ok(process.env.DATABASE_URL, 'DATABASE_URL must point to an isolated test database');
+  const runId = await startRun({ jobType: 'INGEST', scope: { test: 'success-terminal-diagnostic-fencing' } });
+  try {
+    await finishRun(runId, 'SUCCESS', { endpoints: 1, success: 1, failed: 0 });
+    const before = await pool.query<{ status: string; finished_at: Date | null; summary: unknown; error_message: string | null }>(
+      'SELECT status, finished_at, summary, error_message FROM ops.ingestion_runs WHERE ingestion_run_id=$1',
+      [runId],
+    );
+    assert.equal(before.rows[0]?.status, 'SUCCESS');
+    assert.ok(before.rows[0]?.finished_at);
+    assert.equal(before.rows[0]?.error_message, null);
+    await assert.rejects(
+      finishRun(runId, 'FAILED', { endpoints: 1, success: 0, failed: 1 }, new Error('late failure')),
+      /TERMINAL_WRITE_CONFLICT/,
+    );
+    const after = await pool.query<{ status: string; finished_at: Date | null; summary: unknown; error_message: string | null }>(
+      'SELECT status, finished_at, summary, error_message FROM ops.ingestion_runs WHERE ingestion_run_id=$1',
+      [runId],
+    );
+    assert.deepEqual(after.rows[0], before.rows[0], 'late failure must not rewrite successful run or attach an error');
+  } finally {
+    await pool.query('DELETE FROM ops.ingestion_runs WHERE ingestion_run_id=$1', [runId]);
+  }
+});
