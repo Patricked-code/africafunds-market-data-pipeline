@@ -1,5 +1,12 @@
 # 06 — État réel et écarts
 
+## 2026-11-09 — Issue #15 : porte de validation d'observation typée (PARTIAL)
+
+Fonction pure additive : provenance explicite, dates calendaires, ordre date économique/publication, unité, version de méthode et valeur numérique finie. Tests ajoutés ; CI en attente. Non raccordée à la normalisation SQL, aucun mapping par endpoint ni donnée témoin réelle : aucune observation déclarée publiable. NEXT_ACTION : CI puis raccordement aux tables existantes avec mapping officiel et tests PostgreSQL.
+
+---
+
+
 ## Audit S1 et sécurité de déploiement — 2026-11-07
 
 - **PREUVE SERVEUR READ-ONLY** : les domaines `sadiaaf.wealthtechinnovations.com` et `api.sadiaaf.wealthtechinnovations.com` existent et répondent tous deux **HTTP 500** à `curl -I` depuis S1 ; aucun dépôt Git racine dans leurs vhosts ; le seul conteneur Docker actif observé est le bridge MCP. Cela n'atteste pas l'absence d'autres bases/service hors Docker.
