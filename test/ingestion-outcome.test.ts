@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { assertCollectorImplemented, assertIngestionSucceeded, ingestionRunStatus } from '../src/jobs/ingestionOutcome.js';
+import { assertCollectorImplemented, assertIngestionSucceeded, assertStructuredIngestionRows, ingestionRunStatus } from '../src/jobs/ingestionOutcome.js';
 
 test('successful endpoint run is accepted', () => {
   assert.doesNotThrow(() => assertIngestionSucceeded({ endpoints: 1, success: 1, failed: 0 }));
@@ -56,4 +56,12 @@ test('strict backfill rejects an unaccounted endpoint even when failed counter i
   assert.equal(ingestionRunStatus(incomplete), 'FAILED');
   assert.throws(() => assertIngestionSucceeded(incomplete), /Ingestion incomplete/);
   assert.doesNotThrow(() => assertIngestionSucceeded({ endpoints: 3, success: 3, failed: 0 }));
+});
+
+test('ingest mode rejects empty, invalid or fractional row counts before counting success', () => {
+  for (const rows of [0, -1, 1.5, Number.NaN, Number.POSITIVE_INFINITY]) {
+    assert.throws(() => assertStructuredIngestionRows(rows, 'ingest'), /NO_STRUCTURED_ROWS/);
+  }
+  assert.doesNotThrow(() => assertStructuredIngestionRows(1, 'ingest'));
+  assert.doesNotThrow(() => assertStructuredIngestionRows(0, 'discover'));
 });
