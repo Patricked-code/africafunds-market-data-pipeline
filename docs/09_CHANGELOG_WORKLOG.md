@@ -1,5 +1,17 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-09 — Issue #14 / PR #26 : CI #141/#44 confirmées et garde FAILED → PARTIAL testée
+
+- **RECONCILIATION** : PR #1 MERGED ; PR #22/#25/#26 ouvertes Draft selon recherche GitHub ; AGENTS.md, docs/15, dernier checkpoint et code runStore/test relus. Aucune modification des PR #22/#25, de main, des 44 sources ni de S1.
+- **PREUVES CI** : sur HEAD antérieur exact `a0ee06e21bbcd54051d5afe20cf805aedbb8fb6b`, [CI #141 run 42666897297](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/42666897297) completed/SUCCESS et [Docker #44 run 42666897260](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/42666897260) completed/SUCCESS. Ces résultats ne certifient PAS le nouveau test.
+- **TRAVAIL CONCRET** : commit `4f4eacfd2bb2adcf2206ed2311332d504b11a1fe` ajoute un test PostgreSQL sur les fonctions existantes startRun/finishRun : terminal FAILED avec erreur persistée, tentative ultérieure PARTIAL rejetée par TERMINAL_WRITE_CONFLICT, statut/date/résumé/diagnostic strictement inchangés. Aucun changement SQL ni de runtime.
+- **VALIDATION** : tests locaux NOT_RUN ; CI du nouveau HEAD et revue NON_ATTESTÉES. Il ne s'agit pas d'une panne réseau ni d'une preuve de collecte réelle.
+- **BLOCK_REASON** : CI/revue sur nouveau HEAD à vérifier ; simulation déconnexion/driver PostgreSQL non réalisée ; contrats et fixtures officiels des six adaptateurs non qualifiés ; audit des 44 endpoints et historiques incomplets ; gates S1 non satisfaits.
+- **NEXT_ACTION** : contrôler CI et Docker du nouveau HEAD, inspecter les jobs PostgreSQL, corriger tout échec. Ensuite traiter un scénario de déconnexion isolée si reproductible sans effet externe, ou reprendre l'issue #13/#15 indépendante ; qualifier légalement les six adaptateurs avant collecte. Ne pas fusionner ni déployer S1.
+- **ROLLBACK** : revert ciblé du test et de ce checkpoint ; aucune migration ni écriture de production.
+
+---
+
 ## 2026-11-09 — Issue #14 / PR #26 : CI exact-HEAD validée et couverture PARTIAL terminale ajoutée
 
 - **RECONCILIATION** : PR #1 MERGED ; PR #22/#25/#26 OPEN Draft ; AGENTS.md, docs/00–15 et dernier checkpoint relus ; main base PR #26 `73256f48d81d38ce8ff6f51be9e024b25cf5dadb` au contrôle ; PR #26 HEAD avant modification `c13558f1f43ab1f2b62ed72e1a50f4a925aeaa95`. Aucun travail sur PR #22/#25.
