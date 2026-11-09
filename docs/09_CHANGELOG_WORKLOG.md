@@ -1,5 +1,18 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-09 — Issue #14 / PR #26 : validation CI du HEAD précédent et garde des compteurs incohérents
+
+- **RECONCILIATION** : PR #26 OPEN/Draft, HEAD initial `430574dbaed2cac1415f02a4ad6e28e05e747007`; documents AGENTS.md, docs/00–15 prescrits, worklog et checkpoint consultés ; claim PR #26 commentaire `6731559943`. PR #22 et #25 non modifiées.
+- **PREUVES CI HEAD INITIAL** : [CI #109 run 42551575883](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/42551575883) completed/SUCCESS ; [Docker #12 run 42551575840](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/42551575840) completed/SUCCESS. Runs associés au SHA initial uniquement ; détails jobs non inspectés dans cette intervention.
+- **CODE** : `src/jobs/ingestionOutcome.ts` refuse désormais les compteurs non entiers, négatifs, non finis ou dépassant le nombre d'endpoints, avant de classifier SUCCESS/PARTIAL/FAILED ou d'attester un backfill. Commit `e870371b68eb6bfd4e645be8fd1eb3d4d9c51368`.
+- **TESTS** : tests de non-régression ajoutés pour valeurs négatives, overflow, fractionnaires, NaN et Infinity dans `test/ingestion-outcome.test.ts`, commit `7ba78694df3a4e530f23e43f85eaf79b5fbcf7cb`. Exécution locale NOT_RUN ; CI de ces nouveaux commits NON ATTESTÉE.
+- **BLOCK_REASON** : CI et revue sur HEAD résultant non attestées ; contrats, licences, fixtures officielles des six adaptateurs CBE/GOSDMX non disponibles ; historique réel non certifié.
+- **NEXT_ACTION** : vérifier les runs CI/Docker sur HEAD résultant exact, corriger toute régression ; qualifier les contrats et données témoins officiels pour développer les adaptateurs dans les modules existants ; poursuivre issue #13 sans contourner robots/403. Aucune fusion/main/S1.
+- **ROLLBACK** : revert ciblé des deux commits code/test et de ce checkpoint, sans migration ni modification de source brute.
+
+---
+
+
 ## 2026-11-09 — Issue #14 / PR #26 : garde sur sélection vide et CI du HEAD précédent
 
 - **RECONCILIATION** : PR #1 fusionnée ; PR #22, #25 et #26 OPEN/Draft, PR #22 préservée. AGENTS.md, docs/15, checkpoint historique 2026-11-06 et worklog de PR #26 relus. HEAD initial PR #26 `73d4faecb2efb7f9e8fa5b9aa5035b25908a0e1a`.
