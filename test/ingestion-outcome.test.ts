@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { assertCollectorImplemented, assertIngestionSucceeded } from '../src/jobs/ingestionOutcome.js';
+import { assertCollectorImplemented, assertIngestionSucceeded, ingestionRunStatus } from '../src/jobs/ingestionOutcome.js';
 
 test('successful endpoint run is accepted', () => {
   assert.doesNotThrow(() => assertIngestionSucceeded({ endpoints: 1, success: 1, failed: 0 }));
@@ -22,4 +22,14 @@ test('discovery-only adapter fails closed before ingestion can count success', (
 });
 test('implemented collectors remain eligible for existing ingestion behavior', () => {
   assert.doesNotThrow(() => assertCollectorImplemented({ id: 'fixture-html', collector: 'HTML_TABLE' }));
+});
+
+test('empty endpoint selection cannot be recorded as SUCCESS', () => {
+  assert.equal(ingestionRunStatus({ endpoints: 0, success: 0, failed: 0 }), 'FAILED');
+});
+test('ingestion status preserves success, partial and total failure semantics', () => {
+  assert.equal(ingestionRunStatus({ endpoints: 2, success: 2, failed: 0 }), 'SUCCESS');
+  assert.equal(ingestionRunStatus({ endpoints: 2, success: 1, failed: 1 }), 'PARTIAL');
+  assert.equal(ingestionRunStatus({ endpoints: 2, success: 0, failed: 2 }), 'FAILED');
+  assert.equal(ingestionRunStatus({ endpoints: 2, success: 1, failed: 0 }), 'FAILED');
 });
