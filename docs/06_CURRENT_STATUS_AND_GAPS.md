@@ -1,5 +1,10 @@
 # 06 — État réel et écarts
 
+## 2026-11-09 — Strict ingestion : écriture terminale après validation (PR #26)
+
+`runIngestion` validait auparavant `failOnEndpointError` après `finishRun`, ce qui pouvait enregistrer un statut intermédiaire avant de le réécrire FAILED. La validation stricte précède désormais l'écriture terminale ; les erreurs strictes suivent le chemin d'échec existant. Test de compteurs incomplets ajouté. CI du nouveau HEAD non attestée ; aucun adaptateur CBE/GOSDMX déclaré opérationnel, aucun S1.
+
+
 ## 2026-11-09 — Ingestion vide : suppression d'un faux SUCCESS (PR #26)
 
 Une sélection sans endpoint pouvait être marquée SUCCESS dans `runIngestion`. Une garde additive `ingestionRunStatus` renvoie désormais FAILED pour zéro endpoint et conserve les états SUCCESS/PARTIAL/FAILED pour les cas non vides, avec tests unitaires. Code committé sur PR Draft ; tests locaux NOT_RUN et CI du HEAD final à attester. Les six adaptateurs CBE/BCT restent BLOCKED sans contrat/fixtures ; aucun historique complet ni déploiement S1.
