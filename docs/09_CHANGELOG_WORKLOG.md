@@ -1,5 +1,18 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-09 — Issue #14 / PR #26 : CI verte et test de rejet SQL PostgreSQL déterministe
+
+- **RECONCILIATION** : AGENTS.md, docs/00–15 (ordre de lecture), dernier checkpoint docs/09, PR #1 fusionnée, PR ouvertes #22/#25/#26 vérifiées ; PR #26 HEAD initial `b06cd3e7457453a507ab2d453bdd283df30315d0`. Aucun changement de main, de PR #22/#25 ou de source originale.
+- **PREUVES CI SUR HEAD INITIAL** : [CI #137 run 42646697410](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/42646697410) completed/SUCCESS, job validate 129261815021 : typecheck, unit tests, build, migrations, PostgreSQL integration tests et backfill success ; [Docker #40 run 42646697462](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/42646697462) completed/SUCCESS, job 129261925880, persistance Docker/PostgreSQL success. Preuves limitées au SHA initial.
+- **TEST ADDITIF** : commit `ff4d8792eac0382405c2326edbaa8b9d44cdd1f9` dans `test/integration/terminal-run.test.ts` : envoyer un UUID volontairement malformé à `finishRun`, attendre SQLSTATE PostgreSQL 22P02, vérifier qu'un run distinct reste RUNNING, finished_at NULL et summary {}, puis vérifier sa finalisation FAILED valide. Nettoyage des données du test. Il s'agit d'un rejet SQL réel et déterministe, **pas** d'une panne de connexion/serveur ou d'une preuve de reprise après crash.
+- **VALIDATION** : test ajouté au dépôt, tests locaux NOT_RUN ; CI et Docker du nouveau HEAD NON_ATTESTÉS, revue NON_ATTESTÉE. Aucun statut DONE ni HISTORY_COMPLETE.
+- **BLOCK_REASON** : nouveau test à confirmer par CI sur HEAD exact ; simulation de panne de connexion/driver et crash non effectuée ; protections/revue de fusion non attestées ; contrats/licences/fixtures officiels des six adaptateurs non qualifiés ; audit 44 endpoints et historiques non certifiés.
+- **NEXT_ACTION** : contrôler CI et Docker sur HEAD après checkpoint, inspecter le job PostgreSQL integration tests, corriger si rouge ; ensuite traiter une défaillance de connexion/driver dans environnement isolé si admissible ou basculer sur issue #13/#15 indépendante. Ne pas fusionner ni déployer S1.
+- **ROLLBACK** : revert ciblé du commit de test et du checkpoint ; aucun changement de migration, de source ou d'infrastructure.
+
+---
+
+
 ## 2026-11-09 — Issue #14 / PR #26 : validation runtime des statuts terminaux et test PostgreSQL additif
 
 - **RECONCILIATION** : AGENTS.md, docs/00–15 selon ordre canonique, dernier checkpoint et composants runStore/terminal-run relus ; PR ouvertes #22/#25/#26 et issues #3/#5/#13–#17 consultées ; PR #1 déjà intégrée dans main. Branche PR #26 conservée, sans écriture sur main ni sur PR #22/#25. Claim PR #26 commentaire 6744147338, périmètre limité.
