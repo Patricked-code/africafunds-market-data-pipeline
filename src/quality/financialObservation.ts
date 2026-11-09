@@ -20,9 +20,13 @@ function validCalendarDate(value: string): boolean {
 }
 
 export function validateFinancialObservationCandidate(
-  candidate: FinancialObservationCandidate,
+  candidate: FinancialObservationCandidate | null | undefined,
 ): { admissible: boolean; reasons: string[] } {
   const reasons: string[] = [];
+  // Runtime inputs can bypass TypeScript (JSON, external adapters). Fail closed.
+  if (candidate === null || candidate === undefined || typeof candidate !== 'object' || Array.isArray(candidate)) {
+    return { admissible: false, reasons: ['INVALID_CANDIDATE'] };
+  }
   for (const field of ['sourceEndpointCode', 'rawArtifactId', 'unit', 'methodVersion'] as const) {
     if (typeof candidate[field] !== 'string' || !candidate[field].trim()) {
       reasons.push('MISSING_' + field.toUpperCase());
