@@ -26,3 +26,10 @@ export function ingestionRunStatus(summary: { endpoints: number; success: number
   if (summary.failed > 0) return summary.success > 0 ? 'PARTIAL' : 'FAILED';
   return summary.success === summary.endpoints ? 'SUCCESS' : 'FAILED';
 }
+
+/** Archiving an HTTP response without structured rows is not successful financial ingestion. */
+export function assertStructuredIngestionRows(rows: number, mode: 'ingest' | 'discover'): void {
+  if (mode === 'ingest' && (!Number.isSafeInteger(rows) || rows <= 0)) {
+    throw new Error(`NO_STRUCTURED_ROWS: financial ingestion extracted ${rows} rows`);
+  }
+}
