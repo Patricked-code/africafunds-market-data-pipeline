@@ -10,6 +10,7 @@ import { listEndpoints, type SourceEndpoint } from '../config/registry.js';
 import { logger } from '../config/logger.js';
 import { pool, withTransaction } from '../db/pool.js';
 import { finishRun, startRun, upsertEndpoint } from './runStore.js';
+import { writeTerminalOnce } from './terminalWrite.js';
 
 function contentType(headers: Record<string, string>): string {
   return headers['content-type']?.toLowerCase() ?? 'application/octet-stream';
@@ -149,10 +150,10 @@ export async function runIngestion(input: { market?: string; family?: string; en
     // Validate before the terminal write: strict backfill failures must not first be persisted as PARTIAL.
     if (input.failOnEndpointError) assertIngestionSucceeded(summary);
   } catch (error) {
-    await finishRun(runId, 'FAILED', summary, error);
+    await writeTerminalOnce(() => finishRun(runId, 'FAILED', summary, error));
     throw error;
   }
   // A terminal persistence failure must propagate directly: never attempt a second terminal
   // write for the same run when finishRun itself throws.
-  await finishRun(runId, ingestionRunStatus(summary), summary);
+  await writeTerminalOnce(() => finishRun(runId, ingestionRunStatus(summary), summary));
 }
