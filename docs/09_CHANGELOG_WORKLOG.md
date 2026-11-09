@@ -1,5 +1,18 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-09 — Issue #14 / PR #26 : garde sur sélection vide et CI du HEAD précédent
+
+- **RECONCILIATION** : PR #1 fusionnée ; PR #22, #25 et #26 OPEN/Draft, PR #22 préservée. AGENTS.md, docs/15, checkpoint historique 2026-11-06 et worklog de PR #26 relus. HEAD initial PR #26 `73d4faecb2efb7f9e8fa5b9aa5035b25908a0e1a`.
+- **PREUVES CI DU HEAD INITIAL** : [CI #104 run 42546846131](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/42546846131) completed/SUCCESS ; [Docker smoke #7 run 42546846134](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/42546846134) completed/SUCCESS. La recherche du connecteur est limitée aux runs pull_request de la première page ; aucun résultat n'est extrapolé.
+- **DÉFAUT ADDITIONNEL** : `runIngestion` classait `SUCCESS` une sélection de zéro endpoint avec zéro erreur. Ajout d'un calcul explicite `ingestionRunStatus` : zéro endpoint = FAILED ; succès/partiel/échec non vides préservés ; raccordement dans `src/jobs/ingest.ts` et tests de non-régression. Commits techniques `4d51aae93297dd1e5bbe3f906902386d79a3f396`, `1c8dd1c242225a241a6951a32c62454249f51c4c`, `b89e28db15e0a25c19f966cac951632daaaf4718`.
+- **VALIDATION** : commits GitHub attestés, tests locaux NOT_RUN ; CI sur le nouveau code NON ATTESTÉE au moment de ce checkpoint. Aucune collecte réseau, donnée témoin, licence, merge ou déploiement S1.
+- **BLOCK_REASON** : revue/gates PR #26 et CI sur HEAD final non attestés ; contrats et fixtures officiels des six adaptateurs non qualifiés ; historiques réels et publication non certifiés.
+- **NEXT_ACTION** : vérifier CI et Docker sur HEAD final PR #26, corriger toute régression, puis poursuivre qualification des contrats CBE/SDMX et implémenter un adaptateur réel uniquement avec fixture et droits attestés. Reprendre issue #13 indépendamment sans contourner robots/403 ; ne pas toucher PR #22 sans nouveau claim.
+- **ROLLBACK** : revert ciblé des trois commits fonctionnels et du checkpoint, sans migration ni effet sur les sources.
+
+---
+
+
 ## 2026-11-09 — Issue #14 / PR #26 : CI et recette Docker attestées sur SHA exact
 
 - **RECONCILIATION** : PR #26 OPEN/Draft, HEAD `603557ece94506ad9aa887f71df4c672b389be5d` ; PR #25 OPEN/Draft, HEAD `8e1a22fe4d5100f5fea15ec024f063b06486c265`. AGENTS.md, contrat docs/15 et dernier checkpoint relus. Aucune fusion.
