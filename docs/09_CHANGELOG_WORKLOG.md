@@ -1,5 +1,19 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-09 — Issue #14 / PR #26 : validation stricte avant écriture terminale
+
+- **RECONCILIATION** : PR #26 OPEN/Draft, HEAD initial `a1eb2a1156d6d0646eb6ee6655a2772e938b9707` ; AGENTS.md, docs/00–15, journal, issue #14 et PR #26 consultés. PR #22 et #25 non modifiées ; claim PR #26 commentaire `6733061660`.
+- **PREUVES CI SUR HEAD INITIAL** : [CI #113 run 42562727404](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/42562727404) `completed/success` et [Docker #16 run 42562727512](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/42562727512) `completed/success`, récupérés via SHA exact. Ces runs ne valident PAS les nouveaux commits.
+- **CODE** : `src/jobs/ingest.ts` effectue désormais `assertIngestionSucceeded` avant `finishRun` quand `failOnEndpointError` est activé. Auparavant le run pouvait être écrit PARTIAL puis réécrit FAILED après exception ; la nouvelle séquence passe directement au chemin d'échec existant. Commit `63094bdbbcf70f38c38ec338d012c6350a056160`.
+- **TESTS** : cas de compteurs incomplets sans échec comptabilisé ajouté dans `test/ingestion-outcome.test.ts`, commit `c5e2cb7090c9a4209261d57504d31e2b99262cae`. Tests locaux `NOT_RUN`, CI sur HEAD résultant `NON_ATTESTÉE`. Le test couvre la règle de validation, pas le nombre de mises à jour SQL ; aucune preuve d'intégration sur ce dernier point.
+- **DOC** : statut actualisé dans `docs/06_CURRENT_STATUS_AND_GAPS.md`, commit `555c12bcd96a3ae8cc9b2a494965eeb94a26db39`.
+- **BLOCK_REASON** : nouveau HEAD en attente CI et revue ; contrats/licences/fixtures officiels des six adaptateurs non qualifiés ; qualification des 44 sources incomplète. Aucun merge ni déploiement S1.
+- **NEXT_ACTION** : vérifier CI et Docker sur le HEAD final exact de PR #26, corriger si rouge ; ajouter test d'intégration du nombre d'écritures terminales si possible dans l'environnement PostgreSQL isolé ; poursuivre qualification officielle CBE/GOSDMX ou tâche indépendante #13/#15 sans toucher les claims concurrents.
+- **ROLLBACK** : revert ciblé des commits code/test/docs de cette tranche, sans migration, donnée réelle ni modification de production.
+
+---
+
+
 ## 2026-11-09 — Issue #14 / PR #26 : CI et recette Docker attestées sur le HEAD exact précédent
 
 - **RECONCILIATION** : PR #26 OPEN/Draft, branche `fix/manual-api-discovery-fail-closed-20261109`, HEAD vérifié `b6ba4b458d1a1feaffef80e7abea6017f616b554`, base main observée `73256f48d81d38ce8ff6f51be9e024b25cf5dadb` ; issue #14 ouverte, dépôt privé ; AGENTS.md, docs/15, dernier worklog et checkpoint historique du 06/11 consultés. PR #22 et #25 non modifiées.
