@@ -32,3 +32,16 @@ test('rejects NaN and infinite financial values', () => {
     assert.deepEqual(validateFinancialObservationCandidate({ ...valid, observedValue }).reasons, ['NON_FINITE_VALUE']);
   }
 });
+
+test('fails closed on null or undefined runtime observation envelopes', () => {
+  for (const candidate of [null, undefined]) {
+    assert.deepEqual(validateFinancialObservationCandidate(candidate), {
+      admissible: false, reasons: ['INVALID_CANDIDATE'],
+    });
+  }
+});
+
+test('rejects malformed dates supplied by an untyped adapter without throwing', () => {
+  const malformed = { ...valid, economicDate: null } as unknown as typeof valid;
+  assert.deepEqual(validateFinancialObservationCandidate(malformed).reasons, ['INVALID_ECONOMIC_DATE']);
+});
