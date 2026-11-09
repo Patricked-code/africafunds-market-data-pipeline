@@ -1,5 +1,18 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-09 — Issue #14 / PR #26 : validation runtime des statuts terminaux et test PostgreSQL additif
+
+- **RECONCILIATION** : AGENTS.md, docs/00–15 selon ordre canonique, dernier checkpoint et composants runStore/terminal-run relus ; PR ouvertes #22/#25/#26 et issues #3/#5/#13–#17 consultées ; PR #1 déjà intégrée dans main. Branche PR #26 conservée, sans écriture sur main ni sur PR #22/#25. Claim PR #26 commentaire 6744147338, périmètre limité.
+- **PREUVES CI SUR HEAD PRÉCÉDENT** : SHA `3256eadde99b098eb9eb6425ddb577dc545c000a` : [CI #134 run 42638723540](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/42638723540) completed/SUCCESS, job validate : typecheck, unit, build, migrations PostgreSQL et reapplication, tests d'intégration PostgreSQL et backfill SUCCESS ; [Docker #37 run 42638723740](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/42638723740) completed/SUCCESS, job persistance Docker/PostgreSQL SUCCESS. Ces preuves ne couvrent pas les commits ci-dessous.
+- **CAUSE/CHANGEMENT ADDITIF** : l'ancien test CI a démontré que PostgreSQL acceptait une chaîne de statut invalide, malgré l'union TypeScript (qui n'existe pas à l'exécution). `src/jobs/runStore.ts` rejette maintenant les statuts autres que SUCCESS/PARTIAL/FAILED AVANT SQL, sans modifier les signatures ni les valeurs historiques. Commit `91f38f3a7684794f491c5dfd9a6c3ddd222c3431`.
+- **TEST** : `test/integration/terminal-run.test.ts` ajoute une valeur de statut volontairement invalide via cast, vérifie rejet explicite, statut RUNNING/finished_at NULL/summary initial {}, puis finalisation FAILED valide. Commit `9f6e4c3b08e0eb44e54f0579b40439bce64796ea`. Tests locaux NOT_RUN ; CI du HEAD nouveau NON_ATTESTÉE au moment de ce checkpoint. Pas une simulation de panne réseau ou serveur.
+- **BLOCK_REASON** : CI et revue sur HEAD nouveau non attestées ; test de coupure pilote/connexion PostgreSQL non réalisé ; droits/contrats/fixtures officiels des six adaptateurs CBE/GOSDMX non qualifiés ; 44 sources et historiques non certifiés ; gates S1 non validés.
+- **NEXT_ACTION** : contrôler CI et Docker du HEAD après ce checkpoint, inspecter l'exécution du nouveau test ; corriger immédiatement tout échec. Ensuite, tester une défaillance réelle du pilote/connexion dans un environnement isolé, ou reprendre le lot indépendant #13/#15 si bloqué ; poursuivre les adaptateurs uniquement avec échantillons autorisés. Aucune fusion ni déploiement S1.
+- **ROLLBACK** : revert ciblé des commits de garde runtime, de test et de ce checkpoint ; aucune migration ni changement de données ou d'infrastructure.
+
+---
+
+
 ## 2026-11-09 — Issue #14 / PR #26 : correction CI du scénario de sérialisation PostgreSQL
 
 - **RECONCILIATION** : lecture AGENTS.md, docs/15, dernier checkpoint docs/09 et code/test sur branche PR #26 ; PR #22/#25 préservées ; état GitHub des issues #13–#17 consulté. La branche peut être mise à jour par d'autres agents : contrôler le HEAD à chaque étape.
