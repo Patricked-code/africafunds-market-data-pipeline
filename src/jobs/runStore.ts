@@ -11,6 +11,11 @@ export async function startRun(input: { jobType: string; scope: Record<string, u
 }
 
 export async function finishRun(runId: string, status: 'SUCCESS' | 'PARTIAL' | 'FAILED', summary: Record<string, unknown>, error?: unknown): Promise<void> {
+  // TypeScript unions do not validate callers at runtime (e.g. JavaScript or unsafe casts).
+  // Reject invalid terminal statuses before any SQL is sent, preserving the RUNNING row.
+  if (status !== 'SUCCESS' && status !== 'PARTIAL' && status !== 'FAILED') {
+    throw new Error(`INVALID_TERMINAL_STATUS: ${String(status)}`);
+  }
   const result = await pool.query(
     `UPDATE ops.ingestion_runs
        SET status=$2, finished_at=now(), summary=$3::jsonb, error_message=$4
