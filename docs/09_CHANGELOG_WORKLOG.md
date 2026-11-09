@@ -1,5 +1,17 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-10 — Issue #15 : CI vérifiée et durcissement des enveloppes runtime (PARTIAL)
+
+- Réconciliation : PR #27 Draft sur branche `feat/quality-financial-observation-gate-20261109`, HEAD initial `74a786b50fad3a6a8d671151feca6edfc2aad34e`. PR #22/#25/#26 toujours ouvertes ; aucune modification de leurs branches.
+- Preuves CI **sur le HEAD initial seulement** : CI run [42713720394](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/42713720394) SUCCESS ; Docker/PostgreSQL run [42713720418](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/42713720418) SUCCESS.
+- Code additif : `src/quality/financialObservation.ts` refuse désormais explicitement les enveloppes null/undefined et entrées non-objet à l'exécution, plutôt que lever une exception ; test de non-régression ajouté pour ces cas et date malformée. Commits `3bc81e9fd8cfba0e01c108b57640d5573927664f`, `bd6cc9729c541234eb0fd34be8c9212bb47c041d`.
+- TEST_EVIDENCE : les deux runs SUCCESS ci-dessus ne couvrent **pas** les nouveaux commits ; tests locaux NOT_RUN ; CI du nouveau HEAD NOT_ATTESTED. Aucune donnée financière réelle, écriture SQL, migration ou déploiement S1.
+- BLOCK_REASON : mapping officiel source→observation et fixtures réelles non qualifiés ; aucune intégration aux tables canoniques ; revue et CI des nouveaux commits non attestées ; gates de fusion non satisfaits.
+- NEXT_ACTION : contrôler CI et Docker du nouveau HEAD, corriger les éventuelles régressions ; inventorier les contrats de persistance `ref/source/market/fund/method/calc/quality` et raccorder un premier mapping officiel avec provenance, version et test PostgreSQL sans altérer les 44 sources.
+- Rollback : revert ciblé des commits sur la branche Draft ; aucun effet production.
+
+---
+
 ## 2026-11-09 — Issue #15 : première validation typée avant normalisation (PARTIAL)
 
 - Branche : `feat/quality-financial-observation-gate-20261109`, depuis `main` ; PR #22/#25/#26 préservées.
