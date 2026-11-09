@@ -1,5 +1,17 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-09 — Issue #14 / PR #26 : CI et Docker validés sur le HEAD exact efd0bf03
+
+- **RECONCILIATION** : PR #26 OPEN/Draft, HEAD exact `efd0bf03ccfb6334e06a649969d8d949f5cb4985`, base main `73256f48d81d38ce8ff6f51be9e024b25cf5dadb` ; PR #22 et #25 toujours ouvertes, non modifiées ; AGENTS.md, docs/15, journal et fichiers ingestion/terminalWrite relus.
+- **PREUVES** : [CI #123 run 42580954929](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/42580954929) completed/SUCCESS ; [Docker #26 run 42580954989](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/42580954989) completed/SUCCESS ; association obtenue par interrogation des workflows du SHA exact. Détail des jobs non inspecté ; aucune preuve de test de panne PostgreSQL réelle.
+- **CODE** : aucun changement fonctionnel dans cette tranche. La frontière `writeTerminalOnce` reste couverte par un test isolé ; elle ne prouve pas la transaction terminale complète avec PostgreSQL.
+- **BLOCK_REASON** : test d'injection de panne sur vrai `finishRun` non réalisé ; revue indépendante non attestée ; contrats/fixtures CBE-GOSDMX et droits d'accès non qualifiés ; audit 44 sources incomplet.
+- **NEXT_ACTION** : vérifier CI du HEAD documentaire issu de ce checkpoint, puis ajouter un test d'intégration PostgreSQL de l'écriture terminale avec comptage d'appels et injection de panne sans toucher PR #22 ; poursuivre l'issue #14 sur contrat officiel attesté, sinon une tâche indépendante #13/#15. Aucune fusion ni S1.
+- **ROLLBACK** : revert ciblé de ce seul commit documentaire ; aucune modification DB, données brutes ou runtime.
+
+---
+
+
 ## 2026-11-09 — Issue #14 / PR #26 : injection de panne à la frontière d'écriture terminale
 
 - **RECONCILIATION** : dépôt GitHub privé, PR #1 fusionnée ; PR #26 OPEN/Draft, HEAD initial `7fc6280f9b07399e3fdc74da782d0f69fd75665b`, base main `73256f48d81d38ce8ff6f51be9e024b25cf5dadb` ; AGENTS.md, docs/00–15, dernier checkpoint et worklog relus. PR #22/#25 non modifiées ; claim commentaire #6734844111.
