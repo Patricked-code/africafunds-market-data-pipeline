@@ -56,14 +56,15 @@ test('concurrent terminal writes admit exactly one winner and preserve its summa
 });
 
 
-test('a PostgreSQL rejected terminal update leaves the run RUNNING and permits a later valid finalization', async () => {
+test('a serialization failure cannot finalize a run and permits a later valid finalization', async () => {
   assert.ok(process.env.DATABASE_URL, 'DATABASE_URL must point to an isolated test database');
-  const runId = await startRun({ jobType: 'INGEST', scope: { test: 'terminal-database-rejection' } });
+  const runId = await startRun({ jobType: 'INGEST', scope: { test: 'terminal-serialization-rejection' } });
   try {
-    // PostgreSQL rejects this status through its database constraint; the UPDATE must be atomic.
-    // The cast is deliberate fault injection, not a production-supported terminal status.
+    // JSON.stringify rejects BigInt before the UPDATE can be sent to PostgreSQL.
+    // This verifies fail-closed behavior, not a PostgreSQL constraint or network outage.
     await assert.rejects(
-      finishRun(runId, 'INVALID_TERMINAL_STATUS' as 'SUCCESS', { writer: 'rejected' }),
+      finishRun(runId, 'SUCCESS', { writer: BigInt(1) }),
+      /BigInt|serialize/i,
     );
     const afterRejection = await pool.query<{ status: string; finished_at: Date | null; summary: unknown }>(
       'SELECT status, finished_at, summary FROM ops.ingestion_runs WHERE ingestion_run_id=$1',
