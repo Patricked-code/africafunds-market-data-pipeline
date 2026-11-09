@@ -27,3 +27,30 @@ test('terminal run persistence is fenced and cannot overwrite a completed run', 
     await pool.query('DELETE FROM ops.ingestion_runs WHERE ingestion_run_id=$1', [runId]);
   }
 });
+
+test('concurrent terminal writes admit exactly one winner and preserve its summary', async () => {
+  assert.ok(process.env.DATABASE_URL, 'DATABASE_URL must point to an isolated test database');
+  const runId = await startRun({ jobType: 'INGEST', scope: { test: 'concurrent-terminal-fencing' } });
+  try {
+    const outcomes = await Promise.allSettled([
+      finishRun(runId, 'SUCCESS', { writer: 'success' }),
+      finishRun(runId, 'FAILED', { writer: 'failed' }),
+    ]);
+    const fulfilled = outcomes.filter((outcome) => outcome.status === 'fulfilled');
+    const rejected = outcomes.filter((outcome) => outcome.status === 'rejected');
+    assert.equal(fulfilled.length, 1, 'only one concurrent writer may finalize a RUNNING row');
+    assert.equal(rejected.length, 1, 'the losing writer must be rejected');
+    assert.match(String((rejected[0] as PromiseRejectedResult).reason), /TERMINAL_WRITE_CONFLICT/);
+
+    const persisted = await pool.query<{ status: string; summary: { writer: string } }>(
+      'SELECT status, summary FROM ops.ingestion_runs WHERE ingestion_run_id=$1',
+      [runId],
+    );
+    assert.equal(persisted.rowCount, 1);
+    const expectedStatus = outcomes[0]?.status === 'fulfilled' ? 'SUCCESS' : 'FAILED';
+    assert.equal(persisted.rows[0]?.status, expectedStatus);
+    assert.equal(persisted.rows[0]?.summary.writer, expectedStatus === 'SUCCESS' ? 'success' : 'failed');
+  } finally {
+    await pool.query('DELETE FROM ops.ingestion_runs WHERE ingestion_run_id=$1', [runId]);
+  }
+});
