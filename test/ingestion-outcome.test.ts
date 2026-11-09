@@ -50,3 +50,10 @@ test('invalid ingestion counters fail closed and cannot certify backfill', () =>
     assert.throws(() => assertIngestionSucceeded(summary), /Ingestion incomplete/);
   }
 });
+
+test('strict backfill rejects an unaccounted endpoint even when failed counter is zero', () => {
+  const incomplete = { endpoints: 3, success: 2, failed: 0 };
+  assert.equal(ingestionRunStatus(incomplete), 'FAILED');
+  assert.throws(() => assertIngestionSucceeded(incomplete), /Ingestion incomplete/);
+  assert.doesNotThrow(() => assertIngestionSucceeded({ endpoints: 3, success: 3, failed: 0 }));
+});
