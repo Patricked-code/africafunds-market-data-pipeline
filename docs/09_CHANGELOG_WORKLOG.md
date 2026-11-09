@@ -1,5 +1,18 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-09 — Issue #14 / PR #26 : garde SQL terminale et test PostgreSQL réel (validation en attente)
+
+- **RECONCILIATION** : PR #1 fusionnée ; PR #22, #25, #26 OPEN/Draft ; PR #26 HEAD initial `ff3f28ac09327cf7fabaff704cb9ea59866a6b06`, base `main` `73256f48d81d38ce8ff6f51be9e024b25cf5dadb` au contrôle ; dépôt privé ; AGENTS.md, docs/15, journal et composants runStore/ingest/terminalWrite relus. PR #22/#25 préservées.
+- **CI HEAD INITIAL** : GitHub Actions sur SHA exact `ff3f28ac09327cf7fabaff704cb9ea59866a6b06` : runs [42598620533](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/42598620533) et [42598620474](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/42598620474), completed/success. Détails des jobs non inspectés ; ne prouvent pas les changements ci-dessous.
+- **CODE** : `src/jobs/runStore.ts` n'autorise désormais une mise à jour terminale que si le run est `RUNNING`, et rejette explicitement zéro ligne modifiée (`TERMINAL_WRITE_CONFLICT`). Commit `a0866a632c8342e35004d95fac525a3c044430f2`. Pas de migration ni de nouvelle table.
+- **TEST** : `test/integration/terminal-run.test.ts` crée un run en PostgreSQL isolé, termine SUCCESS, vérifie qu'une seconde écriture FAILED est rejetée et que la première conclusion reste inchangée ; vérifie aussi un ID inexistant et nettoie la ligne. Commit `36af099fc8f8e065b1815fddc078e63cbcfe4a16`. **Tests locaux NOT_RUN ; CI sur ces commits NON_ATTESTÉE**. Ce test ne simule pas une coupure réseau PostgreSQL ; il atteste la garde d'état une fois exécuté.
+- **BLOCK_REASON** : CI/revue sur nouveau HEAD non attestées ; injection de panne réseau/driver `finishRun` non couverte ; six contrats et fixtures officiels CBE/GOSDMX non qualifiés ; audit des 44 sources incomplet.
+- **NEXT_ACTION** : inspecter CI et Docker sur HEAD exact après ce checkpoint ; corriger toute régression ; étendre la recette à une panne réelle de persistance terminale si environnement isolé adéquat, puis poursuivre les adaptateurs sous droits officiels ou tâche indépendante #13/#15. Ne pas fusionner ni déployer S1.
+- **ROLLBACK** : revert ciblé des commits de garde SQL, test et checkpoint ; aucune modification de production ni de sources.
+
+---
+
+
 ## 2026-11-09 — Issue #14 / PR #26 : CI et Docker validés sur le HEAD exact efd0bf03
 
 - **RECONCILIATION** : PR #26 OPEN/Draft, HEAD exact `efd0bf03ccfb6334e06a649969d8d949f5cb4985`, base main `73256f48d81d38ce8ff6f51be9e024b25cf5dadb` ; PR #22 et #25 toujours ouvertes, non modifiées ; AGENTS.md, docs/15, journal et fichiers ingestion/terminalWrite relus.
