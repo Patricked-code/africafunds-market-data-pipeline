@@ -1,5 +1,5 @@
 import { Buffer } from 'node:buffer';
-import { assertCollectorImplemented, assertIngestionSucceeded } from './ingestionOutcome.js';
+import { assertCollectorImplemented, assertIngestionSucceeded, ingestionRunStatus } from './ingestionOutcome.js';
 import { fetchWithRetry } from '../http/fetcher.js';
 import { archiveRaw } from '../archive/rawStore.js';
 import { discoverLinks, parseHtmlTables } from '../parsers/html.js';
@@ -146,7 +146,7 @@ export async function runIngestion(input: { market?: string; family?: string; en
         logger.error({ endpoint: endpoint.id, error }, 'Échec de source');
       }
     }
-    await finishRun(runId, summary.failed === 0 ? 'SUCCESS' : summary.success ? 'PARTIAL' : 'FAILED', summary);
+    await finishRun(runId, ingestionRunStatus(summary), summary);
     if (input.failOnEndpointError) assertIngestionSucceeded(summary);
   } catch (error) {
     await finishRun(runId, 'FAILED', summary, error);
