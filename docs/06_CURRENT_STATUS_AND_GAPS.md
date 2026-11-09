@@ -1,5 +1,10 @@
 # 06 — État réel et écarts
 
+## 2026-11-09 — Issue #14 : garde de non-certification des adaptateurs dynamiques
+
+Sur branche Draft dédiée, les endpoints `MANUAL_API_DISCOVERY` échouent explicitement `BLOCKED_ADAPTER` avant toute requête HTTP ou archivage. Cette garde corrige un risque de faux succès sans constituer un adaptateur réel. Les cinq flux CBE et le flux GOSDMX BCT restent sans contrat/échantillon autorisé attesté ; tests/CI/revue à confirmer sur le HEAD exact. Aucun statut HISTORY_COMPLETE.
+
+
 ## Audit S1 et sécurité de déploiement — 2026-11-07
 
 - **PREUVE SERVEUR READ-ONLY** : les domaines `sadiaaf.wealthtechinnovations.com` et `api.sadiaaf.wealthtechinnovations.com` existent et répondent tous deux **HTTP 500** à `curl -I` depuis S1 ; aucun dépôt Git racine dans leurs vhosts ; le seul conteneur Docker actif observé est le bridge MCP. Cela n'atteste pas l'absence d'autres bases/service hors Docker.
