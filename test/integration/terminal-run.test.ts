@@ -85,3 +85,31 @@ test('a serialization failure cannot finalize a run and permits a later valid fi
     await pool.query('DELETE FROM ops.ingestion_runs WHERE ingestion_run_id=$1', [runId]);
   }
 });
+
+
+test('invalid terminal status is rejected before SQL and leaves RUNNING row intact', async () => {
+  assert.ok(process.env.DATABASE_URL, 'DATABASE_URL must point to an isolated test database');
+  const runId = await startRun({ jobType: 'INGEST', scope: { test: 'invalid-terminal-status' } });
+  try {
+    await assert.rejects(
+      finishRun(runId, 'INVALID_TERMINAL_STATUS' as 'SUCCESS', { writer: 'invalid' }),
+      /INVALID_TERMINAL_STATUS/,
+    );
+    const untouched = await pool.query<{ status: string; finished_at: Date | null; summary: unknown }>(
+      'SELECT status, finished_at, summary FROM ops.ingestion_runs WHERE ingestion_run_id=$1',
+      [runId],
+    );
+    assert.equal(untouched.rows[0]?.status, 'RUNNING');
+    assert.equal(untouched.rows[0]?.finished_at, null);
+    assert.deepEqual(untouched.rows[0]?.summary, {});
+    await finishRun(runId, 'FAILED', { writer: 'valid' });
+    const persisted = await pool.query<{ status: string; summary: { writer: string } }>(
+      'SELECT status, summary FROM ops.ingestion_runs WHERE ingestion_run_id=$1',
+      [runId],
+    );
+    assert.equal(persisted.rows[0]?.status, 'FAILED');
+    assert.equal(persisted.rows[0]?.summary.writer, 'valid');
+  } finally {
+    await pool.query('DELETE FROM ops.ingestion_runs WHERE ingestion_run_id=$1', [runId]);
+  }
+});
