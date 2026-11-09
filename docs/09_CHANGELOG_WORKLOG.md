@@ -1,5 +1,18 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-09 — Issue #14 / PR #26 : CI exact-HEAD validée et couverture PARTIAL terminale ajoutée
+
+- **RECONCILIATION** : PR #1 MERGED ; PR #22/#25/#26 OPEN Draft ; AGENTS.md, docs/00–15 et dernier checkpoint relus ; main base PR #26 `73256f48d81d38ce8ff6f51be9e024b25cf5dadb` au contrôle ; PR #26 HEAD avant modification `c13558f1f43ab1f2b62ed72e1a50f4a925aeaa95`. Aucun travail sur PR #22/#25.
+- **PREUVES** : [CI #139 / run 42656625636](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/42656625636) completed/SUCCESS, job validate `129296734332`, étapes PostgreSQL integration tests et backfill SUCCESS ; [Docker #42 / run 42656625628](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/42656625628) completed/SUCCESS, job `129296873413`, étape Docker/PostgreSQL SUCCESS. Ces résultats couvrent uniquement le HEAD initial `c13558f1f43ab1f2b62ed72e1a50f4a925aeaa95`.
+- **TRAVAIL CONCRET** : commit `a3657e0d0782caf0723793484262a2ad6b040583` ajoute à `test/integration/terminal-run.test.ts` une recette PostgreSQL de statut PARTIAL, conservation du résumé et de `error_message`, date terminale et rejet d'une tentative ultérieure de SUCCESS. Pas de modification du schéma, du code métier, des sources ou des secrets.
+- **VALIDATION** : nouveau test committé ; tests locaux NOT_RUN ; CI du HEAD après ajout et du checkpoint NON_ATTESTÉE ; revue NON_ATTESTÉE. Le test ne prouve pas une coupure de connexion ni une reprise après crash.
+- **BLOCK_REASON** : nouvelle CI et revue à vérifier ; pas de test de panne pilote/connexion ; contrats/licences/fixtures officiels CBE/GOSDMX non qualifiés ; audit 44 sources et historiques non certifiés ; gates S1 non satisfaits.
+- **NEXT_ACTION** : vérifier CI et Docker sur le HEAD documentaire exact après commit, inspecter l'étape PostgreSQL integration tests, corriger toute erreur ; poursuivre ensuite un test de défaillance de connexion isolée si réalisable sans risque, sinon issue #13/#15 indépendante. Aucun merge ni déploiement S1.
+- **ROLLBACK** : revert ciblé du test PARTIAL et du checkpoint ; aucune migration ni modification d'infrastructure.
+
+---
+
+
 ## 2026-11-09 — Issue #14 / PR #26 : CI verte et test de rejet SQL PostgreSQL déterministe
 
 - **RECONCILIATION** : AGENTS.md, docs/00–15 (ordre de lecture), dernier checkpoint docs/09, PR #1 fusionnée, PR ouvertes #22/#25/#26 vérifiées ; PR #26 HEAD initial `b06cd3e7457453a507ab2d453bdd283df30315d0`. Aucun changement de main, de PR #22/#25 ou de source originale.
