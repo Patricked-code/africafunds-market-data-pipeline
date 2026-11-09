@@ -148,9 +148,11 @@ export async function runIngestion(input: { market?: string; family?: string; en
     }
     // Validate before the terminal write: strict backfill failures must not first be persisted as PARTIAL.
     if (input.failOnEndpointError) assertIngestionSucceeded(summary);
-    await finishRun(runId, ingestionRunStatus(summary), summary);
   } catch (error) {
     await finishRun(runId, 'FAILED', summary, error);
     throw error;
   }
+  // A terminal persistence failure must propagate directly: never attempt a second terminal
+  // write for the same run when finishRun itself throws.
+  await finishRun(runId, ingestionRunStatus(summary), summary);
 }
