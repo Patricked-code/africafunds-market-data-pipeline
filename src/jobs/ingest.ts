@@ -146,8 +146,9 @@ export async function runIngestion(input: { market?: string; family?: string; en
         logger.error({ endpoint: endpoint.id, error }, 'Échec de source');
       }
     }
-    await finishRun(runId, ingestionRunStatus(summary), summary);
+    // Validate before the terminal write: strict backfill failures must not first be persisted as PARTIAL.
     if (input.failOnEndpointError) assertIngestionSucceeded(summary);
+    await finishRun(runId, ingestionRunStatus(summary), summary);
   } catch (error) {
     await finishRun(runId, 'FAILED', summary, error);
     throw error;
