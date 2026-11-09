@@ -11,3 +11,10 @@ export function assertCollectorImplemented(endpoint: { id: string; collector: st
     throw new Error(`BLOCKED_ADAPTER: ${endpoint.id} requires an authorized API contract and parser`);
   }
 }
+
+/** An empty selection is not a successful ingestion, even without endpoint errors. */
+export function ingestionRunStatus(summary: { endpoints: number; success: number; failed: number }): 'SUCCESS' | 'PARTIAL' | 'FAILED' {
+  if (summary.endpoints === 0) return 'FAILED';
+  if (summary.failed > 0) return summary.success > 0 ? 'PARTIAL' : 'FAILED';
+  return summary.success === summary.endpoints ? 'SUCCESS' : 'FAILED';
+}
