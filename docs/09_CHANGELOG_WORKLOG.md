@@ -1,5 +1,17 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-09 — Issue #14 / PR #26 : écriture terminale unique si finishRun échoue
+
+- **RECONCILIATION** : PR #1 fusionnée, PR #26 OPEN/Draft, HEAD initial `a4ac317ab56e2118612a779ac7e298c19e8af271` ; AGENTS.md, docs/15, journal et code ingestion relus. PR #22/#25 préservées ; claim PR #26 commentaire `6733846780`.
+- **CI SUR HEAD INITIAL** : [CI #117 run 42568031056](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/42568031056) completed/SUCCESS ; [Docker #20 run 42568031113](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/42568031113) completed/SUCCESS. Ces runs ne valident pas le correctif suivant.
+- **CODE** : `src/jobs/ingest.ts` : déplacement de `finishRun(...ingestionRunStatus...)` hors du `try/catch` de traitement. Si l'écriture terminale elle-même échoue, l'erreur remonte sans seconde tentative `finishRun('FAILED')`. La validation stricte reste dans le `try` et continue à enregistrer `FAILED` sur échec de traitement. Commit `5357540d374ba4c2831750c9423630225f7e5942`.
+- **VALIDATION** : inspection statique du flux ; tests locaux NOT_RUN ; test d'intégration du nombre d'écritures terminales NOT_RUN ; CI sur nouveau HEAD NON_ATTESTÉE à ce checkpoint. Pas de preuve d'absence de régression avant CI.
+- **BLOCK_REASON** : CI/revue sur nouveau HEAD en attente ; absence de test d'injection de panne `finishRun` ; six contrats/fixtures CBE/GOSDMX non qualifiés ; qualification des 44 endpoints incomplète.
+- **NEXT_ACTION** : vérifier CI/Docker sur HEAD exact de PR #26 ; créer un test d'intégration isolé qui injecte un échec de `finishRun` et atteste une seule tentative terminale, puis poursuivre les adaptateurs autorisés ou issue indépendante #13/#15 sans collision. Aucune fusion ni S1.
+- **ROLLBACK** : revert ciblé du commit `5357540d374ba4c2831750c9423630225f7e5942` et de cette entrée ; aucun changement DB, source brute ou runtime.
+
+---
+
 ## 2026-11-09 — Issue #14 / PR #26 : validation stricte avant écriture terminale
 
 - **RECONCILIATION** : PR #26 OPEN/Draft, HEAD initial `a1eb2a1156d6d0646eb6ee6655a2772e938b9707` ; AGENTS.md, docs/00–15, journal, issue #14 et PR #26 consultés. PR #22 et #25 non modifiées ; claim PR #26 commentaire `6733061660`.
