@@ -1,5 +1,17 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-09 — Issue #14 / PR #26 : validation PostgreSQL et scénario de rejet atomique
+
+- **RECONCILIATION** : PR #1 fusionnée ; PR #22, #25 et #26 ouvertes/Draft ; PR #26 HEAD initial `c5bf93e1bd66ea8dca78bc422f950bcdda11208f`, base `main=73256f48d81d38ce8ff6f51be9e024b25cf5dadb` ; AGENTS.md, docs/15, worklog et dernier checkpoint lus. Aucun changement sur main, PR #22 ou PR #25.
+- **PREUVES CI** : sur ce HEAD initial exact, [CI #128 / 42609826488](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/42609826488) completed/SUCCESS et [Docker #31 / 42609826803](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/42609826803) completed/SUCCESS. Jobs inspectés : CI étape « PostgreSQL integration tests » SUCCESS, ainsi que migrations, tests unitaires, build, backfill ; recette Docker PostgreSQL SUCCESS. Ceci atteste les tests inclus dans le HEAD initial, **pas** le test ajouté ensuite.
+- **TEST ADDITIF** : commit `b094acc13491e93864daea28869cc5b3928cc864`, extension de `test/integration/terminal-run.test.ts` : injection d'un statut terminal invalide pour provoquer un rejet PostgreSQL ; vérification que status reste RUNNING, finished_at et summary restent NULL ; finalisation FAILED ultérieure réussie. Le test ne coupe pas le réseau et ne prouve pas la reprise après crash. **Tests locaux NOT_RUN, CI du nouveau HEAD NON_ATTESTÉE**.
+- **BLOCK_REASON** : CI/revue du nouveau HEAD non attestées ; panne réseau/driver non simulée ; contrats/licences et données témoins officiels des six adaptateurs non qualifiés ; 44 endpoints et historiques non certifiés.
+- **NEXT_ACTION** : inspecter CI/Docker sur HEAD issu de ce checkpoint ; corriger tout échec. Vérifier que le statut invalide est rejeté par la contrainte PostgreSQL réelle ; si le schéma autorise arbitrairement des statuts, remplacer le scénario par une autre injection de panne SQL déterministe. Puis poursuivre les adaptateurs autorisés ou une tâche indépendante des lots existants. Aucune fusion ni déploiement S1.
+- **ROLLBACK** : revert ciblé du commit de test et de ce checkpoint ; aucun changement de schéma, de sources, de secrets ou de runtime.
+
+---
+
+
 ## 2026-11-09 — Issue #14 / PR #26 : concurrence réelle sur écriture terminale PostgreSQL (CI en attente)
 
 - **RECONCILIATION** : PR #1 fusionnée ; PR #26 OPEN/Draft ; base SHA vérifié `d9ee51a2929734286613a53b8b5244068ffbc2bd` ; dépôt privé ; AGENTS.md, docs/15, journal et code/test runStore relus. PR #22/#25 non modifiées. Claim GitHub commentaire `6738998786`, périmètre limité au test et worklog.
