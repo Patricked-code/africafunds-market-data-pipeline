@@ -54,3 +54,33 @@ test('concurrent terminal writes admit exactly one winner and preserve its summa
     await pool.query('DELETE FROM ops.ingestion_runs WHERE ingestion_run_id=$1', [runId]);
   }
 });
+
+
+test('a PostgreSQL rejected terminal update leaves the run RUNNING and permits a later valid finalization', async () => {
+  assert.ok(process.env.DATABASE_URL, 'DATABASE_URL must point to an isolated test database');
+  const runId = await startRun({ jobType: 'INGEST', scope: { test: 'terminal-database-rejection' } });
+  try {
+    // PostgreSQL rejects this status through its database constraint; the UPDATE must be atomic.
+    // The cast is deliberate fault injection, not a production-supported terminal status.
+    await assert.rejects(
+      finishRun(runId, 'INVALID_TERMINAL_STATUS' as 'SUCCESS', { writer: 'rejected' }),
+    );
+    const afterRejection = await pool.query<{ status: string; finished_at: Date | null; summary: unknown }>(
+      'SELECT status, finished_at, summary FROM ops.ingestion_runs WHERE ingestion_run_id=$1',
+      [runId],
+    );
+    assert.equal(afterRejection.rows[0]?.status, 'RUNNING');
+    assert.equal(afterRejection.rows[0]?.finished_at, null);
+    assert.equal(afterRejection.rows[0]?.summary, null);
+
+    await finishRun(runId, 'FAILED', { writer: 'recovery' });
+    const afterRecovery = await pool.query<{ status: string; summary: { writer: string } }>(
+      'SELECT status, summary FROM ops.ingestion_runs WHERE ingestion_run_id=$1',
+      [runId],
+    );
+    assert.equal(afterRecovery.rows[0]?.status, 'FAILED');
+    assert.equal(afterRecovery.rows[0]?.summary.writer, 'recovery');
+  } finally {
+    await pool.query('DELETE FROM ops.ingestion_runs WHERE ingestion_run_id=$1', [runId]);
+  }
+});
