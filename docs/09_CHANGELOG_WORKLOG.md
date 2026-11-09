@@ -1,5 +1,17 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-09 — Issue #14 / PR #26 : vérification CI exact-HEAD de la garde NO_STRUCTURED_ROWS
+
+- **RECONCILIATION** : PR #1 MERGED ; PR #22/#25/#26 OPEN Draft ; HEAD PR #26 vérifié `d798db4b41c9002e8f437c6293c98ec830df96e7`, base main indiquée par GitHub `73256f48d81d38ce8ff6f51be9e024b25cf5dadb`. AGENTS.md, docs/15, dernier checkpoint et code/test ingestionOutcome/ingest relus. Les anciennes assertions de statut ne remplacent pas les preuves exact-HEAD.
+- **PREUVES CI EXACT-HEAD** : [CI run 42695306524](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/42695306524) completed/SUCCESS, job 129425485398 : TypeScript, unit tests (incluant la garde zéro ligne), build, migrations/reapplication, PostgreSQL integration tests, backfill claim/window tests tous SUCCESS. [Docker run 42695306547](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/42695306547) completed/SUCCESS, job 129425609897 : isolated Docker/PostgreSQL persistence SUCCESS. Vérifications des étapes des deux jobs effectuées par connecteur GitHub.
+- **PORTÉE CERTIFIÉE** : contrôles CI du commit `d798db4b41c9002e8f437c6293c98ec830df96e7` uniquement. Aucun échantillon financier réel, contrat CBE/BCT, test de panne réseau, revue indépendante, merge ni déploiement S1 attesté.
+- **BLOCK_REASON** : PR #26 encore Draft sans revue indépendante attestée ; contrats/licences/fixtures officiels pour six adaptateurs manquants ; qualité sémantique, provenance, dates économiques et normalisation #15 non certifiées ; audit #13 et historiques #5/#17 incomplets ; gates S1 non satisfaits.
+- **NEXT_ACTION** : éviter d'ajouter des tests terminaux redondants à PR #26 ; après vérification d'absence de claim concurrent, ouvrir une branche indépendante pour issue #15, inspecter les tables canonical/quality et parseurs existants, ajouter une validation de provenance/date économique et tests déterministes sans modifier les 44 sources ; demander revue indépendante PR #26. Pour #14, n'implémenter CBE/BCT qu'avec contrats et fixtures autorisés. Ne pas fusionner ni déployer S1.
+- **ROLLBACK** : revert ciblé de cette entrée documentaire ; aucun changement code, schéma, données ou infrastructure.
+
+---
+
+
 ## 2026-11-09 — Issue #14 / PR #26 : zéro ligne structurée ne vaut pas succès financier
 
 - **RECONCILIATION** : PR #1 fusionnée ; PR #22/#25/#26 ouvertes Draft ; base PR #26 main `73256f48d81d38ce8ff6f51be9e024b25cf5dadb`, HEAD avant travaux `173f6a38b7dbba846635cd43c1271939a555b1d4`. AGENTS.md, docs/15, dernier checkpoint, code ingest/ingestionOutcome et tests lus. Pas d'écriture main, PR #22/#25, S1 ou sources.
