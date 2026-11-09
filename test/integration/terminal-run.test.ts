@@ -177,3 +177,32 @@ test('PARTIAL terminal status persists its error and cannot be overwritten', asy
     await pool.query('DELETE FROM ops.ingestion_runs WHERE ingestion_run_id=$1', [runId]);
   }
 });
+
+
+test('FAILED terminal status persists diagnostic and rejects a later PARTIAL overwrite', async () => {
+  assert.ok(process.env.DATABASE_URL, 'DATABASE_URL must point to an isolated test database');
+  const runId = await startRun({ jobType: 'INGEST', scope: { test: 'failed-terminal-diagnostic' } });
+  try {
+    await finishRun(runId, 'FAILED', { endpoints: 1, success: 0, failed: 1 }, new Error('collector unavailable'));
+    const before = await pool.query<{ status: string; finished_at: Date | null; summary: { failed: number }; error_message: string | null }>(
+      'SELECT status, finished_at, summary, error_message FROM ops.ingestion_runs WHERE ingestion_run_id=$1',
+      [runId],
+    );
+    assert.equal(before.rows[0]?.status, 'FAILED');
+    assert.ok(before.rows[0]?.finished_at);
+    assert.equal(before.rows[0]?.summary.failed, 1);
+    assert.equal(before.rows[0]?.error_message, 'collector unavailable');
+
+    await assert.rejects(
+      finishRun(runId, 'PARTIAL', { endpoints: 1, success: 1, failed: 0 }),
+      /TERMINAL_WRITE_CONFLICT/,
+    );
+    const after = await pool.query<{ status: string; finished_at: Date | null; summary: { failed: number }; error_message: string | null }>(
+      'SELECT status, finished_at, summary, error_message FROM ops.ingestion_runs WHERE ingestion_run_id=$1',
+      [runId],
+    );
+    assert.deepEqual(after.rows[0], before.rows[0], 'failed terminal diagnostics must remain immutable');
+  } finally {
+    await pool.query('DELETE FROM ops.ingestion_runs WHERE ingestion_run_id=$1', [runId]);
+  }
+});
