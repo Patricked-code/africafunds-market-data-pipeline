@@ -1,5 +1,10 @@
 # 06 — État réel et écarts
 
+## 2026-11-09 — Ingestion vide : suppression d'un faux SUCCESS (PR #26)
+
+Une sélection sans endpoint pouvait être marquée SUCCESS dans `runIngestion`. Une garde additive `ingestionRunStatus` renvoie désormais FAILED pour zéro endpoint et conserve les états SUCCESS/PARTIAL/FAILED pour les cas non vides, avec tests unitaires. Code committé sur PR Draft ; tests locaux NOT_RUN et CI du HEAD final à attester. Les six adaptateurs CBE/BCT restent BLOCKED sans contrat/fixtures ; aucun historique complet ni déploiement S1.
+
+
 ## 2026-11-09 — Issue #14 : garde de non-certification des adaptateurs dynamiques
 
 Sur branche Draft dédiée, les endpoints `MANUAL_API_DISCOVERY` échouent explicitement `BLOCKED_ADAPTER` avant toute requête HTTP ou archivage. Cette garde corrige un risque de faux succès sans constituer un adaptateur réel. Les cinq flux CBE et le flux GOSDMX BCT restent sans contrat/échantillon autorisé attesté ; tests/CI/revue à confirmer sur le HEAD exact. Aucun statut HISTORY_COMPLETE.
