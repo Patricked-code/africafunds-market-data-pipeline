@@ -1,5 +1,18 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-09 — Issue #14 / PR #26 : CI rouge diagnostiquée, test corrigé sans hypothèse de contrainte SQL
+
+- **RECONCILIATION** : PR #26 OPEN/Draft HEAD initial `819f9ec9b29a1ae383cf4a77a3de91c77c2ccfce`, base main `73256f48d81d38ce8ff6f51be9e024b25cf5dadb` ; PR #22/#25 OPEN/Draft non modifiées. AGENTS.md, docs/15, journal et test/runStore relus.
+- **PREUVES** : [CI #130 run 42618653956](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/42618653956) completed/FAILURE, job validate 129164860739, étape PostgreSQL integration tests FAILURE. Log : `not ok 6 - a PostgreSQL rejected terminal update...`, `Missing expected rejection`. TypeScript, unit tests, build, migrations et réapplication des migrations SUCCESS ; étapes suivantes skipped. [Docker #33 run 42618653913](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/42618653913) completed/SUCCESS sur même HEAD.
+- **CAUSE** : le schéma réel n'a pas rejeté `INVALID_TERMINAL_STATUS` ; le test précédent supposait à tort une contrainte PostgreSQL. Aucun statut invalide ne doit être considéré comme interdit par la base sans preuve.
+- **CORRECTION** : commit `e90f6e2b753017a3982d81f5c1fa73ad2e61b840` remplace le scénario par une erreur déterministe de sérialisation `BigInt` avant UPDATE, vérifie RUNNING/NULL puis finalisation FAILED. Il s'agit d'une erreur de sérialisation applicative, **pas** d'une injection de panne PostgreSQL réelle ; tests locaux NOT_RUN, CI sur HEAD corrigé NON_ATTESTÉE. Aucun changement de schéma ni de contrat métier.
+- **BLOCK_REASON** : CI sur HEAD corrigé et revue non attestées ; absence de contrainte DB sur les statuts constatée par le test (risque à qualifier indépendamment) ; panne réseau/driver PostgreSQL non simulée ; contrats/licences/fixtures des six adaptateurs et audit 44 sources incomplets.
+- **NEXT_ACTION** : inspecter CI/Docker du HEAD corrigé, réparer tout échec ; évaluer de façon additive une validation des statuts terminaux au niveau applicatif et/ou migration contrôlée après inventaire des valeurs historiques, sans toucher aux données existantes. Poursuivre ensuite issue #14 sur fixtures officielles, sinon tâche indépendante #13/#15 ; ne pas fusionner ni déployer S1.
+- **ROLLBACK** : revert ciblé du commit de test et du présent checkpoint ; aucune modification main/S1.
+
+---
+
+
 ## 2026-11-09 — Issue #14 / PR #26 : validation PostgreSQL et scénario de rejet atomique
 
 - **RECONCILIATION** : PR #1 fusionnée ; PR #22, #25 et #26 ouvertes/Draft ; PR #26 HEAD initial `c5bf93e1bd66ea8dca78bc422f950bcdda11208f`, base `main=73256f48d81d38ce8ff6f51be9e024b25cf5dadb` ; AGENTS.md, docs/15, worklog et dernier checkpoint lus. Aucun changement sur main, PR #22 ou PR #25.
