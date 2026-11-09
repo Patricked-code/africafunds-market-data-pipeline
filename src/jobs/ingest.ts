@@ -1,5 +1,5 @@
 import { Buffer } from 'node:buffer';
-import { assertIngestionSucceeded } from './ingestionOutcome.js';
+import { assertCollectorImplemented, assertIngestionSucceeded } from './ingestionOutcome.js';
 import { fetchWithRetry } from '../http/fetcher.js';
 import { archiveRaw } from '../archive/rawStore.js';
 import { discoverLinks, parseHtmlTables } from '../parsers/html.js';
@@ -94,6 +94,8 @@ async function parseAndPersist(endpoint: SourceEndpoint, artifactId: string, bod
 }
 
 async function ingestEndpoint(endpoint: SourceEndpoint, mode: 'ingest' | 'discover'): Promise<{ artifacts: number; rows: number; links: number }> {
+  // Discovery-only URLs must never be archived or counted as successfully ingested data.
+  assertCollectorImplemented(endpoint);
   await withTransaction((client) => upsertEndpoint(client, endpoint));
   const page = await fetchWithRetry(endpoint.url);
   const pageArtifactId = await saveArtifact(endpoint, page);
