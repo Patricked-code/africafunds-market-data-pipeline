@@ -1,5 +1,19 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-09 — Issue #14 / PR #26 : correction CI du scénario de sérialisation PostgreSQL
+
+- **RECONCILIATION** : lecture AGENTS.md, docs/15, dernier checkpoint docs/09 et code/test sur branche PR #26 ; PR #22/#25 préservées ; état GitHub des issues #13–#17 consulté. La branche peut être mise à jour par d'autres agents : contrôler le HEAD à chaque étape.
+- **PREUVES EXACTES** : [CI #132 / run 42627417369](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/42627417369) completed/FAILURE sur SHA `1f6d2ce53faec8c8bb32c2ef0005c1be45886081`, job `129194735629`, étape PostgreSQL integration tests ; 5 tests PASS, test 6 FAIL avec `{} !== null` ligne 75. [Docker #35 / run 42627417345](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/42627417345) completed/SUCCESS sur même SHA.
+- **CAUSE** : `startRun()` initialise `ops.ingestion_runs.summary` avec la valeur JSONB vide `{}` via la valeur par défaut du schéma ; l'échec de sérialisation `BigInt` survient avant l'UPDATE et laisse ce résumé initial inchangé, contrairement à l'attente erronée `NULL` du test. Le test ne révèle pas une écriture terminale indue.
+- **CORRECTION** : commit `94e66c4d111708a87a5cd898601c8c8befcdd061` dans `test/integration/terminal-run.test.ts` : remplacer l'assertion `summary === null` par une égalité profonde avec `{}`, conserver `status=RUNNING`, `finished_at=NULL` et récupération terminale. Aucune migration, aucun secret, aucun changement de source ni de logique métier.
+- **VALIDATION** : diagnostic fondé sur les logs CI réels ; tests locaux NOT_RUN ; CI sur commit corrigé NON_ATTESTÉE, revue NON_ATTESTÉE. La simulation est une erreur de sérialisation avant SQL, pas une panne réseau PostgreSQL.
+- **BLOCK_REASON** : attendre CI/Docker sur le HEAD contenant ce correctif, revue et protections ; absence de recette de panne de driver/connexion ; contrats/licences/fixtures officiels des six adaptateurs non qualifiés ; qualification des 44 sources et historiques non terminée.
+- **NEXT_ACTION** : vérifier les runs du HEAD après ce checkpoint, inspecter l'étape PostgreSQL integration tests, corriger si rouge ; ensuite ajouter un test de défaillance SQL/connexion isolée sans faux SUCCESS si faisable ; reprendre les six adaptateurs seulement avec preuves officielles, sinon lot indépendant #13/#15. Aucune fusion ni déploiement S1.
+- **ROLLBACK** : revert ciblé du commit de test et du présent checkpoint ; aucun changement de données ou de runtime.
+
+---
+
+
 ## 2026-11-09 — Issue #14 / PR #26 : CI rouge diagnostiquée, test corrigé sans hypothèse de contrainte SQL
 
 - **RECONCILIATION** : PR #26 OPEN/Draft HEAD initial `819f9ec9b29a1ae383cf4a77a3de91c77c2ccfce`, base main `73256f48d81d38ce8ff6f51be9e024b25cf5dadb` ; PR #22/#25 OPEN/Draft non modifiées. AGENTS.md, docs/15, journal et test/runStore relus.
