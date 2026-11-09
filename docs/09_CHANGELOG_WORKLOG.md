@@ -1,5 +1,17 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-09 — Issue #14 / PR #26 : CI et recette Docker attestées sur le HEAD exact précédent
+
+- **RECONCILIATION** : PR #26 OPEN/Draft, branche `fix/manual-api-discovery-fail-closed-20261109`, HEAD vérifié `b6ba4b458d1a1feaffef80e7abea6017f616b554`, base main observée `73256f48d81d38ce8ff6f51be9e024b25cf5dadb` ; issue #14 ouverte, dépôt privé ; AGENTS.md, docs/15, dernier worklog et checkpoint historique du 06/11 consultés. PR #22 et #25 non modifiées.
+- **PREUVES SUR HEAD EXACT** : [CI #112, run 42556899850](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/42556899850) completed/SUCCESS ; [Docker runtime #15, run 42556899806](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/42556899806) completed/SUCCESS ; association obtenue par interrogation GitHub Actions du SHA exact. Détails des étapes non inspectés ; aucune validation des contrats CBE/GOSDMX ou de S1 impliquée.
+- **TRAVAIL** : réconciliation du code `src/jobs/ingestionOutcome.ts` et de `src/jobs/ingest.ts` ; garde des six collecteurs MANUAL_API_DISCOVERY toujours en place. Aucun code modifié dans cette tranche, faute de contrat/fixture autorisé pour un adaptateur réel. Checkpoint documentaire uniquement ; CI du nouveau HEAD documentaire à revérifier.
+- **BLOCK_REASON** : six contrats/fixtures officiels non attestés ; revue et gates de fusion absents/non attestés ; 22 NOT_PROBED, 7 HEAD 403 et 1 HEAD 404 de l'issue #13 toujours non qualifiés. Ne pas contourner les restrictions.
+- **NEXT_ACTION** : contrôler CI sur HEAD documentaire résultant, vérifier revue et protections ; identifier une fixture CBE ou SDMX officielle avec licence/format attestés, implémenter le premier adaptateur dans le parseur existant avec tests ; à défaut travailler sur une tâche indépendante des lots 0–13 après claim. Ne pas toucher PR #22 sans coordination.
+- **ROLLBACK** : revert ciblé du commit documentaire, aucun impact DB, source brute ou S1 ; aucune fusion.
+
+---
+
+
 ## 2026-11-09 — Issue #14 / PR #26 : validation CI du HEAD précédent et garde des compteurs incohérents
 
 - **RECONCILIATION** : PR #26 OPEN/Draft, HEAD initial `430574dbaed2cac1415f02a4ad6e28e05e747007`; documents AGENTS.md, docs/00–15 prescrits, worklog et checkpoint consultés ; claim PR #26 commentaire `6731559943`. PR #22 et #25 non modifiées.
