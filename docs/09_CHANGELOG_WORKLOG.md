@@ -1,5 +1,18 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-09 — Issue #14 : fail-closed des six adaptateurs non implémentés (branche indépendante)
+
+- **RECONCILIATION** : main `73256f48d81d38ce8ff6f51be9e024b25cf5dadb` observé comme base de PR #25 ; branche dédiée issue #14, claim dans issue #14 ; PR #22 et PR #25 non modifiées. AGENTS.md, docs/00–15, dernier checkpoint de PR #25 et matrice audit 42314547906 consultés.
+- **CONSTAT** : `MANUAL_API_DISCOVERY` était traité par `ingestEndpoint` comme un collector ordinaire ; une page HTTP 200 sans parsing métier pouvait produire un faux succès.
+- **CODE** : ajout `assertCollectorImplemented` et garde avant `upsertEndpoint`/HTTP/archive dans `src/jobs/ingest.ts` ; les six IDs CBE/BCT déclarés MANUAL_API_DISCOVERY échouent explicitement `BLOCKED_ADAPTER`, sans contourner 403. Autres collecteurs inchangés.
+- **TESTS** : tests unitaires couvrant les six IDs et la non-régression HTML_TABLE ajoutés. Exécution locale NOT_RUN ; CI sur HEAD résultant NON ATTESTÉE au moment du commit.
+- **BLOCK_REASON** : contrats officiels, formats/échantillons et licences non attestés ; six adaptateurs restent à implémenter ; CI/revue requises ; aucune certification d'historique.
+- **NEXT_ACTION** : obtenir CI et revue de la PR Draft #14, corriger les échecs ; puis qualifier contrat SDMX BCT et cinq flux CBE avec échantillons autorisés, développer parseurs compatibles et tests métier. Ne pas fusionner ni déployer sans gates.
+- **ROLLBACK** : revert ciblé de la branche/PR ; aucune modification des URLs, données ou production.
+
+---
+
+
 ## 2026-11-07 — SadiaAF S1 : première installation staging gouvernée, archives persistantes et autorisation des vhosts
 
 - **MANDAT** : l'utilisateur autorise désormais la modification des deux vhosts `sadiaaf.wealthtechinnovations.com` et `api.sadiaaf.wealthtechinnovations.com`, et la suppression d'une archive identifiable. Audit S1 répété : API vhost 16 Ko, frontend 36 Ko ; uniquement pages Plesk d'origine, dossiers historiques `.well-known`, `e-vote`, `sadiaaf_project-v2` ; **aucune archive détectée dans ces vhosts**. Les archives AMF-UMOA, sauvegardes Plesk et autres données hors vhosts ne sont pas autorisées à suppression indifférenciée. Aucune suppression S1 effectuée.
