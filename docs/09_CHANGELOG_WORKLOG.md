@@ -1,5 +1,17 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-09 — Issue #14 / PR #26 : exact-HEAD CI validée, diagnostic SUCCESS protégé
+
+- **RECONCILIATION** : PR #1 MERGED ; PR #22/#25/#26 OPEN Draft ; base PR #26 main `73256f48d81d38ce8ff6f51be9e024b25cf5dadb`, HEAD initial `47bfce4671aba453b66b78fbe3319de36ff236b1`. Instructions AGENTS.md et docs/15, dernier checkpoint et fonctions runStore/test relus. Aucun changement sur main, PR #22/#25, sources ou S1.
+- **PREUVES EXACT-HEAD** : sur `47bfce4671aba453b66b78fbe3319de36ff236b1`, [CI run 42674732070](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/42674732070) completed/SUCCESS (job 129352969168 : types, unit, build, migrations et reapplication, integration PostgreSQL, backfill success) ; [Docker run 42674731945](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/42674731945) completed/SUCCESS (job 129353082941 : persistence Docker/PostgreSQL). Ces runs ne valident PAS le nouveau commit.
+- **TRAVAIL CONCRET** : commit `905a3b0a8e09d74ea2d4da741a8a76872ed6703d` ajoute un test PostgreSQL sur SUCCESS, `error_message=NULL` et conservation stricte du statut/date/summary/diagnostic après tentative tardive FAILED avec erreur. Test local NOT_RUN ; CI du HEAD après ce commit NON_ATTESTÉE.
+- **BLOCK_REASON** : nouvelle CI et revue à vérifier ; panne driver/connexion et reprise crash non testées ; six adaptateurs CBE/GOSDMX sans contrats/fixtures autorisés attestés ; qualification 44 sources et historiques incomplets ; gates S1 non satisfaits.
+- **NEXT_ACTION** : vérifier CI et Docker sur le nouveau HEAD exact et corriger tout échec ; ensuite éviter de multiplier les tests terminaux redondants et reprendre la qualification des adaptateurs officiels (#14) ou la normalisation/provenance (#15) sur branche indépendante, après vérification des claims et dépendances. Aucune fusion ni S1.
+- **ROLLBACK** : revert ciblé du test et du checkpoint ; aucune migration ni écriture de production.
+
+---
+
+
 ## 2026-11-09 — Issue #14 / PR #26 : CI #141/#44 confirmées et garde FAILED → PARTIAL testée
 
 - **RECONCILIATION** : PR #1 MERGED ; PR #22/#25/#26 ouvertes Draft selon recherche GitHub ; AGENTS.md, docs/15, dernier checkpoint et code runStore/test relus. Aucune modification des PR #22/#25, de main, des 44 sources ni de S1.
