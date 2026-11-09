@@ -1,5 +1,18 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-09 — Issue #15 : première validation typée avant normalisation (PARTIAL)
+
+- Branche : `feat/quality-financial-observation-gate-20261109`, depuis `main` ; PR #22/#25/#26 préservées.
+- PR #26 HEAD `bc632405eb8964250c4d88fb56adff846d652a9d` : CI 42703414041 SUCCESS, Docker 42703414070 SUCCESS, sur ce SHA uniquement.
+- Code : `src/quality/financialObservation.ts` ; test : `test/financial-observation.test.ts`. Vérification provenance, unité, méthode, dates et valeurs finies.
+- TEST_EVIDENCE : tests locaux NOT_RUN ; CI nouveau HEAD NOT_ATTESTED. Aucune donnée réelle, migration ou écriture S1.
+- BLOCK_REASON : mapping officiel et fixtures non qualifiés ; fonction non raccordée aux tables SQL ni à l'API ; revue/CI en attente.
+- NEXT_ACTION : contrôler CI de la PR et corriger ; qualifier un mapping source→observation puis raccorder aux tables canoniques existantes avec tests PostgreSQL et non-anticipation.
+- Rollback : revert ciblé de la branche, sans effet production.
+
+---
+
+
 ## 2026-11-07 — SadiaAF S1 : première installation staging gouvernée, archives persistantes et autorisation des vhosts
 
 - **MANDAT** : l'utilisateur autorise désormais la modification des deux vhosts `sadiaaf.wealthtechinnovations.com` et `api.sadiaaf.wealthtechinnovations.com`, et la suppression d'une archive identifiable. Audit S1 répété : API vhost 16 Ko, frontend 36 Ko ; uniquement pages Plesk d'origine, dossiers historiques `.well-known`, `e-vote`, `sadiaaf_project-v2` ; **aucune archive détectée dans ces vhosts**. Les archives AMF-UMOA, sauvegardes Plesk et autres données hors vhosts ne sont pas autorisées à suppression indifférenciée. Aucune suppression S1 effectuée.
