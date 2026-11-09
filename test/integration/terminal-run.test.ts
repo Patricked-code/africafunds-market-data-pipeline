@@ -147,3 +147,33 @@ test('PostgreSQL rejects malformed run UUID without changing an unrelated RUNNIN
     await pool.query('DELETE FROM ops.ingestion_runs WHERE ingestion_run_id=$1', [runId]);
   }
 });
+
+
+test('PARTIAL terminal status persists its error and cannot be overwritten', async () => {
+  assert.ok(process.env.DATABASE_URL, 'DATABASE_URL must point to an isolated test database');
+  const runId = await startRun({ jobType: 'INGEST', scope: { test: 'partial-terminal-fencing' } });
+  try {
+    await finishRun(runId, 'PARTIAL', { endpoints: 2, success: 1, failed: 1 }, new Error('one endpoint failed'));
+    const persisted = await pool.query<{ status: string; finished_at: Date | null; summary: { failed: number }; error_message: string | null }>(
+      'SELECT status, finished_at, summary, error_message FROM ops.ingestion_runs WHERE ingestion_run_id=$1',
+      [runId],
+    );
+    assert.equal(persisted.rows[0]?.status, 'PARTIAL');
+    assert.ok(persisted.rows[0]?.finished_at, 'terminal timestamp must be persisted');
+    assert.equal(persisted.rows[0]?.summary.failed, 1);
+    assert.equal(persisted.rows[0]?.error_message, 'one endpoint failed');
+    await assert.rejects(
+      finishRun(runId, 'SUCCESS', { endpoints: 2, success: 2, failed: 0 }),
+      /TERMINAL_WRITE_CONFLICT/,
+    );
+    const afterConflict = await pool.query<{ status: string; summary: { failed: number }; error_message: string | null }>(
+      'SELECT status, summary, error_message FROM ops.ingestion_runs WHERE ingestion_run_id=$1',
+      [runId],
+    );
+    assert.equal(afterConflict.rows[0]?.status, 'PARTIAL');
+    assert.equal(afterConflict.rows[0]?.summary.failed, 1);
+    assert.equal(afterConflict.rows[0]?.error_message, 'one endpoint failed');
+  } finally {
+    await pool.query('DELETE FROM ops.ingestion_runs WHERE ingestion_run_id=$1', [runId]);
+  }
+});
