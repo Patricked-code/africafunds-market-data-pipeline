@@ -72,7 +72,7 @@ test('a serialization failure cannot finalize a run and permits a later valid fi
     );
     assert.equal(afterRejection.rows[0]?.status, 'RUNNING');
     assert.equal(afterRejection.rows[0]?.finished_at, null);
-    assert.equal(afterRejection.rows[0]?.summary, null);
+    assert.deepEqual(afterRejection.rows[0]?.summary, {}, 'RUNNING row retains its initial empty JSONB summary');
 
     await finishRun(runId, 'FAILED', { writer: 'recovery' });
     const afterRecovery = await pool.query<{ status: string; summary: { writer: string } }>(
