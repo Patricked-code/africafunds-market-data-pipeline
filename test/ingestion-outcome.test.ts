@@ -33,3 +33,20 @@ test('ingestion status preserves success, partial and total failure semantics', 
   assert.equal(ingestionRunStatus({ endpoints: 2, success: 0, failed: 2 }), 'FAILED');
   assert.equal(ingestionRunStatus({ endpoints: 2, success: 1, failed: 0 }), 'FAILED');
 });
+
+
+test('invalid ingestion counters fail closed and cannot certify backfill', () => {
+  const invalid = [
+    { endpoints: -1, success: -1, failed: 0 },
+    { endpoints: 2, success: 3, failed: 0 },
+    { endpoints: 2, success: 1, failed: 2 },
+    { endpoints: 2, success: -1, failed: 0 },
+    { endpoints: 2, success: 1.5, failed: 0 },
+    { endpoints: Number.NaN, success: 0, failed: 0 },
+    { endpoints: Number.POSITIVE_INFINITY, success: 0, failed: 0 },
+  ];
+  for (const summary of invalid) {
+    assert.equal(ingestionRunStatus(summary), 'FAILED');
+    assert.throws(() => assertIngestionSucceeded(summary), /Ingestion incomplete/);
+  }
+});
