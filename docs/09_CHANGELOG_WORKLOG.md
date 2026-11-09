@@ -1,5 +1,18 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-09 — Issue #14 / PR #26 : concurrence réelle sur écriture terminale PostgreSQL (CI en attente)
+
+- **RECONCILIATION** : PR #1 fusionnée ; PR #26 OPEN/Draft ; base SHA vérifié `d9ee51a2929734286613a53b8b5244068ffbc2bd` ; dépôt privé ; AGENTS.md, docs/15, journal et code/test runStore relus. PR #22/#25 non modifiées. Claim GitHub commentaire `6738998786`, périmètre limité au test et worklog.
+- **CI DU HEAD INITIAL** : [CI #126 run 42602577210](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/42602577210) et [Docker #29 run 42602577360](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/42602577360), tous deux completed/SUCCESS sur `d9ee51a2929734286613a53b8b5244068ffbc2bd`. N'attestent pas le nouveau test.
+- **TEST** : commit `ad7419deb9fb65caf73a922903343faba365aac1` complète `test/integration/terminal-run.test.ts` : deux appels concurrents à `finishRun` sur une même ligne RUNNING ; un seul succès, un conflit, statut et summary du gagnant persistés, nettoyage. Réutilisation de PostgreSQL et des fonctions existantes ; aucune nouvelle table ni migration. **Tests locaux NOT_RUN ; CI nouveau HEAD NON_ATTESTÉE**.
+- **LIMITE** : la concurrence SQL réelle est couverte par le scénario de test, mais pas de coupure réseau/driver ni de crash du serveur PostgreSQL simulé ; pas de preuve de réussite tant que CI n'a pas exécuté le test.
+- **BLOCK_REASON** : validation CI/revue sur nouveau HEAD à vérifier ; panne réelle de persistance non couverte ; contrats et fixtures officiels des six adaptateurs CBE/GOSDMX non qualifiés ; audit des 44 sources incomplet.
+- **NEXT_ACTION** : contrôler les jobs CI/Docker sur le HEAD résultant et vérifier que le test PostgreSQL a réellement été exécuté ; corriger tout échec. Ensuite ajouter une recette de panne de driver/connexion sans faux SUCCESS, puis reprendre les adaptateurs autorisés ou tâche indépendante #13/#15. Pas de fusion ni S1.
+- **ROLLBACK** : revert ciblé du commit de test et du présent checkpoint, sans effet sur schémas, données sources ni runtime.
+
+---
+
+
 ## 2026-11-09 — Issue #14 / PR #26 : garde SQL terminale et test PostgreSQL réel (validation en attente)
 
 - **RECONCILIATION** : PR #1 fusionnée ; PR #22, #25, #26 OPEN/Draft ; PR #26 HEAD initial `ff3f28ac09327cf7fabaff704cb9ea59866a6b06`, base `main` `73256f48d81d38ce8ff6f51be9e024b25cf5dadb` au contrôle ; dépôt privé ; AGENTS.md, docs/15, journal et composants runStore/ingest/terminalWrite relus. PR #22/#25 préservées.
