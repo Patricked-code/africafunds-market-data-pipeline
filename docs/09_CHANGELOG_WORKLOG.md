@@ -1,5 +1,15 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-09 — Issue #14 / PR #26 : CI et recette Docker attestées sur SHA exact
+
+- **RECONCILIATION** : PR #26 OPEN/Draft, HEAD `603557ece94506ad9aa887f71df4c672b389be5d` ; PR #25 OPEN/Draft, HEAD `8e1a22fe4d5100f5fea15ec024f063b06486c265`. AGENTS.md, contrat docs/15 et dernier checkpoint relus. Aucune fusion.
+- **PREUVES CI PR #26** : run [42541208302](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/42541208302), job validate `128916308638` completed/SUCCESS (typecheck, unit, build, migrations PostgreSQL, seed, tests d'intégration et backfill) ; run [42541208338](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/42541208338), job Docker runtime `128916308597` completed/SUCCESS (stack isolée, persistance DB). Ces preuves concernent uniquement le SHA ci-dessus ; elles ne prouvent ni S1 ni adaptateurs métier réels.
+- **BLOCK_REASON** : PR Draft sans revue indépendante attestée ; contrats, licences, formats et fixtures officiels des cinq CBE et de GOSDMX non qualifiés. Aucune fusion, aucune collecte et aucun déploiement S1.
+- **NEXT_ACTION** : vérifier les checks du nouveau HEAD documentaire, obtenir revue et gates ; puis implémenter les six adaptateurs dans les modules existants avec fixtures autorisées et tests métier. En parallèle, poursuivre les 22 NOT_PROBED, 7 HEAD 403 et 1 HEAD 404 de l'issue #13 sans contournement.
+- **ROLLBACK** : revert ciblé de cette entrée documentaire ; aucun changement des sources ou de la production.
+
+---
+
 ## 2026-11-09 — Issue #14 : fail-closed des six adaptateurs non implémentés (branche indépendante)
 
 - **RECONCILIATION** : main `73256f48d81d38ce8ff6f51be9e024b25cf5dadb` observé comme base de PR #25 ; branche dédiée issue #14, claim dans issue #14 ; PR #22 et PR #25 non modifiées. AGENTS.md, docs/00–15, dernier checkpoint de PR #25 et matrice audit 42314547906 consultés.
