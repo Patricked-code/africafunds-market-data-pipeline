@@ -1,5 +1,18 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-09 — Issue #14 / PR #26 : zéro ligne structurée ne vaut pas succès financier
+
+- **RECONCILIATION** : PR #1 fusionnée ; PR #22/#25/#26 ouvertes Draft ; base PR #26 main `73256f48d81d38ce8ff6f51be9e024b25cf5dadb`, HEAD avant travaux `173f6a38b7dbba846635cd43c1271939a555b1d4`. AGENTS.md, docs/15, dernier checkpoint, code ingest/ingestionOutcome et tests lus. Pas d'écriture main, PR #22/#25, S1 ou sources.
+- **PREUVES EXACT-HEAD ANTÉRIEUR** : [CI run 42684281808](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/42684281808) completed/SUCCESS ; [Docker run 42684281650](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/42684281650) completed/SUCCESS pour `173f6a38b7dbba846635cd43c1271939a555b1d4` uniquement.
+- **TRAVAIL CONCRET** : commits `d0342299f1d3fa7cb10ec100ceae7d4fb250ee2d`, `e4333c3d6a3b09dde558c1ffa11439bc0c28760b`, `8a47bb2feed4137b4a47bc765369d5f6020fcc14`. Dans le chemin d'ingestion financière, un endpoint archivé avec zéro ligne structurée provoque `NO_STRUCTURED_ROWS` avant incrémentation du compteur SUCCESS. Le mode `discover` conserve la possibilité de découvrir des liens sans lignes structurées. Test unitaire pour zéro/négatif/fractionnaire/NaN/infini et compatibilité discovery. L'archive brute et le diagnostic d'échec sont préservés.
+- **VALIDATION** : tests locaux NOT_RUN ; CI sur HEAD modifié NON_ATTESTÉE ; revue NON_ATTESTÉE. Cette garde ne prouve ni validité sémantique, ni normalisation, ni données historiques complètes.
+- **BLOCK_REASON** : nouvelle CI/revue à vérifier ; sources sans contrat/fixtures autorisés ; qualité métier et normalisation #15 incomplètes ; audit #13 et backfill #5 incomplets ; gates S1 non satisfaits.
+- **NEXT_ACTION** : contrôler CI et Docker du HEAD documentaire exact ; corriger toute régression de tests existants ; puis poursuivre #15 (provenance, dates économiques et qualité) ou #14 (adaptateurs sous contrat) après claim/réconciliation. Aucun merge ni S1.
+- **ROLLBACK** : revert ciblé des trois commits et de ce checkpoint ; aucune migration, suppression ou modification serveur.
+
+---
+
+
 ## 2026-11-09 — Issue #14 / PR #26 : exact-HEAD CI validée, diagnostic SUCCESS protégé
 
 - **RECONCILIATION** : PR #1 MERGED ; PR #22/#25/#26 OPEN Draft ; base PR #26 main `73256f48d81d38ce8ff6f51be9e024b25cf5dadb`, HEAD initial `47bfce4671aba453b66b78fbe3319de36ff236b1`. Instructions AGENTS.md et docs/15, dernier checkpoint et fonctions runStore/test relus. Aucun changement sur main, PR #22/#25, sources ou S1.
