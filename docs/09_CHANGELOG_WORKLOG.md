@@ -1,5 +1,18 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-10 — Issue #15 : rejet transactionnel de famille de données discordante (PARTIAL)
+
+- RECONCILIATION : lecture de AGENTS.md, docs/15_AUTONOMOUS_AGENT_EXECUTION.md, dernier checkpoint de ce journal et code de la branche PR #27. PR #27 OPEN/Draft, HEAD initial `4887d53fabe0c315d35934fa9492671f749ba52d`, base main rapportée `73256f48d81d38ce8ff6f51be9e024b25cf5dadb` ; PR #22/#25/#26 OPEN. Aucune modification des branches concurrentes. Claim atomique multi-agent toujours non attesté.
+- TEST_EVIDENCE_PREVIOUS_HEAD : runs GitHub Actions [42867311750](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/42867311750) (CI) et [42867312144](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/42867312144) (Docker/PostgreSQL), completed/success selon connecteur pour le HEAD initial ; ne certifient pas le nouveau test.
+- TEST_CODE : commit `58233152839202145f690d26aacea051e37fe362` dans `test/integration/financial-provenance.test.ts` : fixture PostgreSQL transactionnelle avec marché et endpoint cohérents mais famille de données discordante ; `withVerifiedRawRecord` doit rejeter avec `PROVENANCE_MISMATCH` avant tout callback INSERT ; compteur d'écritures synthétiques doit rester zéro. Fixtures annulées par ROLLBACK, sans donnée réelle ni migration.
+- VALIDATION : écriture GitHub confirmée ; tests locaux NOT_RUN, CI sur nouveau HEAD NOT_ATTESTED, revue indépendante NOT_ATTESTED. Aucune déclaration HISTORY_COMPLETE, DONE ou déploiement.
+- BLOCK_REASON : writer financier canonique, mapping officiel source→série, droits/licences et données témoins non qualifiés ; claim atomique inter-agent et revue indépendante non attestés.
+- NEXT_ACTION : contrôler CI et Docker/PostgreSQL sur le HEAD exact de ce checkpoint et corriger si échec ; qualifier le vrai writer et les mappings officiels avant raccordement aux tables métier ; si bloqué, reprendre #13/#14 sur branche indépendante non possédée, sans contournement d'accès.
+- ROLLBACK : revert ciblé du test et de cette entrée sur PR #27 Draft ; aucun push main, merge, secret ou S1.
+
+---
+
+
 ## 2026-11-10 — Issue #15 : preuve de rollback du writer après admission (PARTIAL)
 
 - RECONCILIATION : PR #1 MERGED ; PR #22/#25/#26/#27 OPEN selon recherche GitHub ; PR #27 Draft, base main rapportée `73256f48d81d38ce8ff6f51be9e024b25cf5dadb`, HEAD initial `13c5bc463fa735f1138c9789aedea13742e09f2b`. Lecture AGENTS.md, docs/15, dernier checkpoint et documents maîtres. Aucun claim atomique inter-agent attesté ; écriture uniquement dans la branche PR #27 avec contrôle SHA de blob.
