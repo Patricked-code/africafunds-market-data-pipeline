@@ -5,6 +5,9 @@ import type pg from 'pg';
  * The registry is authoritative for endpoint, market and data family.
  * This guard performs no writes and does not infer an official financial mapping.
  * Call before any canonical observation INSERT, using the same transaction/client.
+ * Row-level SHARE locks prevent concurrent edits of the validated record,
+ * artifact and registry entry until the CALLER commits or rolls back.
+ * Without an explicit caller-owned transaction these locks end at statement end.
  */
 export async function assertRawRecordProvenance(
   client: Pick<pg.Client, 'query'>,
@@ -33,7 +36,8 @@ export async function assertRawRecordProvenance(
        FROM market.raw_records r
        JOIN source.raw_artifacts a ON a.raw_artifact_id = r.raw_artifact_id
        JOIN source.source_endpoints e ON e.endpoint_code = a.endpoint_code
-      WHERE r.raw_record_id = $1::uuid`,
+      WHERE r.raw_record_id = $1::uuid
+        FOR SHARE OF r, a, e`,
     [rawRecordId, expectedEndpointCode, expectedArtifactId],
   );
   if (result.rowCount !== 1 || result.rows.length !== 1 || result.rows[0]?.admissible !== true) {
