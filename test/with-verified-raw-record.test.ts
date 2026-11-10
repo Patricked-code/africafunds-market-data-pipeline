@@ -59,3 +59,27 @@ test('database failure propagates and writer is not invoked', async () => {
   );
   assert.equal(writes, 0);
 });
+
+
+test('writer failure propagates without retry or hidden transaction control', async () => {
+  const failure = new Error('SYNTHETIC_WRITER_FAILURE');
+  const statements: string[] = [];
+  let attempts = 0;
+  const client = {
+    query: async (sql: string) => {
+      statements.push(sql);
+      return { rowCount: 1, rows: [{ admissible: true }] };
+    },
+  } as unknown as Parameters<typeof withVerifiedRawRecord>[0];
+  await assert.rejects(
+    withVerifiedRawRecord(client, references, async (transaction) => {
+      assert.equal(transaction, client);
+      attempts += 1;
+      throw failure;
+    }),
+    (error: unknown) => error === failure,
+  );
+  assert.equal(attempts, 1, 'writer must never be retried implicitly');
+  assert.equal(statements.length, 1, 'helper must not COMMIT or ROLLBACK');
+  assert.match(statements[0]!, /SELECT/);
+});
