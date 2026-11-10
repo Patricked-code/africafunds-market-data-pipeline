@@ -91,6 +91,16 @@ test('provenance guard rejects ambiguous SQL cardinality and propagates database
       `ambiguous cardinality ${String(rowCount)} must reject`,
     );
   }
+  for (const rows of [[], [{ admissible: true }, { admissible: true }]]) {
+    const client = {
+      query: async () => ({ rowCount: 1, rows }),
+    } as unknown as Parameters<typeof assertRawRecordProvenance>[0];
+    await assert.rejects(
+      assertRawRecordProvenance(client, record, endpoint, artifact),
+      /PROVENANCE_MISMATCH/,
+      'driver rowCount and returned rows must agree on exactly one row',
+    );
+  }
   const nullPredicateClient = {
     query: async () => ({ rowCount: 1, rows: [{ admissible: null }] }),
   } as unknown as Parameters<typeof assertRawRecordProvenance>[0];
