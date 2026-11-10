@@ -1,5 +1,18 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-10 — Issue #15 : verrouillage de la chaîne de provenance pendant la transaction (PARTIAL)
+
+- RECONCILIATION : PR #1 MERGED ; PR #22/#25/#26/#27 OPEN Draft, #27 HEAD initial `7e5e5eca12840c44edb24ca4861015b9801dc7b2`, base PR main `73256f48d81d38ce8ff6f51be9e024b25cf5dadb`. AGENTS.md, docs/15, dernier checkpoint, code de la garde et tests relus. Aucun claim atomique inter-agent attesté ; branche #27 seule modifiée avec contrôle de blob SHA.
+- TEST_EVIDENCE_PREVIOUS_HEAD : GitHub Actions CI run [42887050599](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/42887050599) et Docker/PostgreSQL run [42887050660](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/42887050660) : completed/success pour le HEAD initial exact ; ne prouvent pas les nouveaux commits.
+- CODE : commit `b87f5fd81cb208c13916667733c2cf31f5d80a84`, `src/quality/rawRecordProvenance.ts` utilise `FOR SHARE OF r, a, e` pour protéger record, archive et entrée du registre contre des modifications concurrentes entre admission et INSERT, **uniquement si l'appelant conserve la même transaction PostgreSQL ouverte**. Ne crée pas de transaction, mapping ou writer.
+- TEST : commit `27b6f8055194af9b96315ad7d99214e39ff9ce58`, assertion de contrat SQL sur les trois verrous dans le test unitaire existant. Tests locaux NOT_RUN ; CI du nouveau HEAD NOT_ATTESTED à cette écriture ; revue indépendante NOT_ATTESTED.
+- LIMITATION : ce verrouillage ne prouve pas que les writers métier l'utilisent ; il ne protège pas un appel hors transaction explicite et ne remplace pas un mapping officiel, une licence ni une donnée témoin. Une validation PostgreSQL sur HEAD exact est obligatoire avant toute intégration.
+- BLOCK_REASON : writer financier canonique et mappings source→série non qualifiés ; droits/licences et données témoins manquants ; claim atomique multi-agent et revue indépendante non attestés. Issue #15 PARTIAL, aucune publication ou HISTORY_COMPLETE certifiée.
+- NEXT_ACTION : vérifier CI et Docker/PostgreSQL sur HEAD final exact et corriger toute erreur SQL/TypeScript ; inventorier migrations et chemin d'INSERT financier existant, qualifier mapping officiel et raccorder la garde dans une transaction explicite ; si bloqué, sélectionner tâche indépendante #13/#14 après réconciliation/claim. Ne pas multiplier des tests synthétiques sans progresser vers des données officielles.
+- ROLLBACK : revert ciblé des deux commits techniques et de ce checkpoint sur branche Draft ; aucun merge, push main, secret ou déploiement S1.
+
+---
+
 ## 2026-11-10 — Issue #15 : propagation d'erreur writer sans retry ni transaction cachée (PARTIAL)
 
 - RECONCILIATION : PR #27 OPEN/Draft, HEAD avant intervention `5e705aa52a2cfd50e86e4970c16d1fc2990058f3`, base PR main `73256f48d81d38ce8ff6f51be9e024b25cf5dadb` ; PR #22/#25/#26 OPEN. AGENTS.md, docs/15, checkpoint précédent et code/tests pertinents relus. Claim atomique multi-agent non attesté ; modification limitée à la branche #27, contrôle blob SHA.
