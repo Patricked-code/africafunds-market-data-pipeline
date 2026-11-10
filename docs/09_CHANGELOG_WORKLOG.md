@@ -1,5 +1,18 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-11 — Issue #15 : CI du HEAD exact attestée ; inventaire writer encore non résolu (PARTIAL)
+
+- RECONCILIATION : dépôt GitHub private, PR #27 OPEN/Draft, HEAD initial exact `04a56ca149c02ec090707d27f9e7f52618ebfd4b`, base `73256f48d81d38ce8ff6f51be9e024b25cf5dadb`. PR #22/#25/#26 également OPEN/Draft. Lecture AGENTS.md, des 14 documents maîtres ordonnés, docs/15 et du dernier checkpoint. Aucune fusion ni déploiement autorisé.
+- TEST_EVIDENCE_EXACT_HEAD : GitHub Actions CI [42916217509](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/42916217509) completed/success et Docker/PostgreSQL [42916217555](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/42916217555) completed/success, **sur HEAD `04a56ca149c02ec090707d27f9e7f52618ebfd4b` seulement**. Ces runs ne prouvent ni données réelles ni déploiement.
+- INVENTORY : `src/quality/withVerifiedRawRecord.ts` ne contient aucun INSERT, transaction implicite ou mapping officiel ; `src/quality/rawRecordProvenance.ts` valide raw_records/raw_artifacts/source_endpoints et verrouille via `FOR SHARE OF r, a, e` dans la transaction de l'appelant. La recherche de code sur main pour INSERT INTO / CREATE TABLE / market.observations / financial_observations n'a retourné aucun résultat exploitable ; **absence de résultats de recherche ne prouve pas absence de writer**. Inventaire exhaustif des migrations, schémas et writers encore requis avant tout raccordement.
+- VALIDATION : CI du HEAD précédent attestée ; tests locaux NOT_RUN ; nouveau HEAD documentaire non encore validé. Claim atomique inter-agent et revue indépendante NOT_ATTESTED. Aucun code métier modifié dans ce checkpoint ; aucune donnée officielle insérée.
+- BLOCK_REASON : writer financier canonique et mappings officiels source→série non identifiés, licences/données témoins non qualifiées ; claim multi-agent et revue indépendante non attestés. Issue #15 PARTIAL, aucun HISTORY_COMPLETE/DONE.
+- NEXT_ACTION : inventorier les fichiers SQL/migrations et chemins d'écriture réellement présents sur main et branches PR pertinentes, vérifier absence de collision avec PR #22/#25/#26, puis raccorder la garde à un writer existant avec mapping officiel et test d'intégration. Si aucun writer admissible, qualifier une tâche indépendante #13/#14 et ses droits sans modifier les PR possédées. Vérifier CI sur tout nouveau HEAD avant certification.
+- ROLLBACK : revert ciblé de cette seule entrée documentaire sur branche Draft. Aucun push main, merge, secret, changement de visibilité ou opération S1.
+
+---
+
+
 ## 2026-11-10 — Issue #15 : preuve de libération du verrou PostgreSQL après rollback (PARTIAL)
 
 - RECONCILIATION : lecture AGENTS.md, docs/15_AUTONOMOUS_AGENT_EXECUTION.md, dernier checkpoint du journal, code du test PostgreSQL ; PR #27 OPEN/Draft, autres PR #22/#25/#26 ouvertes selon recherche GitHub. HEAD précédent exact `0a1292b666b08e22c299beeea6455c707d6769f9`. Aucun claim atomique multi-agent attesté ; modification limitée au fichier de test sur branche #27 avec contrôle du blob SHA.
