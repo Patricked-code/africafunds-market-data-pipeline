@@ -189,6 +189,14 @@ test('raw record provenance guard admits only consistent registry chains', async
       assertRawRecordProvenance(client, valid.rows[0]!.raw_record_id, endpoint.endpoint_code, ''),
       /PROVENANCE_MISSING_REFERENCE/,
     );
+    await assert.rejects(
+      assertRawRecordProvenance(client, 'not-a-uuid', endpoint.endpoint_code, artifactId),
+      /PROVENANCE_INVALID_REFERENCE/,
+    );
+    await assert.rejects(
+      assertRawRecordProvenance(client, valid.rows[0]!.raw_record_id, endpoint.endpoint_code, 'not-a-uuid'),
+      /PROVENANCE_INVALID_REFERENCE/,
+    );
   } finally {
     await client.query('ROLLBACK');
     await client.end();
