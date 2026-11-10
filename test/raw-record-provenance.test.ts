@@ -19,6 +19,7 @@ test('provenance guard rejects malformed references without querying PostgreSQL'
   const cases: Array<{ label: string; record: string; endpoint: string; artifact: string; reason: string }> = [
     { label: 'missing record', record: '', endpoint: 'OFFICIAL', artifact: validId, reason: 'PROVENANCE_MISSING_REFERENCE' },
     { label: 'missing endpoint', record: validId, endpoint: '', artifact: validId, reason: 'PROVENANCE_MISSING_REFERENCE' },
+    { label: 'whitespace-only endpoint', record: validId, endpoint: '  \t  ', artifact: validId, reason: 'PROVENANCE_INVALID_REFERENCE' },
     { label: 'missing artifact', record: validId, endpoint: 'OFFICIAL', artifact: '', reason: 'PROVENANCE_MISSING_REFERENCE' },
     { label: 'invalid record UUID', record: 'not-a-uuid', endpoint: 'OFFICIAL', artifact: validId, reason: 'PROVENANCE_INVALID_REFERENCE' },
     { label: 'invalid artifact UUID', record: validId, endpoint: 'OFFICIAL', artifact: 'not-a-uuid', reason: 'PROVENANCE_INVALID_REFERENCE' },
