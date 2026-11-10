@@ -1,5 +1,18 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-10 — Issue #15 : frontière transactionnelle de provenance (PARTIAL)
+
+- RECONCILIATION : PR #1 MERGED, PR #22/#25/#26/#27 OPEN Draft ; PR #27 HEAD avant intervention `9d4208ccbc407d34fca622388c50254ca7f1e497`. Dépôt privé selon get_repo ; AGENTS.md, docs/15, worklog et 14 documents maîtres consultés. Claim atomique inter-agent non attesté ; écriture limitée à la branche PR #27.
+- TEST_EVIDENCE : sur HEAD initial exact, GitHub Actions runs 42835796657 et 42835796766 : completed SUCCESS (connecteur GitHub). Ces runs ne valident PAS les nouveaux commits. Tests locaux NOT_RUN ; CI nouveau HEAD NOT_ATTESTED.
+- CODE : commit `bcf006e425276f5219a259344232dcfda310947c` crée `src/quality/withVerifiedRawRecord.ts` : helper additif qui appelle `assertRawRecordProvenance` avant un callback d'écriture autorisé, en transmettant le même client PostgreSQL. Transaction ouverte/COMMIT/ROLLBACK demeurent responsabilité explicite de l'appelant. Aucun mapping officiel, INSERT canonique ou transaction production inventé.
+- TEST : commit `f4811fa1093ba0a54566e8b61bd9ad4978ff95fb` ajoute trois scénarios mock : absence d'appel au writer après mismatch, identité du client entre garde et callback, propagation erreur DB sans écriture. Tests enregistrés, non exécutés localement.
+- BLOCK_REASON : aucun writer canonique officiel ni mapping source-série/licence/données témoins qualifié ; helper non raccordé au pipeline d'ingestion ; claim atomique, revue indépendante et CI du HEAD final non attestés.
+- NEXT_ACTION : vérifier CI et Docker/PostgreSQL sur HEAD final exact ; corriger si rouge ; inventorier les writers canoniques/migrations existants et raccorder ce helper uniquement à un chemin d'INSERT autorisé dans une transaction avec test d'absence d'INSERT sur mismatch. Si aucune série officielle admissible, poursuivre #13/#14 sur branche indépendante après contrôle des claims/droits.
+- ROLLBACK : revert ciblé des commits helper/test et checkpoint sur PR #27 Draft ; main, S1, données et 44 sources inchangés.
+
+---
+
+
 ## 2026-11-10 — Issue #15 : cohérence cardinalité driver PostgreSQL (PARTIAL)
 
 - RECONCILIATION : PR #1 MERGED ; PR #22/#25/#26/#27 OPEN Draft ; PR #27 HEAD initial `91f6058663f1fc75ccda39df32b7c2335539ac53`, base SHA rapporté `73256f48d81d38ce8ff6f51be9e024b25cf5dadb`. AGENTS.md, documents maîtres, docs/15, worklog et garde/tests consultés. Aucun claim atomique multi-agent attesté ; intervention bornée à la branche PR #27, avec contrôle blob SHA.
