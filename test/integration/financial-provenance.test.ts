@@ -262,6 +262,15 @@ test('verified raw record callback inserts only after consistent provenance in P
        VALUES ($1,$2,$3,$4,2,'{}'::jsonb) RETURNING raw_record_id`,
       [artifactId, endpoint.endpoint_code, alternate.rows[0]!.market_code, endpoint.data_family],
     );
+    // A matching market alone is insufficient: the data family must also
+    // match the registered endpoint. This remains a synthetic rollback-only fixture.
+    const wrongFamily = await client.query<{ raw_record_id: string }>(
+      `INSERT INTO market.raw_records
+         (raw_artifact_id, endpoint_code, market_code, data_family, row_number, payload)
+       VALUES ($1,$2,$3,$4,3,'{}'::jsonb) RETURNING raw_record_id`,
+      [artifactId, endpoint.endpoint_code, endpoint.market_code,
+        endpoint.data_family === 'SYNTHETIC_MISMATCH' ? 'SYNTHETIC_OTHER' : 'SYNTHETIC_MISMATCH'],
+    );
     const writer = async (transaction: Pick<pg.Client, 'query'>, recordId: string) => {
       assert.equal(transaction, client, 'guard and writer must share transaction client');
       await transaction.query(
@@ -274,6 +283,14 @@ test('verified raw record callback inserts only after consistent provenance in P
         rawRecordId: invalid.rows[0]!.raw_record_id, endpointCode: endpoint.endpoint_code, artifactId,
       }, (transaction) => writer(transaction, invalid.rows[0]!.raw_record_id)),
       /PROVENANCE_MISMATCH/,
+    );
+    await assert.rejects(
+      withVerifiedRawRecord(client, {
+        rawRecordId: wrongFamily.rows[0]!.raw_record_id,
+        endpointCode: endpoint.endpoint_code, artifactId,
+      }, (transaction) => writer(transaction, wrongFamily.rows[0]!.raw_record_id)),
+      /PROVENANCE_MISMATCH/,
+      'matching market with mismatched data family must not invoke the writer',
     );
     const rejectedCount = await client.query<{ count: string }>(
       'SELECT count(*)::text AS count FROM synthetic_admitted_observations',
