@@ -1,5 +1,18 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-10 — Issue #15 : test négatif de discordance de provenance (PARTIAL)
+
+- RECONCILIATION : AGENTS.md, docs/15_AUTONOMOUS_AGENT_EXECUTION.md, dernier checkpoint du présent journal, test transactionnel et migration sql/migrations/002_market.sql relus sur branche PR #27 ; PR #27 OPEN/Draft (issue GitHub). Recherche globale des PR non fiable pour un inventaire exhaustif : aucune conclusion de fusion pour les autres branches. Aucun SHA main actuel attesté pendant cette passe.
+- TEST_EVIDENCE : pour le HEAD antérieur exact `e55044d9c40d24553791fbd1dbfc76146b5b89b6`, GitHub Actions CI #163 run [42757311931](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/42757311931) et Docker/PostgreSQL #66 run [42757312125](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/42757312125) : completed SUCCESS. Jobs détaillés non inspectés ; aucun succès imputé au nouveau HEAD.
+- CODE/TEST : ajout d'un scénario PostgreSQL transactionnel négatif dans `test/integration/financial-provenance.test.ts`, commit `cd035b0c34a227f09968dd123b86ca47bad6245c`. Il construit un raw_record synthétique dont le marché diffère de celui du registre et vérifie que le prédicat de concordance endpoint/artifact/market/family refuse l'admission. Toutes les écritures sont ROLLBACK ; aucune donnée officielle ni S1 modifiée.
+- LIMITATION : caractérisation de risque seulement, pas encore de garde métier appelée depuis le pipeline ; le schéma permet toujours l'insertion d'une discordance. Test local NOT_RUN, nouveau HEAD CI NOT_ATTESTED. Fixture exige au moins deux marchés seedés. Aucun mapping officiel inventé.
+- BLOCK_REASON : absence de contrôle de concordance appliqué au chemin de normalisation, absence de mappings officiels et de données témoins autorisées ; revue indépendante et protections de fusion non attestées.
+- NEXT_ACTION : contrôler la CI exacte du nouveau HEAD et corriger si rouge ; introduire une admission SQL fail-closed réutilisable dans le chemin réel de normalisation avant toute écriture canonique, avec test RED/GREEN de discordance, sans migration destructive ni création d'observations fictives. Continuer les issues #13/#14 indépendamment si les mappings officiels restent bloqués.
+- ROLLBACK : revert ciblé du test et du checkpoint sur branche Draft ; main/S1 inchangés.
+
+---
+
+
 ## 2026-11-10 — Issue #15 : test transactionnel de provenance synthétique (PARTIAL)
 
 - RECONCILIATION : instructions AGENTS.md, docs/09_CHANGELOG_WORKLOG.md et docs/15_AUTONOMOUS_AGENT_EXECUTION.md relues sur la branche PR #27 ; migrations canoniques 001_core.sql/002_market.sql et test PostgreSQL existant relus. PR #27 reste Draft ; aucune fusion.
