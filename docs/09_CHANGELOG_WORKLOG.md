@@ -1,5 +1,18 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-10 — Issue #15 : admission SQL paramétrée et fail-closed (PARTIAL)
+
+- RECONCILIATION : AGENTS.md et les 14 documents maîtres prescrits relus depuis la branche PR #27 ; worklog courant et docs/15 consultés. Recherche GitHub : PR ouvertes #22/#25/#26/#27 ; issues #15/#14/#13/#5 restent des chantiers à qualifier. Aucun claim inter-agent atomique attesté ; modification circonscrite à la branche existante #27.
+- TEST_EVIDENCE : sur HEAD antérieur exact `f5a705decf599637cbee6f8fa7490bee702c678b`, GitHub Actions CI #178 run 42800832398 et Docker/PostgreSQL #81 run 42800832318 : completed SUCCESS. Résultats limités à cet ancien HEAD, pas au nouveau commit.
+- TEST : commit `4fc509b1a83352e16143478a7c6488df7d10b815` ajoute un test unitaire mock de la voie SQL valide : trois paramètres liés, aucune interpolation du code endpoint (y compris chaîne ressemblant à une injection), admission uniquement pour `admissible === true`, rejet pour false/null/undefined/1/'true'. Aucun changement métier, SQL de production ou schéma. Tests locaux NOT_RUN ; CI nouveau HEAD NOT_ATTESTED.
+- LIMITATION : ce test mock ne prouve ni exécution PostgreSQL sur le nouveau HEAD, ni writer canonique, ni mapping/licence/données témoins officiels, ni historique réel.
+- BLOCK_REASON : writer financier admissible et mapping source→série non qualifiés ; claim atomique inter-agent et revue indépendante non attestés ; CI exacte du nouveau HEAD à contrôler.
+- NEXT_ACTION : vérifier CI et Docker/PostgreSQL sur HEAD `4fc509b1a83352e16143478a7c6488df7d10b815` et corriger si nécessaire ; identifier le chemin d'insertion canonique autorisé et y appliquer la garde dans la même transaction avec preuve d'absence d'INSERT sur discordance. En cas de blocage de licence/mapping, poursuivre #13/#14 sur une branche indépendante après vérification de claim et des droits d'accès.
+- ROLLBACK : revert ciblé du commit de test et du présent checkpoint ; aucun push main, merge, changement de sources ou S1.
+
+---
+
+
 ## 2026-11-10 — Issue #15 : garde fail-closed testée sans PostgreSQL (PARTIAL)
 
 - RECONCILIATION : AGENTS.md et documents maîtres prescrits 00–15 relus sur la branche PR #27 ; PR ouvertes #22/#25/#26/#27 retrouvées ; dépôt private selon get_repo. Aucun merge ni déploiement. L'absence de claim atomique inter-agent reste un risque ; modification circonscrite à un nouveau fichier de test et au worklog.
