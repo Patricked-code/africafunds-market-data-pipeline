@@ -1,5 +1,18 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-10 — Issue #15 : cohérence cardinalité driver PostgreSQL (PARTIAL)
+
+- RECONCILIATION : PR #1 MERGED ; PR #22/#25/#26/#27 OPEN Draft ; PR #27 HEAD initial `91f6058663f1fc75ccda39df32b7c2335539ac53`, base SHA rapporté `73256f48d81d38ce8ff6f51be9e024b25cf5dadb`. AGENTS.md, documents maîtres, docs/15, worklog et garde/tests consultés. Aucun claim atomique multi-agent attesté ; intervention bornée à la branche PR #27, avec contrôle blob SHA.
+- TEST_EVIDENCE : sur le HEAD initial exact, GitHub Actions Docker/PostgreSQL run [42826419252](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/42826419252) et CI run [42826419333](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/42826419333) sont completed SUCCESS selon le connecteur. Ces runs ne couvrent pas les commits suivants.
+- CODE : commit `90bdd37b858711c2535f84d88f59aee594d78f51` : la garde refuse un résultat SQL dont `rowCount=1` mais `rows.length!==1`, même si une ligne porte `admissible=true`. Contrat PostgreSQL normal conservé.
+- TEST : commit `213dab9a317e533e91d26eed48a1b0d4d6e9fd3b` : deux scénarios mock de discordance `rowCount`/lignes (zéro ou deux lignes avec `rowCount=1`). Tests locaux NOT_RUN ; CI sur le nouveau HEAD NOT_ATTESTED à cette écriture.
+- LIMITATION : test mock uniquement ; aucun mapping officiel, writer financier canonique ni donnée témoin réelle validés ; pas de certification de normalisation ou publication.
+- BLOCK_REASON : absence de writer financier autorisé et mapping source→série/licences/données témoins ; claim atomique inter-agent et revue indépendante non attestés ; CI du nouveau HEAD en attente.
+- NEXT_ACTION : contrôler CI et Docker/PostgreSQL sur le HEAD final exact, corriger tout échec ; identifier le writer canonique et intégrer la garde dans la transaction d'INSERT avec test de non-insertion. Si mapping/licences indisponibles, reprendre une tâche indépendante #13/#14 après vérification de propriété et des droits.
+- ROLLBACK : revert ciblé des deux commits code/test et de ce checkpoint sur la branche Draft ; main, sources, données et S1 inchangés.
+
+---
+
 ## 2026-11-10 — Issue #15 : endpoint uniquement blanc rejeté avant SQL (PARTIAL)
 
 - RECONCILIATION : PR #1 MERGED ; PR #22/#25/#26/#27 OPEN Draft via get_pr_info ; PR #27 HEAD initial `ea74f76b2e17ab1f38a95a4de197b9a1e078d9d5`, base SHA rapporté `73256f48d81d38ce8ff6f51be9e024b25cf5dadb` (pas une attestation indépendante de main). AGENTS.md, worklog/checkpoint, docs/15 et garde/tests relus. Aucun claim atomique multi-agent attesté ; intervention limitée à la branche PR #27 avec blob SHA.
