@@ -331,3 +331,56 @@ test('verified raw record callback inserts only after consistent provenance in P
     await client.end();
   }
 });
+
+
+/**
+ * Issue #15: demonstrate real PostgreSQL row-lock behavior, not merely SQL text.
+ * Requires an isolated seeded test database. No permanent writes or production use.
+ * The admission client holds its transaction open while a competing client attempts
+ * to update the same registry row; PostgreSQL must reject that update on lock timeout.
+ */
+test('provenance admission holds registry row against concurrent update until rollback', async () => {
+  assert.ok(process.env.DATABASE_URL, 'isolated test DATABASE_URL required');
+  const admission = new pg.Client({ connectionString: process.env.DATABASE_URL });
+  const competitor = new pg.Client({ connectionString: process.env.DATABASE_URL });
+  await admission.connect();
+  try {
+    await competitor.connect();
+    await admission.query('BEGIN');
+    const endpoints = await admission.query<{ endpoint_code: string; market_code: string; data_family: string }>(
+      'SELECT endpoint_code, market_code, data_family FROM source.source_endpoints LIMIT 1',
+    );
+    const endpoint = endpoints.rows[0];
+    assert.ok(endpoint, 'seeded endpoint required');
+    const artifact = await admission.query<{ raw_artifact_id: string }>(
+      `INSERT INTO source.raw_artifacts
+         (endpoint_code, source_url, final_url, fetched_at, http_status, sha256, byte_size, archive_path)
+       VALUES ($1, 'https://example.invalid/lock-proof', 'https://example.invalid/lock-proof',
+               now(), 200, $2, 0, 'ci/synthetic-rollback-only')
+       RETURNING raw_artifact_id`,
+      [endpoint.endpoint_code, randomBytes(32).toString('hex')],
+    );
+    const artifactId = artifact.rows[0]!.raw_artifact_id;
+    const record = await admission.query<{ raw_record_id: string }>(
+      `INSERT INTO market.raw_records
+         (raw_artifact_id, endpoint_code, market_code, data_family, row_number, payload)
+       VALUES ($1,$2,$3,$4,1,'{}'::jsonb) RETURNING raw_record_id`,
+      [artifactId, endpoint.endpoint_code, endpoint.market_code, endpoint.data_family],
+    );
+    await assertRawRecordProvenance(admission, record.rows[0]!.raw_record_id, endpoint.endpoint_code, artifactId);
+    await competitor.query('BEGIN');
+    await competitor.query("SET LOCAL lock_timeout = '300ms'");
+    await assert.rejects(
+      competitor.query(
+        'UPDATE source.source_endpoints SET market_code = market_code WHERE endpoint_code = $1',
+        [endpoint.endpoint_code],
+      ),
+      (error: unknown) => (error as { code?: string }).code === '55P03',
+      'concurrent registry UPDATE must time out while the admission transaction holds FOR SHARE',
+    );
+  } finally {
+    // Both clients roll back; even the competing transaction's timeout is isolated.
+    await Promise.allSettled([competitor.query('ROLLBACK'), admission.query('ROLLBACK')]);
+    await Promise.allSettled([competitor.end(), admission.end()]);
+  }
+});
