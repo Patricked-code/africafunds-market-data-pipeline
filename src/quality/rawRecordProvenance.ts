@@ -36,7 +36,7 @@ export async function assertRawRecordProvenance(
       WHERE r.raw_record_id = $1::uuid`,
     [rawRecordId, expectedEndpointCode, expectedArtifactId],
   );
-  if (result.rowCount !== 1 || result.rows[0]?.admissible !== true) {
+  if (result.rowCount !== 1 || result.rows.length !== 1 || result.rows[0]?.admissible !== true) {
     throw new Error('PROVENANCE_MISMATCH');
   }
 }
