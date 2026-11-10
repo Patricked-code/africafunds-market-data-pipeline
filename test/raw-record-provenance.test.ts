@@ -59,6 +59,8 @@ test('provenance guard parameterizes references and admits only an explicit true
   assert.equal(calls.length, 1);
   assert.deepEqual(calls[0]?.params, [record, endpoint, artifact]);
   assert.ok(!calls[0]?.sql.includes(endpoint), 'endpoint must remain a bound parameter');
+  assert.match(calls[0]!.sql, /FOR SHARE OF r, a, e\b/i,
+    'the record, archive and registry must be locked during caller-owned transaction');
 
   for (const value of [false, null, undefined, 1, 'true']) {
     admissible = value;
