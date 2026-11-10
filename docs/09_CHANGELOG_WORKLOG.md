@@ -1,5 +1,18 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-10 — Issue #15 : UUID provenance non fiables, fail-closed (PARTIAL)
+
+- RECONCILIATION : AGENTS.md et docs maîtres 00–15 relus sur branche PR #27 ; PR #27 OPEN/Draft, HEAD avant cette passe `baf7349b25f6752370b1ed7ba1c4c7b2712785ab`. PR ouvertes identifiées par recherche : #22/#25/#26/#27. Aucun claim concurrent prouvé sur la branche #27 ; aucune autre branche modifiée.
+- TEST_EVIDENCE : pour le HEAD précédent exact `baf7349b25f6752370b1ed7ba1c4c7b2712785ab`, GitHub Actions CI run [42776056077](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/42776056077) completed SUCCESS ; Docker/PostgreSQL run [42776055950](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/42776055950) completed SUCCESS. Ce résultat ne valide PAS les commits suivants.
+- CODE : commit `a9e9b9cedb2b7f56fbe38ff3ac9e64ed60b1f13f` : `assertRawRecordProvenance` refuse les UUID malformés avant les casts PostgreSQL ; diagnostic stable `PROVENANCE_INVALID_REFERENCE`. Le rejet des références vides reste `PROVENANCE_MISSING_REFERENCE`.
+- TEST : commit `ad7d9a853ac9a039c590def1dd705274b19c9d47` : deux scénarios transactionnels pour identifiants raw_record/archive malformés. Tests locaux NOT_RUN, CI du HEAD nouveau NOT_ATTESTED à la rédaction.
+- LIMITATION : `src/jobs/ingest.ts` persiste les archives et raw_records et les évaluations de qualité, mais n'insère aucune observation financière canonique. La garde n'est donc pas encore appelée par un writer officiel ; pas de preuve de publication, de mapping, de licence ni de données réelles.
+- BLOCK_REASON : writer d'observation canonique et mapping source→série autorisés non qualifiés ; nouvelle CI, revue indépendante et gates de fusion non attestées. Aucune certification HISTORY_COMPLETE, aucune modification S1.
+- NEXT_ACTION : vérifier CI et Docker sur le nouveau HEAD exact ; identifier/implémenter uniquement le writer canonique admissible après qualification de mapping officiel, puis prouver par test transactionnel qu'une discordance empêche tout INSERT. Si mapping toujours indisponible, progresser sur les issues #13/#14 avec claim indépendant et preuves de sources autorisées.
+- ROLLBACK : revert ciblé des commits code/test et checkpoint sur branche Draft ; aucun effet sur main ou S1.
+
+---
+
 ## 2026-11-10 — Issue #15 : cas négatifs supplémentaires de provenance (PARTIAL)
 
 - RECONCILIATION : AGENTS.md, documents maîtres 00–15, dernier checkpoint et garde `src/quality/rawRecordProvenance.ts` relus sur branche PR #27 ; dépôt GitHub déclaré private. Le résultat de recherche GitHub des PR mélange issues et PR : inventaire exhaustif des PR non attesté par cette recherche.
