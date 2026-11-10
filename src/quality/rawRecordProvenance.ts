@@ -15,6 +15,10 @@ export async function assertRawRecordProvenance(
   if (!rawRecordId || !expectedEndpointCode || !expectedArtifactId) {
     throw new Error('PROVENANCE_MISSING_REFERENCE');
   }
+  // Reject non-string runtime inputs (including Symbol) before regex/SQL casts.
+  if (typeof rawRecordId !== 'string' || typeof expectedEndpointCode !== 'string' || typeof expectedArtifactId !== 'string') {
+    throw new Error('PROVENANCE_INVALID_REFERENCE');
+  }
   // Untrusted adapter inputs must fail closed before PostgreSQL UUID casts.
   const uuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
   if (!uuid.test(rawRecordId) || !uuid.test(expectedArtifactId)) {
