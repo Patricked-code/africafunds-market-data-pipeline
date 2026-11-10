@@ -378,8 +378,20 @@ test('provenance admission holds registry row against concurrent update until ro
       (error: unknown) => (error as { code?: string }).code === '55P03',
       'concurrent registry UPDATE must time out while the admission transaction holds FOR SHARE',
     );
+    // A lock timeout aborts the competing transaction. Release both transactions
+    // and prove a fresh transaction can update the same row after the guard exits.
+    await competitor.query('ROLLBACK');
+    await admission.query('ROLLBACK');
+    await competitor.query('BEGIN');
+    await competitor.query("SET LOCAL lock_timeout = '300ms'");
+    const unlocked = await competitor.query(
+      'UPDATE source.source_endpoints SET market_code = market_code WHERE endpoint_code = $1',
+      [endpoint.endpoint_code],
+    );
+    assert.equal(unlocked.rowCount, 1, 'registry lock must be released after admission rollback');
+    await competitor.query('ROLLBACK');
   } finally {
-    // Both clients roll back; even the competing transaction's timeout is isolated.
+    // Cleanup is best-effort even when a prior assertion fails.
     await Promise.allSettled([competitor.query('ROLLBACK'), admission.query('ROLLBACK')]);
     await Promise.allSettled([competitor.end(), admission.end()]);
   }
