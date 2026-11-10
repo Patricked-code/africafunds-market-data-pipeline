@@ -1,5 +1,17 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-10 — Issue #15 : CI précédente verte, entrée de date runtime fail-closed (PARTIAL)
+
+- Réconciliation : PR #1 fusionnée ; PR #22/#25/#26/#27 ouvertes Draft ; branche de travail PR #27 uniquement. HEAD initial #27 `a8c024bcd86145b7e3c75489097665d88688c3df`.
+- TEST_EVIDENCE vérifiée sur HEAD initial exact : CI #154 run [42721728723](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/42721728723) completed SUCCESS ; Docker/PostgreSQL #57 run [42721728732](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/42721728732) completed SUCCESS. Ces runs ne couvrent pas les nouveaux commits.
+- TDD : test additif `test/financial-observation.test.ts` pour nombres, objets, tableaux et Symbol transmis comme date économique depuis un adaptateur non typé (commit `bd9d2e6f8e9217f2abfe950d5eab9176825234a0`). Correction minimale `src/quality/financialObservation.ts` : `validCalendarDate(value: unknown)` rejette toute valeur non-string avant RegExp, évitant notamment l'exception sur Symbol (commit `6e9f053fda55cea39feadae047f0e062eaef64dd`). Aucun contrat public ni schéma modifié.
+- TEST_EVIDENCE nouveau HEAD : tests locaux NOT_RUN ; CI/Docker NOT_ATTESTED au moment du checkpoint ; aucune donnée témoin réelle, aucun mapping SQL, aucune collecte, aucun déploiement S1.
+- BLOCK_REASON : mapping officiel et fixtures sources→observations non qualifiés ; raccordement aux tables canoniques inexistant ; revue et CI du nouveau HEAD non attestées ; gates de fusion non satisfaits.
+- NEXT_ACTION : contrôler les runs CI/Docker du HEAD de PR #27 contenant ces commits et corriger toute régression ; inventorier les tables canoniques `ref/source/market/fund/method/calc/quality` et préparer un raccordement minimal avec provenance et tests PostgreSQL uniquement après qualification d'un mapping officiel. Continuer les autres issues indépendantes sans modifier leurs PR possédées.
+- Rollback : revert ciblé sur la branche Draft ; aucun effet sur main ou S1.
+
+---
+
 ## 2026-11-10 — Issue #15 : CI vérifiée et durcissement des enveloppes runtime (PARTIAL)
 
 - Réconciliation : PR #27 Draft sur branche `feat/quality-financial-observation-gate-20261109`, HEAD initial `74a786b50fad3a6a8d671151feca6edfc2aad34e`. PR #22/#25/#26 toujours ouvertes ; aucune modification de leurs branches.
