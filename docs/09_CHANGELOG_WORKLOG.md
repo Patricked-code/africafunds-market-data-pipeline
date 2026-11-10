@@ -1,5 +1,18 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-10 — Issue #15 : preuve de rollback du writer après admission (PARTIAL)
+
+- RECONCILIATION : PR #1 MERGED ; PR #22/#25/#26/#27 OPEN selon recherche GitHub ; PR #27 Draft, base main rapportée `73256f48d81d38ce8ff6f51be9e024b25cf5dadb`, HEAD initial `13c5bc463fa735f1138c9789aedea13742e09f2b`. Lecture AGENTS.md, docs/15, dernier checkpoint et documents maîtres. Aucun claim atomique inter-agent attesté ; écriture uniquement dans la branche PR #27 avec contrôle SHA de blob.
+- TEST_EVIDENCE_PREVIOUS_HEAD : CI run [42856459421](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/42856459421) et Docker/PostgreSQL run [42856459341](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/42856459341) : completed SUCCESS sur `13c5bc463fa735f1138c9789aedea13742e09f2b` selon GitHub. Ne prouvent pas le nouveau test.
+- TEST_CODE : commit `281e0c26972e93c3812f92fbb401c2726581b9bd` complète le test d'intégration PostgreSQL de `withVerifiedRawRecord` : SAVEPOINT après première écriture synthétique, callback admis effectuant un INSERT puis levant `SYNTHETIC_WRITER_FAILURE`, vérification de 2 lignes avant rollback et 1 après `ROLLBACK TO SAVEPOINT`. La transaction englobante est toujours annulée en finally. Le test établit le contrat explicite : le helper propage l'erreur, mais seul l'appelant assure le rollback. Aucun writer officiel, aucune observation financière réelle.
+- VALIDATION : code enregistré sur branche ; tests locaux NOT_RUN, CI et Docker/PostgreSQL du nouveau HEAD NOT_ATTESTED, revue indépendante NOT_ATTESTED. Ne pas déclarer PASS.
+- BLOCK_REASON : writer canonique/mappings officiels source→série, licences et témoins non qualifiés ; claim atomique inter-agent et revue indépendante non attestés. L'issue #15 reste PARTIAL ; aucune preuve de collecte historique ni publication.
+- NEXT_ACTION : vérifier CI et Docker/PostgreSQL sur le HEAD exact après ce checkpoint, corriger si rouge ; qualifier le véritable chemin d'écriture financière et sa transaction explicite, puis intégrer la garde uniquement avec mappings et autorisations prouvés. Si bloqué, poursuivre #13/#14 sans toucher aux branches concurrentes.
+- ROLLBACK : revert ciblé du test et de ce checkpoint dans la PR #27 Draft ; aucun push main, merge, S1, secret ou modification des 44 sources.
+
+---
+
+
 ## 2026-11-10 — Issue #15 : test PostgreSQL réel de non-insertion après rejet de provenance (PARTIAL)
 
 - RECONCILIATION : lecture AGENTS.md, docs/15, dernier checkpoint de la branche PR #27 et contrôle PR/issues ; PR #1 fusionnée, #22/#25/#26/#27 en cours selon recherche GitHub. La branche PR #27 reste Draft ; aucune réservation atomique inter-agent attestée. L'ancien HEAD documenté était `3b1d56b6bd9da786a85ae02f8eb6ad0c72c227ef`.
