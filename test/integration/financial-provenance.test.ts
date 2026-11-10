@@ -189,6 +189,20 @@ test('raw record provenance guard admits only consistent registry chains', async
       assertRawRecordProvenance(client, valid.rows[0]!.raw_record_id, endpoint.endpoint_code, ''),
       /PROVENANCE_MISSING_REFERENCE/,
     );
+    // Runtime adapter payloads can violate static TypeScript contracts.
+    // Reject before invoking SQL; even Symbol must never throw a native TypeError.
+    await assert.rejects(
+      assertRawRecordProvenance(client, Symbol('raw-id') as unknown as string, endpoint.endpoint_code, artifactId),
+      /PROVENANCE_INVALID_REFERENCE/,
+    );
+    await assert.rejects(
+      assertRawRecordProvenance(client, valid.rows[0]!.raw_record_id, 42 as unknown as string, artifactId),
+      /PROVENANCE_INVALID_REFERENCE/,
+    );
+    await assert.rejects(
+      assertRawRecordProvenance(client, valid.rows[0]!.raw_record_id, endpoint.endpoint_code, Symbol('artifact') as unknown as string),
+      /PROVENANCE_INVALID_REFERENCE/,
+    );
     await assert.rejects(
       assertRawRecordProvenance(client, 'not-a-uuid', endpoint.endpoint_code, artifactId),
       /PROVENANCE_INVALID_REFERENCE/,
