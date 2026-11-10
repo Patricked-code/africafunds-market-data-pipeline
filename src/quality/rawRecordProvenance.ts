@@ -21,7 +21,7 @@ export async function assertRawRecordProvenance(
   }
   // Untrusted adapter inputs must fail closed before PostgreSQL UUID casts.
   const uuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-  if (!uuid.test(rawRecordId) || !uuid.test(expectedArtifactId)) {
+  if (!uuid.test(rawRecordId) || !uuid.test(expectedArtifactId) || expectedEndpointCode.trim().length === 0) {
     throw new Error('PROVENANCE_INVALID_REFERENCE');
   }
   const result = await client.query<{ admissible: boolean }>(
