@@ -216,3 +216,78 @@ test('raw record provenance guard admits only consistent registry chains', async
     await client.end();
   }
 });
+
+
+/**
+ * Issue #15: PostgreSQL integration for the existing transaction-boundary helper.
+ * A TEMP table represents a synthetic future writer, NOT a canonical financial table.
+ * The same transaction owns fixture, admission and write; everything is rolled back.
+ */
+test('verified raw record callback inserts only after consistent provenance in PostgreSQL', async () => {
+  assert.ok(process.env.DATABASE_URL, 'isolated test DATABASE_URL required');
+  const { withVerifiedRawRecord } = await import('../../src/quality/withVerifiedRawRecord.js');
+  const client = new pg.Client({ connectionString: process.env.DATABASE_URL });
+  await client.connect();
+  try {
+    await client.query('BEGIN');
+    await client.query('CREATE TEMP TABLE synthetic_admitted_observations (raw_record_id uuid NOT NULL) ON COMMIT DROP');
+    const endpointResult = await client.query<{ endpoint_code: string; market_code: string; data_family: string }>(
+      'SELECT endpoint_code, market_code, data_family FROM source.source_endpoints LIMIT 1',
+    );
+    const endpoint = endpointResult.rows[0];
+    assert.ok(endpoint, 'seeded endpoint required');
+    const alternate = await client.query<{ market_code: string }>(
+      'SELECT market_code FROM ref.markets WHERE market_code <> $1 LIMIT 1',
+      [endpoint.market_code],
+    );
+    assert.ok(alternate.rows[0], 'second seeded market required');
+    const artifact = await client.query<{ raw_artifact_id: string }>(
+      `INSERT INTO source.raw_artifacts
+         (endpoint_code, source_url, final_url, fetched_at, http_status, sha256, byte_size, archive_path)
+       VALUES ($1, 'https://example.invalid/verified-writer', 'https://example.invalid/verified-writer',
+               now(), 200, $2, 0, 'ci/synthetic-rollback-only')
+       RETURNING raw_artifact_id`,
+      [endpoint.endpoint_code, randomBytes(32).toString('hex')],
+    );
+    const artifactId = artifact.rows[0]!.raw_artifact_id;
+    const valid = await client.query<{ raw_record_id: string }>(
+      `INSERT INTO market.raw_records
+         (raw_artifact_id, endpoint_code, market_code, data_family, row_number, payload)
+       VALUES ($1,$2,$3,$4,1,'{}'::jsonb) RETURNING raw_record_id`,
+      [artifactId, endpoint.endpoint_code, endpoint.market_code, endpoint.data_family],
+    );
+    const invalid = await client.query<{ raw_record_id: string }>(
+      `INSERT INTO market.raw_records
+         (raw_artifact_id, endpoint_code, market_code, data_family, row_number, payload)
+       VALUES ($1,$2,$3,$4,2,'{}'::jsonb) RETURNING raw_record_id`,
+      [artifactId, endpoint.endpoint_code, alternate.rows[0]!.market_code, endpoint.data_family],
+    );
+    const writer = async (transaction: Pick<pg.Client, 'query'>, recordId: string) => {
+      assert.equal(transaction, client, 'guard and writer must share transaction client');
+      await transaction.query(
+        'INSERT INTO synthetic_admitted_observations (raw_record_id) VALUES ($1::uuid)',
+        [recordId],
+      );
+    };
+    await assert.rejects(
+      withVerifiedRawRecord(client, {
+        rawRecordId: invalid.rows[0]!.raw_record_id, endpointCode: endpoint.endpoint_code, artifactId,
+      }, (transaction) => writer(transaction, invalid.rows[0]!.raw_record_id)),
+      /PROVENANCE_MISMATCH/,
+    );
+    const rejectedCount = await client.query<{ count: string }>(
+      'SELECT count(*)::text AS count FROM synthetic_admitted_observations',
+    );
+    assert.equal(rejectedCount.rows[0]!.count, '0', 'mismatch must never reach INSERT');
+    await withVerifiedRawRecord(client, {
+      rawRecordId: valid.rows[0]!.raw_record_id, endpointCode: endpoint.endpoint_code, artifactId,
+    }, (transaction) => writer(transaction, valid.rows[0]!.raw_record_id));
+    const accepted = await client.query<{ raw_record_id: string }>(
+      'SELECT raw_record_id FROM synthetic_admitted_observations',
+    );
+    assert.deepEqual(accepted.rows.map((row) => row.raw_record_id), [valid.rows[0]!.raw_record_id]);
+  } finally {
+    await client.query('ROLLBACK');
+    await client.end();
+  }
+});
