@@ -1,5 +1,18 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-10 — Issue #15 : test transactionnel de provenance synthétique (PARTIAL)
+
+- RECONCILIATION : instructions AGENTS.md, docs/09_CHANGELOG_WORKLOG.md et docs/15_AUTONOMOUS_AGENT_EXECUTION.md relues sur la branche PR #27 ; migrations canoniques 001_core.sql/002_market.sql et test PostgreSQL existant relus. PR #27 reste Draft ; aucune fusion.
+- TEST_EVIDENCE : HEAD précédent PR #27 `9cb1ec5274f59a0d12a2355369bd8e45383110bd` : CI #161 [42750862759](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/42750862759) completed SUCCESS et Docker/PostgreSQL #64 [42750863066](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/42750863066) completed SUCCESS ; résultats globaux seulement. Aucun résultat CI attribué au nouveau test.
+- CODE/TEST : nouveau `test/integration/financial-provenance.test.ts`, commit `45696ed34730501e7db86c005a30a49020a05237`. Fixture synthétique avec endpoint seedé, archive SHA unique et raw_record ; jointure vérifiée source endpoint → raw_artifact → raw_record, concordance marché et rollback systématique. Aucun indice financier officiel créé, aucun mapping inventé.
+- LIMITATION : ce test démontre uniquement une chaîne cohérente ; les FK actuelles indépendantes ne garantissent PAS la concordance endpoint/market pour des données arbitraires. L'insertion dans une table d'observation officielle et le rejet transactionnel des discordances restent à développer. Tests locaux NOT_RUN ; CI nouveau HEAD NOT_ATTESTED.
+- BLOCK_REASON : mapping source→série officiel et fixture réelle autorisée absents ; contrainte composite de concordance non attestée ; revue indépendante et gates de fusion non attestés.
+- NEXT_ACTION : contrôler CI et Docker sur le nouveau HEAD exact ; étendre le test PostgreSQL RED pour une discordance de provenance puis implémenter un contrôle additif GREEN dans le chemin de normalisation existant, sans modifier les 44 sources ni publier de données synthétiques. Reprendre #13/#14 si claim concurrent #15.
+- ROLLBACK : revert ciblé des commits test et checkpoint sur branche Draft ; toutes les insertions du test sont transactionnelles et annulées ; aucun effet main/S1.
+
+---
+
+
 ## 2026-11-10 — Issue #15 : migrations SQL canoniques retrouvées, CI #160/#63 attestée (PARTIAL)
 
 - RECONCILIATION : PR #27 Draft, HEAD initial exact `07afaff5547c213c2d555ace1653f36094a2b924`, base main `73256f48d81d38ce8ff6f51be9e024b25cf5dadb` selon GitHub PR ; PR #22/#25/#26 également ouvertes, sans écriture sur leurs branches. Arbre Git récursif du SHA main précité consulté (non tronqué) : les migrations existent réellement dans `sql/migrations/`, et non sous `src/db/migrations/`. Ce constat corrige le BLOCK_REASON historique « migrations non localisées » ; il ne certifie pas un mapping officiel.
