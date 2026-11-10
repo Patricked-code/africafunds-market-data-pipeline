@@ -1,5 +1,17 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-10 — Issue #15 : CI exacte verte et couverture des entrées runtime étendue (PARTIAL)
+
+- RECONCILIATION : PR #22/#25/#26/#27 ouvertes selon recherche GitHub ; PR #27 seule modifiée. Documents AGENTS.md, docs/00–15 prescrits relus ; dernier NEXT_ACTION repris. Les SHAs historiques ne sont pas des preuves actuelles de main.
+- TEST_EVIDENCE : sur HEAD PR #27 `c6e03108b7021ffd64e1bd1a5503b81204190eba`, CI #157 [42730148349](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/42730148349) completed SUCCESS (job validate SUCCESS) ; Docker/PostgreSQL #60 [42730147997](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/42730147997) completed SUCCESS (job Build, boot, migrate and verify persistent PostgreSQL SUCCESS).
+- ACTION CODE/TEST : test additif sur `test/financial-observation.test.ts` pour dates de publication runtime null/nombre/objet/tableau/Symbol et enveloppes primitives booléen/nombre/chaîne/Symbol ; commit `7ed7171f0e86e35d4c4b33742157d4be811a1a60`. Aucun changement au validateur ou aux tables. Tests locaux NOT_RUN ; CI sur ce nouveau commit NOT_ATTESTED.
+- INVENTAIRE PARTIEL : `src/jobs/ingest.ts` écrit actuellement les artefacts dans `source.raw_artifacts`, les lignes non normalisées dans `market.raw_records` et les scores dans `quality.assessments` ; aucune preuve de mapping officiel ni de persistance d'observation financière typée. Les chemins de migration supposés `src/db/migrations/001_init.sql` et `002_canonical.sql` ne sont pas présents : rechercher les migrations réelles avant toute modification SQL.
+- BLOCK_REASON : mappings officiels, licences et données témoins non qualifiés ; intégration SQL des observations typées absente ; revue indépendante et gates de fusion non attestés. Aucune couverture historique, collecte réelle, runner permanent ou production S1 certifiée.
+- NEXT_ACTION : contrôler les workflows exact-HEAD après ce test et corriger si nécessaire ; retrouver les chemins de migration SQL réels et les contrats ref/source/market/fund/method/calc/quality, puis implémenter un raccordement minimal prouvé par fixture autorisée et tests PostgreSQL. Conserver PR #22/#25/#26 indépendantes et Draft ; aucune fusion sans gates.
+- ROLLBACK : revert ciblé du commit test et de ce checkpoint sur branche Draft ; main et S1 inchangés.
+
+---
+
 ## 2026-11-10 — Issue #15 : CI précédente verte, entrée de date runtime fail-closed (PARTIAL)
 
 - Réconciliation : PR #1 fusionnée ; PR #22/#25/#26/#27 ouvertes Draft ; branche de travail PR #27 uniquement. HEAD initial #27 `a8c024bcd86145b7e3c75489097665d88688c3df`.
