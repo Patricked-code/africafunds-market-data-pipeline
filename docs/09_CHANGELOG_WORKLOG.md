@@ -1,5 +1,19 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-10 — Issue #15 : références runtime non textuelles, rejet fail-closed (PARTIAL)
+
+- RECONCILIATION : PR #1 MERGED ; PR #27 OPEN/Draft HEAD initial `f4e25f605b4c7d739a6adc3f0296f4594a37d438`, base SHA PR `73256f48d81d38ce8ff6f51be9e024b25cf5dadb` (ne pas assimiler à une vérification indépendante de main). PR ouvertes identifiées #22/#25/#26/#27. AGENTS.md, présent worklog, docs/15 et code/test de provenance relus sur la branche #27. Aucun claim atomique multi-agent attesté ; modification limitée aux fichiers de #27, avec SHA de blob pour chaque écriture.
+- TEST_EVIDENCE : GitHub Actions sur le HEAD initial exact `f4e25f605b4c7d739a6adc3f0296f4594a37d438` : CI #173 run [42784141206](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/42784141206) completed SUCCESS ; Docker/PostgreSQL #76 run [42784141294](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/42784141294) completed SUCCESS. Ne couvrent PAS les nouveaux commits.
+- CODE : commit `6060aaf23fcc3514260a4869d901690d16925c94` ; garde `assertRawRecordProvenance` refuse explicitement les références runtime non textuelles avant l'expression régulière UUID et les requêtes SQL. Conserve les diagnostics existants pour références vides et UUID malformés.
+- TEST : commit `0d1b3a170caa741dfb43aeecef880a7d3211473c` ; trois scénarios d'intégration transactionnels couvrant Symbol raw_record_id, nombre endpoint_code et Symbol raw_artifact_id. Tests locaux NOT_RUN ; CI du HEAD nouveau NOT_ATTESTED à l'écriture.
+- LIMITATION : la garde reste non intégrée à un writer canonique d'observations ; aucune donnée témoin officielle, licence ou mapping source→série qualifiés. Aucun historique complet, aucun déploiement S1 ni fusion.
+- BLOCK_REASON : mapping source-série officiel et writer canonique admissible non qualifiés ; CI nouveau HEAD et revue indépendante non attestées ; claim atomique inter-agent absent.
+- NEXT_ACTION : contrôler CI et Docker/PostgreSQL sur le HEAD final de la PR #27 ; corriger tout échec. Identifier un writer canonique autorisé et appliquer la garde dans la transaction d'insertion avec test d'absence d'INSERT sur discordance. Si mapping/licence toujours indisponible, reprendre #13/#14 sur une branche indépendante après réconciliation de propriété.
+- ROLLBACK : revert ciblé des deux commits code/test et du checkpoint ; main, sources originales et S1 inchangés.
+
+---
+
+
 ## 2026-11-10 — Issue #15 : UUID provenance non fiables, fail-closed (PARTIAL)
 
 - RECONCILIATION : AGENTS.md et docs maîtres 00–15 relus sur branche PR #27 ; PR #27 OPEN/Draft, HEAD avant cette passe `baf7349b25f6752370b1ed7ba1c4c7b2712785ab`. PR ouvertes identifiées par recherche : #22/#25/#26/#27. Aucun claim concurrent prouvé sur la branche #27 ; aucune autre branche modifiée.
