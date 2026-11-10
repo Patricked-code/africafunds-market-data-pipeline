@@ -1,5 +1,17 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-10 — Issue #15 : cas négatifs supplémentaires de provenance (PARTIAL)
+
+- RECONCILIATION : AGENTS.md, documents maîtres 00–15, dernier checkpoint et garde `src/quality/rawRecordProvenance.ts` relus sur branche PR #27 ; dépôt GitHub déclaré private. Le résultat de recherche GitHub des PR mélange issues et PR : inventaire exhaustif des PR non attesté par cette recherche.
+- TEST_EVIDENCE : sur le HEAD antérieur exact `a773433a08eb52b84e556348cb93bfda9c254d16`, CI #168 run [42769441342](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/42769441342) completed SUCCESS ; Docker/PostgreSQL #71 run [42769441439](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/42769441439) completed SUCCESS. Aucun résultat attribué au HEAD ultérieur.
+- TEST : commit `6eb93bcda0b8b99866f3fd56535c7e7b853296c1` sur PR #27 ; ajout de cas transactionnels synthétiques pour archive attendue différente et références obligatoires manquantes (rawRecordId, endpointCode, artifactId). Aucun code métier modifié. Tests locaux NOT_RUN ; nouveau HEAD CI NOT_ATTESTED au moment de cette écriture.
+- LIMITATION : la garde reste non raccordée à un writer d'observations financières canonique ; les tests démontrent le contrat de la garde, pas son invocation obligatoire par un pipeline de publication. Aucun mapping officiel, licence ou données témoins attestés.
+- BLOCK_REASON : mapping officiel source→série et writer autorisé non qualifiés ; intégration transactionnelle et revue indépendante non attestées. Pas de certification des 44 endpoints, des six adaptateurs, des historiques ou de S1.
+- NEXT_ACTION : vérifier les CI et jobs Docker du nouveau HEAD exact, corriger tout échec ; identifier le writer canonique réel, puis intégrer la garde dans sa transaction avec test négatif prouvant absence d'INSERT sur discordance. Si absence de writer/mapping admissible, reprendre #13/#14 sur branche indépendante avec claim réconcilié. Aucune fusion ni S1 sans gates.
+- ROLLBACK : revert ciblé du commit test et de ce checkpoint sur branche Draft ; aucun changement main, base réelle ou S1.
+
+---
+
 ## 2026-11-10 — Issue #15 : garde transactionnelle de provenance réutilisable (PARTIAL)
 
 - RECONCILIATION : PR #1 MERGED ; PR #22/#25/#26/#27 OPEN Draft vérifiées via GitHub ; PR #27 HEAD avant travail `a063dfa934cfcf8bd2c7cc2ab4b2681b4142c7f3`, base PR `73256f48d81d38ce8ff6f51be9e024b25cf5dadb` (base SHA dans métadonnées PR, pas une attestation indépendante du HEAD main instantané). AGENTS.md, présent journal, docs/15, migration 001/002, test provenance relus.
