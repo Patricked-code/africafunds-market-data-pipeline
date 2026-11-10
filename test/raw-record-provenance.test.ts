@@ -69,3 +69,41 @@ test('provenance guard parameterizes references and admits only an explicit true
   }
   assert.equal(calls.length, 6);
 });
+
+
+/**
+ * SQL integrity is part of the admission contract: duplicate/empty results,
+ * NULL from a SQL predicate, and transport errors must never be admitted.
+ * These are mock contract tests, not evidence of an official mapping.
+ */
+test('provenance guard rejects ambiguous SQL cardinality and propagates database errors', async () => {
+  const record = '00000000-0000-0000-0000-000000000001';
+  const artifact = '00000000-0000-0000-0000-000000000002';
+  const endpoint = 'OFFICIAL';
+  for (const rowCount of [0, 2, null]) {
+    const client = {
+      query: async () => ({ rowCount, rows: [{ admissible: true }] }),
+    } as unknown as Parameters<typeof assertRawRecordProvenance>[0];
+    await assert.rejects(
+      assertRawRecordProvenance(client, record, endpoint, artifact),
+      /PROVENANCE_MISMATCH/,
+      `ambiguous cardinality ${String(rowCount)} must reject`,
+    );
+  }
+  const nullPredicateClient = {
+    query: async () => ({ rowCount: 1, rows: [{ admissible: null }] }),
+  } as unknown as Parameters<typeof assertRawRecordProvenance>[0];
+  await assert.rejects(
+    assertRawRecordProvenance(nullPredicateClient, record, endpoint, artifact),
+    /PROVENANCE_MISMATCH/,
+  );
+  const dbError = new Error('SYNTHETIC_DATABASE_UNAVAILABLE');
+  const failingClient = {
+    query: async () => { throw dbError; },
+  } as unknown as Parameters<typeof assertRawRecordProvenance>[0];
+  await assert.rejects(
+    assertRawRecordProvenance(failingClient, record, endpoint, artifact),
+    (error: unknown) => error === dbError,
+    'database failures must propagate, never be converted into admission',
+  );
+});
