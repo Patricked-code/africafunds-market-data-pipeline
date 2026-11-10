@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { randomBytes } from 'node:crypto';
 import pg from 'pg';
+import { assertRawRecordProvenance } from '../../src/quality/rawRecordProvenance.js';
 
 /**
  * Synthetic provenance fixture only: no claim of official index coverage.
@@ -110,6 +111,67 @@ test('financial provenance admission detects mismatched market before publicatio
     assert.equal(admission.rowCount, 1);
     assert.equal(admission.rows[0]!.admissible, false,
       'inconsistent raw record must never be admitted as normalized financial data');
+  } finally {
+    await client.query('ROLLBACK');
+    await client.end();
+  }
+});
+
+/**
+ * RED/GREEN integration: the reusable guard must accept a consistent chain,
+ * reject a market mismatch, and reject an unknown raw record. All fixtures
+ * are synthetic and rolled back; no canonical observation is published.
+ */
+test('raw record provenance guard admits only consistent registry chains', async () => {
+  assert.ok(process.env.DATABASE_URL, 'isolated test DATABASE_URL required');
+  const client = new pg.Client({ connectionString: process.env.DATABASE_URL });
+  await client.connect();
+  try {
+    await client.query('BEGIN');
+    const endpoints = await client.query<{ endpoint_code: string; market_code: string; data_family: string }>(
+      'SELECT endpoint_code, market_code, data_family FROM source.source_endpoints LIMIT 1',
+    );
+    const endpoint = endpoints.rows[0];
+    assert.ok(endpoint, 'seeded endpoint required');
+    const alternate = await client.query<{ market_code: string }>(
+      'SELECT market_code FROM ref.markets WHERE market_code <> $1 LIMIT 1',
+      [endpoint.market_code],
+    );
+    assert.ok(alternate.rows[0], 'two markets required');
+    const artifact = await client.query<{ raw_artifact_id: string }>(
+      `INSERT INTO source.raw_artifacts
+         (endpoint_code, source_url, final_url, fetched_at, http_status, sha256, byte_size, archive_path)
+       VALUES ($1, 'https://example.invalid/guard', 'https://example.invalid/guard',
+               now(), 200, $2, 0, 'ci/synthetic-rollback-only')
+       RETURNING raw_artifact_id`,
+      [endpoint.endpoint_code, randomBytes(32).toString('hex')],
+    );
+    const artifactId = artifact.rows[0]!.raw_artifact_id;
+    const valid = await client.query<{ raw_record_id: string }>(
+      `INSERT INTO market.raw_records
+         (raw_artifact_id, endpoint_code, market_code, data_family, row_number, payload)
+       VALUES ($1,$2,$3,$4,1,'{}'::jsonb) RETURNING raw_record_id`,
+      [artifactId, endpoint.endpoint_code, endpoint.market_code, endpoint.data_family],
+    );
+    await assertRawRecordProvenance(client, valid.rows[0]!.raw_record_id, endpoint.endpoint_code, artifactId);
+    const invalid = await client.query<{ raw_record_id: string }>(
+      `INSERT INTO market.raw_records
+         (raw_artifact_id, endpoint_code, market_code, data_family, row_number, payload)
+       VALUES ($1,$2,$3,$4,2,'{}'::jsonb) RETURNING raw_record_id`,
+      [artifactId, endpoint.endpoint_code, alternate.rows[0]!.market_code, endpoint.data_family],
+    );
+    await assert.rejects(
+      assertRawRecordProvenance(client, invalid.rows[0]!.raw_record_id, endpoint.endpoint_code, artifactId),
+      /PROVENANCE_MISMATCH/,
+    );
+    await assert.rejects(
+      assertRawRecordProvenance(client, '00000000-0000-0000-0000-000000000000', endpoint.endpoint_code, artifactId),
+      /PROVENANCE_MISMATCH/,
+    );
+    await assert.rejects(
+      assertRawRecordProvenance(client, valid.rows[0]!.raw_record_id, 'WRONG_ENDPOINT', artifactId),
+      /PROVENANCE_MISMATCH/,
+    );
   } finally {
     await client.query('ROLLBACK');
     await client.end();
