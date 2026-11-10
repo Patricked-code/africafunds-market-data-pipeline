@@ -172,6 +172,23 @@ test('raw record provenance guard admits only consistent registry chains', async
       assertRawRecordProvenance(client, valid.rows[0]!.raw_record_id, 'WRONG_ENDPOINT', artifactId),
       /PROVENANCE_MISMATCH/,
     );
+    await assert.rejects(
+      assertRawRecordProvenance(client, valid.rows[0]!.raw_record_id, endpoint.endpoint_code,
+        '00000000-0000-0000-0000-000000000000'),
+      /PROVENANCE_MISMATCH/,
+    );
+    await assert.rejects(
+      assertRawRecordProvenance(client, '', endpoint.endpoint_code, artifactId),
+      /PROVENANCE_MISSING_REFERENCE/,
+    );
+    await assert.rejects(
+      assertRawRecordProvenance(client, valid.rows[0]!.raw_record_id, '', artifactId),
+      /PROVENANCE_MISSING_REFERENCE/,
+    );
+    await assert.rejects(
+      assertRawRecordProvenance(client, valid.rows[0]!.raw_record_id, endpoint.endpoint_code, ''),
+      /PROVENANCE_MISSING_REFERENCE/,
+    );
   } finally {
     await client.query('ROLLBACK');
     await client.end();
