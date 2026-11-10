@@ -53,3 +53,16 @@ test('rejects non-string runtime dates including symbols without throwing', () =
     assert.deepEqual(validateFinancialObservationCandidate(malformed).reasons, ['INVALID_ECONOMIC_DATE']);
   }
 });
+
+
+test('rejects malformed publication dates and primitive runtime envelopes without throwing', () => {
+  for (const publicationDate of [null, 17, {}, [], Symbol('publication')]) {
+    const candidate = { ...valid, publicationDate } as unknown as typeof valid;
+    assert.deepEqual(validateFinancialObservationCandidate(candidate).reasons, ['INVALID_PUBLICATION_DATE']);
+  }
+  for (const candidate of [false, 17, 'observation', Symbol('observation')]) {
+    assert.deepEqual(validateFinancialObservationCandidate(candidate as unknown as typeof valid), {
+      admissible: false, reasons: ['INVALID_CANDIDATE'],
+    });
+  }
+});
