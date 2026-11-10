@@ -1,5 +1,17 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-10 — Issue #15 : preuve de libération du verrou PostgreSQL après rollback (PARTIAL)
+
+- RECONCILIATION : lecture AGENTS.md, docs/15_AUTONOMOUS_AGENT_EXECUTION.md, dernier checkpoint du journal, code du test PostgreSQL ; PR #27 OPEN/Draft, autres PR #22/#25/#26 ouvertes selon recherche GitHub. HEAD précédent exact `0a1292b666b08e22c299beeea6455c707d6769f9`. Aucun claim atomique multi-agent attesté ; modification limitée au fichier de test sur branche #27 avec contrôle du blob SHA.
+- TEST_EVIDENCE_PREVIOUS_HEAD : workflow Docker/PostgreSQL [42907456760](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/42907456760) et CI [42907456959](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/42907456959), completed/success sur HEAD précédent uniquement.
+- TEST_CODE : commit `34c1d00e7e40da14dfbb7d1e6d11251833a4e9ad` complète le scénario de concurrence : après SQLSTATE 55P03, rollback des deux transactions, ouverture d'une nouvelle transaction concurrente et UPDATE de la ligne de registre auparavant verrouillée ; vérification rowCount=1, puis rollback. Ce test établit le contrat de libération du verrou, sans observation financière réelle.
+- VALIDATION : modification GitHub confirmée ; tests locaux NOT_RUN ; CI du nouveau HEAD NOT_ATTESTED au moment du checkpoint ; revue indépendante NOT_ATTESTED. Aucun merge ou déploiement.
+- BLOCK_REASON : writer financier canonique, mappings officiels source→série, licences et données témoins non qualifiés ; claim atomique inter-agent et revue indépendante non attestés. Issue #15 PARTIAL ; ce test n'établit pas une chaîne métier opérationnelle.
+- NEXT_ACTION : contrôler CI et Docker/PostgreSQL du HEAD de ce checkpoint et corriger toute erreur ; inventorier les véritables migrations/tables financières et chemins d'INSERT avant tout raccordement métier. Si ce raccordement dépend de mappings ou licences absents, poursuivre une tâche indépendante #13/#14 après vérification des droits et claims. Ne pas ajouter de nouveaux tests synthétiques à la place de la qualification métier.
+- ROLLBACK : revert ciblé du commit test et de cette entrée sur la branche Draft ; aucune écriture main, fusion, secret ou opération S1.
+
+---
+
 ## 2026-11-10 — Issue #15 : test PostgreSQL de verrouillage concurrent du registre (PARTIAL)
 
 - RECONCILIATION : branche PR #27 Draft, HEAD initial exact `90e20d69216173fa12a118abb13359c2a8f33611`, base PR `73256f48d81d38ce8ff6f51be9e024b25cf5dadb` ; PR #22/#25/#26 également ouvertes. AGENTS.md, docs/15, journal, dernier checkpoint, code de provenance et test PostgreSQL lus ; dépôt GitHub déclaré private. Aucun claim atomique inter-agent attesté : intervention limitée à la branche #27 avec contrôle de blob SHA, sans toucher aux branches concurrentes.
