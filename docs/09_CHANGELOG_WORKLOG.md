@@ -1,5 +1,18 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-10 — Issue #15 : garde fail-closed testée sans PostgreSQL (PARTIAL)
+
+- RECONCILIATION : AGENTS.md et documents maîtres prescrits 00–15 relus sur la branche PR #27 ; PR ouvertes #22/#25/#26/#27 retrouvées ; dépôt private selon get_repo. Aucun merge ni déploiement. L'absence de claim atomique inter-agent reste un risque ; modification circonscrite à un nouveau fichier de test et au worklog.
+- TEST_EVIDENCE : pour le HEAD antérieur exact `ecfc92e80a2fe9281610c562b3ce9d846ae38368`, CI #176 [run 42791708267](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/42791708267) completed SUCCESS et Docker/PostgreSQL #79 [run 42791708091](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/42791708091) completed SUCCESS. Ces résultats ne couvrent PAS le nouveau test.
+- TEST : commit `86ca8178cf7203b1979ecb52ec604757977e7f92` ajoute `test/raw-record-provenance.test.ts` (suite unitaire incluse par `npm test` / `npm run test:ci`). Huit cas d'entrée invalide vérifient les diagnostics métier et l'invariant zéro appel SQL sur mock. Test local NOT_RUN ; CI nouveau HEAD NOT_ATTESTED à la rédaction.
+- LIMITATION : le contrôle reste non raccordé à un writer canonique d'observations ; les mappings source→série, licences et données témoins officielles ne sont pas qualifiés. Le nouveau test ne prouve pas une insertion transactionnelle ni un rejet par un writer réel.
+- BLOCK_REASON : writer financier admissible et mapping officiel non qualifiés ; claim atomique inter-agent et revue indépendante non attestés ; CI du nouveau HEAD à contrôler.
+- NEXT_ACTION : vérifier CI et Docker/PostgreSQL du nouveau HEAD exact ; corriger toute erreur. Identifier un chemin d'insertion canonique autorisé et appliquer la garde dans la même transaction, avec test de non-insertion sur discordance. Si ce mapping est bloqué, poursuivre une tâche indépendante #13/#14 après réconciliation des claims et droits d'accès.
+- ROLLBACK : revert ciblé du commit de test et du présent checkpoint sur branche Draft ; main, S1 et 44 sources originelles inchangés.
+
+---
+
+
 ## 2026-11-10 — Issue #15 : références runtime non textuelles, rejet fail-closed (PARTIAL)
 
 - RECONCILIATION : PR #1 MERGED ; PR #27 OPEN/Draft HEAD initial `f4e25f605b4c7d739a6adc3f0296f4594a37d438`, base SHA PR `73256f48d81d38ce8ff6f51be9e024b25cf5dadb` (ne pas assimiler à une vérification indépendante de main). PR ouvertes identifiées #22/#25/#26/#27. AGENTS.md, présent worklog, docs/15 et code/test de provenance relus sur la branche #27. Aucun claim atomique multi-agent attesté ; modification limitée aux fichiers de #27, avec SHA de blob pour chaque écriture.
