@@ -1,5 +1,18 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-10 — Issue #15 : test PostgreSQL réel de non-insertion après rejet de provenance (PARTIAL)
+
+- RECONCILIATION : lecture AGENTS.md, docs/15, dernier checkpoint de la branche PR #27 et contrôle PR/issues ; PR #1 fusionnée, #22/#25/#26/#27 en cours selon recherche GitHub. La branche PR #27 reste Draft ; aucune réservation atomique inter-agent attestée. L'ancien HEAD documenté était `3b1d56b6bd9da786a85ae02f8eb6ad0c72c227ef`.
+- TEST_EVIDENCE_PREVIOUS_HEAD : runs GitHub Actions 42845611853 (CI) et 42845611827 (Docker/PostgreSQL) `completed/success` sur `3b1d56b6bd9da786a85ae02f8eb6ad0c72c227ef`, **pas** sur le nouveau commit.
+- TEST_CODE : commit `8baac8051b8a79d473febf0ff09958b3830e767a`, ajout dans `test/integration/financial-provenance.test.ts` d'une transaction PostgreSQL synthétique réelle avec endpoint seed, archive, raw records cohérent/incohérent, TEMP TABLE représentant seulement un writer témoin ; `withVerifiedRawRecord` refuse l'incohérence avant INSERT (compte zéro), autorise le record cohérent sur le même client, puis ROLLBACK. Aucun writer financier officiel ou observation canonique n'est créé.
+- VALIDATION : test non exécuté localement ; CI du nouveau HEAD à vérifier ; ne pas déclarer PASS avant résultat exact.
+- BLOCK_REASON : mapping officiel source→série, licences et données témoins non qualifiés ; absence de writer financier canonique raccordé ; claim inter-agent et revue indépendante non attestés. La TEMP TABLE ne prouve pas la publication financière.
+- NEXT_ACTION : contrôler CI et Docker/PostgreSQL sur HEAD exact après checkpoint, corriger tout échec ; qualifier les mappings et brancher le helper dans le véritable writer seulement après autorisation et preuve d'absence d'INSERT. Sinon poursuivre les tâches indépendantes #13/#14 sous branche non possédée et sans contournement robots.
+- ROLLBACK : revert ciblé du test et de ce checkpoint sur PR #27 Draft ; aucun push main, merge, S1 ou modification des 44 sources.
+
+---
+
+
 ## 2026-11-10 — Issue #15 : frontière transactionnelle de provenance (PARTIAL)
 
 - RECONCILIATION : PR #1 MERGED, PR #22/#25/#26/#27 OPEN Draft ; PR #27 HEAD avant intervention `9d4208ccbc407d34fca622388c50254ca7f1e497`. Dépôt privé selon get_repo ; AGENTS.md, docs/15, worklog et 14 documents maîtres consultés. Claim atomique inter-agent non attesté ; écriture limitée à la branche PR #27.
