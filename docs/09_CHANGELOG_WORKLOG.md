@@ -1,5 +1,18 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-10 — Issue #15 : test PostgreSQL de verrouillage concurrent du registre (PARTIAL)
+
+- RECONCILIATION : branche PR #27 Draft, HEAD initial exact `90e20d69216173fa12a118abb13359c2a8f33611`, base PR `73256f48d81d38ce8ff6f51be9e024b25cf5dadb` ; PR #22/#25/#26 également ouvertes. AGENTS.md, docs/15, journal, dernier checkpoint, code de provenance et test PostgreSQL lus ; dépôt GitHub déclaré private. Aucun claim atomique inter-agent attesté : intervention limitée à la branche #27 avec contrôle de blob SHA, sans toucher aux branches concurrentes.
+- TEST_EVIDENCE_PREVIOUS_HEAD : GitHub Actions Docker/PostgreSQL run [42897460854](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/42897460854) et CI run [42897461083](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/42897461083), completed/success sur le HEAD initial, **pas** sur les nouveaux commits.
+- TEST_CODE : commit `4bd06b4b86c57410947708f36010e0fc9ff4b9ec` ajoute dans `test/integration/financial-provenance.test.ts` une vérification PostgreSQL à deux clients : admission cohérente avec `FOR SHARE` sur le registre, transaction maintenue ouverte, UPDATE concurrent sur la même ligne, timeout SQLSTATE 55P03 attendu, rollback des deux transactions. Fixtures synthétiques seulement, aucune donnée financière réelle.
+- VALIDATION : test enregistré sur GitHub, exécution locale NOT_RUN, CI/Docker du nouveau HEAD NOT_ATTESTED au moment de l'écriture ; revue indépendante NOT_ATTESTED. Ne pas déclarer le scénario PASS sans résultat CI exact.
+- BLOCK_REASON : writer financier canonique et mappings officiels source→série non qualifiés, licences/données témoins manquantes ; claim atomique inter-agent et revue indépendante non attestés. La preuve de verrouillage ne constitue pas un raccordement métier ni HISTORY_COMPLETE.
+- NEXT_ACTION : vérifier les deux workflows GitHub Actions du HEAD final exact et corriger tout échec ; inventorier les migrations et INSERT financiers canoniques pour un raccordement autorisé et transactionnel, ou reprendre une tâche indépendante #13/#14 avec claim et qualification des droits. Éviter la répétition de tests synthétiques sans progression métier.
+- ROLLBACK : revert ciblé du commit test et de ce checkpoint sur la branche Draft ; aucune fusion, écriture main, modification des 44 sources, secret ou déploiement S1.
+
+---
+
+
 ## 2026-11-10 — Issue #15 : verrouillage de la chaîne de provenance pendant la transaction (PARTIAL)
 
 - RECONCILIATION : PR #1 MERGED ; PR #22/#25/#26/#27 OPEN Draft, #27 HEAD initial `7e5e5eca12840c44edb24ca4861015b9801dc7b2`, base PR main `73256f48d81d38ce8ff6f51be9e024b25cf5dadb`. AGENTS.md, docs/15, dernier checkpoint, code de la garde et tests relus. Aucun claim atomique inter-agent attesté ; branche #27 seule modifiée avec contrôle de blob SHA.
