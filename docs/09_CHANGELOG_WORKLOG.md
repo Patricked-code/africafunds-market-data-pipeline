@@ -1,5 +1,17 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-10 — Issue #15 : propagation d'erreur writer sans retry ni transaction cachée (PARTIAL)
+
+- RECONCILIATION : PR #27 OPEN/Draft, HEAD avant intervention `5e705aa52a2cfd50e86e4970c16d1fc2990058f3`, base PR main `73256f48d81d38ce8ff6f51be9e024b25cf5dadb` ; PR #22/#25/#26 OPEN. AGENTS.md, docs/15, checkpoint précédent et code/tests pertinents relus. Claim atomique multi-agent non attesté ; modification limitée à la branche #27, contrôle blob SHA.
+- TEST_EVIDENCE_PREVIOUS_HEAD : CI run [42876442270](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/42876442270) et Docker/PostgreSQL run [42876442326](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/42876442326) completed/success sur HEAD initial exact. Ne certifient pas le nouveau commit.
+- TEST_CODE : commit `ead3f2e967df0612061528ab1e8cc0c486fc3c54`, nouveau scénario dans `test/with-verified-raw-record.test.ts` : erreur synthétique du callback writer propagée à l'identique ; un seul appel du writer ; aucune requête COMMIT/ROLLBACK/retry cachée dans le helper. Aucun changement de schéma, source ou donnée officielle.
+- VALIDATION : code committé, tests locaux NOT_RUN, CI du nouveau HEAD NOT_ATTESTED, revue indépendante NOT_ATTESTED. Issue #15 PARTIAL.
+- BLOCK_REASON : aucun writer canonique ni mapping officiel source→série, licence ou donnée témoin qualifiés ; claim atomique multi-agent et revue indépendante non attestés. Aucune certification HISTORY_COMPLETE/DONE.
+- NEXT_ACTION : vérifier les runs CI et Docker/PostgreSQL du HEAD final exact et corriger si rouge ; inventorier le véritable writer financier et ses mappings avant raccordement à une transaction métier, sinon poursuivre une tâche indépendante #13/#14 après contrôle des droits et propriété de branche. Ne pas multiplier les seuls tests synthétiques comme substitut à une donnée réelle.
+- ROLLBACK : revert ciblé du commit test et de ce checkpoint sur branche Draft ; aucun merge, main, secret ou S1.
+
+---
+
 ## 2026-11-10 — Issue #15 : rejet transactionnel de famille de données discordante (PARTIAL)
 
 - RECONCILIATION : lecture de AGENTS.md, docs/15_AUTONOMOUS_AGENT_EXECUTION.md, dernier checkpoint de ce journal et code de la branche PR #27. PR #27 OPEN/Draft, HEAD initial `4887d53fabe0c315d35934fa9492671f749ba52d`, base main rapportée `73256f48d81d38ce8ff6f51be9e024b25cf5dadb` ; PR #22/#25/#26 OPEN. Aucune modification des branches concurrentes. Claim atomique multi-agent toujours non attesté.
