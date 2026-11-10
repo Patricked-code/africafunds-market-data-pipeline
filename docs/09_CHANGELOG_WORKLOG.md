@@ -1,5 +1,16 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-10 — Issue #15 : cardinalité SQL et erreur DB fail-closed (PARTIAL)
+
+- RECONCILIATION : PR #1 MERGED ; PR #22/#25/#26/#27 OPEN Draft selon get_pr_info ; PR #27 HEAD avant écriture `9be8121750360b06b0baba72b6ea1ad7f7ed6042`, base SHA PR `73256f48d81d38ce8ff6f51be9e024b25cf5dadb` (ne prouve pas un HEAD main indépendant). AGENTS.md, docs/15, présent worklog et code/test de provenance relus. Aucune réservation atomique inter-agent attestée : intervention bornée à la branche existante.
+- TEST_EVIDENCE : sur le HEAD antérieur exact `9be8121750360b06b0baba72b6ea1ad7f7ed6042`, CI #180 run [42808620861](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/42808620861) et Docker/PostgreSQL #83 run [42808621127](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/42808621127) : completed SUCCESS selon GitHub Actions. Aucun succès attribué au nouveau commit.
+- TEST : commit `94ce252e3d628f998c185f184b69a4aea25f7c91` ; extension du test unitaire existant : rejet cardinalité SQL 0, 2, null ; prédicat SQL NULL ; propagation de l'erreur de base sans admission implicite. Mock uniquement, sans base ni observation officielle. Tests locaux NOT_RUN, CI sur nouveau HEAD NOT_ATTESTED.
+- BLOCK_REASON : writer canonique autorisé et mapping source→série/licences/données témoins non qualifiés ; claim atomique et revue indépendante non attestés ; CI du nouveau HEAD à vérifier. Pas de publication, historique complet, merge ni S1.
+- NEXT_ACTION : contrôler CI/Docker du HEAD après ce checkpoint, corriger si rouge ; identifier un writer financier canonique admissible et appliquer assertRawRecordProvenance dans sa transaction, avec test prouvant l'absence d'INSERT en cas de discordance. Si mapping indisponible, poursuivre #13/#14 de façon indépendante après contrôle des claims et droits.
+- ROLLBACK : revert ciblé du test et de ce checkpoint sur branche Draft ; aucune écriture main, S1, données officielles ou sources historiques.
+
+---
+
 ## 2026-11-10 — Issue #15 : admission SQL paramétrée et fail-closed (PARTIAL)
 
 - RECONCILIATION : AGENTS.md et les 14 documents maîtres prescrits relus depuis la branche PR #27 ; worklog courant et docs/15 consultés. Recherche GitHub : PR ouvertes #22/#25/#26/#27 ; issues #15/#14/#13/#5 restent des chantiers à qualifier. Aucun claim inter-agent atomique attesté ; modification circonscrite à la branche existante #27.
