@@ -1,5 +1,17 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-10 — Issue #15 : CI exacte #159/#62 vérifiée, admission SQL toujours bloquée (PARTIAL)
+
+- RECONCILIATION : instructions AGENTS.md et documents maîtres 00–15 consultés sur branche PR #27 ; dernier checkpoint repris. Issues #13–#17 toujours actives dans la recherche GitHub. Recherche des PR ouvertes via search_issues non concluante (résultats d'issues mélangés) : ne pas inférer un inventaire exhaustif de PR à partir de cette recherche. Aucun SHA main actuel attesté pendant cette intervention.
+- TEST_EVIDENCE : sur le SHA exact PR #27 `28a150b5538407765cc9fac0b2edf184b67d29ce`, GitHub Actions CI #159 run [42737071883](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/42737071883) completed SUCCESS ; Docker/PostgreSQL #62 run [42737071898](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/42737071898) completed SUCCESS. Résultat global des workflows uniquement ; jobs/logs non inspectés sur cette passe. Aucune réussite attribuée au commit documentaire ultérieur.
+- INVENTAIRE : validateur `src/quality/financialObservation.ts` et tests `test/financial-observation.test.ts` relus sur la branche #27. Ce validateur est une admission en mémoire, non un mapping source→observation SQL. Recherche de code GitHub sur `CREATE TABLE market`, `raw_records`, `migrations`, `method_versions` sans résultat exploitable ; ceci ne démontre pas l'absence des migrations. Ne pas inventer un chemin ou une FK.
+- CODE/TEST : aucun changement métier admissible sans identification des migrations réelles et fixture de mapping officielle. Aucun test local lancé ; aucun runner S1 utilisé.
+- BLOCK_REASON : arborescence SQL exacte, correspondance des clés de provenance et données témoins autorisées non vérifiées ; revue indépendante/gates de fusion non attestés. Les recherches de code sur main ne suffisent pas pour raccorder SQL sans risque.
+- NEXT_ACTION : relever l'arbre Git réel de la branche PR #27 et localiser les migrations SQL, lire les contrats de `source.raw_artifacts`, `market.raw_records`, `quality.assessments` et les tables canoniques ; obtenir une fixture officielle licite, ajouter un test PostgreSQL RED puis un raccordement additif GREEN sur branche distincte ou PR #27 après claim/reconciliation. Revérifier CI et revue sur le HEAD exact avant tout merge ; poursuivre indépendamment l'audit #13 et les adaptateurs #14 si le mapping reste bloqué.
+- ROLLBACK : revert ciblé de ce seul checkpoint documentaire sur la branche Draft ; main, données et S1 inchangés.
+
+---
+
 ## 2026-11-10 — Issue #15 : CI exacte verte et couverture des entrées runtime étendue (PARTIAL)
 
 - RECONCILIATION : PR #22/#25/#26/#27 ouvertes selon recherche GitHub ; PR #27 seule modifiée. Documents AGENTS.md, docs/00–15 prescrits relus ; dernier NEXT_ACTION repris. Les SHAs historiques ne sont pas des preuves actuelles de main.
