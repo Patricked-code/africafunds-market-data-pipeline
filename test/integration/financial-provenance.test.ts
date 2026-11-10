@@ -286,6 +286,29 @@ test('verified raw record callback inserts only after consistent provenance in P
       'SELECT raw_record_id FROM synthetic_admitted_observations',
     );
     assert.deepEqual(accepted.rows.map((row) => row.raw_record_id), [valid.rows[0]!.raw_record_id]);
+    // The callback is not the transaction owner: a failed write must be rolled
+    // back by the caller. Verify this with a real PostgreSQL SAVEPOINT rather
+    // than treating a propagated callback error as automatic rollback.
+    await client.query('SAVEPOINT before_failing_writer');
+    await assert.rejects(
+      withVerifiedRawRecord(client, {
+        rawRecordId: valid.rows[0]!.raw_record_id, endpointCode: endpoint.endpoint_code, artifactId,
+      }, async (transaction) => {
+        await writer(transaction, valid.rows[0]!.raw_record_id);
+        throw new Error('SYNTHETIC_WRITER_FAILURE');
+      }),
+      /SYNTHETIC_WRITER_FAILURE/,
+    );
+    const beforeRollback = await client.query<{ count: string }>(
+      'SELECT count(*)::text AS count FROM synthetic_admitted_observations',
+    );
+    assert.equal(beforeRollback.rows[0]!.count, '2', 'callback error alone must not imply rollback');
+    await client.query('ROLLBACK TO SAVEPOINT before_failing_writer');
+    const afterRollback = await client.query<{ count: string }>(
+      'SELECT count(*)::text AS count FROM synthetic_admitted_observations',
+    );
+    assert.equal(afterRollback.rows[0]!.count, '1', 'caller rollback removes failed writer insertion');
+    await client.query('RELEASE SAVEPOINT before_failing_writer');
   } finally {
     await client.query('ROLLBACK');
     await client.end();
