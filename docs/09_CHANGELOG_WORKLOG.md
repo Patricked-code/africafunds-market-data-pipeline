@@ -1,5 +1,17 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-10 — Issue #15 : endpoint uniquement blanc rejeté avant SQL (PARTIAL)
+
+- RECONCILIATION : PR #1 MERGED ; PR #22/#25/#26/#27 OPEN Draft via get_pr_info ; PR #27 HEAD initial `ea74f76b2e17ab1f38a95a4de197b9a1e078d9d5`, base SHA rapporté `73256f48d81d38ce8ff6f51be9e024b25cf5dadb` (pas une attestation indépendante de main). AGENTS.md, worklog/checkpoint, docs/15 et garde/tests relus. Aucun claim atomique multi-agent attesté ; intervention limitée à la branche PR #27 avec blob SHA.
+- CODE : commit `b8853ea764ef50515ef475ba6f68b5407a075770` ; `assertRawRecordProvenance` refuse maintenant un endpoint composé seulement d'espaces/tabulations avant tout appel PostgreSQL, avec `PROVENANCE_INVALID_REFERENCE`. Aucun changement des UUID, des sources, migrations ou observations.
+- TEST : commit `d7b92ffbf6afe5dc5a5b9fe4a6f9b41f6ad63f8e` ; cas mock supplémentaire prouvant le rejet d'un endpoint blanc et zéro requête SQL. Tests locaux NOT_RUN ; CI et Docker/PostgreSQL du HEAD final NOT_ATTESTED lors de l'écriture. Les runs historiques ne sont pas réutilisés comme preuve de ce changement.
+- BLOCK_REASON : writer financier canonique et mapping officiel source→série/licences/données témoins non qualifiés ; claim atomique et revue indépendante non attestés. Aucun HISTORY_COMPLETE, merge, S1 ou publication.
+- NEXT_ACTION : vérifier les checks CI et Docker/PostgreSQL du HEAD exact après checkpoint, corriger tout échec ; raccorder la garde au writer canonique dans la même transaction et prouver l'absence d'INSERT en cas de discordance dès que mapping/autorisation disponibles. Sinon reprendre une tâche indépendante #13/#14 après réconciliation de propriété et des droits.
+- ROLLBACK : revert ciblé des deux commits et du checkpoint sur la branche Draft ; main, données et S1 inchangés.
+
+---
+
+
 ## 2026-11-10 — Issue #15 : cardinalité SQL et erreur DB fail-closed (PARTIAL)
 
 - RECONCILIATION : PR #1 MERGED ; PR #22/#25/#26/#27 OPEN Draft selon get_pr_info ; PR #27 HEAD avant écriture `9be8121750360b06b0baba72b6ea1ad7f7ed6042`, base SHA PR `73256f48d81d38ce8ff6f51be9e024b25cf5dadb` (ne prouve pas un HEAD main indépendant). AGENTS.md, docs/15, présent worklog et code/test de provenance relus. Aucune réservation atomique inter-agent attestée : intervention bornée à la branche existante.
