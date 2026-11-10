@@ -45,3 +45,11 @@ test('rejects malformed dates supplied by an untyped adapter without throwing', 
   const malformed = { ...valid, economicDate: null } as unknown as typeof valid;
   assert.deepEqual(validateFinancialObservationCandidate(malformed).reasons, ['INVALID_ECONOMIC_DATE']);
 });
+
+
+test('rejects non-string runtime dates including symbols without throwing', () => {
+  for (const date of [42, {}, [], Symbol('date')]) {
+    const malformed = { ...valid, economicDate: date } as unknown as typeof valid;
+    assert.deepEqual(validateFinancialObservationCandidate(malformed).reasons, ['INVALID_ECONOMIC_DATE']);
+  }
+});
