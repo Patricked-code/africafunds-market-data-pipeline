@@ -1,5 +1,18 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-10 — Issue #15 : garde transactionnelle de provenance réutilisable (PARTIAL)
+
+- RECONCILIATION : PR #1 MERGED ; PR #22/#25/#26/#27 OPEN Draft vérifiées via GitHub ; PR #27 HEAD avant travail `a063dfa934cfcf8bd2c7cc2ab4b2681b4142c7f3`, base PR `73256f48d81d38ce8ff6f51be9e024b25cf5dadb` (base SHA dans métadonnées PR, pas une attestation indépendante du HEAD main instantané). AGENTS.md, présent journal, docs/15, migration 001/002, test provenance relus.
+- TEST_EVIDENCE : GitHub Actions pour HEAD antérieur exact `a063dfa934cfcf8bd2c7cc2ab4b2681b4142c7f3` : CI #165 run [42762817349](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/42762817349) completed SUCCESS ; Docker/PostgreSQL #68 run [42762817352](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/42762817352) completed SUCCESS. Ne couvre PAS les nouveaux commits.
+- CODE : nouveau `src/quality/rawRecordProvenance.ts`, commit `e8133ec96a4b81fd8dcbf0bfa6e0b95ec36efce5` ; garde SQL read-only qui vérifie raw_record → artifact → registry (endpoint, market, data_family), plus endpoint et artifact attendus ; échec fermé si absent/incohérent. Aucune insertion d'observation canonique ni migration.
+- TEST : ajout dans `test/integration/financial-provenance.test.ts`, commit `d9c6b9da73a412fce5c53fbd83e2b43ef8b9bf75`, des cas cohérent, marché divergent, identifiant absent et endpoint attendu divergent ; transaction synthétique avec ROLLBACK. Tests locaux NOT_RUN ; CI du nouveau HEAD NOT_ATTESTED à cette écriture.
+- LIMITATION : garde disponible pour les futurs chemins de normalisation mais PAS encore appelée par un writer d'observation canonique (aucun mapping officiel admissible attesté). Pas de certification des 44 sources, des six adaptateurs, des historiques ou du runtime S1.
+- BLOCK_REASON : mapping officiel source→série, unités, méthodes et données témoins autorisées absents ; absence d'un writer canonique qualifié auquel raccorder la garde ; revue et gates de fusion non attestées.
+- NEXT_ACTION : contrôler CI et jobs Docker du HEAD exact après ces commits, corriger les erreurs ; inventorier les writers canoniques existants et intégrer obligatoirement `assertRawRecordProvenance` dans la même transaction avant tout INSERT officiel autorisé, puis tester absence d'écriture sur mismatch. Si mapping/licence indisponible, poursuivre #13/#14 sur branche indépendante après claim et réconciliation. Aucune fusion ni S1 sans gates.
+- ROLLBACK : revert ciblé des deux commits code/test et de ce checkpoint sur PR #27 Draft ; aucune mutation main/S1.
+
+---
+
 ## 2026-11-10 — Issue #15 : test négatif de discordance de provenance (PARTIAL)
 
 - RECONCILIATION : AGENTS.md, docs/15_AUTONOMOUS_AGENT_EXECUTION.md, dernier checkpoint du présent journal, test transactionnel et migration sql/migrations/002_market.sql relus sur branche PR #27 ; PR #27 OPEN/Draft (issue GitHub). Recherche globale des PR non fiable pour un inventaire exhaustif : aucune conclusion de fusion pour les autres branches. Aucun SHA main actuel attesté pendant cette passe.
