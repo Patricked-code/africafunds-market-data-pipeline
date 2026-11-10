@@ -15,6 +15,11 @@ export async function assertRawRecordProvenance(
   if (!rawRecordId || !expectedEndpointCode || !expectedArtifactId) {
     throw new Error('PROVENANCE_MISSING_REFERENCE');
   }
+  // Untrusted adapter inputs must fail closed before PostgreSQL UUID casts.
+  const uuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  if (!uuid.test(rawRecordId) || !uuid.test(expectedArtifactId)) {
+    throw new Error('PROVENANCE_INVALID_REFERENCE');
+  }
   const result = await client.query<{ admissible: boolean }>(
     `SELECT (r.endpoint_code = a.endpoint_code
                  AND r.market_code = e.market_code
