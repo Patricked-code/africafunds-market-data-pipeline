@@ -1,5 +1,17 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-11 — Issue #15 : réconciliation exacte CI et contrats DDL des observations (PARTIAL)
+
+- RECONCILIATION : AGENTS.md, docs/00,01,11,02,12,03,04,13,14,05,06,07,08,10, docs/15 et checkpoint le plus récent de docs/09 consultés ; PR #1 et #18 MERGED ; PR #22 (HEAD 0eacd313b46bb99b523b8be24e68dc06233c0458), #25 (8e1a22fe4d5100f5fea15ec024f063b06486c265), #26 (bc632405eb8964250c4d88fb56adff846d652a9d), #27 (d7d483b541667b6d2960e6ad74eb7c92753bdd8f) OPEN/Draft. Ces SHAs sont des observations à revérifier au prochain passage.
+- CI_EXACT_HEAD : commit PR #27 `d7d483b541667b6d2960e6ad74eb7c92753bdd8f` : Docker/PostgreSQL [42939929072](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/42939929072) completed/success ; CI [42939929459](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/42939929459) completed/success. Ces succès ne prouvent aucune donnée réelle ni licence ni writer.
+- DDL_VERIFIED : `sql/migrations/002_market.sql` contient les cibles `market.official_index_observations` (FK official_index_id, observation_date, publication_date, raw_record_id, revision_number), `market.official_rate_observations` (FK rate_series_id, observation_date, publication_date, raw_record_id, revision_number), `market.fx_observations` et `market.inflation_observations`. Les séries officielles `market.official_indices` et `market.official_rate_series` exigent un identifiant de série explicite ; un `endpoint_code` seul ne fournit pas le mapping autorisé. Recherche de code sur main pour `official_rate_observations` et `nav_observations` : aucun résultat exploitable, non assimilable à preuve d'absence de writer.
+- DECISION_ADMISSIBILITY : aucun INSERT financier ajouté faute de mapping source→série, unité, dates et licence vérifiés ; ne pas fabriquer de correspondance à partir d'un JSONB ni utiliser un writer synthétique comme preuve de normalisation. Les branches #22/#25/#26 restent isolées. Aucun test local exécuté, aucune fusion ou opération S1.
+- BLOCK_REASON : mapping officiel source→série, licence et donnée témoin non qualifiés ; writer financier effectif non identifié avec preuve ; claim atomique inter-agent et revue indépendante non attestés. Issue #15 PARTIAL ; HISTORY_COMPLETE interdit.
+- NEXT_ACTION : identifier dans le dépôt/PR une source officielle autorisée avec identifiant de série et fixture documentée, puis créer sur branche dédiée un INSERT/UPSERT transactionnel dans **une table existante** sous `withVerifiedRawRecord`, avec vérification des dates, unités, version/révisions et tests PostgreSQL RED/GREEN. Si cette preuve manque, continuer la qualification indépendante #13/#14 sans modifier les branches déjà possédées. Vérifier CI du HEAD exact de ce checkpoint avant tout PASS.
+- ROLLBACK : revert ciblé de cette entrée documentaire ; aucune écriture directe main, merge, déploiement, secret ou modification de visibilité.
+
+---
+
 ## 2026-11-11 — Issue #15 : inventaire vérifié des six migrations initiales et cibles d'observations (PARTIAL)
 
 - RECONCILIATION : PR #27 OPEN/Draft sur `feat/quality-financial-observation-gate-20261109` ; PR #22/#25/#26 ouvertes et conservées. Dépôt GitHub déclaré private au contrôle. AGENTS.md, docs/15, dernier checkpoint de ce journal et schémas SQL sur main consultés. Les anciens SHAs ne constituent pas une autorité actuelle.
