@@ -148,3 +148,12 @@ test('rejects inherited provenance and observation fields from an untrusted prot
   const own = { ...valid };
   assert.deepEqual(validateFinancialObservationCandidate(own), { admissible: true, reasons: [] });
 });
+
+
+test('accepts finite negative official rates without clipping or coercion', () => {
+  // Negative money-market yields are valid observations; zero and negatives
+  // must not be confused with absent values by the pre-normalization gate.
+  const candidate = { ...valid, observedValue: -0.125 };
+  assert.deepEqual(validateFinancialObservationCandidate(candidate), { admissible: true, reasons: [] });
+  assert.equal(candidate.observedValue, -0.125);
+});
