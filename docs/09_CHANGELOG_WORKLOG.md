@@ -1,5 +1,19 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-11 10:35 Europe/Paris — Issue #15 : snapshot anti-TOCTOU des observations externes (PARTIAL)
+
+- RECONCILIATION : PR #1 fusionnée, instructions AGENTS.md, 14 documents maîtres, docs/15 et dernière entrée du présent worklog relus sur GitHub. PR #27 OPEN/Draft HEAD initial `69405d909e7b123baa8fcd996c9d5b96ff88c96a` ; autres travaux ouverts à préserver ; aucun claim atomique inter-agent prouvé.
+- CI_EXACT_PREVIOUS_HEAD : `69405d909e7b123baa8fcd996c9d5b96ff88c96a` — [CI 42987887759](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/42987887759) completed/success et [Docker/PostgreSQL 42987887782](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/42987887782) completed/success. Ne pas extrapoler aux nouveaux commits.
+- DEFECT : le validateur lisait plusieurs fois les propriétés de date d'un candidat externe. Un getter non déterministe pouvait retourner des dates différentes entre vérification et comparaison chronologique.
+- TEST_COMMITTED : `2c2d30e0e5e590df1d0fade17e7931d0bff9a615` impose lecture unique de economicDate et refus de la première valeur invalide. RED non exécuté localement.
+- CODE_COMMITTED : `5b7ad81cd30463b49001260c4171f063e5f4008e` capture une seule fois les champs non fiables avant validation ; conserve les codes de refus et le fail-closed existants. GREEN non exécuté localement.
+- VALIDATION : nouveau HEAD CI NOT_ATTESTED au moment de l'écriture ; tests locaux NOT_RUN ; revue indépendante NOT_ATTESTED. Aucun mapping officiel source→série, licence ou observation témoin certifié ; aucune normalisation financière réelle démontrée.
+- BLOCK_REASON : contrats officiels et observation témoin manquants pour writer financier, claim atomique inter-agent non attesté, revue indépendante absente ; #15 PARTIAL.
+- NEXT_ACTION : vérifier les deux workflows sur le HEAD final de cette entrée, corriger tout échec ; qualifier via #13/#14 source, série, droits, format, dates, unité et donnée témoin ; raccorder ensuite la provenance transactionnelle à une table financière existante avec tests PostgreSQL. Ne pas toucher aux branches concurrentes sans claim.
+- ROLLBACK : revert ciblé des commits test/code et de cette entrée ; aucun push direct main, merge, déploiement S1, secret, changement de visibilité ni modification des 44 sources.
+
+---
+
 ## 2026-11-11 — Issue #15 : fail-closed sur accesseurs d'adaptateurs non fiables (PARTIAL)
 
 - RECONCILIATION : PR #1 MERGED ; PR #27 OPEN/Draft, HEAD initial `5f0c17f21a50ae2f3ad8622b7dfecb40d70649fe` ; dépôt private selon GitHub ; AGENTS.md, documents maîtres 00/01/11/02/12/03/04/13/14/05/06/07/08/10, docs/15, checkpoint historique 06/11 et dernier NEXT_ACTION lus sur main/branche. Issues #13/#14/#15/#16/#17 et PR concurrentes réexaminées sans modification de leurs branches.
