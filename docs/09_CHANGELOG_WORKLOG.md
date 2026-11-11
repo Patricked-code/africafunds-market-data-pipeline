@@ -1,5 +1,19 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-11 — Issue #15 : preuve CI et inventaire du chemin d'écriture brute (PARTIAL)
+
+- RECONCILIATION : PR #27 OPEN/Draft HEAD exact avant écriture `9940713e58a9f07d05da65c0a3156e2267861729`, base `73256f48d81d38ce8ff6f51be9e024b25cf5dadb`; PR #22/#25/#26 OPEN selon recherche. Lecture AGENTS.md, des documents maîtres ordonnés, docs/15 et dernier checkpoint. GitHub est la seule autorité ; aucune intervention sur les branches concurrentes.
+- TEST_EVIDENCE_EXACT_HEAD : GitHub Actions CI [42925362341](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/42925362341) et Docker/PostgreSQL [42925362293](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/42925362293), completed/success pour `9940713e58a9f07d05da65c0a3156e2267861729` uniquement. Aucun test local lancé ; ces succès ne certifient ni données officielles ni S1.
+- INVENTORY_CODE_MAIN : `src/jobs/ingest.ts` est un writer **brut**, non financier canonique : `saveArtifact` écrit `source.raw_artifacts` ; `persistRows` écrit `market.raw_records` avec `ON CONFLICT ON CONSTRAINT raw_records_identity_nullsafe` et `quality.assessments` dans une transaction explicite. `parseAndPersist` traite HTML/CSV/XLSX ; aucun mapping financier officiel ni INSERT d'observation normalisée dans ce chemin. `sql/migrations/006_raw_records_nullsafe.sql` impose `UNIQUE NULLS NOT DISTINCT` et bloque les doublons historiques sans les effacer. Cela prouve l'existence du chemin raw, **pas** l'absence de tout autre writer dans le dépôt.
+- GAP : `withVerifiedRawRecord` de PR #27 accepte un callback writer mais ne l'appelle que si un mapping admissible existe ; ne pas brancher ce callback directement sur `persistRows`, qui appartient à l'étape raw et ne publie pas de série financière. La branche #26 modifie déjà l'ingestion pour les six adaptateurs manuels : ne pas modifier `src/jobs/ingest.ts` depuis #27 sans claim/réconciliation explicite. La migration #006 requiert audit des doublons et sauvegarde avant toute application à une DB existante.
+- VALIDATION : lecture GitHub et preuves de CI du HEAD précédent ; aucun nouveau test ni code métier dans ce checkpoint ; CI du nouveau HEAD NOT_ATTESTED, revue indépendante et claim atomique NOT_ATTESTED. Issue #15 PARTIAL ; aucune licence, donnée témoin, normalisation ni HISTORY_COMPLETE certifiée.
+- BLOCK_REASON : inventaire exhaustif des migrations 001..005 et des writers `market/fund/calc/publish` non achevé ; mapping source→série, licences et données témoins non qualifiés ; branches #22/#25/#26 déjà occupées. Ne pas fabriquer un writer ni une source officielle.
+- NEXT_ACTION : inventorier les migrations 001..005, schémas `market/fund/method/calc/quality/publish` et appels SQL de normalisation sur main et branches pertinentes ; sélectionner le writer canonique existant ou spécifier un raccordement additif après contrat source-série officiel ; tests PostgreSQL transactionnels et CI sur HEAD exact. Si bloqué, examiner les contrats d'accès #13/#14 en lecture seule sans intervenir sur les branches possédées.
+- ROLLBACK : revert ciblé de cette entrée sur PR #27 ; aucun push direct main, merge, secret, déploiement S1 ni modification de visibilité.
+
+---
+
+
 ## 2026-11-11 — Issue #15 : CI du HEAD exact attestée ; inventaire writer encore non résolu (PARTIAL)
 
 - RECONCILIATION : dépôt GitHub private, PR #27 OPEN/Draft, HEAD initial exact `04a56ca149c02ec090707d27f9e7f52618ebfd4b`, base `73256f48d81d38ce8ff6f51be9e024b25cf5dadb`. PR #22/#25/#26 également OPEN/Draft. Lecture AGENTS.md, des 14 documents maîtres ordonnés, docs/15 et du dernier checkpoint. Aucune fusion ni déploiement autorisé.
