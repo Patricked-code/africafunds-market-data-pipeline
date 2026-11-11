@@ -113,3 +113,28 @@ test('reads an untrusted economic date only once to prevent inconsistent adapter
   assert.deepEqual(result, { admissible: false, reasons: ['INVALID_ECONOMIC_DATE'] });
   assert.equal(reads, 1);
 });
+
+
+test('snapshots publication date and numeric value once from an untrusted adapter', () => {
+  let publicationReads = 0;
+  let valueReads = 0;
+  const candidate = { ...valid } as Record<string, unknown>;
+  Object.defineProperty(candidate, 'publicationDate', {
+    get() {
+      publicationReads += 1;
+      return publicationReads === 1 ? '2026-01-01' : '2026-02-01';
+    },
+  });
+  Object.defineProperty(candidate, 'observedValue', {
+    get() {
+      valueReads += 1;
+      return valueReads === 1 ? Number.NaN : 1;
+    },
+  });
+  assert.deepEqual(validateFinancialObservationCandidate(candidate as unknown as typeof valid), {
+    admissible: false,
+    reasons: ['PUBLICATION_BEFORE_ECONOMIC_DATE', 'NON_FINITE_VALUE'],
+  });
+  assert.equal(publicationReads, 1);
+  assert.equal(valueReads, 1);
+});
