@@ -1,5 +1,18 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-11 11:35 Europe/Paris — Issue #15 : non-régression snapshot publication/valeur (PARTIAL)
+
+- RECONCILIATION : PR #1 MERGED ; PR #27 OPEN/Draft, HEAD avant écriture `2a003d64fd196ad729aafff04f6ef4a07bf1b68b`, mergeable=true à la consultation ; autres PR ouvertes #22/#25/#26 préservées. AGENTS.md, docs/00/01/11/02/12/03/04/13/14/05/06/07/08/10, docs/15, checkpoint historique 06/11 et dernier NEXT_ACTION consultés sur GitHub. Aucun claim inter-agent atomique prouvé.
+- CI_EXACT_PREVIOUS_HEAD : `2a003d64fd196ad729aafff04f6ef4a07bf1b68b` : CI [42996598573](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/42996598573) completed/success ; Docker/PostgreSQL [42996598725](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/42996598725) completed/success. Ces preuves ne valent pas pour les nouveaux commits.
+- TEST_COMMITTED : `d3d31797b9e4123207b4b0996ab4c41fea5ac85d` ajoute une non-régression vérifiant que publicationDate et observedValue de getters instables ne sont lus qu'une fois, et que les premières valeurs invalides ne peuvent être remplacées par des secondes valeurs valides. Réutilise le validateur existant, sans modifier son contrat ou créer de mécanisme parallèle.
+- VALIDATION : tests locaux NOT_RUN, nouveau HEAD CI NOT_ATTESTED, RED/GREEN non attesté ; revue indépendante et données témoins officielles non attestées. Ce test ne prouve ni writer financier, ni accès autorisé à une source, ni HISTORY_COMPLETE.
+- BLOCK_REASON : contrats officiels source→série, licence, format, unité et observation témoin toujours manquants ; writer transactionnel non raccordé ; claim atomique inter-agent et revue indépendante non attestés. Issue #15 PARTIAL.
+- NEXT_ACTION : vérifier CI et Docker/PostgreSQL sur le HEAD exact de cette entrée, corriger si rouge ; qualifier une source officielle avec contrat et observation témoin via #13/#14, puis raccorder provenance transactionnelle aux tables existantes et tester PostgreSQL. Rechercher une tâche indépendante si le contrat reste bloqué ; ne pas modifier les branches concurrentes sans claim.
+- ROLLBACK : revert ciblé du commit test et de cette entrée. Aucun push main, fusion, déploiement S1, secret, visibilité ou modification des 44 sources.
+
+---
+
+
 ## 2026-11-11 10:35 Europe/Paris — Issue #15 : snapshot anti-TOCTOU des observations externes (PARTIAL)
 
 - RECONCILIATION : PR #1 fusionnée, instructions AGENTS.md, 14 documents maîtres, docs/15 et dernière entrée du présent worklog relus sur GitHub. PR #27 OPEN/Draft HEAD initial `69405d909e7b123baa8fcd996c9d5b96ff88c96a` ; autres travaux ouverts à préserver ; aucun claim atomique inter-agent prouvé.
