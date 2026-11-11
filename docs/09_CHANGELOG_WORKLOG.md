@@ -1,5 +1,17 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-11 — Issue #15 : CI du correctif calendrier attestée, qualification métier toujours bloquée (PARTIAL)
+
+- RECONCILIATION : branche PR #27 et docs/09, AGENTS.md, docs/15 lus ; PR #22/#25/#26 et autres PR découvertes par recherche GitHub, sans modification de leurs branches. Le SHA historique ne remplace pas le HEAD courant ; aucun claim inter-agent transactionnel attesté.
+- CI_EXACT_HEAD : commit `49fa68ed4a62908f5a06dc84631fe991186a4df9` : CI [42960458121](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/42960458121) completed/success et Docker/PostgreSQL [42960458131](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/42960458131) completed/success. Les résultats attestent les contrôles de cette version, pas une collecte réelle ou une exécution S1.
+- ANALYSE : `src/quality/financialObservation.ts` et `test/financial-observation.test.ts` relus. La validation typée et la date sans année zéro sont couvertes dans la branche, mais aucun mapping source→série autorisé ni observation officielle témoin ne permet de choisir un INSERT financier sans inventer de données. Aucun nouveau test synthétique ajouté pour masquer ce blocage.
+- BLOCK_REASON : mapping officiel source→série, licence, unité, fixture et writer financier transactionnel non qualifiés ; claim inter-agent et revue indépendante non attestés. Issue #15 PARTIAL ; pas de HISTORY_COMPLETE.
+- NEXT_ACTION : réconcilier HEAD et CI du présent checkpoint ; identifier dans les preuves de l'issue #13/#14 une source officiellement accessible avec identifiant de série et donnée témoin, sans modifier les branches #25/#26 ; implémenter seulement ensuite un writer transactionnel vers une table existante et sa recette PostgreSQL. À défaut, poursuivre les qualifications documentées des sources et accès dans les issues existantes.
+- ROLLBACK : revert ciblé de cette entrée ; aucun push direct main, fusion, secret, modification de visibilité ou déploiement S1.
+
+---
+
+
 ## 2026-11-11 — Issue #15 : rejet explicite de l'année zéro ISO avant admission PostgreSQL (PARTIAL)
 
 - RECONCILIATION : PR #1 MERGED, PR #27 OPEN/Draft sur `feat/quality-financial-observation-gate-20261109`, HEAD initial vérifié `4e8a45bb8d7ee704be2ac174a06bbbdafc2b9336` ; AGENTS.md, les 14 documents maîtres, docs/15 et dernier checkpoint relus. PR concurrentes #22/#25/#26 préservées ; aucun changement main.
