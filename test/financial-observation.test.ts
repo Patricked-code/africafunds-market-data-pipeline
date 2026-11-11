@@ -138,3 +138,13 @@ test('snapshots publication date and numeric value once from an untrusted adapte
   assert.equal(publicationReads, 1);
   assert.equal(valueReads, 1);
 });
+
+
+test('rejects inherited provenance and observation fields from an untrusted prototype', () => {
+  const inherited = Object.create(valid) as typeof valid;
+  assert.deepEqual(validateFinancialObservationCandidate(inherited), {
+    admissible: false, reasons: ['INVALID_CANDIDATE'],
+  });
+  const own = { ...valid };
+  assert.deepEqual(validateFinancialObservationCandidate(own), { admissible: true, reasons: [] });
+});
