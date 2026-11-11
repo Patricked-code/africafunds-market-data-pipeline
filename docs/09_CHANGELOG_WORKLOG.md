@@ -1,5 +1,16 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-11 20:34 Europe/Paris — Réconciliation CI et frontière ingestion/SDMX (#14/#15 PARTIAL)
+
+- RECONCILIATION : GitHub repo visibility=private ; PR #27 OPEN/Draft HEAD `5c11f13d650a099bffaceebdcc4fcceaf51df4ac`, base main `73256f48d81d38ce8ff6f51be9e024b25cf5dadb` selon métadonnées PR ; PR #22/#25/#26 ouvertes, branches non modifiées. `AGENTS.md`, `docs/15_AUTONOMOUS_AGENT_EXECUTION.md`, worklog récent et audit historique 44 sources consultés ; protection main et claim atomique non attestés. Les 14 documents maîtres n'ont pas tous été relus intégralement durant cette passe : aucune modification de code admise sur cette base.
+- CI_EXACT_HEAD : [CI #43078977691](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43078977691) completed/success et [Docker/PostgreSQL #43078977634](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43078977634) completed/success, tous deux associés au HEAD `5c11f13d650a099bffaceebdcc4fcceaf51df4ac`. Pas de test local ni revue indépendante attestés.
+- CODE_INSPECTION : `src/jobs/ingest.ts` sur main ne contient que les branches de parsing HTML, CSV/texte et XLS/XLSX ; aucun parseur SDMX ou contrat de série GOSDMX n'y est attesté. `config/sources.json` conserve les 11 registres d'origine. La PR #26 traite le refus des collecteurs MANUAL_API_DISCOVERY ; ne pas modifier sa branche concurrente sans claim. Le HEAD 200 historique de `tun-bct-gosdmx` n'est pas une preuve de licence, de format ou de données témoins.
+- BLOCK_REASON : contrat officiel GOSDMX (API/SDMX, licence, structure, observation témoin) non qualifié ; claim atomique et revue indépendante non attestés ; PR #26 concurrente sur ingestion. Aucun nouveau code ou test n'a été committé, aucune preuve de collecte, publication, HISTORY_COMPLETE ou S1.
+- NEXT_ACTION : réconcilier claims/branche #26, puis obtenir par canal officiel le contrat SDMX BCT et une fixture licite ; relire les 14 documents maîtres ; ajouter le parseur SDMX dans les composants existants sur branche non possédée, test RED/GREEN, CI exacte et revue. À défaut, choisir une tâche indépendante avec claim vérifié, sans nouveau checkpoint purement documentaire répété.
+- ROLLBACK : revert de cette entrée uniquement ; aucune modification de main, sources, secrets, runtime ou déploiement.
+
+---
+
 ## 2026-11-11 19:33 Europe/Paris — CI HEAD #27 et audit anti-duplication des tests (#15 PARTIAL)
 
 - RECONCILIATION : PR #1 CLOSED/MERGED ; PR #27 OPEN/Draft HEAD `e3b26cdab5e9e87b5fd04945c11d04b553ee5678`, base main `73256f48d81d38ce8ff6f51be9e024b25cf5dadb` (métadonnées PR) ; PR #22/#25/#26 OPEN, branches concurrentes préservées. AGENTS.md, docs/15, worklog, checkpoint du 06/11, code qualité et tests relus. Protection main et claims atomiques non attestés ici.
