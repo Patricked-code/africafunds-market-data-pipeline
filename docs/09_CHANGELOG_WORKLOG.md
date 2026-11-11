@@ -1,5 +1,17 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-11 — Issue #15 : tests calendrier et valeurs d'adaptateurs non typées (PARTIAL)
+
+- RECONCILIATION : dépôt privé, main base PR #27 `73256f48d81d38ce8ff6f51be9e024b25cf5dadb`, PR #27 OPEN/Draft HEAD initial `83fa0ac2d8fb0e154574fd6e765cef36eea122d6`, PR #22/#25/#26 ouvertes. AGENTS.md, 14 documents maîtres ordonnés, docs/15 et dernier checkpoint docs/09 relus. Aucune autre branche modifiée.
+- CI_EXACT_PREVIOUS_HEAD : `83fa0ac2d8fb0e154574fd6e765cef36eea122d6` : CI [42946771163](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/42946771163) completed/success ; Docker/PostgreSQL [42946770955](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/42946770955) completed/success. Ne pas attribuer ces résultats au nouveau HEAD.
+- CODE_TEST : commit `1c97096d673d03a1f8673a0a9b89ea7f81660790` ajoute deux tests unitaires à `test/financial-observation.test.ts` : 29 février valide en année bissextile, dates impossibles refusées, publication le même jour admise, nombres sous forme de chaînes et champs de mapping vides rejetés. Tests locaux NOT_RUN ; résultat CI du nouveau HEAD NOT_ATTESTED. Aucun mapping officiel ni insertion financière simulée.
+- BLOCK_REASON : source→série, droits/licences, unités et fixtures officielles non qualifiés ; writer métier et claim atomique inter-agent non attestés ; revue indépendante absente. Issue #15 PARTIAL, HISTORY_COMPLETE interdit.
+- NEXT_ACTION : vérifier CI et Docker/PostgreSQL sur le HEAD exact de ce checkpoint ; corriger si rouge. Ensuite qualifier une source/série et fixture officielles autorisées, et seulement alors raccorder le writer transactionnel à une table financière existante ; sinon poursuivre #13/#14 indépendamment en respectant les branches occupées.
+- ROLLBACK : revert ciblé des deux tests et de ce checkpoint ; aucun push main, fusion, déploiement S1, secret ou changement de visibilité.
+
+---
+
+
 ## 2026-11-11 — Issue #15 : réconciliation exacte CI et contrats DDL des observations (PARTIAL)
 
 - RECONCILIATION : AGENTS.md, docs/00,01,11,02,12,03,04,13,14,05,06,07,08,10, docs/15 et checkpoint le plus récent de docs/09 consultés ; PR #1 et #18 MERGED ; PR #22 (HEAD 0eacd313b46bb99b523b8be24e68dc06233c0458), #25 (8e1a22fe4d5100f5fea15ec024f063b06486c265), #26 (bc632405eb8964250c4d88fb56adff846d652a9d), #27 (d7d483b541667b6d2960e6ad74eb7c92753bdd8f) OPEN/Draft. Ces SHAs sont des observations à revérifier au prochain passage.
