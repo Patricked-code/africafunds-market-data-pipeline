@@ -1,5 +1,16 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-11 17:35 Europe/Paris — CI HEAD attestée, priorité métier sans faux progrès (#15 PARTIAL)
+
+- RECONCILIATION : PR #1 CLOSED/MERGED vérifiée ; PR #27 OPEN/Draft, HEAD exact `11bb75696ffc2fa72a19038357a8b51fcdec8d8e`, base `main` SHA `73256f48d81d38ce8ff6f51be9e024b25cf5dadb` dans les métadonnées de PR ; PR #22/#25/#26 ouvertes et préservées. AGENTS.md, docs/15, dernier worklog et checkpoint historique relus sur la branche. Protection main et claims atomiques non réattestés.
+- CI_EXACT_HEAD : `11bb75696ffc2fa72a19038357a8b51fcdec8d8e` — [CI 43049236417](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43049236417) completed/success ; [Docker/PostgreSQL 43049236668](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43049236668) completed/success. Aucune preuve de collecte officielle, insertion métier ou déploiement.
+- CODE_INSPECTION : `src/quality/financialObservation.ts` et `test/financial-observation.test.ts` vérifiés ; les contrôles propres/champs, dates, valeurs finies, getters et taux négatifs sont déjà couverts. Aucun test artificiellement redondant ajouté. Les six adaptateurs officiels, le writer transactionnel et la licence/fixture réelle restent à qualifier. Pas de modification de branches concurrentes.
+- BLOCK_REASON : mapping officiel série→source, droits de réutilisation, unité/format, observation témoin et claim atomique multi-agent non attestés ; développer un writer réel ou prendre une branche concurrente sans claim serait prématuré. Revue indépendante non attestée.
+- NEXT_ACTION : qualifier via #13/#14 une série et fixture licites (source officielle, endpoint autorisé, droits, identifiant, unité, dates, provenance), puis développer un test PostgreSQL RED et le raccordement transactionnel GREEN dans les tables existantes sur une branche/claim libre. En cas d'impossibilité, examiner les corrections indépendantes de #5/#16 sans toucher #22/#25/#26 ; vérifier CI du HEAD suivant. Aucune déclaration HISTORY_COMPLETE.
+- ROLLBACK : revert ciblé de cette entrée documentaire ; aucun push main, merge, S1, secret, changement de visibilité ni modification des 44 sources.
+
+---
+
 ## 2026-11-11 16:30 Europe/Paris — CI exacte et réconciliation des dépendances, #15 PARTIAL
 
 - RECONCILIATION : PR #1 fusionnée (vérifiée via GitHub), PR #27 OPEN/Draft HEAD `88e7f4cd60c4437934f3af10b7ebc8b4fef43ec9`, base main `73256f48d81d38ce8ff6f51be9e024b25cf5dadb` au contrôle ; dépôt GitHub visibility=private. PR #22/#25/#26 ouvertes et non modifiées. AGENTS.md, les 14 documents maîtres, docs/15, dernier worklog et checkpoint historique relus. Protection main et claim atomique non réattestés.
