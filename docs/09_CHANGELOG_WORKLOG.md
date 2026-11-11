@@ -1,5 +1,17 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-11 — Issue #15 : rejet explicite de l'année zéro ISO avant admission PostgreSQL (PARTIAL)
+
+- RECONCILIATION : PR #1 MERGED, PR #27 OPEN/Draft sur `feat/quality-financial-observation-gate-20261109`, HEAD initial vérifié `4e8a45bb8d7ee704be2ac174a06bbbdafc2b9336` ; AGENTS.md, les 14 documents maîtres, docs/15 et dernier checkpoint relus. PR concurrentes #22/#25/#26 préservées ; aucun changement main.
+- CI_EXACT_PREVIOUS_HEAD : `4e8a45bb8d7ee704be2ac174a06bbbdafc2b9336` : CI [42953825205](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/42953825205) completed/success ; Docker/PostgreSQL [42953825021](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/42953825021) completed/success. Ne pas transférer ces conclusions aux nouveaux commits.
+- RED_TEST_COMMITTED : `8207311cd6c5aacf4f8d05a0e6ea7f4c4421bfec` ajoute un test pour refuser `0000-01-01` en date économique et publication. RED est attendu du code précédent mais NON EXECUTE ; aucun résultat RED revendiqué.
+- GREEN_CODE_COMMITTED : `d2c5b05509c20c153ccb857471b1582ddb25db3a` refuse l'année zéro dans `validCalendarDate`, afin de ne pas admettre une date ISO incompatible avec PostgreSQL DATE. GREEN NOT_ATTESTED en attente de CI exacte. Pas de nouvelle table, mapping, writer, donnée ni migration.
+- BLOCK_REASON : mappings officiels source→série, droits/licences, unités et observations témoins toujours non qualifiés ; writer métier transactionnel non raccordé ; claim atomique et revue indépendante non attestés. Issue #15 PARTIAL, HISTORY_COMPLETE interdit.
+- NEXT_ACTION : contrôler CI et Docker/PostgreSQL du HEAD exact créé par ce checkpoint, corriger tout échec ; ensuite qualifier un mapping officiel autorisé et une observation témoin, raccorder le writer transactionnel aux tables existantes avec tests PostgreSQL, sinon poursuivre l'audit #13/#14 sans toucher aux branches occupées.
+- ROLLBACK : revert ciblé des commits test/code et de cette entrée ; aucun push main, fusion, déploiement S1, secret ni changement de visibilité.
+
+---
+
 ## 2026-11-11 — Issue #15 : tests calendrier et valeurs d'adaptateurs non typées (PARTIAL)
 
 - RECONCILIATION : dépôt privé, main base PR #27 `73256f48d81d38ce8ff6f51be9e024b25cf5dadb`, PR #27 OPEN/Draft HEAD initial `83fa0ac2d8fb0e154574fd6e765cef36eea122d6`, PR #22/#25/#26 ouvertes. AGENTS.md, 14 documents maîtres ordonnés, docs/15 et dernier checkpoint docs/09 relus. Aucune autre branche modifiée.
