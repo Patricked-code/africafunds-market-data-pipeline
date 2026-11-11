@@ -1,5 +1,17 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-11 16:30 Europe/Paris — CI exacte et réconciliation des dépendances, #15 PARTIAL
+
+- RECONCILIATION : PR #1 fusionnée (vérifiée via GitHub), PR #27 OPEN/Draft HEAD `88e7f4cd60c4437934f3af10b7ebc8b4fef43ec9`, base main `73256f48d81d38ce8ff6f51be9e024b25cf5dadb` au contrôle ; dépôt GitHub visibility=private. PR #22/#25/#26 ouvertes et non modifiées. AGENTS.md, les 14 documents maîtres, docs/15, dernier worklog et checkpoint historique relus. Protection main et claim atomique non réattestés.
+- CI_EXACT_HEAD : `88e7f4cd60c4437934f3af10b7ebc8b4fef43ec9` : [CI 43039256561](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43039256561) completed/success ; [Docker/PostgreSQL 43039257108](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43039257108) completed/success. Cela n'atteste aucune observation officielle ni déploiement.
+- TECHNICAL_SCOPE : validateur et tests relus ; pas de défaut additionnel démontré justifiant une nouvelle modification isolée. Le développement d'un writer sans contrat source-série, licence, fixture et schéma de transaction vérifiés reste interdit ; éviter les tests redondants et les commits documentaires sans avancement métier.
+- BLOCK_REASON : absence de série officielle contractuellement qualifiée et d'observation témoin licite pour #15 ; six adaptateurs #14 toujours à qualifier ; claims/revue indépendante non attestés. Aucune collecte réelle, publication ou HISTORY_COMPLETE déclarée.
+- NEXT_ACTION : (1) qualifier via #13/#14 un identifiant de série officiel, protocole, unité, dates, licence et fixture autorisée ; (2) examiner les schémas source/market et développer sur branche non possédée une transaction de provenance/observation testée avec PostgreSQL ; (3) à défaut, sélectionner un correctif indépendant sur #5 ou #16 après vérification des PR/claims ; (4) vérifier CI du HEAD suivant sans fusion implicite.
+- ROLLBACK : revert ciblé de cette entrée uniquement. Aucun push main, merge, déploiement S1, secret, altération des 44 sources ou visibilité.
+
+---
+
+
 ## 2026-11-11 15:30 Europe/Paris — Issue #15 : CI exacte validée, priorité au raccordement métier (PARTIAL)
 
 - RECONCILIATION : AGENTS.md et docs/15 relus sur main ; dernier NEXT_ACTION et checkpoint du worklog relus sur branche PR #27. PR ouvertes #22/#25/#26/#27 vérifiées dans GitHub ; les branches concurrentes sont préservées. La PR #1 est historiquement fusionnée selon le journal, sans nouvelle attestation de métadonnées PR dans cette exécution. Le HEAD main et les protections n'ont pas été réattestés ici : ne pas inférer leur état depuis le checkpoint.
