@@ -1,5 +1,19 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-11 12:39 Europe/Paris — Issue #15 : provenance héritée rejetée (PARTIAL)
+
+- RECONCILIATION : PR #1 MERGED ; PR #27 OPEN/Draft, HEAD initial `2dc110b9174bfad80cc41887ccdc248c3ecc5f56`, base main `73256f48d81d38ce8ff6f51be9e024b25cf5dadb` au contrôle. AGENTS.md, 14 documents maîtres, docs/15, dernier checkpoint 06/11 et NEXT_ACTION relus. PR #22/#25/#26 non modifiées ; aucun claim atomique multi-agent attesté.
+- CI_EXACT_PREVIOUS_HEAD : `2dc110b9174bfad80cc41887ccdc248c3ecc5f56` — CI [43004838964](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43004838964) completed/success ; Docker/PostgreSQL [43004838983](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43004838983) completed/success. Aucun résultat extrapolé aux nouveaux commits.
+- DEFECT : le validateur de candidats externes acceptait par destructuration des champs hérités d'un prototype, y compris provenance et valeur, alors qu'une observation financière doit porter explicitement ses propres champs.
+- TEST_COMMITTED : `946c0bc2839c565fb374fef0d36730c1b2563204` vérifie le rejet d'un candidat `Object.create(valid)` et l'acceptation d'un objet ordinaire avec propriétés propres. RED non exécuté localement.
+- CODE_COMMITTED : `d08151b49aeba5be200f82d32374d5b8bd7cf09a` vérifie `Object.prototype.hasOwnProperty.call` sur les sept champs avant leur lecture. Garde fail-closed existante conservée ; aucune modification SQL, sources ou API. GREEN non exécuté localement.
+- VALIDATION : tests locaux NOT_RUN ; CI du nouveau HEAD NOT_ATTESTED ; revue indépendante NOT_ATTESTED ; aucun contrat officiel ni observation témoin qualifié. Issue #15 PARTIAL ; aucune donnée financière publiée ni HISTORY_COMPLETE.
+- BLOCK_REASON : mappings officiels source-série, droits/licences, formats et fixtures réelles non qualifiés ; writer financier transactionnel non raccordé ; claim atomique et revue indépendante non attestés.
+- NEXT_ACTION : vérifier les deux workflows sur le HEAD exact de cette entrée et corriger tout échec. Puis sélectionner un contrat officiel et une observation témoin via #13/#14 ; raccorder provenance et insertion transactionnelle aux tables SQL existantes avec tests PostgreSQL. Si accès bloqué, traiter une tâche indépendante sans collision avec PR concurrentes.
+- ROLLBACK : revert ciblé des commits test/code et de ce checkpoint. Aucun push direct main, fusion, déploiement S1, secret ou modification des 44 sources.
+
+---
+
 ## 2026-11-11 11:35 Europe/Paris — Issue #15 : non-régression snapshot publication/valeur (PARTIAL)
 
 - RECONCILIATION : PR #1 MERGED ; PR #27 OPEN/Draft, HEAD avant écriture `2a003d64fd196ad729aafff04f6ef4a07bf1b68b`, mergeable=true à la consultation ; autres PR ouvertes #22/#25/#26 préservées. AGENTS.md, docs/00/01/11/02/12/03/04/13/14/05/06/07/08/10, docs/15, checkpoint historique 06/11 et dernier NEXT_ACTION consultés sur GitHub. Aucun claim inter-agent atomique prouvé.
