@@ -87,3 +87,15 @@ test('rejects ISO year zero before PostgreSQL DATE admission', () => {
     assert.ok(result.reasons.includes(field === 'economicDate' ? 'INVALID_ECONOMIC_DATE' : 'INVALID_PUBLICATION_DATE'));
   }
 });
+
+
+test('fails closed when an untrusted adapter supplies throwing property accessors', () => {
+  const candidate = { ...valid } as Record<string, unknown>;
+  Object.defineProperty(candidate, 'observedValue', {
+    get() { throw new Error('adapter accessor failure'); },
+  });
+  assert.doesNotThrow(() => validateFinancialObservationCandidate(candidate as unknown as typeof valid));
+  assert.deepEqual(validateFinancialObservationCandidate(candidate as unknown as typeof valid), {
+    admissible: false, reasons: ['INVALID_CANDIDATE'],
+  });
+});
