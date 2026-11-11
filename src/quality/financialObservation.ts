@@ -30,6 +30,7 @@ export function validateFinancialObservationCandidate(
   if (candidate === null || candidate === undefined || typeof candidate !== 'object' || Array.isArray(candidate)) {
     return { admissible: false, reasons: ['INVALID_CANDIDATE'] };
   }
+  try {
   for (const field of ['sourceEndpointCode', 'rawArtifactId', 'unit', 'methodVersion'] as const) {
     if (typeof candidate[field] !== 'string' || !candidate[field].trim()) {
       reasons.push('MISSING_' + field.toUpperCase());
@@ -45,4 +46,9 @@ export function validateFinancialObservationCandidate(
     reasons.push('NON_FINITE_VALUE');
   }
   return { admissible: reasons.length === 0, reasons };
+  } catch {
+    // Untrusted adapters may supply getters or proxies that throw on property access.
+    // Never let a malformed envelope crash the ingestion boundary.
+    return { admissible: false, reasons: ['INVALID_CANDIDATE'] };
+  }
 }
