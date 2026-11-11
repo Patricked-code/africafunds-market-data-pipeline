@@ -1,5 +1,17 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-11 19:33 Europe/Paris — CI HEAD #27 et audit anti-duplication des tests (#15 PARTIAL)
+
+- RECONCILIATION : PR #1 CLOSED/MERGED ; PR #27 OPEN/Draft HEAD `e3b26cdab5e9e87b5fd04945c11d04b553ee5678`, base main `73256f48d81d38ce8ff6f51be9e024b25cf5dadb` (métadonnées PR) ; PR #22/#25/#26 OPEN, branches concurrentes préservées. AGENTS.md, docs/15, worklog, checkpoint du 06/11, code qualité et tests relus. Protection main et claims atomiques non attestés ici.
+- CI_EXACT_HEAD : [CI #43070394789](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43070394789) completed/success ; [Docker/PostgreSQL #43070394783](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43070394783) completed/success, tous deux associés au SHA `e3b26cdab5e9e87b5fd04945c11d04b553ee5678`.
+- CODE_INSPECTION : `src/quality/rawRecordProvenance.ts`, `src/quality/withVerifiedRawRecord.ts`, `test/raw-record-provenance.test.ts`, `test/with-verified-raw-record.test.ts` et schéma `sql/migrations/002_market.sql` inspectés. Les tests existants couvrent déjà l'interdiction du writer après refus de provenance, le même client transactionnel, les erreurs SQL et writer ; tentative de créer un fichier test homonyme rejetée par GitHub 422 (fichier déjà présent), aucune écriture technique effectuée. Aucun test RED/GREEN local exécuté.
+- SOURCE_AUDIT : `docs/SOURCE_AUDIT_RUN_42314547906.md` vérifié sur main : 44 sources, 14 HEAD 200 non qualifiés, 7 HEAD 403, 1 HEAD 404, 22 NOT_PROBED ; aucune preuve de série officielle ou licence permettant un writer réel. Ne pas confondre HEAD 200 avec autorisation de réutilisation.
+- BLOCK_REASON : absence de contrat officiel série/source, licence, fixture et mapping financier autorisés ; absence de claim atomique multi-agent et de revue indépendante attestés. Aucun writer réel, historique complet, S1 ou runner 24/7 revendiqué.
+- NEXT_ACTION : prioriser une qualification juridique et technique documentée pour `tun-bct-gosdmx` (HEAD 200 historique seulement), identifier API/SDMX et observation témoin légalement accessible ; sur branche libre et claim réconcilié, développer parseur + test RED/GREEN ; sinon poursuivre un correctif indépendant issu des lots 0–13. Vérifier la CI de tout nouveau HEAD, sans fusion implicite.
+- ROLLBACK : revert ciblé de cette entrée ; aucun push main, merge, S1, secret ni modification du registre source.
+
+---
+
 ## 2026-11-11 18:39 Europe/Paris — CI exacte et réorientation vers livrables métier (#13/#14/#15)
 
 - RECONCILIATION : AGENTS.md, docs/15, dernier checkpoint du worklog, code et tests de src/quality/financialObservation.ts relus ; PR ouvertes #22 (backfill), #25 (audit), #26 (adaptateurs), #27 (qualité), sans intervention sur les branches concurrentes. Issues #13–#17 et #9 consultées. Le statut de protection main, la visibilité et le SHA main ne sont pas réattestés lors de cette passe ; aucune hypothèse à partir des anciens checkpoints.
