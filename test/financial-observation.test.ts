@@ -99,3 +99,17 @@ test('fails closed when an untrusted adapter supplies throwing property accessor
     admissible: false, reasons: ['INVALID_CANDIDATE'],
   });
 });
+
+test('reads an untrusted economic date only once to prevent inconsistent adapter snapshots', () => {
+  let reads = 0;
+  const candidate = { ...valid } as Record<string, unknown>;
+  Object.defineProperty(candidate, 'economicDate', {
+    get() {
+      reads += 1;
+      return reads === 1 ? '2026-02-30' : '2026-01-31';
+    },
+  });
+  const result = validateFinancialObservationCandidate(candidate as unknown as typeof valid);
+  assert.deepEqual(result, { admissible: false, reasons: ['INVALID_ECONOMIC_DATE'] });
+  assert.equal(reads, 1);
+});
