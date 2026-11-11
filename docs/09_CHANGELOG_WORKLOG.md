@@ -1,5 +1,16 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-11 18:39 Europe/Paris — CI exacte et réorientation vers livrables métier (#13/#14/#15)
+
+- RECONCILIATION : AGENTS.md, docs/15, dernier checkpoint du worklog, code et tests de src/quality/financialObservation.ts relus ; PR ouvertes #22 (backfill), #25 (audit), #26 (adaptateurs), #27 (qualité), sans intervention sur les branches concurrentes. Issues #13–#17 et #9 consultées. Le statut de protection main, la visibilité et le SHA main ne sont pas réattestés lors de cette passe ; aucune hypothèse à partir des anciens checkpoints.
+- CI_EXACT_HEAD : commit `7a4877d1e5b6da4464f41d128de95d5a072f1b45` : [CI #43059998790](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43059998790) completed/success ; [Docker/PostgreSQL #43059998715](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43059998715) completed/success. Aucune preuve de collecte réelle, historique complet, publication ou S1.
+- ANALYSE : le validateur de candidat financier et ses tests couvrent déjà dates, provenance propre, valeurs finies et getters hostiles. Ajouter un test supplémentaire sans exigence métier démontrée prolongerait artificiellement la PR #27. La PR #26 bloque explicitement les collecteurs MANUAL_API_DISCOVERY non implémentés ; ce blocage est préférable à un faux SUCCESS.
+- BLOCK_REASON : contrat officiel série/source, licence d'accès/réutilisation, format, unité, fixture et mappings économiques non qualifiés ; writer transactionnel non raccordé. Claims inter-agent atomiques et revue indépendante non attestés ; PR #22/#25/#26 occupent leurs fichiers respectifs.
+- NEXT_ACTION : (1) contrôler CI du HEAD documentaire suivant ; (2) dans #13/#14, qualifier une série officielle précise et un échantillon autorisé (identifiant, endpoint, robots/licence, format, date économique/publication, unité, provenance) sans contourner les restrictions ; (3) sur branche libre avec claim vérifié, coder un adaptateur/parseur réel avec fixture et tests RED/GREEN ; (4) seulement ensuite brancher le writer PostgreSQL avec FK, transaction et tests d'intégration ; (5) à défaut, travailler une tâche indépendante sans chevaucher #22/#25/#26. Ne pas déclarer DONE/HISTORY_COMPLETE.
+- ROLLBACK : revert ciblé de cette entrée documentaire ; aucun merge, push main, secret, déploiement S1 ni modification du registre des 44 sources.
+
+---
+
 ## 2026-11-11 17:35 Europe/Paris — CI HEAD attestée, priorité métier sans faux progrès (#15 PARTIAL)
 
 - RECONCILIATION : PR #1 CLOSED/MERGED vérifiée ; PR #27 OPEN/Draft, HEAD exact `11bb75696ffc2fa72a19038357a8b51fcdec8d8e`, base `main` SHA `73256f48d81d38ce8ff6f51be9e024b25cf5dadb` dans les métadonnées de PR ; PR #22/#25/#26 ouvertes et préservées. AGENTS.md, docs/15, dernier worklog et checkpoint historique relus sur la branche. Protection main et claims atomiques non réattestés.
