@@ -79,3 +79,11 @@ test('rejects numeric strings and missing official mapping fields from runtime a
     'MISSING_SOURCEENDPOINTCODE', 'MISSING_UNIT', 'NON_FINITE_VALUE',
   ]);
 });
+
+
+test('rejects ISO year zero before PostgreSQL DATE admission', () => {
+  for (const field of ['economicDate', 'publicationDate'] as const) {
+    const result = validateFinancialObservationCandidate({ ...valid, [field]: '0000-01-01' });
+    assert.ok(result.reasons.includes(field === 'economicDate' ? 'INVALID_ECONOMIC_DATE' : 'INVALID_PUBLICATION_DATE'));
+  }
+});
