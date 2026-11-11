@@ -1,5 +1,17 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-11 14:37 Europe/Paris — Issue #15 : taux négatifs conservés, CI précédente vérifiée (PARTIAL)
+
+- RECONCILIATION : PR #1 MERGED ; PR #27 OPEN/Draft HEAD initial `6c6ece71519ff565ab17942faee22707827e14e6`, base main `73256f48d81d38ce8ff6f51be9e024b25cf5dadb` à la consultation ; PR #22/#25/#26 OPEN et préservées. AGENTS.md, docs/15, dernier NEXT_ACTION, checkpoint historique 06/11 et code/test du validateur consultés. Aucun claim atomique multi-agent attesté.
+- CI_EXACT_PREVIOUS_HEAD : `6c6ece71519ff565ab17942faee22707827e14e6` — [CI 43021887688](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43021887688) completed/success ; [Docker/PostgreSQL 43021887541](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43021887541) completed/success. Ne pas extrapoler aux nouveaux commits.
+- TEST_COMMITTED : `371b75be8ec9cf37ce2e265dc6dad0ccfd971011` ajoute un cas de non-régression : un taux officiel négatif fini (-0.125) doit rester admissible et non coercé. Le code de validation existant autorise déjà les valeurs négatives finies : test de préservation du comportement, pas de nouveau parser ou writer. RED non applicable à ce comportement déjà correct ; tests locaux NOT_RUN.
+- VALIDATION : CI du nouveau HEAD NOT_ATTESTED ; revue indépendante NOT_ATTESTED ; aucune collecte officielle ni publication, aucun HISTORY_COMPLETE.
+- BLOCK_REASON : contrat officiel source→série, licence/droit de réutilisation, unité/format, fixture témoin et writer transactionnel PostgreSQL non qualifiés ; claim atomique inter-agent non attesté. Issue #15 PARTIAL.
+- NEXT_ACTION : vérifier les deux workflows du HEAD exact après ce checkpoint, corriger toute régression ; qualifier une source officielle via issues #13/#14, puis coder et tester le raccordement provenance→observation transactionnelle sur les tables existantes. Si les droits restent bloqués, traiter une tâche indépendante après claim sans modifier les PR #22/#25/#26 occupées.
+- ROLLBACK : revert ciblé du test et de cette entrée. Aucun push main, merge, S1, secret, modification des 44 sources ou visibilité.
+
+---
+
 ## 2026-11-11 13:35 Europe/Paris — Issue #15 : CI exacte et admission conservatrice, source officielle toujours bloquante (PARTIAL)
 
 - RECONCILIATION : AGENTS.md, 14 documents maîtres dans l'ordre imposé, docs/15, checkpoint historique du 06/11 et dernier NEXT_ACTION relus sur la branche PR #27. PR #1 déjà fusionnée ; PR ouvertes #22/#25/#26/#27 confirmées ; PR #27 Draft, mergeable=true à la consultation ; main non modifiée. Dépôt déclaré private par GitHub à cette consultation ; ancienne alerte de visibilité #3 conservée sans changement de configuration.
