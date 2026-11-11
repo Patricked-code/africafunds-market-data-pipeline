@@ -31,6 +31,13 @@ export function validateFinancialObservationCandidate(
     return { admissible: false, reasons: ['INVALID_CANDIDATE'] };
   }
   try {
+    // Financial fields must be supplied by the candidate itself, never inherited
+    // from an adapter-controlled prototype. This also rejects forged provenance.
+    const requiredFields = ['sourceEndpointCode', 'rawArtifactId', 'unit', 'methodVersion',
+      'economicDate', 'publicationDate', 'observedValue'] as const;
+    if (!requiredFields.every((field) => Object.prototype.hasOwnProperty.call(candidate, field))) {
+      return { admissible: false, reasons: ['INVALID_CANDIDATE'] };
+    }
     // Snapshot each untrusted field exactly once. Accessors may return different
     // values on successive reads, otherwise bypassing date-order validation.
     const { sourceEndpointCode, rawArtifactId, unit, methodVersion,
