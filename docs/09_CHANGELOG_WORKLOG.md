@@ -1,5 +1,19 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-11 — Issue #15 : inventaire vérifié des six migrations initiales et cibles d'observations (PARTIAL)
+
+- RECONCILIATION : PR #27 OPEN/Draft sur `feat/quality-financial-observation-gate-20261109` ; PR #22/#25/#26 ouvertes et conservées. Dépôt GitHub déclaré private au contrôle. AGENTS.md, docs/15, dernier checkpoint de ce journal et schémas SQL sur main consultés. Les anciens SHAs ne constituent pas une autorité actuelle.
+- CI_EXACT_HEAD : commit précédent `0c222d727b129ceb96a9e19d58a492ecc5d2586e` ; CI run [42933051718](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/42933051718) completed/success et Docker/PostgreSQL run [42933051708](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/42933051708) completed/success. Aucun test local exécuté ; ces résultats ne prouvent ni normalisation réelle ni S1.
+- INVENTORY_VERIFIED_MAIN : le répertoire `sql/migrations` contient exactement `001_core.sql`, `002_market.sql`, `002_market_calc.sql`, `003_ops_quality.sql`, `004_views.sql`, `005_funds_categories.sql`, `006_raw_records_nullsafe.sql` au moment de l'inventaire. Les six premiers ont été lus : `001_core` crée les schémas ref/source/market/fund/method/calc/quality/publish/ops et le registre/archives ; `002_market` crée `market.raw_records`, `official_index_observations`, `official_rate_observations`, `instrument_market_observations`, `fx_observations`, `inflation_observations` ; `002_market_calc` crée les méthodes et calculs ; `003_ops_quality` crée jobs et assessments ; `004_views` crée les vues publish ; `005_funds_categories` crée notamment `fund.nav_observations`.
+- ARCHITECTURE_GAP : les tables financières normalisées existent **déjà** et plusieurs possèdent une FK facultative `raw_record_id` ; le chemin d'ingestion `src/jobs/ingest.ts` n'insère que dans `source.raw_artifacts`, `market.raw_records` et `quality.assessments`. Aucune preuve de writer métier effectif, mapping officiel ou publication autorisée n'a été obtenue. Ne pas créer une table d'observation parallèle ni confondre existence du DDL et ingestion métier opérationnelle.
+- VALIDATION : inventaire GitHub en lecture seule ; aucun nouveau test/code métier, CI du présent checkpoint NOT_ATTESTED, claim atomique et revue indépendante NOT_ATTESTED. Issue #15 PARTIAL.
+- BLOCK_REASON : contrats source→série, unités, dates économiques/publication, licences et observations témoins officielles non qualifiés ; writer métier effectif non identifié. Branches concurrentes occupées ; ne pas toucher leur ingestion sans claim.
+- NEXT_ACTION : rechercher les références et INSERT/UPSERT réels des tables `market.official_*_observations`, `market.fx_observations`, `market.inflation_observations`, `fund.nav_observations` sur main et PR pertinentes ; sélectionner **une seule** famille avec contrat officiel vérifié et mapping explicite, puis brancher la garde de provenance et un writer transactionnel sur branche dédiée avec tests RED/GREEN PostgreSQL et CI exact-HEAD. En l'absence de mapping/licence, poursuivre l'audit indépendant #13/#14 en lecture seule et enregistrer les blocages.
+- ROLLBACK : revert ciblé du présent checkpoint sur la PR #27 ; aucun push main, fusion, secret, déploiement S1 ou modification de visibilité.
+
+---
+
+
 ## 2026-11-11 — Issue #15 : preuve CI et inventaire du chemin d'écriture brute (PARTIAL)
 
 - RECONCILIATION : PR #27 OPEN/Draft HEAD exact avant écriture `9940713e58a9f07d05da65c0a3156e2267861729`, base `73256f48d81d38ce8ff6f51be9e024b25cf5dadb`; PR #22/#25/#26 OPEN selon recherche. Lecture AGENTS.md, des documents maîtres ordonnés, docs/15 et dernier checkpoint. GitHub est la seule autorité ; aucune intervention sur les branches concurrentes.
