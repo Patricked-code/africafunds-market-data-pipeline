@@ -1,5 +1,17 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-11 21:34 Europe/Paris — Contrôle CI et admission documentaire complète, #14 bloqué par contrat/claim
+
+- RECONCILIATION : lecture GitHub des 14 documents maîtres dans l'ordre AGENTS.md, du protocole docs/15, du journal canonique et du checkpoint 2026-11-06 ; lecture de src/jobs/ingest.ts sur la branche #27. Les issues #3/#5/#6/#7/#8/#9/#13/#14/#15/#16/#17 restent retrouvables via recherche GitHub ; branches concurrentes non modifiées. La recherche de PR via le connecteur ne fournit pas les numéros dans son résultat : aucune assertion de nouvel état des PR ni de protection main sans vérification complémentaire.
+- CI_EXACT_HEAD : pour `7cc3505e8f259132c273d660e8cb95d186e6c45c`, runs [43088601744](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43088601744) (CI) et [43088601769](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43088601769) (Docker/PostgreSQL), tous deux completed/success selon fetch_commit_workflow_runs. Ce sont des preuves de CI du SHA antérieur uniquement.
+- CODE_INSPECTION : ingestion HTML, CSV, XLSX existante ; absence de traitement SDMX explicite dans src/jobs/ingest.ts. Aucune donnée GOSDMX autorisée, aucun contrat de série ni fixture officielle n'a été validé ici. Aucun test local exécuté.
+- BLOCK_REASON : absence de contrat/fixture SDMX BCT et d'attestation de claim exclusif pour les fichiers d'ingestion déjà concernés par travaux concurrents ; ne pas inventer de test RED/GREEN, de couverture source ou de données réelles. Aucun nouveau code committé dans cette passe.
+- NEXT_ACTION : vérifier le HEAD et le claim de la PR #26 et l'issue #14, qualifier les métadonnées SDMX et la licence officielle BCT, puis ajouter sur branche exclusivement possédée un parseur et des tests fixture RED/GREEN. À défaut, traiter une tâche indépendante après claim vérifiable ; vérifier les CI du présent HEAD, sans nouveau checkpoint répétitif si aucune preuve ne change.
+- ROLLBACK : revert documentaire seulement ; aucun push main, merge, changement de visibilité, secret, source d'origine ou déploiement S1.
+
+---
+
+
 ## 2026-11-11 20:34 Europe/Paris — Réconciliation CI et frontière ingestion/SDMX (#14/#15 PARTIAL)
 
 - RECONCILIATION : GitHub repo visibility=private ; PR #27 OPEN/Draft HEAD `5c11f13d650a099bffaceebdcc4fcceaf51df4ac`, base main `73256f48d81d38ce8ff6f51be9e024b25cf5dadb` selon métadonnées PR ; PR #22/#25/#26 ouvertes, branches non modifiées. `AGENTS.md`, `docs/15_AUTONOMOUS_AGENT_EXECUTION.md`, worklog récent et audit historique 44 sources consultés ; protection main et claim atomique non attestés. Les 14 documents maîtres n'ont pas tous été relus intégralement durant cette passe : aucune modification de code admise sur cette base.
