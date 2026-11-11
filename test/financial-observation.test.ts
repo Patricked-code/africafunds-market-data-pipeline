@@ -66,3 +66,16 @@ test('rejects malformed publication dates and primitive runtime envelopes withou
     });
   }
 });
+
+test('enforces leap-year calendar dates and allows same-day official publication', () => {
+  assert.deepEqual(validateFinancialObservationCandidate({ ...valid, economicDate: '2024-02-29', publicationDate: '2024-02-29' }), { admissible: true, reasons: [] });
+  assert.ok(validateFinancialObservationCandidate({ ...valid, economicDate: '2025-02-29' }).reasons.includes('INVALID_ECONOMIC_DATE'));
+  assert.ok(validateFinancialObservationCandidate({ ...valid, publicationDate: '2026-04-31' }).reasons.includes('INVALID_PUBLICATION_DATE'));
+});
+
+test('rejects numeric strings and missing official mapping fields from runtime adapters', () => {
+  const candidate = { ...valid, sourceEndpointCode: '  ', unit: '', observedValue: '0' } as unknown as typeof valid;
+  assert.deepEqual(validateFinancialObservationCandidate(candidate).reasons, [
+    'MISSING_SOURCEENDPOINTCODE', 'MISSING_UNIT', 'NON_FINITE_VALUE',
+  ]);
+});
