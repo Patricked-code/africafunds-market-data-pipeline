@@ -1,5 +1,18 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-11 13:35 Europe/Paris — Issue #15 : CI exacte et admission conservatrice, source officielle toujours bloquante (PARTIAL)
+
+- RECONCILIATION : AGENTS.md, 14 documents maîtres dans l'ordre imposé, docs/15, checkpoint historique du 06/11 et dernier NEXT_ACTION relus sur la branche PR #27. PR #1 déjà fusionnée ; PR ouvertes #22/#25/#26/#27 confirmées ; PR #27 Draft, mergeable=true à la consultation ; main non modifiée. Dépôt déclaré private par GitHub à cette consultation ; ancienne alerte de visibilité #3 conservée sans changement de configuration.
+- CI_EXACT_PREVIOUS_HEAD : commit `cb16b93470fde04a251e61f8ee6d5e3d6153393a` : CI principale [43013835274](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43013835274) completed/success ; Docker/PostgreSQL [43013835348](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43013835348) completed/success. Ces résultats ne prouvent ni writer financier ni collecte réelle.
+- CODE_REVIEW : `src/quality/financialObservation.ts` et `test/financial-observation.test.ts` vérifiés dans PR #27 ; rejet des champs hérités, snapshot unique et refus fail-closed déjà présents. Aucun test redondant ou nouveau writer fictif ajouté ; le travail fonctionnel exige des mappings officiels et des fixtures licites. Les branches concurrentes restent intactes.
+- VALIDATION : deux workflows GitHub exacts ci-dessus ; tests locaux NOT_RUN ; revue indépendante NOT_ATTESTED ; aucune série, licence, fixture officielle ou publication financière attestée ; #15 PARTIAL, HISTORY_COMPLETE interdit.
+- BLOCK_REASON : mapping source→série, droits de réutilisation, format/unité, observation témoin et contrat de provenance transactionnelle non vérifiés ; claim atomique inter-agent et revue indépendante non attestés. Le développement de writer sur données supposées est refusé.
+- NEXT_ACTION : vérifier les workflows du nouveau HEAD documentaire ; qualifier un contrat officiel et une observation témoin via issues #13/#14 (sans contourner robots ni modifier PR #25/#26), puis développer un writer transactionnel avec FK et tests PostgreSQL sur branche réconciliée. En parallèle examiner issue #5 sur une branche distincte après claim vérifié, sans modifier PR #22 occupée. Si aucune source admissible, enregistrer les raisons précises dans issue #13 et reprendre une tâche de code indépendante non conflictuelle.
+- ROLLBACK : revert ciblé de cette seule entrée documentaire ; aucune fusion, écriture main, secret, modification de visibilité ou déploiement S1.
+
+---
+
+
 ## 2026-11-11 12:39 Europe/Paris — Issue #15 : provenance héritée rejetée (PARTIAL)
 
 - RECONCILIATION : PR #1 MERGED ; PR #27 OPEN/Draft, HEAD initial `2dc110b9174bfad80cc41887ccdc248c3ecc5f56`, base main `73256f48d81d38ce8ff6f51be9e024b25cf5dadb` au contrôle. AGENTS.md, 14 documents maîtres, docs/15, dernier checkpoint 06/11 et NEXT_ACTION relus. PR #22/#25/#26 non modifiées ; aucun claim atomique multi-agent attesté.
