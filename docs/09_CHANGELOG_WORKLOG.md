@@ -1,5 +1,18 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-11 15:30 Europe/Paris — Issue #15 : CI exacte validée, priorité au raccordement métier (PARTIAL)
+
+- RECONCILIATION : AGENTS.md et docs/15 relus sur main ; dernier NEXT_ACTION et checkpoint du worklog relus sur branche PR #27. PR ouvertes #22/#25/#26/#27 vérifiées dans GitHub ; les branches concurrentes sont préservées. La PR #1 est historiquement fusionnée selon le journal, sans nouvelle attestation de métadonnées PR dans cette exécution. Le HEAD main et les protections n'ont pas été réattestés ici : ne pas inférer leur état depuis le checkpoint.
+- CI_EXACT_PREVIOUS_HEAD : `558a28c08fd0c3a496fbd9db94830f8da78dc83c` : [CI 43030899682](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43030899682) completed/success ; [Docker/PostgreSQL 43030899467](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43030899467) completed/success. Ce sont des contrôles du commit précédent, pas une recette de collecte officielle.
+- CODE_REVIEW : `src/quality/financialObservation.ts` et `test/financial-observation.test.ts` consultés. Les validations déjà couvertes comprennent provenance explicite, champs propres, getters instables, valeurs finies négatives et dates. Aucun nouveau test redondant ou writer sans contrat officiel n'est ajouté ; aucun test local exécuté.
+- ADMISSIBILITY : les issues #13/#14 demandent contrats/licences/fixtures officiels ; la PR #26 bloque déjà les six adaptateurs non implémentés ; #22/#25/#26 ont des branches ouvertes. Aucune collision ni contournement d'accès autorisé. Issue #15 PARTIAL, HISTORY_COMPLETE non attesté.
+- BLOCK_REASON : pas de mapping officiel source-série, licence de réutilisation, unité, fixture autorisée et contrat transactionnel vérifiés pour le writer ; claim atomique inter-agent et revue indépendante non attestés. Pas de preuve de runner permanent ni de déploiement S1.
+- NEXT_ACTION : (1) vérifier CI du nouveau HEAD de ce checkpoint ; (2) qualifier légalement une série officielle et un échantillon réel via #13/#14 ; (3) développer sur branche dédiée le raccordement source/raw_artifact→observation financière dans les tables existantes, avec tests PostgreSQL et preuves CI ; (4) si l'accès reste bloqué, sélectionner une tâche indépendante non possédée après réconciliation du claim. Ne pas répéter indéfiniment des commits documentaires en l'absence de progrès fonctionnel.
+- ROLLBACK : revert ciblé de cette entrée. Aucun push direct main, merge, déploiement S1, secret ou changement de visibilité.
+
+---
+
+
 ## 2026-11-11 14:37 Europe/Paris — Issue #15 : taux négatifs conservés, CI précédente vérifiée (PARTIAL)
 
 - RECONCILIATION : PR #1 MERGED ; PR #27 OPEN/Draft HEAD initial `6c6ece71519ff565ab17942faee22707827e14e6`, base main `73256f48d81d38ce8ff6f51be9e024b25cf5dadb` à la consultation ; PR #22/#25/#26 OPEN et préservées. AGENTS.md, docs/15, dernier NEXT_ACTION, checkpoint historique 06/11 et code/test du validateur consultés. Aucun claim atomique multi-agent attesté.
