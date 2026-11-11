@@ -1,5 +1,18 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-11 — Issue #15 / #13 : CI exacte du checkpoint et qualification des limites du sondage (PARTIAL)
+
+- RECONCILIATION : AGENTS.md, 14 documents maîtres, docs/15 et dernier checkpoint du journal relus sur GitHub ; PR ouvertes #22/#25/#26/#27 identifiées. Les branches concurrentes restent inchangées. Aucun claim atomique inter-agent attesté.
+- CI_EXACT_HEAD : commit `b77f087cae69a7c8e1a048710e031485793f4a0f` : workflow CI [42967307645](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/42967307645) completed/success ; Docker/PostgreSQL [42967307630](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/42967307630) completed/success. Ces preuves ne sont pas transposables au présent commit documentaire.
+- SOURCE_EVIDENCE_REVIEW : `docs/SOURCE_AUDIT_RUN_42314547906.md` sur main relu ; 44 sources / 11 marchés : 14 HEAD 200 (contenu non vérifié), 7 HEAD 403, 1 HEAD 404, 22 NOT_PROBED par prudence robots. La source `tun-bct-gosdmx` n'a qu'une réponse HEAD 200 ; aucune série, donnée témoin, licence, format ni mapping officiel certifié. Ne pas inférer de writer ni de qualification de données à partir d'un HEAD 200.
+- ACTION : qualification documentaire fondée sur preuve GitHub existante, sans changer les URLs, contourner robots, toucher les branches #25/#26 ou créer une source parallèle. Aucun nouveau code métier admissible pour l'insertion officielle sans contrat de données.
+- VALIDATION : lecture GitHub et CI sur SHA précédent ; tests locaux NOT_RUN ; aucune donnée réelle ni déploiement attestés.
+- BLOCK_REASON : mapping officiel source→série, licence et observation témoin toujours non qualifiés ; writer financier transactionnel non raccordé ; claim inter-agent et revue indépendante non attestés. Issue #15 PARTIAL, issue #13 non certifiée ; HISTORY_COMPLETE interdit.
+- NEXT_ACTION : vérifier CI du nouveau HEAD ; qualifier d'abord le contrat officiel de `tun-bct-gosdmx` (HEAD 200 n'est pas une autorisation), ou autre source avec série, date, unité, valeur et licence documentées ; ensuite seulement implémenter un writer sous transaction et garde de provenance avec tests PostgreSQL. En parallèle, poursuivre l'audit #13 et les adaptateurs #14 sur branches non occupées après claim.
+- ROLLBACK : revert ciblé de l'entrée documentaire ; aucun push direct main, fusion, déploiement S1, secret ou changement de visibilité.
+
+---
+
 ## 2026-11-11 — Issue #15 : CI du correctif calendrier attestée, qualification métier toujours bloquée (PARTIAL)
 
 - RECONCILIATION : branche PR #27 et docs/09, AGENTS.md, docs/15 lus ; PR #22/#25/#26 et autres PR découvertes par recherche GitHub, sans modification de leurs branches. Le SHA historique ne remplace pas le HEAD courant ; aucun claim inter-agent transactionnel attesté.
