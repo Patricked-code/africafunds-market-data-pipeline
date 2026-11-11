@@ -1,5 +1,18 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-11 — Issues #13/#14/#15 : CI du HEAD exact et réconciliation des gates officiels (PARTIAL)
+
+- RECONCILIATION : AGENTS.md, docs/00,01,11,02,12,03,04,13,14,05,06,07,08,10, docs/15, checkpoint docs/CONTINUITY_CHECKPOINT_2026-11-06.md et entrée la plus récente du présent worklog consultés sur GitHub. Le checkpoint 06/11 est historique, pas une preuve actuelle. Dépôt déclaré private par GitHub ; PR #27 toujours OPEN/Draft ; les travaux concurrents #22/#25/#26 ne sont pas modifiés.
+- CI_EXACT_HEAD : commit `4d7084385e1e8b362cc8064328c91fc423736e37` : CI principale [42973520132](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/42973520132) completed/success et Docker/PostgreSQL [42973520191](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/42973520191) completed/success. Aucune preuve de collecte réelle, licence, writer financier ou déploiement S1 n'en découle.
+- CODE_REVIEW : `src/quality/financialObservation.ts` et `test/financial-observation.test.ts` relus sur la branche PR #27 ; contrôles déjà présents sur types, dates calendaires, année zéro, provenance et valeurs non finies. Aucun changement de code artificiel ajouté faute de contrat officiel source→série et d'observation témoin. Aucune collision volontaire avec les branches des adaptateurs.
+- ADMISSIBILITY : les issues #13/#14 imposent de ne pas inférer accès aux données ou licence depuis HEAD 200 ; la matrice historique 44 sources reste non certifiée. Les 22 NOT_PROBED ne peuvent être reclassés sans preuve robots et sondage autorisé. Le schéma financier existant doit être réutilisé, sans nouveau registre ni writer factice.
+- VALIDATION : deux runs CI GitHub exacts ci-dessus ; tests locaux NOT_RUN ; aucune validation de donnée officielle ou runtime S1.
+- BLOCK_REASON : contrats officiels série/format/licence/observation témoin non vérifiés ; claim atomique inter-agent non attesté ; revue indépendante non attestée ; normalisation métier #15 PARTIAL.
+- NEXT_ACTION : vérifier CI sur le nouveau HEAD ; obtenir pour `tun-bct-gosdmx` un contrat officiel vérifiable (licence, série, format, dates, unités, exemple) et respecter robots ; sinon reprendre l'issue #14 via une branche indépendante après claim prouvé. Ensuite seulement raccorder un writer transactionnel aux tables financières existantes et prouver ses tests PostgreSQL.
+- ROLLBACK : revert ciblé de cette entrée documentaire ; aucune fusion, écriture main, déploiement S1, secret, changement de visibilité ou modification des 44 sources.
+
+---
+
 ## 2026-11-11 — Issue #15 / #13 : CI exacte du checkpoint et qualification des limites du sondage (PARTIAL)
 
 - RECONCILIATION : AGENTS.md, 14 documents maîtres, docs/15 et dernier checkpoint du journal relus sur GitHub ; PR ouvertes #22/#25/#26/#27 identifiées. Les branches concurrentes restent inchangées. Aucun claim atomique inter-agent attesté.
