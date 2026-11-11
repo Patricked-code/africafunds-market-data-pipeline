@@ -31,21 +31,28 @@ export function validateFinancialObservationCandidate(
     return { admissible: false, reasons: ['INVALID_CANDIDATE'] };
   }
   try {
-  for (const field of ['sourceEndpointCode', 'rawArtifactId', 'unit', 'methodVersion'] as const) {
-    if (typeof candidate[field] !== 'string' || !candidate[field].trim()) {
-      reasons.push('MISSING_' + field.toUpperCase());
+    // Snapshot each untrusted field exactly once. Accessors may return different
+    // values on successive reads, otherwise bypassing date-order validation.
+    const { sourceEndpointCode, rawArtifactId, unit, methodVersion,
+      economicDate, publicationDate, observedValue } = candidate;
+    const fields = { sourceEndpointCode, rawArtifactId, unit, methodVersion };
+    for (const field of ['sourceEndpointCode', 'rawArtifactId', 'unit', 'methodVersion'] as const) {
+      const value = fields[field];
+      if (typeof value !== 'string' || !value.trim()) {
+        reasons.push('MISSING_' + field.toUpperCase());
+      }
     }
-  }
-  if (!validCalendarDate(candidate.economicDate)) reasons.push('INVALID_ECONOMIC_DATE');
-  if (!validCalendarDate(candidate.publicationDate)) reasons.push('INVALID_PUBLICATION_DATE');
-  if (validCalendarDate(candidate.economicDate) && validCalendarDate(candidate.publicationDate)
-      && candidate.publicationDate < candidate.economicDate) {
-    reasons.push('PUBLICATION_BEFORE_ECONOMIC_DATE');
-  }
-  if (typeof candidate.observedValue !== 'number' || !Number.isFinite(candidate.observedValue)) {
-    reasons.push('NON_FINITE_VALUE');
-  }
-  return { admissible: reasons.length === 0, reasons };
+    const economicDateValid = validCalendarDate(economicDate);
+    const publicationDateValid = validCalendarDate(publicationDate);
+    if (!economicDateValid) reasons.push('INVALID_ECONOMIC_DATE');
+    if (!publicationDateValid) reasons.push('INVALID_PUBLICATION_DATE');
+    if (economicDateValid && publicationDateValid && publicationDate < economicDate) {
+      reasons.push('PUBLICATION_BEFORE_ECONOMIC_DATE');
+    }
+    if (typeof observedValue !== 'number' || !Number.isFinite(observedValue)) {
+      reasons.push('NON_FINITE_VALUE');
+    }
+    return { admissible: reasons.length === 0, reasons };
   } catch {
     // Untrusted adapters may supply getters or proxies that throw on property access.
     // Never let a malformed envelope crash the ingestion boundary.
