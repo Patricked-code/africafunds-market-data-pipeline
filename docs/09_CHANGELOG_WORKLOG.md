@@ -1,5 +1,18 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-11 — Issue #15 : fail-closed sur accesseurs d'adaptateurs non fiables (PARTIAL)
+
+- RECONCILIATION : PR #1 MERGED ; PR #27 OPEN/Draft, HEAD initial `5f0c17f21a50ae2f3ad8622b7dfecb40d70649fe` ; dépôt private selon GitHub ; AGENTS.md, documents maîtres 00/01/11/02/12/03/04/13/14/05/06/07/08/10, docs/15, checkpoint historique 06/11 et dernier NEXT_ACTION lus sur main/branche. Issues #13/#14/#15/#16/#17 et PR concurrentes réexaminées sans modification de leurs branches.
+- CI_EXACT_PREVIOUS_HEAD : `5f0c17f21a50ae2f3ad8622b7dfecb40d70649fe` : Docker/PostgreSQL [42980110016](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/42980110016) completed/success et CI [42980110039](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/42980110039) completed/success. Ces résultats ne concernent pas les nouveaux commits.
+- TEST_COMMITTED : `cefbe92b51dad94b138230e0865cb90861fe4297` ajoute un cas de propriété `observedValue` avec getter qui lance une exception, exigeant un rejet `INVALID_CANDIDATE` sans propagation d'exception. RED non exécuté localement.
+- CODE_COMMITTED : `eb966a7a6cee4aecf7797cfc865b8c4c05912d01` protège la lecture des champs non fiables par un catch fail-closed. Le contrat d'admission nominal et les contrôles de dates restent inchangés. GREEN non attesté ; attendre CI exacte.
+- VALIDATION : tests locaux NOT_RUN ; nouvelle CI NOT_ATTESTED ; revue indépendante et claim atomique inter-agent non attestés. Aucun mapping source-série, licence, donnée témoin, writer transactionnel ni collecte réelle prouvés. #15 PARTIAL, HISTORY_COMPLETE interdit.
+- BLOCK_REASON : qualification des contrats officiels source→série et observation témoin manquante ; writer métier non raccordé ; claim multi-agent non attesté, revue indépendante absente.
+- NEXT_ACTION : vérifier CI et Docker/PostgreSQL du nouveau HEAD, corriger si rouge ; qualifier source et contrat officiel via #13/#14 (robots/licence/format/série/dates/unité/fixture), puis raccorder la garde de provenance à une table financière existante avec tests PostgreSQL. Éviter tout changement de branche occupée sans claim.
+- ROLLBACK : revert ciblé des deux commits test/code et du checkpoint ; aucun push main, fusion, secret, changement de visibilité ou déploiement S1.
+
+---
+
 ## 2026-11-11 — Issues #13/#14/#15 : CI du HEAD exact et réconciliation des gates officiels (PARTIAL)
 
 - RECONCILIATION : AGENTS.md, docs/00,01,11,02,12,03,04,13,14,05,06,07,08,10, docs/15, checkpoint docs/CONTINUITY_CHECKPOINT_2026-11-06.md et entrée la plus récente du présent worklog consultés sur GitHub. Le checkpoint 06/11 est historique, pas une preuve actuelle. Dépôt déclaré private par GitHub ; PR #27 toujours OPEN/Draft ; les travaux concurrents #22/#25/#26 ne sont pas modifiés.
