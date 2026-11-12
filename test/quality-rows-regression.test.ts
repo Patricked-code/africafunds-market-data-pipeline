@@ -126,3 +126,16 @@ test('invalid date objects do not inflate structural coverage', () => {
   assert.equal(result.status, 'PROVISIONAL');
   assert.equal(result.score, 20);
 });
+
+// Empty Map/Set values are collection shells, not extracted observations.
+test('empty Map and Set containers cannot inflate structural coverage', () => {
+  const result = validateRows([{ value: new Map() }, { value: new Set() }]);
+  assert.equal(result.status, 'PROVISIONAL');
+  assert.equal(result.score, 20);
+});
+
+test('nonempty Map and Set containers retain structural admission', () => {
+  const result = validateRows([{ value: new Map([['rate', 0]]) }, { value: new Set([0]) }]);
+  assert.equal(result.status, 'VALID');
+  assert.equal(result.score, 100);
+});
