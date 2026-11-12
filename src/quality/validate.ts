@@ -13,6 +13,7 @@ export function validateRows(rows: Array<Record<string, unknown>>): QualityResul
       value !== undefined &&
       (typeof value !== 'string' || value.trim().length > 0) &&
       (typeof value !== 'number' || Number.isFinite(value)) &&
+      (!(value instanceof Date) || Number.isFinite(value.getTime())) &&
       (!Array.isArray(value) || value.length > 0) &&
       (typeof value !== 'object' || Array.isArray(value) || Object.getPrototypeOf(value) !== Object.prototype || Object.keys(value).length > 0),
     ),
