@@ -1,5 +1,18 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-12 16:30 Europe/Paris — PR #28 : validation CI exacte des onze tests (issue #15 / lot 11)
+
+- ADMISSION : AGENTS.md, docs/15_AUTONOMOUS_AGENT_EXECUTION.md, docs/09_CHANGELOG_WORKLOG.md et docs/CONTINUITY_CHECKPOINT_2026-11-06.md relus sur la branche de PR #28 ; src/quality/validate.ts et test/quality-rows-regression.test.ts inspectés. Le checkpoint du 06/11 est historique, non un état actuel de main.
+- PREUVE : fetch_commit_workflow_runs pour SHA exact `2cdb2f1f29e5966c12c5ffd4be35c5d8d446ee2f` retourne [CI 43239802197](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43239802197) completed/success et [Docker/PostgreSQL 43239801874](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43239801874) completed/success. Onze tests de régression qualité sont présents dans le commit testé. Ces succès ne certifient ni conformité financière, ni contrats CBE/GOSDMX, ni données réelles, ni S1.
+- REVUE : list_pull_request_reviews PR #28 retourne [] ; PR #28 reste open/Draft selon issue GitHub. Aucune revue indépendante ni merge autorisé. Aucune modification des branches concurrentes, aucune revendication de claim sur leurs fichiers.
+- TRAVAIL : validation de la dernière modification de tests, inspection du prédicat structurel et consignation de cette preuve dans le journal canonique. Aucun nouveau code métier ajouté dans cette intervention ; ne pas entretenir artificiellement une succession de commits documentaires comme substitut aux lots fonctionnels.
+- BLOCK_REASON : revue indépendante absente et gates de fusion non attestés ; six adaptateurs officiels, licences, fixtures, writer financier, historiques et publication réelle non certifiés. La CI du présent commit documentaire reste NOT_RUN jusqu'à preuve exacte.
+- NEXT_ACTION : vérifier CI exact-HEAD du présent checkpoint ; obtenir une revue indépendante habilitée avant sortie de Draft. Priorité de développement : issue #14 (contrats officiels/adaptateurs) et issue #15 (normalisation/provenance) après vérification des branches et claims #22/#25/#26/#27, en préférant un périmètre de code indépendant ; aucune modification S1/main.
+- ROLLBACK : revert ciblé du présent checkpoint sur branche Draft ; aucun impact production, main, schémas ou sources originelles.
+
+---
+
+
 ## 2026-11-12 15:40 Europe/Paris — PR #28 : CI du précédent HEAD et deux cas limites supplémentaires (issue #15 / lot 11)
 
 - ADMISSION : lecture de AGENTS.md, des 14 documents maîtres, docs/15_AUTONOMOUS_AGENT_EXECUTION.md, de ce journal et de docs/CONTINUITY_CHECKPOINT_2026-11-06.md ; dépôt GitHub visibility=private. PR #28 sans revue indépendante (reviews=[]). Les autres PR ne sont pas modifiées ; leur propriété et leurs SHAs doivent être réconciliés avant tout travail concurrent.
