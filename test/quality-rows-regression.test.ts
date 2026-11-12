@@ -49,3 +49,16 @@ test('structural scoring does not mutate caller-owned rows', () => {
   assert.equal(rows.at(0)?.value, 0);
   assert.equal(rows.at(1)?.value, null);
 });
+
+// An explicit undefined field is absent, not a populated observation.
+test('undefined-only rows are provisional rather than structurally valid', () => {
+  const result = validateRows([{ value: undefined }]);
+  assert.equal(result.status, 'PROVISIONAL');
+  assert.equal(result.score, 20);
+});
+
+test('undefined fields do not inflate mixed-row coverage', () => {
+  const result = validateRows([{ value: 0 }, { value: undefined }]);
+  assert.equal(result.status, 'PROVISIONAL');
+  assert.equal(result.score, 60);
+});
