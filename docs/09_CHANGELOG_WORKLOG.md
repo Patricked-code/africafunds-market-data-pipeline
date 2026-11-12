@@ -1,5 +1,18 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-12 13:31 Europe/Paris — PR #28 : validation CI des 9 tests et correctif undefined (lot 11 / issue #15)
+
+- RECONCILIATION : GitHub get_repo indique visibility=private, default_branch=main ; PR #28 OPEN/Draft sur branche `test/quality-row-admission-regression-20261112`. Les PR #22/#25/#26/#27 restent listées OPEN dans la recherche GitHub. Aucun SHA historique de main n'est réutilisé comme HEAD actuel ; aucune fusion autorisée. AGENTS.md, docs/15, journal de PR #28 et checkpoint 2026-11-06 relus.
+- PREUVE CI DU CODE : fetch_commit_workflow_runs pour le commit `3b61628a476100ea57f04ba44d845bc0278f3e6b` retourne [run 43210462631](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43210462631) completed/success ; job validate `131156436008` completed/success, avec TypeScript, unit tests, build, migrations et réapplication PostgreSQL, intégration PostgreSQL, contrôles backfill. [Run Docker 43210462695](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43210462695) completed/success ; job `131156560214` completed/success avec étape Docker/PostgreSQL. Ce sont des preuves CI, pas des observations financières officielles ni un déploiement S1.
+- CORRECTION VALIDÉE : le prédicat `value !== undefined` et les deux tests ajoutés aux sept précédents sont inclus dans le commit validé. Aucun nouveau code de production n'est ajouté lors de cette intervention.
+- REVUE : list_pull_request_reviews PR #28 retourne `[]` ; PR maintenue Draft. Aucun reviewer indépendant attesté, aucune fusion. Le nouveau commit documentaire de cette entrée exigera une vérification CI distincte.
+- BLOCK_REASON : revue indépendante et gates de fusion manquants/non attestés ; contrats, licences, fixtures autorisées CBE/GOSDMX, writer financier et HISTORY_COMPLETE non certifiés. Aucun claim sur les autres PR.
+- NEXT_ACTION : vérifier la CI du HEAD documentaire créé par ce checkpoint ; demander une revue indépendante par un reviewer habilité une fois la PR admissible à la revue ; poursuivre les issues #14/#15/#17 par des tâches de code indépendantes et claims vérifiés, sans altérer les PR #22/#25/#26/#27 ni les 44 sources.
+- ROLLBACK : revert ciblé du présent commit documentaire sur branche Draft ; aucun effet S1/main.
+
+---
+
+
 ## 2026-11-12 12:34 Europe/Paris — Lot 11 / issue #15 / PR #28 : correction undefined dans couverture structurelle
 
 - RECONCILIATION : dépôt GitHub private ; PR #28 OPEN/Draft, HEAD initial `a388466f0cdeba223e3cab7f1f6c5d9d93241fb9`, base de PR `73256f48d81d38ce8ff6f51be9e024b25cf5dadb` (base PR, pas preuve indépendante de HEAD main). PR #22/#25/#26/#27 OPEN ; PR #1 historiquement fusionnée. AGENTS.md, 14 documents maîtres, docs/15, journal et checkpoint 2026-11-06 lus sur branche PR #28. Aucune autre branche touchée.
