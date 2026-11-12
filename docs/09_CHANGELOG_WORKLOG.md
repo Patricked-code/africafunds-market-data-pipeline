@@ -1,5 +1,17 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-12 19:35 Europe/Paris — PR #28 : CI exacte des 13 tests confirmée (lot 11 / issue #15)
+
+- ADMISSION/RECONCILIATION : AGENTS.md, docs/15_AUTONOMOUS_AGENT_EXECUTION.md et checkpoint historique 2026-11-06 relus sur la branche documentaire PR #1 ; journal actuel et code/tests relus sur PR #28. main HEAD vérifié via GitHub : `73256f48d81d38ce8ff6f51be9e024b25cf5dadb`. Dépôt `private` selon get_repo. PR #1/#2 et #22/#25/#26/#27/#28 retrouvées dans GitHub ; pas de claim concurrent pris ni de modification de leurs branches.
+- PREUVES EXACT-HEAD : `6be05e3b40f16357e8ef17cc85c371e026a75136`, [CI 43271351210](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43271351210) `completed/success` et [Docker/PostgreSQL 43271351017](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43271351017) `completed/success`. Treize tests présents dans le fichier de ce SHA ; RED non exécuté séparément. Ces workflows ne prouvent pas les contrats officiels, la qualité financière ni un runtime S1.
+- ACTION GITHUB : description de PR #28 mise à jour avec les deux preuves exactes, les limites et les gates. Aucune modification supplémentaire de code métier : éviter les tests artificiels et les collisions avec les branches actives. Revues PR #28 `[]`, Draft, non fusionnée.
+- BLOCK_REASON : revue indépendante et protections/gates de fusion non attestées ; six adaptateurs officiels CBE/GOSDMX, licences/fixtures, writer financier et historiques réels non certifiés. CI du commit documentaire de cette entrée non encore attestée.
+- NEXT_ACTION : vérifier CI du nouveau commit documentaire ; faire réaliser une revue indépendante par un reviewer habilité ; après réconciliation des claims, avancer du code fonctionnel dans les lots existants (issues #14/#15/#16/#17) sur un périmètre non concurrent, sans fusion ni S1 sans gates. Ne pas répéter des checkpoints comme substitut au développement.
+- ROLLBACK : revert ciblé du seul checkpoint sur branche Draft ; aucune mutation de main/S1 ni des 44 sources.
+
+---
+
+
 ## 2026-11-12 18:36 Europe/Paris — PR #28 : contrôle des nombres non finis (lot 11 / issue #15)
 
 - ADMISSION : AGENTS.md, documents maîtres docs/00–14, docs/15_AUTONOMOUS_AGENT_EXECUTION.md, checkpoint 2026-11-06 et journal de la branche PR #28 consultés. PR #28 OPEN/Draft et reviews=[] ; branches concurrentes non modifiées. Le SHA historique main n'est pas repris comme HEAD actuel.
