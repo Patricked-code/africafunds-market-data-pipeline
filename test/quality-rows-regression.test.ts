@@ -75,3 +75,16 @@ test('multiple absent field representations do not inflate coverage', () => {
   assert.equal(result.status, 'PROVISIONAL');
   assert.equal(result.score, 60);
 });
+
+// Non-finite numeric sentinels are not actual financial observations.
+test('NaN-only rows are not structurally populated', () => {
+  const result = validateRows([{ value: Number.NaN }]);
+  assert.equal(result.status, 'PROVISIONAL');
+  assert.equal(result.score, 20);
+});
+
+test('infinite numeric sentinels do not inflate mixed-row coverage', () => {
+  const result = validateRows([{ value: 0 }, { value: Number.POSITIVE_INFINITY }, { value: Number.NEGATIVE_INFINITY }]);
+  assert.equal(result.status, 'PROVISIONAL');
+  assert.equal(result.score, 47);
+});
