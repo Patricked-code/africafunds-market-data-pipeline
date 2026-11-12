@@ -1,5 +1,16 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-12 10:37 Europe/Paris — PR #28 : CI du HEAD documentaire vérifiée (issue #15, lot 11)
+
+- RECONCILIATION : branche PR #28 OPEN/Draft, HEAD avant écriture `d376809682dc920c165217967da5b35f777daf24`, base observée `73256f48d81d38ce8ff6f51be9e024b25cf5dadb` (non assimilée au HEAD actuel de main). PR concurrentes OPEN/Draft : #22 `0eacd313b46bb99b523b8be24e68dc06233c0458`, #25 `8e1a22fe4d5100f5fea15ec024f063b06486c265`, #26 `bc632405eb8964250c4d88fb56adff846d652a9d`, #27 `6b292b66c5201780b6583da6bf502a9817edfac1`. Dépôt private selon get_repo. AGENTS.md, 14 documents maîtres, docs/15, worklog et checkpoint historique relus.
+- PREUVE GREEN : [CI run 43184431378](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43184431378), completed/success, associée au SHA `d376809682dc920c165217967da5b35f777daf24` par fetch_commit_workflow_runs ; job validate `131067984125` completed/success ; TypeScript, unit tests, build, migrations PostgreSQL, seed, intégration, contrôles backfill et S1 read-only ont conclu success. Ce run n'atteste ni données financières réelles ni déploiement S1.
+- REVUE : list_pull_request_reviews PR #28 retourne [] ; aucune revue indépendante. PR demeure Draft ; aucun merge autorisé. Aucune modification du code métier pendant cette intervention.
+- BLOCK_REASON : revue indépendante et gates de protection/merge non attestés ; contrats et fixtures CBE/GOSDMX, writer financier, droits d'accès et HISTORY_COMPLETE non qualifiés. La CI de ce nouveau checkpoint documentaire devra être vérifiée séparément.
+- NEXT_ACTION : contrôler CI du HEAD créé par cette écriture, solliciter revue indépendante lorsque le réviseur habilité est identifié et que la PR peut sortir de Draft ; ne pas fusionner implicitement. Poursuivre une tâche indépendante dans lots 0–13 après vérification de claim et des branches, priorité aux contrats officiels et observations autorisées de l'issue #14 ou au raccordement financier #15 sans chevauchement de PR #26/#27.
+- ROLLBACK : revert ciblé du checkpoint documentaire ; aucun effet sur main/S1 ni les 44 sources.
+
+---
+
 ## 2026-11-12 09:36 Europe/Paris — PR #28 : CI de correction TypeScript vérifiée (issue #15, lot 11)
 
 - RECONCILIATION : lecture de AGENTS.md, docs/15, du journal le plus récent et du checkpoint historique docs/CONTINUITY_CHECKPOINT_2026-11-06.md sur GitHub. Dépôt private selon get_repo ; cinq PR ouvertes #22/#25/#26/#27/#28 selon search_prs. Aucun claim exclusif nouveau ni revue indépendante attestés. Les SHA de main et des autres PR ne sont pas déclarés revalidés par une simple recherche.
