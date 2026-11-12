@@ -1,5 +1,15 @@
 # 06 — État réel et écarts
 
+## 2026-11-12 20:35 Europe/Paris — PR #28 : espaces blancs exclus du score (PARTIAL)
+
+- 15 tests de régression dans `test/quality-rows-regression.test.ts` (13 précédents + 2 nouveaux). Commits `831b0cd8e2d2d3d196ffc93f3793895b23b938e8` (tests) et `99ba82ee086f8e25fa3b2c82d25bab3d40bea41a` (correctif) : une chaîne ne contenant que des espaces/tabulations/retours ligne n'est plus considérée comme une donnée structurelle. `0` et `false` restent présents ; aucune modification des sources ou schémas.
+- CI du précédent HEAD `8f2560a05b798ccae519cce087d4afc667e81f22` : deux runs `43281484881` et `43281484696`, completed/success. **Les deux nouveaux tests et le correctif ne sont pas encore attestés par CI** ; RED non exécuté séparément.
+- BLOCK_REASON : PR Draft sans revue indépendante ; CI du nouveau HEAD à contrôler ; licences, adaptateurs officiels, normalisation et historiques réels non certifiés.
+- NEXT_ACTION : contrôler CI exact-HEAD, corriger les échecs éventuels, solliciter revue habilitée et reprendre un lot fonctionnel indépendant après réconciliation des claims. Aucune fusion ni S1.
+
+---
+
+
 ## 2026-11-12 15:40 Europe/Paris — PR #28 : deux tests mixtes supplémentaires (PARTIAL)
 
 - Onze tests de régression dans `test/quality-rows-regression.test.ts` sur branche Draft, dont deux cas limites mixtes ajoutés au commit `955e01d39cbb85c294cf71d1cd7022d9f36c9548`. Le correctif de production `undefined` préexistant est conservé, sans autre modification de production.
