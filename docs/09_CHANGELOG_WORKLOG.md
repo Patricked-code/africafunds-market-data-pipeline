@@ -1,5 +1,16 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-12 09:36 Europe/Paris — PR #28 : CI de correction TypeScript vérifiée (issue #15, lot 11)
+
+- RECONCILIATION : lecture de AGENTS.md, docs/15, du journal le plus récent et du checkpoint historique docs/CONTINUITY_CHECKPOINT_2026-11-06.md sur GitHub. Dépôt private selon get_repo ; cinq PR ouvertes #22/#25/#26/#27/#28 selon search_prs. Aucun claim exclusif nouveau ni revue indépendante attestés. Les SHA de main et des autres PR ne sont pas déclarés revalidés par une simple recherche.
+- PREUVE GREEN : [GitHub Actions run 43176602030](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43176602030), completed/success, associé au commit exact a13cd13a234b6b4c96c57a8face3d7c623f529ce selon fetch_commit_workflow_runs. Job validate 131042269903 completed/success ; étapes TypeScript, unit tests, build, migrations et réapplication PostgreSQL, seed, intégration PostgreSQL, backfill claim/window et contrôles S1 read-only success. Cette preuve valide la correction TS2532 des assertions ; elle ne certifie aucune collecte financière réelle, aucun writer financier ni déploiement S1.
+- CODE : aucun nouveau changement métier pendant ce contrôle ; correction des assertions déjà présente dans le commit 7a99358ff00ccf61761032b8b539f11d8f0dc4ed. Aucun push direct main, merge, déploiement ou modification des 44 sources.
+- BLOCK_REASON : PR #28 toujours à faire revoir indépendamment ; politiques/protections de fusion non attestées ; CBE/GOSDMX sans contrat/fixture officielle prouvés, mapping SQL et HISTORY_COMPLETE non certifiés. Le présent checkpoint documentaire déclenchera potentiellement une nouvelle CI à vérifier séparément.
+- NEXT_ACTION : vérifier la CI du nouveau HEAD de PR #28, obtenir une revue indépendante puis corriger tout retour ; sans fusion implicite. Poursuivre ensuite une tâche admissible indépendante des PR #22/#25/#26/#27, ou qualification documentaire des contrats officiels et licences sans chevauchement de code. Réconcilier les SHA et claims avant toute écriture supplémentaire.
+- ROLLBACK : revert de ce seul checkpoint documentaire sur branche PR #28 ; aucun effet production.
+
+---
+
 ## 2026-11-12 08:36 Europe/Paris — PR #28 : correction CI TypeScript sur assertions de non-mutation (issue #15)
 
 - RECONCILIATION : PR #28 OPEN/Draft, HEAD avant correction `8f481a884b13f4c90628fcda1b561debde40fd28`, base PR `73256f48d81d38ce8ff6f51be9e024b25cf5dadb` (non assimilée à une vérification indépendante de main). PR #22/#25/#26/#27 OPEN ; PR #1 fusionnée. AGENTS.md, les 14 documents maîtres, docs/15, journal et checkpoint précédent relus. Aucune autre branche modifiée.
