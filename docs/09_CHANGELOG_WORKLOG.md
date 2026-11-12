@@ -1,5 +1,17 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-12 06:33 Europe/Paris — PR #28 : CI du HEAD documentaire confirmée (issue #15)
+
+- RECONCILIATION : PR #1 fusionnée ; PR #22, #25, #26, #27, #28 OPEN/Draft. PR #28 HEAD exact avant écriture `a9bfbac7a9d7090c3b512e0393bbe90aef8b6381` ; main base de PR affichée `73256f48d81d38ce8ff6f51be9e024b25cf5dadb` (non assimilée à une lecture indépendante de main). Dépôt GitHub privé lors de ce contrôle. AGENTS.md, les 14 documents maîtres, docs/15 et dernier worklog relus sur la branche PR #28. Branches concurrentes non modifiées.
+- PREUVE CI EXACT_HEAD : [GitHub Actions run 43156039263](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43156039263), completed/success sur `a9bfbac7a9d7090c3b512e0393bbe90aef8b6381` ; job `validate` 130976090418 completed/success. Étapes attestées : types, tests unitaires, build, migrations PostgreSQL (et réapplication), intégration PostgreSQL, backfill claim/window, contrôles S1 sans déploiement. Aucun test local ni validation financière réelle revendiqués.
+- PORTÉE : les quatre tests de non-régression de `test/quality-rows-regression.test.ts` sont couverts par la CI réussie du HEAD précédent ; aucun nouveau code de production et aucune modification des 44 sources. Le présent commit documentaire exigera sa propre vérification CI.
+- BLOCK_REASON : revue indépendante/protections et CI du commit documentaire suivant non attestées ; absence de contrats officiels CBE/GOSDMX, licences, fixtures financières autorisées et mapping SQL réel. Pas de DONE/HISTORY_COMPLETE, ni de déploiement S1.
+- NEXT_ACTION : vérifier la CI du HEAD créé par ce checkpoint ; solliciter une revue indépendante de PR #28 ; corriger toute anomalie. Puis avancer sur une tâche indépendante dans les lots 0–13 sans chevaucher les PR #22/#25/#26/#27, ou reprendre les sources officielles après qualification des droits/fixtures. Aucun merge implicite.
+- ROLLBACK : revert ciblé de ce checkpoint ; aucun impact runtime.
+
+---
+
+
 ## 2026-11-12 05:36 Europe/Paris — PR #28 / issue #15 : tests qualité structurelle, CI exacte attestée
 
 - RECONCILIATION : AGENTS.md, les quatorze documents maîtres, docs/15, dernier checkpoint de docs/09 sur PR #27 et état GitHub consultés. PR #22/#25/#26/#27/#28 OPEN Draft, branches concurrentes non modifiées. PR #28 HEAD initial vérifié `ca9c208c002be229486bcae5de71dde56e4ea9b1`, base main `73256f48d81d38ce8ff6f51be9e024b25cf5dadb` dans métadonnées PR ; SHA de main hors métadonnées PR non réattesté indépendamment.
