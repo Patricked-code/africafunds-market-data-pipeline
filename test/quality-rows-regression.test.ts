@@ -88,3 +88,16 @@ test('infinite numeric sentinels do not inflate mixed-row coverage', () => {
   assert.equal(result.status, 'PROVISIONAL');
   assert.equal(result.score, 47);
 });
+
+// Whitespace-only text is not a meaningful extracted field.
+test('whitespace-only text does not count as a populated row', () => {
+  const result = validateRows([{ value: '  \t\n ' }]);
+  assert.equal(result.status, 'PROVISIONAL');
+  assert.equal(result.score, 20);
+});
+
+test('whitespace siblings do not hide a valid numeric zero', () => {
+  const result = validateRows([{ note: '  ', value: 0 }, { note: '\t' }]);
+  assert.equal(result.status, 'PROVISIONAL');
+  assert.equal(result.score, 60);
+});
