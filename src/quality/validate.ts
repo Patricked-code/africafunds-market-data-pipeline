@@ -7,7 +7,7 @@ export interface QualityResult {
 export function validateRows(rows: Array<Record<string, unknown>>): QualityResult {
   const warnings: string[] = [];
   if (rows.length === 0) warnings.push('Aucune ligne structurée extraite');
-  const populated = rows.filter((row) => Object.values(row).some((value) => value !== null && value !== undefined && value !== '')).length;
+  const populated = rows.filter((row) => Object.values(row).some((value) => value !== null && value !== undefined && value !== '' && (typeof value !== 'number' || Number.isFinite(value)))).length;
   const coverage = rows.length ? populated / rows.length : 0;
   const score = Math.round(Math.max(0, Math.min(100, coverage * 80 + (rows.length ? 20 : 0))));
   return {
