@@ -1,5 +1,17 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-13 00:40 Europe/Paris — Lot 11 / issue #15 : dictionnaires sans prototype (PR #28, PARTIAL)
+
+- **RECONCILIATION** : AGENTS.md, docs/15, docs/09, checkpoint de continuité le plus récent, code et tests relus sur GitHub. PR #22/#25/#26/#27 toujours ouvertes ; aucun fichier concurrent modifié. PR #28 Draft, reviews=[].
+- **PREUVE CI EXACT-HEAD PRECEDENT** : `7ccbbb71edb4295ca4e1dab808a6dbeb2be21643` : [CI 43321210557](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43321210557) et [Docker/PostgreSQL 43321210286](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43321210286), completed/success. Ne valide pas les nouveaux changements.
+- **CODE/TEST** : commit `56a623ade0ef7e1df6e77bfc57cc1c5dba4caee6` ajoute deux tests : dictionnaire `Object.create(null)` vide -> PROVISIONAL/20, dictionnaire renseigné avec zéro -> VALID/100. Commit `3701c6202450f8dd103f0fd492a1e9a56e42b939` traite les dictionnaires sans prototype comme objets ordinaires pour la détection du vide. 23 tests présents dans le fichier. Aucun changement des 44 sources, des schémas, des adaptateurs ni de S1.
+- **TEST_EVIDENCE** : nouveaux tests RED/GREEN locaux NOT_RUN ; CI du nouveau HEAD NOT_YET_ATTESTED au moment de cette écriture. Aucune certification métier ou historique réel.
+- **BLOCK_REASON** : CI exacte du nouveau HEAD à vérifier, revue indépendante absente et gates de fusion non démontrés ; contrats CBE/GOSDMX, données témoins et writer financier non certifiés ; PR #26/#27 occupent des périmètres métier.
+- **NEXT_ACTION** : vérifier CI et Docker du HEAD incluant cette entrée, corriger tout échec ; solliciter revue indépendante, puis poursuivre en priorité un développement métier libre dans les lots existants après réconciliation des claims. Ne pas fusionner ni déployer S1.
+- **ROLLBACK** : revert ciblé des commits tests/correctif sur PR #28, sans reset main.
+
+---
+
 ## 2026-11-12 23:33 Europe/Paris — Lot 11 / issue #15 : Map/Set vides (PR #28)
 
 - **RECONCILIATION** : PR #1 MERGED, PR #28 OPEN/Draft, PR #22/#25/#26/#27 ouvertes et non modifiées. Lecture de AGENTS.md, docs/00–15, du checkpoint historique et de ce journal ; SHA historique main non réutilisé comme preuve courante.
