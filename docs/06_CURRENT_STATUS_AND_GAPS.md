@@ -1,5 +1,16 @@
 # 06 — État réel et écarts
 
+## 2026-11-12 14:31 Europe/Paris — PR #28, qualité structurelle : correction de statut et preuve CI (PARTIAL)
+
+- Neuf tests de régression sur la branche Draft, et correction minimale de production dans `src/quality/validate.ts` : `undefined` est absent pour la couverture ; zéro numérique et `false` restent présents. Cette entrée corrige le statut antérieur obsolète (« quatre tests, aucun changement de production »).
+- CI exact-HEAD du commit documentaire `46d4e66090968273432529a03eb824e1289e4ae9` : [CI 43218891785](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43218891785) et [Docker/PostgreSQL 43218891794](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43218891794), toutes deux completed/success. Job CI `131185054175` completed/success (typecheck, unit, build, migrations, intégration PostgreSQL, backfill). Ce résultat ne certifie pas les données financières réelles.
+- Revue indépendante : `reviews=[]` au contrôle ; PR #28 Draft, aucune fusion. Dépôt private selon GitHub. Les PR #22/#25/#26/#27 restent ouvertes.
+- **BLOCK_REASON** : revue/gates de fusion non attestés ; contrats et fixtures CBE/GOSDMX, licences, normalisation SQL et HISTORY_COMPLETE non certifiés.
+- **NEXT_ACTION** : demander revue indépendante habilitée, maintenir Draft sans merge, puis poursuivre les adaptateurs/normalisation sur périmètre non revendiqué après réconciliation des claims. CI du commit de cette documentation à contrôler séparément.
+
+---
+
+
 ## 2026-11-12 — Lot 11 / issue #15 / PR #28 : invariants de qualité structurelle (PARTIAL)
 
 - Quatre tests additifs pour `validateRows` sur branche Draft : zéro numérique présent, extraction vide, valeurs nulles/vides et score de couverture partielle. Pas de changement du code de production.
