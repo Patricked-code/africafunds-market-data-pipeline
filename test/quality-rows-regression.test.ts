@@ -62,3 +62,16 @@ test('undefined fields do not inflate mixed-row coverage', () => {
   assert.equal(result.status, 'PROVISIONAL');
   assert.equal(result.score, 60);
 });
+
+// Mixed fields must be scored per row, not by the presence of a field name.
+test('an undefined sibling does not hide a populated false value', () => {
+  const result = validateRows([{ missing: undefined, active: false }]);
+  assert.equal(result.status, 'VALID');
+  assert.equal(result.score, 100);
+});
+
+test('multiple absent field representations do not inflate coverage', () => {
+  const result = validateRows([{ a: undefined, b: null, c: '' }, { value: 0 }]);
+  assert.equal(result.status, 'PROVISIONAL');
+  assert.equal(result.score, 60);
+});
