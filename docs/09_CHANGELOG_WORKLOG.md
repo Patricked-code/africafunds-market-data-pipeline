@@ -1,5 +1,17 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-12 08:36 Europe/Paris — PR #28 : correction CI TypeScript sur assertions de non-mutation (issue #15)
+
+- RECONCILIATION : PR #28 OPEN/Draft, HEAD avant correction `8f481a884b13f4c90628fcda1b561debde40fd28`, base PR `73256f48d81d38ce8ff6f51be9e024b25cf5dadb` (non assimilée à une vérification indépendante de main). PR #22/#25/#26/#27 OPEN ; PR #1 fusionnée. AGENTS.md, les 14 documents maîtres, docs/15, journal et checkpoint précédent relus. Aucune autre branche modifiée.
+- PREUVE RED : [CI run 43169681764](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43169681764), completed/failure, job validate `131019745682`, étape `Verify TypeScript types` failure ; logs : `TS2532 Object is possibly 'undefined'` aux lignes 49 et 50 de `test/quality-rows-regression.test.ts`. Les étapes unit tests/build/PostgreSQL sont SKIPPED, et ne doivent pas être déclarées réussies pour ce run. GitHub a utilisé un merge commit temporaire `61b9cb36db29b9b1b803f71f93dd5ef5b35b8fdb` pour le contrôle PR.
+- CODE : [commit 7a99358ff00ccf61761032b8b539f11d8f0dc4ed](https://github.com/Patricked-code/africafunds-market-data-pipeline/commit/7a99358ff00ccf61761032b8b539f11d8f0dc4ed) : remplacement strictement ciblé de `rows[0].value` et `rows[1].value` par `rows.at(0)?.value` et `rows.at(1)?.value`, conservant les assertions de valeur et la non-mutation sans accès indexé potentiellement undefined. Aucun code de production modifié.
+- VALIDATION : correction non encore validée par CI sur son HEAD exact ; tests NOT_RUN après correction au moment du checkpoint. Ne pas déclarer GREEN prématurément.
+- BLOCK_REASON : nouvelle CI et revue indépendante non attestées ; contrats CBE/GOSDMX, licences, fixtures, writer financier et HISTORY_COMPLETE restent non qualifiés. Protection et approbations de main non attestées.
+- NEXT_ACTION : contrôler la CI exacte de la branche PR #28 après ce checkpoint (typecheck, tests, build, PostgreSQL), corriger tout nouvel échec, puis demander revue indépendante ; ne pas fusionner avant gates. Poursuivre ensuite un lot indépendant sans collision avec PR #22/#25/#26/#27.
+- ROLLBACK : revert ciblé du commit de test et de ce checkpoint ; aucun impact S1.
+
+---
+
 ## 2026-11-12 07:38 Europe/Paris — PR #28 : extension concrète des tests qualité (issue #15)
 
 - RECONCILIATION : PR #1 merged ; PR #22/#25/#26/#27/#28 OPEN Draft ; dépôt private selon get_repo. PR #28 HEAD avant écriture `659ec7f03e3968cdab39226d58cf8b7b4aab215f`, base PR `73256f48d81d38ce8ff6f51be9e024b25cf5dadb` (ne constitue pas une attestation indépendante du HEAD main). AGENTS.md, 14 documents maîtres, docs/15, worklog et checkpoint historique relus. Aucune branche concurrente modifiée.
