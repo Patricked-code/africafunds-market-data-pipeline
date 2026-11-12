@@ -1,5 +1,18 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-12 20:35 Europe/Paris — PR #28 : correctif espaces blancs, 15 tests (issue #15 / lot 11)
+
+- ADMISSION : AGENTS.md, les 14 documents maîtres, docs/15_AUTONOMOUS_AGENT_EXECUTION.md, checkpoint historique 2026-11-06, journal et code/tests PR #28 relus. PR #1 confirmée MERGED le 2026-11-07 15:36:24Z ; PR #22/#25/#26/#27/#28 toujours OPEN ; PR #28 Draft. Pas de claim sur les branches concurrentes.
+- CI PRECEDENTE : SHA `8f2560a05b798ccae519cce087d4afc667e81f22` : GitHub Actions runs [43281484881](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43281484881) et [43281484696](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43281484696), completed/success. Ne pas extrapoler aux nouveaux commits.
+- CODE : `831b0cd8e2d2d3d196ffc93f3793895b23b938e8` ajoute 2 tests pour chaînes composées uniquement d'espaces/tabulations/sauts de ligne et coexistence avec zéro ; `99ba82ee086f8e25fa3b2c82d25bab3d40bea41a` corrige le prédicat de `src/quality/validate.ts` par `value.trim().length > 0` pour les chaînes. Score et statut préservés pour nombres finis, zéro, false, valeurs non vides. 15 tests désormais présents, mais **nouveaux tests NOT_RUN** à ce checkpoint ; RED déduit statiquement, non exécuté. `docs/06_CURRENT_STATUS_AND_GAPS.md` actualisé par `da36382a7a791b0298c4150d53d149f86768c731`.
+- LIMITES : qualité structurelle uniquement, pas de preuve de contrats officiels, droits, ingestion, normalisation SQL, historique, API ni S1. Aucun changement des 44 sources, migrations, secrets ou main.
+- BLOCK_REASON : CI exacte des nouveaux commits à vérifier ; revue indépendante/gates de fusion absents ou non attestés ; PR #26/#27 occupent adaptateurs et admission financière ; données témoins et licences toujours non qualifiées.
+- NEXT_ACTION : vérifier les workflows CI/Docker du HEAD de cette entrée et corriger tout échec ; obtenir une revue indépendante habilitée ; reprendre ensuite une tâche fonctionnelle indépendante dans les lots 0–13 après contrôle des claims. Ne pas substituer de simples checkpoints au développement.
+- ROLLBACK : revert ciblé des commits de test/code/documentation sur branche Draft ; aucune mutation de main ni S1.
+
+---
+
+
 ## 2026-11-12 19:35 Europe/Paris — PR #28 : CI exacte des 13 tests confirmée (lot 11 / issue #15)
 
 - ADMISSION/RECONCILIATION : AGENTS.md, docs/15_AUTONOMOUS_AGENT_EXECUTION.md et checkpoint historique 2026-11-06 relus sur la branche documentaire PR #1 ; journal actuel et code/tests relus sur PR #28. main HEAD vérifié via GitHub : `73256f48d81d38ce8ff6f51be9e024b25cf5dadb`. Dépôt `private` selon get_repo. PR #1/#2 et #22/#25/#26/#27/#28 retrouvées dans GitHub ; pas de claim concurrent pris ni de modification de leurs branches.
