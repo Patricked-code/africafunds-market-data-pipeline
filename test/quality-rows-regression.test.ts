@@ -119,3 +119,10 @@ test('date objects remain populated under the legacy structural contract', () =>
   assert.equal(result.status, 'VALID');
   assert.equal(result.score, 100);
 });
+
+// Invalid Date instances must not masquerade as populated economic dates.
+test('invalid date objects do not inflate structural coverage', () => {
+  const result = validateRows([{ economicDate: new Date(Number.NaN) }]);
+  assert.equal(result.status, 'PROVISIONAL');
+  assert.equal(result.score, 20);
+});
