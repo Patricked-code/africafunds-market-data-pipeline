@@ -1,5 +1,17 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-12 23:33 Europe/Paris — Lot 11 / issue #15 : Map/Set vides (PR #28)
+
+- **RECONCILIATION** : PR #1 MERGED, PR #28 OPEN/Draft, PR #22/#25/#26/#27 ouvertes et non modifiées. Lecture de AGENTS.md, docs/00–15, du checkpoint historique et de ce journal ; SHA historique main non réutilisé comme preuve courante.
+- **PREUVE CI EXACT-HEAD PRECEDENT** : commit `15a17aaa8d097c07460180a309841cd6f8775faf` : GitHub Actions [43311148658](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43311148658) et [43311148625](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43311148625) = completed/success. Ces runs ne couvrent pas les nouveaux commits.
+- **CODE/TEST** : `d7834361223b0c0f79a431c19edc81791afc8714` ajoute deux tests : Map/Set vides -> PROVISIONAL/20 ; Map/Set non vides -> VALID/100. `ebef76c92ee6c09a49339d442c847c55e1cd9565` exclut Map/Set vides dans `src/quality/validate.ts` sans changer les contrats de score, les tables, sources ni S1. 21 tests structurels présents dans le fichier ; RED/GREEN local NOT_RUN, CI de ces commits NOT_YET_ATTESTED.
+- **LIMITES** : qualité structurelle uniquement ; aucun certificat de données financières réelles, licences CBE/GOSDMX, historique complet, writer financier ou publication API.
+- **BLOCK_REASON** : CI des nouveaux commits à vérifier ; PR #28 Draft sans revue indépendante/gates de fusion démontrés ; périmètres #14/#15 déjà occupés par PR #26/#27 et contrats/données témoins non qualifiés.
+- **NEXT_ACTION** : contrôler CI/Docker du HEAD incluant ce checkpoint, corriger tout échec, demander revue indépendante habilitée ; puis sélectionner un travail métier réellement indépendant dans les lots 0–13 après réconciliation des claims. Ne pas fusionner ni déployer S1.
+- **ROLLBACK** : revert ciblé des deux commits de code/tests sur la branche PR #28 ; jamais reset main.
+
+---
+
 ## 2026-11-12 — Lot 11 / issue #15 : invalid Date fail-closed (PR #28)
 
 - **RECONCILIATION** : AGENTS.md et contrat docs/15 lus sur main ; PR #1 historiquement fusionnée ; autres PR #22/#25/#26/#27 non modifiées. Branche dédiée PR #28 : `test/quality-row-admission-regression-20261112`. SHA historiques non réutilisés comme preuve courante.
