@@ -1,5 +1,15 @@
 # 06 — État réel et écarts
 
+## 2026-11-12 15:40 Europe/Paris — PR #28 : deux tests mixtes supplémentaires (PARTIAL)
+
+- Onze tests de régression dans `test/quality-rows-regression.test.ts` sur branche Draft, dont deux cas limites mixtes ajoutés au commit `955e01d39cbb85c294cf71d1cd7022d9f36c9548`. Le correctif de production `undefined` préexistant est conservé, sans autre modification de production.
+- Sur le HEAD précédent `92a6ada2fa2e5f460ad8809a1b3e80449722f8b1`, CI [43228457956](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43228457956) et Docker/PostgreSQL [43228457736](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43228457736) : completed/success. Les deux nouveaux tests ne sont **pas** validés par ces runs ; CI du nouveau HEAD NOT_YET_ATTESTED.
+- BLOCK_REASON : PR Draft sans revue indépendante, gates de fusion non attestés ; contrats/licences/fixtures et données financières réelles non certifiés.
+- NEXT_ACTION : contrôler CI exact-HEAD et revue ; poursuivre issue #15 ou #14 seulement sur périmètre indépendant et après vérification des claims. Aucun HISTORY_COMPLETE ni S1.
+
+---
+
+
 ## 2026-11-12 14:31 Europe/Paris — PR #28, qualité structurelle : correction de statut et preuve CI (PARTIAL)
 
 - Neuf tests de régression sur la branche Draft, et correction minimale de production dans `src/quality/validate.ts` : `undefined` est absent pour la couverture ; zéro numérique et `false` restent présents. Cette entrée corrige le statut antérieur obsolète (« quatre tests, aucun changement de production »).
