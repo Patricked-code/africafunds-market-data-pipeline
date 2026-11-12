@@ -141,3 +141,11 @@ Commencer Phase 1 et Phase 2 sur une branche fonctionnelle : identité/RBAC/audi
 - **Backfill** : PR #12 contient des corrections P0, dernière CI du HEAD `ab45f3ffe175f69e45ba3f06ffe3b033185c6e3e` run 42313428780 SUCCESS vérifié, mais des fenêtres réelles et la reprise des RUNNING expirés restent incomplètes ; issue #5 non DONE.
 - **Normalisation/recette** : issues #15/#17 ouvertes ; PostgreSQL et méthodes financières existants, chaîne raw→canonical→calc→publish non attestée pour 11 marchés.
 - **Protection de main** : dernière vérification `protected=false` ; aucun merge/déploiement autorisé par ce checkpoint. Vérifier de nouveau à chaque reprise.
+
+## 2026-11-12 — PR #28 : qualité structurelle (PARTIAL)
+
+- 19 tests de régression présents dans `test/quality-rows-regression.test.ts`, dont le nouveau contrôle des instances `Date` invalides.
+- `src/quality/validate.ts` ignore désormais les dates invalides (`getTime()` non fini), en préservant les dates valides.
+- CI précédente au SHA `fe23ed765bf414ffffb6353e4843cfd9007eacec` : runs 43302163517 et 43302163525 SUCCESS. **CI du nouveau correctif non attestée ; tests locaux NOT_RUN.**
+- **BLOCK_REASON** : revue indépendante et gates manquants, absence de certification financière réelle.
+- **NEXT_ACTION** : contrôler la CI exacte de la PR #28, corriger tout échec, revue indépendante, puis poursuivre raccordement des sources officielles et normalisation sans collision avec les autres PR.
