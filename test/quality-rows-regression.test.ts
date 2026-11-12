@@ -113,3 +113,9 @@ test('nonempty nested containers preserve existing structural admission', () => 
   assert.equal(result.status, 'VALID');
   assert.equal(result.score, 100);
 });
+
+test('date objects remain populated under the legacy structural contract', () => {
+  const result = validateRows([{ economicDate: new Date('2026-11-12T00:00:00Z') }]);
+  assert.equal(result.status, 'VALID');
+  assert.equal(result.score, 100);
+});
