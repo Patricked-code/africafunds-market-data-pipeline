@@ -1,5 +1,19 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-12 12:34 Europe/Paris — Lot 11 / issue #15 / PR #28 : correction undefined dans couverture structurelle
+
+- RECONCILIATION : dépôt GitHub private ; PR #28 OPEN/Draft, HEAD initial `a388466f0cdeba223e3cab7f1f6c5d9d93241fb9`, base de PR `73256f48d81d38ce8ff6f51be9e024b25cf5dadb` (base PR, pas preuve indépendante de HEAD main). PR #22/#25/#26/#27 OPEN ; PR #1 historiquement fusionnée. AGENTS.md, 14 documents maîtres, docs/15, journal et checkpoint 2026-11-06 lus sur branche PR #28. Aucune autre branche touchée.
+- PREUVE CI AVANT MODIFICATION : [run 43201139183](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43201139183), completed/success, associé au SHA `a388466f0cdeba223e3cab7f1f6c5d9d93241fb9`. Job validate `131124562527` completed/success, incluant types, tests unitaires, build et intégration PostgreSQL. Cela ne valide PAS les changements ci-dessous.
+- DEFAUT CONSTATE PAR LECTURE : `src/quality/validate.ts` considérait `undefined` comme valeur renseignée alors que `null` et chaîne vide étaient exclues. Une ligne `{value: undefined}` pouvait donc obtenir `VALID/100` malgré l'absence de donnée.
+- TESTS : commit [c00ea040](https://github.com/Patricked-code/africafunds-market-data-pipeline/commit/c00ea0409b6a9fd3a2ce151837620d1414d7907b), deux assertions supplémentaires pour ligne undefined seule (attendu PROVISIONAL/20) et mélange 0 + undefined (attendu PROVISIONAL/60). RED attendu d'après code antérieur ; **RED non exécuté en CI** ; ne pas le déclarer observé.
+- CORRECTION : commit [9aa7864d](https://github.com/Patricked-code/africafunds-market-data-pipeline/commit/9aa7864d7693249420f2432f82d5fa1dfc684f23), ajout du seul prédicat `value !== undefined` dans la couverture structurelle existante. Contrat zéro et false conservé ; pas de nouveau pipeline, ni migration, ni source modifiée.
+- VALIDATION : **NOT_RUN** pour les nouveaux tests et la correction tant que CI exact-HEAD n'est pas revenue. Aucune donnée financière officielle, aucun déploiement S1, aucun HISTORY_COMPLETE.
+- BLOCK_REASON : nouvelle CI et revue indépendante de PR #28 à attester ; protections de main et conditions de fusion non confirmées ; contrats/licences/observations témoins CBE/GOSDMX et writer financier non certifiés.
+- NEXT_ACTION : consulter CI et jobs du HEAD de ce checkpoint, corriger tout échec ; obtenir revue indépendante et vérifier gates avant toute fusion. Puis poursuivre les issues #14/#15/#17 sur périmètre indépendant après contrôle des claims #22/#25/#26/#27.
+- ROLLBACK : revert ciblé des commits c00ea040, 9aa7864d et du présent checkpoint sur branche PR #28 ; aucun effet S1.
+
+---
+
 ## 2026-11-12 11:30 Europe/Paris — PR #28 : contrôle CI exact-HEAD et revue (issue #15, lot 11)
 
 - PREUVE GITHUB : [CI run 43193156813](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43193156813), statut completed, conclusion success, retournée par fetch_commit_workflow_runs pour le commit exact `b8184660a157fcb3fe23100c9db15bdb99c5a8a3`. Ce contrôle ne certifie ni données financières réelles ni runtime S1.
