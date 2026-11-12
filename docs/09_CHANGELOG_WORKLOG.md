@@ -1,5 +1,16 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-12 02:35 Europe/Paris — Diagnostic CI sans jobs, issue #8 (lot 11)
+
+- RECONCILIATION : dépôt GitHub privé ; PR #1 fusionnée, PR #22/#25/#26/#27 ouvertes Draft. AGENTS.md, docs/15, les 14 documents maîtres sur main, le checkpoint historique et le dernier NEXT_ACTION du journal ont été consultés. La source de vérité reste GitHub ; aucune branche concurrente modifiée.
+- CI_EXACT_HEAD : SHA `3845b7dc1af36f68bea9de0777c4abde43d585ec` ; runs [43096863764](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43096863764) et [43096863731](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43096863731) : `queued`, conclusion nulle, et `jobs=[]` dans les deux réponses GitHub. Aucun succès ou échec de test ne peut être conclu.
+- ACTION_GITHUB : diagnostic reproductible inscrit dans [issue #8, commentaire 6811795872](https://github.com/Patricked-code/africafunds-market-data-pipeline/issues/8#issuecomment-6811795872). Inspection de `.github/workflows/ci.yml` sur main : job validate ubuntu-latest/PostgreSQL 16 configuré ; sa configuration ne prouve pas une exécution. Aucun changement de workflow sans cause démontrée.
+- BLOCK_REASON : absence de jobs visibles pour les deux runs ; cause de mise en attente non identifiable avec les seules réponses disponibles. Adaptateur GOSDMX toujours sans contrat officiel/fixture autorisée et sans claim exclusif attesté (#14/#26).
+- NEXT_ACTION : examiner annotations et restrictions GitHub Actions/runners/quota/approbations des deux runs et diagnostiquer la cause avant tout correctif CI (#8). En parallèle, réconcilier claim de PR #26 et qualifier série/licence/fixture BCT (#14) ; si bloqué, sélectionner un correctif indépendant non possédé dans les lots 0–13. Ne pas répéter de commits purement documentaires sans preuve supplémentaire.
+- TESTS : NOT_RUN localement ; aucune exécution de job attestée sur le SHA observé. ROLLBACK : revert documentaire ciblé ; aucun push main, merge, secret, changement de visibilité ni S1.
+
+---
+
 ## 2026-11-11 21:34 Europe/Paris — Contrôle CI et admission documentaire complète, #14 bloqué par contrat/claim
 
 - RECONCILIATION : lecture GitHub des 14 documents maîtres dans l'ordre AGENTS.md, du protocole docs/15, du journal canonique et du checkpoint 2026-11-06 ; lecture de src/jobs/ingest.ts sur la branche #27. Les issues #3/#5/#6/#7/#8/#9/#13/#14/#15/#16/#17 restent retrouvables via recherche GitHub ; branches concurrentes non modifiées. La recherche de PR via le connecteur ne fournit pas les numéros dans son résultat : aucune assertion de nouvel état des PR ni de protection main sans vérification complémentaire.
