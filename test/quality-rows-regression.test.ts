@@ -46,6 +46,6 @@ test('structural scoring does not mutate caller-owned rows', () => {
   const rows = Object.freeze([Object.freeze({ value: 0 }), Object.freeze({ value: null })]);
   const result = validateRows(rows.map((row) => row));
   assert.equal(result.score, 60);
-  assert.equal(rows[0].value, 0);
-  assert.equal(rows[1].value, null);
+  assert.equal(rows.at(0)?.value, 0);
+  assert.equal(rows.at(1)?.value, null);
 });
