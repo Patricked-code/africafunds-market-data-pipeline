@@ -14,7 +14,7 @@ export function validateRows(rows: Array<Record<string, unknown>>): QualityResul
       (typeof value !== 'string' || value.trim().length > 0) &&
       (typeof value !== 'number' || Number.isFinite(value)) &&
       (!Array.isArray(value) || value.length > 0) &&
-      (typeof value !== 'object' || Array.isArray(value) || Object.keys(value).length > 0),
+      (typeof value !== 'object' || Array.isArray(value) || Object.getPrototypeOf(value) !== Object.prototype || Object.keys(value).length > 0),
     ),
   ).length;
   const coverage = rows.length ? populated / rows.length : 0;
