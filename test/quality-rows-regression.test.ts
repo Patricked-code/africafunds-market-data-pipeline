@@ -139,3 +139,19 @@ test('nonempty Map and Set containers retain structural admission', () => {
   assert.equal(result.status, 'VALID');
   assert.equal(result.score, 100);
 });
+
+// Dictionary objects without Object.prototype are common in parser output.
+test('empty null-prototype dictionaries are not populated observations', () => {
+  const dictionary = Object.create(null) as Record<string, unknown>;
+  const result = validateRows([{ value: dictionary }]);
+  assert.equal(result.status, 'PROVISIONAL');
+  assert.equal(result.score, 20);
+});
+
+test('populated null-prototype dictionaries preserve structural admission', () => {
+  const dictionary = Object.create(null) as Record<string, unknown>;
+  dictionary.rate = 0;
+  const result = validateRows([{ value: dictionary }]);
+  assert.equal(result.status, 'VALID');
+  assert.equal(result.score, 100);
+});
