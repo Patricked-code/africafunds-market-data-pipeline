@@ -1,5 +1,18 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-12 — Lot 11 / issue #15 : invalid Date fail-closed (PR #28)
+
+- **RECONCILIATION** : AGENTS.md et contrat docs/15 lus sur main ; PR #1 historiquement fusionnée ; autres PR #22/#25/#26/#27 non modifiées. Branche dédiée PR #28 : `test/quality-row-admission-regression-20261112`. SHA historiques non réutilisés comme preuve courante.
+- **CI PRÉCÉDENTE** : HEAD `fe23ed765bf414ffffb6353e4843cfd9007eacec` : GitHub Actions CI [43302163517](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43302163517) et Docker/PostgreSQL [43302163525](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43302163525) = completed/success. Ces résultats ne valident PAS les commits suivants.
+- **CODE ET TEST** : commit test `3cf990fb03b2968806e9cdaa8bc584c0fceabd36`, correctif `9cdf91f8f2505e68d8914f72bee552b7b4db81af`. `validateRows` ignore désormais une instance Date invalide (`getTime()=NaN`) comme valeur renseignée, tout en préservant les Date valides. Nouveau test : Date invalide → PROVISIONAL/20. 19 tests de régression dans le fichier après ajout. Aucune source, table, donnée ni S1 modifiés.
+- **TEST_EVIDENCE** : tests RED/GREEN locaux NOT_RUN ; CI du nouveau HEAD NOT_YET_ATTESTED. Le succès antérieur ne prouve pas cette correction.
+- **BLOCK_REASON** : attendre les runs exact-HEAD du correctif, revue indépendante et gates de merge ; contrats CBE/GOSDMX, observations témoins, writer financier et couverture historique non certifiés. Les PR concurrentes restent isolées.
+- **NEXT_ACTION** : vérifier GitHub Actions pour le HEAD incluant ce checkpoint ; corriger tout échec ; solliciter revue indépendante ; poursuivre les issues #14/#15/#17 uniquement après réconciliation des claims et sur périmètre libre, sans fusion implicite ni déploiement S1.
+- **ROLLBACK** : revert ciblé des deux commits sur branche Draft, sans reset main ni destruction de données.
+
+---
+
+
 ## 2026-11-12 21:35 Europe/Paris — PR #28 : conteneurs imbriqués vides et compatibilité Date (issue #15 / lot 11)
 
 - ADMISSION : AGENTS.md, docs/00–14, checkpoint 2026-11-06, docs/15_AUTONOMOUS_AGENT_EXECUTION.md, journal et code/tests consultés dans GitHub. Branches PR concurrentes laissées intactes.
