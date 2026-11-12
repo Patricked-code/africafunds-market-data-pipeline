@@ -1,5 +1,16 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-12 11:30 Europe/Paris — PR #28 : contrôle CI exact-HEAD et revue (issue #15, lot 11)
+
+- PREUVE GITHUB : [CI run 43193156813](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43193156813), statut completed, conclusion success, retournée par fetch_commit_workflow_runs pour le commit exact `b8184660a157fcb3fe23100c9db15bdb99c5a8a3`. Ce contrôle ne certifie ni données financières réelles ni runtime S1.
+- REVUE : list_pull_request_reviews PR #28 retourne [] ; aucune approbation indépendante démontrée. La branche `test/quality-row-admission-regression-20261112` existe ; aucun claim nouveau sur les PR concurrentes n'est pris.
+- CODE : aucun changement de production ; les sept tests qualité de PR #28 restent la portée technique du chantier. Pas de fusion, pas de déploiement, pas de modification des 44 sources.
+- BLOCK_REASON : PR #28 en attente de revue indépendante et des gates d'intégration ; qualification CBE/GOSDMX, licences, données témoins, writer financier et historiques réels toujours non attestés. Les branches et protections de main doivent être recontrôlées avant toute intégration.
+- NEXT_ACTION : obtenir la revue indépendante de PR #28 et vérifier les checks du HEAD au moment de la décision, sans fusion implicite ; avancer sur les issues #14/#15 via un périmètre indépendant après contrôle des claims de PR #26/#27, avec tests de données autorisées. Ne pas créer de nouvel orchestrateur ni intervenir sur S1.
+- ROLLBACK : revert ciblé de cette entrée documentaire sur branche PR #28 ; aucune action serveur.
+
+---
+
 ## 2026-11-12 10:37 Europe/Paris — PR #28 : CI du HEAD documentaire vérifiée (issue #15, lot 11)
 
 - RECONCILIATION : branche PR #28 OPEN/Draft, HEAD avant écriture `d376809682dc920c165217967da5b35f777daf24`, base observée `73256f48d81d38ce8ff6f51be9e024b25cf5dadb` (non assimilée au HEAD actuel de main). PR concurrentes OPEN/Draft : #22 `0eacd313b46bb99b523b8be24e68dc06233c0458`, #25 `8e1a22fe4d5100f5fea15ec024f063b06486c265`, #26 `bc632405eb8964250c4d88fb56adff846d652a9d`, #27 `6b292b66c5201780b6583da6bf502a9817edfac1`. Dépôt private selon get_repo. AGENTS.md, 14 documents maîtres, docs/15, worklog et checkpoint historique relus.
