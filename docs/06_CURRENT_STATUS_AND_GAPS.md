@@ -1,5 +1,15 @@
 # 06 — État réel et écarts
 
+## 2026-11-12 — Lot 11 / issue #15 / PR #28 : invariants de qualité structurelle (PARTIAL)
+
+- Quatre tests additifs pour `validateRows` sur branche Draft : zéro numérique présent, extraction vide, valeurs nulles/vides et score de couverture partielle. Pas de changement du code de production.
+- Preuve GitHub sur HEAD initial `ca9c208c002be229486bcae5de71dde56e4ea9b1` : CI run [43149453473](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43149453473), job validate 130954914950 completed/success, tests unitaires et PostgreSQL inclus. Tests locaux NOT_RUN. La CI du nouveau HEAD documentaire reste à vérifier.
+- **PARTIAL / BLOCK_REASON** : aucune validation sémantique financière, source officielle/licence/fixture, mapping par endpoint, writer normalisé, revue indépendante ou autorisation de fusion attestés. Ne pas confondre qualité de structure et observation financière publiable.
+- **NEXT_ACTION** : vérifier CI finale de PR #28, obtenir revue indépendante, puis poursuivre mapping financier autorisé et intégration dans les tables existantes sans collision avec les PR concurrentes. Aucun HISTORY_COMPLETE ni S1.
+
+---
+
+
 ## Audit S1 et sécurité de déploiement — 2026-11-07
 
 - **PREUVE SERVEUR READ-ONLY** : les domaines `sadiaaf.wealthtechinnovations.com` et `api.sadiaaf.wealthtechinnovations.com` existent et répondent tous deux **HTTP 500** à `curl -I` depuis S1 ; aucun dépôt Git racine dans leurs vhosts ; le seul conteneur Docker actif observé est le bridge MCP. Cela n'atteste pas l'absence d'autres bases/service hors Docker.
