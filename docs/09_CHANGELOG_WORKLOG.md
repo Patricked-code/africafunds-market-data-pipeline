@@ -1,5 +1,17 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-12 03:33 Europe/Paris — CI effective sur checkpoint #27, diagnostic #8 actualisé
+
+- RECONCILIATION : lecture GitHub de AGENTS.md, docs/15_AUTONOMOUS_AGENT_EXECUTION.md, du présent journal et du dernier checkpoint. Les issues #3/#5–#9/#13–#17 demeurent des travaux non certifiés DONE ; les SHA historiques ne sont pas réutilisés comme état courant.
+- PREUVE CI : pour le commit documentaire exact `5cafb80b86bef567d88718e33a86a21a30321945`, GitHub retourne le run [43135705774](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43135705774) `completed/success`, job `validate` `completed/success` (job 130910421730), et le run [43135705778](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43135705778) `completed/success`, job `Build, boot, migrate and verify persistent PostgreSQL` `completed/success` (job 130910422098). Il s'agit de CI isolée et non d'un déploiement S1.
+- DISTINCTION : les anciens runs 43096863764 et 43096863731 retournent toujours `jobs=[]` ; ne pas inférer leur réussite, ni conclure que la cause de leur mise en attente est corrigée.
+- BLOCK_REASON : contrat officiel GOSDMX/observation témoin/licence non qualifiés ; claim inter-agent exclusif sur les fichiers d'ingestion non attesté ; cause des anciens runs sans jobs non établie. La preuve CI de ce checkpoint ne démontre pas HISTORY_COMPLETE ni l'exécution des adaptateurs.
+- NEXT_ACTION : réconcilier les HEAD exacts de main et des PR #22/#25/#26/#27 et leurs claims, examiner les paramètres GitHub Actions pour les anciens runs sans jobs ; sélectionner ensuite un correctif indépendant du lot 11 si le périmètre des adaptateurs #14 demeure occupé, avec TDD, CI et revue. Ne pas fusionner sans gates, ne pas déployer S1.
+- ROLLBACK : changement documentaire limité à la branche de PR #27, aucune mutation runtime ni source officielle.
+
+---
+
+
 ## 2026-11-12 02:35 Europe/Paris — Diagnostic CI sans jobs, issue #8 (lot 11)
 
 - RECONCILIATION : dépôt GitHub privé ; PR #1 fusionnée, PR #22/#25/#26/#27 ouvertes Draft. AGENTS.md, docs/15, les 14 documents maîtres sur main, le checkpoint historique et le dernier NEXT_ACTION du journal ont été consultés. La source de vérité reste GitHub ; aucune branche concurrente modifiée.
