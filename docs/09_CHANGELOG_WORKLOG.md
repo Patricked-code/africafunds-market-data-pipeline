@@ -1,5 +1,19 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-12 18:36 Europe/Paris — PR #28 : contrôle des nombres non finis (lot 11 / issue #15)
+
+- ADMISSION : AGENTS.md, documents maîtres docs/00–14, docs/15_AUTONOMOUS_AGENT_EXECUTION.md, checkpoint 2026-11-06 et journal de la branche PR #28 consultés. PR #28 OPEN/Draft et reviews=[] ; branches concurrentes non modifiées. Le SHA historique main n'est pas repris comme HEAD actuel.
+- PREUVE CI PRÉCÉDENTE : commit `3a8417a5b2c70e84e7114acb9a5cd85b69994635`, [CI 43260007185](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43260007185) completed/success et [Docker 43260006846](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43260006846) completed/success. Ces runs ne valident PAS les commits nouveaux.
+- DÉFAUT STATIQUE : `validateRows` considérait `NaN` et `Infinity` comme valeurs renseignées ; risque de faux score structurel élevé. Pas de preuve de série financière réelle.
+- TDD : commit test `3b21428b474fc1743227b56ac5390c5f2e6ad3dc` ajoute deux cas NaN et ±Infinity (attendus PROVISIONAL/20 et PROVISIONAL/47). RED déduit statiquement du prédicat précédent, **non exécuté**. Commit code `9efbea9e9ed331edf27e1d2c1e102c8bd50ccde0` exclut les nombres non finis tout en conservant zéro, false et les autres valeurs finies. Aucun changement de schéma, sources, ingestion, S1 ou main.
+- VALIDATION : CI des nouveaux commits **NOT_RUN / NON ATTESTÉE** à l'instant du checkpoint ; aucun résultat local prétendu. Tests financiers métier, licences et données témoins toujours non certifiés.
+- BLOCK_REASON : PR Draft sans revue indépendante ; CI exacte du nouveau HEAD en attente ; gates d'intégration, contrats officiels CBE/GOSDMX, writer financier et historiques réels non attestés. Les PR concurrentes #22/#25/#26/#27 restent réservées à leurs propriétaires.
+- NEXT_ACTION : vérifier les workflows CI/Docker exact-HEAD de cette PR et corriger tout échec ; obtenir une revue indépendante ; reprendre un travail de code sans collision dans les lots existants, priorité adaptateurs officiels #14 / normalisation #15, après réconciliation des claims. Ne pas fusionner ou déployer S1 sans gates.
+- ROLLBACK : revert ciblé des deux commits de code/tests sur la branche Draft après revue ; pas de reset, aucun effet sur main ni sur les données.
+
+---
+
+
 ## 2026-11-12 17:32 Europe/Paris — PR #28 : CI exact-HEAD attestée et description réconciliée
 
 - ADMISSION : lecture de AGENTS.md, des 14 documents maîtres, de docs/15_AUTONOMOUS_AGENT_EXECUTION.md, du journal courant et du checkpoint historique 2026-11-06 ; main réconcilié par base_sha de PR #28 `73256f48d81d38ce8ff6f51be9e024b25cf5dadb` (ne vaut pas attestation indépendante du HEAD main). PR #28 OPEN/Draft HEAD `e510fc4a80e17d78ff550898a764f12db9946139` ; PR #22/#25/#26/#27 OPEN/Draft, SHAs vérifiés respectivement `0eacd313b46bb99b523b8be24e68dc06233c0458`, `8e1a22fe4d5100f5fea15ec024f063b06486c265`, `bc632405eb8964250c4d88fb56adff846d652a9d`, `6b292b66c5201780b6583da6bf502a9817edfac1` ; aucune branche concurrente modifiée.
