@@ -1,5 +1,18 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-12 15:40 Europe/Paris — PR #28 : CI du précédent HEAD et deux cas limites supplémentaires (issue #15 / lot 11)
+
+- ADMISSION : lecture de AGENTS.md, des 14 documents maîtres, docs/15_AUTONOMOUS_AGENT_EXECUTION.md, de ce journal et de docs/CONTINUITY_CHECKPOINT_2026-11-06.md ; dépôt GitHub visibility=private. PR #28 sans revue indépendante (reviews=[]). Les autres PR ne sont pas modifiées ; leur propriété et leurs SHAs doivent être réconciliés avant tout travail concurrent.
+- PREUVES CI : sur SHA documentaire précédent `92a6ada2fa2e5f460ad8809a1b3e80449722f8b1`, [CI 43228457956](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43228457956) completed/success, job validate 131217714508 completed/success : TypeScript, unit, build, migrations et reapplication, intégration PostgreSQL, backfill ; [Docker/PostgreSQL 43228457736](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43228457736) completed/success, job 131217824118. Aucun runtime S1, donnée financière officielle ni runner permanent attesté.
+- CODE : [commit 955e01d39cbb85c294cf71d1cd7022d9f36c9548](https://github.com/Patricked-code/africafunds-market-data-pipeline/commit/955e01d39cbb85c294cf71d1cd7022d9f36c9548) sur branche existante PR #28 : deux tests additifs dans `test/quality-rows-regression.test.ts` pour mélange undefined+false (VALID/100) et undefined+null+chaîne vide avec zéro sur une autre ligne (PROVISIONAL/60). Total désormais 11 tests de régression dans ce fichier. Aucun changement production, migrations, sources ou contrats.
+- VALIDATION : les deux nouveaux tests sont NOT_RUN à cet instant ; les succès des runs précédents ne les valident pas. Attendre la CI du nouveau HEAD de PR #28, puis vérifier jobs et corriger si rouge.
+- BLOCK_REASON : revue indépendante absente, merge gates non attestés ; contrats/licences/fixtures CBE/GOSDMX, writer financier, historiques réels et déploiement S1 non certifiés. Les tests sont strictement structurels et ne valident pas les données financières.
+- NEXT_ACTION : vérifier les CI exact-HEAD de la présente branche après ce checkpoint, corriger tout échec, demander revue indépendante habilitée avant sortie de Draft ; continuer une tâche indépendante dans lots 0–13 après réconciliation des claims #22/#25/#26/#27, sans fusion ni déploiement S1.
+- ROLLBACK : revert ciblé du commit de tests 955e01d et du présent checkpoint sur la seule branche Draft ; aucun effet sur main ni sur les 44 sources.
+
+---
+
+
 ## 2026-11-12 14:31 Europe/Paris — PR #28 : CI exact-HEAD GREEN et correction de l'état canonique (issue #15, lot 11)
 
 - ADMISSION : AGENTS.md, docs/15_AUTONOMOUS_AGENT_EXECUTION.md, journal et checkpoint docs/CONTINUITY_CHECKPOINT_2026-11-06.md consultés ; dépôt private selon get_repo ; PR #22/#25/#26/#27/#28 ouvertes selon search_prs. PR #28 reviews=[] ; aucun merge ni déploiement.
