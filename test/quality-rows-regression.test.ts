@@ -101,3 +101,15 @@ test('whitespace siblings do not hide a valid numeric zero', () => {
   assert.equal(result.status, 'PROVISIONAL');
   assert.equal(result.score, 60);
 });
+
+test('empty nested containers cannot inflate structural coverage', () => {
+  const result = validateRows([{ value: [] }, { value: {} }]);
+  assert.equal(result.status, 'PROVISIONAL');
+  assert.equal(result.score, 20);
+});
+
+test('nonempty nested containers preserve existing structural admission', () => {
+  const result = validateRows([{ value: [0] }, { value: { amount: 0 } }]);
+  assert.equal(result.status, 'VALID');
+  assert.equal(result.score, 100);
+});
