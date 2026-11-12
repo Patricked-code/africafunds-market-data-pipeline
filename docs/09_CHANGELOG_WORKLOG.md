@@ -1,5 +1,18 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-12 21:35 Europe/Paris — PR #28 : conteneurs imbriqués vides et compatibilité Date (issue #15 / lot 11)
+
+- ADMISSION : AGENTS.md, docs/00–14, checkpoint 2026-11-06, docs/15_AUTONOMOUS_AGENT_EXECUTION.md, journal et code/tests consultés dans GitHub. Branches PR concurrentes laissées intactes.
+- CI PRÉCÉDENTE : SHA 1b0566292621246f2eada1190611a0f5010c6b24 ; [CI 43292015350](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43292015350) et [Docker 43292015360](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43292015360) completed/success. Ne valide pas les nouveaux commits.
+- CODE/TESTS : fefe369fa24ffd1eadd936a07633bcb2af30ed34 ajoute tests tableaux/objets vides et non vides ; 9aacdaf0c67ac43cdffc3132fa95803dfee706d8 et e248abc74d3a0f8a8564d9ac2440fe43995a1889 modifient src/quality/validate.ts pour exclure les conteneurs vides, en conservant les objets non ordinaires ; 9f59ff4523293a83507aa720001d3b801a90acac ajoute un test Date. 18 tests dans le fichier ; les trois nouveaux tests ne sont pas encore attestés par CI ; RED non exécuté.
+- LIMITES : validation structurelle seulement, aucune certification financière, source, historique, publication ou S1. Aucun changement des 44 sources originelles, migrations, secrets ou main.
+- BLOCK_REASON : workflows du SHA 9f59ff4523293a83507aa720001d3b801a90acac absents au dernier contrôle ; PR #28 Draft, reviews=[] ; contrats CBE/GOSDMX, données témoins et raccordement métier non certifiés.
+- NEXT_ACTION : vérifier CI/Docker du nouveau HEAD et corriger tout échec ; revue indépendante ; reprendre développement fonctionnel non concurrent des issues #14/#15/#17 après contrôle des claims. Aucun merge ni déploiement S1 sans gates.
+- ROLLBACK : revert ciblé des commits sur branche Draft, sans action serveur.
+
+---
+
+
 ## 2026-11-12 20:35 Europe/Paris — PR #28 : correctif espaces blancs, 15 tests (issue #15 / lot 11)
 
 - ADMISSION : AGENTS.md, les 14 documents maîtres, docs/15_AUTONOMOUS_AGENT_EXECUTION.md, checkpoint historique 2026-11-06, journal et code/tests PR #28 relus. PR #1 confirmée MERGED le 2026-11-07 15:36:24Z ; PR #22/#25/#26/#27/#28 toujours OPEN ; PR #28 Draft. Pas de claim sur les branches concurrentes.
