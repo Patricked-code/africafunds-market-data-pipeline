@@ -14,6 +14,8 @@ export function validateRows(rows: Array<Record<string, unknown>>): QualityResul
       (typeof value !== 'string' || value.trim().length > 0) &&
       (typeof value !== 'number' || Number.isFinite(value)) &&
       (!(value instanceof Date) || Number.isFinite(value.getTime())) &&
+      (!(value instanceof Map) || value.size > 0) &&
+      (!(value instanceof Set) || value.size > 0) &&
       (!Array.isArray(value) || value.length > 0) &&
       (typeof value !== 'object' || Array.isArray(value) || Object.getPrototypeOf(value) !== Object.prototype || Object.keys(value).length > 0),
     ),
