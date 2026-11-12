@@ -1,5 +1,18 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-12 07:38 Europe/Paris — PR #28 : extension concrète des tests qualité (issue #15)
+
+- RECONCILIATION : PR #1 merged ; PR #22/#25/#26/#27/#28 OPEN Draft ; dépôt private selon get_repo. PR #28 HEAD avant écriture `659ec7f03e3968cdab39226d58cf8b7b4aab215f`, base PR `73256f48d81d38ce8ff6f51be9e024b25cf5dadb` (ne constitue pas une attestation indépendante du HEAD main). AGENTS.md, 14 documents maîtres, docs/15, worklog et checkpoint historique relus. Aucune branche concurrente modifiée.
+- PREUVE CI HEAD PRÉCÉDENT : [run 43162286882](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43162286882) completed/success pour `659ec7f03e3968cdab39226d58cf8b7b4aab215f` selon GitHub Actions. Le succès ne couvre pas les nouveaux tests.
+- CODE : commit [e399262a816e1102379218122b7109d5e5241aed](https://github.com/Patricked-code/africafunds-market-data-pipeline/commit/e399262a816e1102379218122b7109d5e5241aed) sur la branche de PR #28 : trois tests additifs (objets vides, booléen false, absence de mutation des entrées) dans `test/quality-rows-regression.test.ts`. Comportements déduits du code `src/quality/validate.ts` lu ; aucun code de production modifié.
+- VALIDATION : nouveaux tests NOT_RUN à ce stade ; CI exact-HEAD du commit de code et du checkpoint documentaire à contrôler. Pas de preuve de données financières réelles, ni de source/licence/fixture officielle.
+- BLOCK_REASON : revue indépendante et protection de main non attestées ; contrats CBE/GOSDMX et writer financier toujours non qualifiés ; CI du nouveau code non encore observée.
+- NEXT_ACTION : inspecter CI et jobs du HEAD final de PR #28 ; corriger toute régression, demander revue indépendante, ne pas fusionner avant gates. Reprendre ensuite un travail indépendant du lot 0–13 ou qualification des sources officielles sans collision avec #22/#25/#26/#27.
+- ROLLBACK : revert ciblé des trois tests et de cette entrée sur branche Draft, aucun effet S1.
+
+---
+
+
 ## 2026-11-12 06:33 Europe/Paris — PR #28 : CI du HEAD documentaire confirmée (issue #15)
 
 - RECONCILIATION : PR #1 fusionnée ; PR #22, #25, #26, #27, #28 OPEN/Draft. PR #28 HEAD exact avant écriture `a9bfbac7a9d7090c3b512e0393bbe90aef8b6381` ; main base de PR affichée `73256f48d81d38ce8ff6f51be9e024b25cf5dadb` (non assimilée à une lecture indépendante de main). Dépôt GitHub privé lors de ce contrôle. AGENTS.md, les 14 documents maîtres, docs/15 et dernier worklog relus sur la branche PR #28. Branches concurrentes non modifiées.
