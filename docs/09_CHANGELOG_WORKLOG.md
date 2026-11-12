@@ -1,5 +1,17 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-12 05:36 Europe/Paris — PR #28 / issue #15 : tests qualité structurelle, CI exacte attestée
+
+- RECONCILIATION : AGENTS.md, les quatorze documents maîtres, docs/15, dernier checkpoint de docs/09 sur PR #27 et état GitHub consultés. PR #22/#25/#26/#27/#28 OPEN Draft, branches concurrentes non modifiées. PR #28 HEAD initial vérifié `ca9c208c002be229486bcae5de71dde56e4ea9b1`, base main `73256f48d81d38ce8ff6f51be9e024b25cf5dadb` dans métadonnées PR ; SHA de main hors métadonnées PR non réattesté indépendamment.
+- CODE : PR #28 ajoute `test/quality-rows-regression.test.ts` avec quatre cas sur `validateRows` (aucune ligne, zéro numérique, valeurs nulles/vides, couverture partielle). La fonction de production existante a été lue et les assertions concordent statiquement avec son contrat. Aucun code métier ni source officielle modifié.
+- CI EXACT_HEAD : [run 43149453473](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43149453473) completed/success sur `ca9c208c002be229486bcae5de71dde56e4ea9b1` ; job validate 130954914950 completed/success, incluant typecheck, unit tests, build, migrations et intégrations PostgreSQL. Aucun test local effectué. Le résultat ne certifie ni normalisation financière ni données réelles.
+- BLOCK_REASON : revue indépendante et protections de fusion non attestées ; PR #28 Draft ; contrats CBE/GOSDMX, fixtures et droits de réutilisation non qualifiés ; writer financier et HISTORY_COMPLETE non prouvés. CI du commit documentaire créé après cette entrée à contrôler.
+- NEXT_ACTION : contrôler la CI du nouveau HEAD de PR #28, solliciter revue indépendante puis corriger tout retour. Poursuivre l'issue #15 avec mapping officiel/fixtures avant writer PostgreSQL, ou tâche indépendante admissible sans collision avec #22/#25/#26/#27. Ne pas fusionner sans gates, ni déployer S1.
+- ROLLBACK : revert ciblé des tests et de ce checkpoint ; aucune action runtime.
+
+---
+
+
 ## 2026-11-07 — SadiaAF S1 : première installation staging gouvernée, archives persistantes et autorisation des vhosts
 
 - **MANDAT** : l'utilisateur autorise désormais la modification des deux vhosts `sadiaaf.wealthtechinnovations.com` et `api.sadiaaf.wealthtechinnovations.com`, et la suppression d'une archive identifiable. Audit S1 répété : API vhost 16 Ko, frontend 36 Ko ; uniquement pages Plesk d'origine, dossiers historiques `.well-known`, `e-vote`, `sadiaaf_project-v2` ; **aucune archive détectée dans ces vhosts**. Les archives AMF-UMOA, sauvegardes Plesk et autres données hors vhosts ne sont pas autorisées à suppression indifférenciée. Aucune suppression S1 effectuée.
