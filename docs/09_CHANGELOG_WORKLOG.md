@@ -1,5 +1,17 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-12 14:31 Europe/Paris — PR #28 : CI exact-HEAD GREEN et correction de l'état canonique (issue #15, lot 11)
+
+- ADMISSION : AGENTS.md, docs/15_AUTONOMOUS_AGENT_EXECUTION.md, journal et checkpoint docs/CONTINUITY_CHECKPOINT_2026-11-06.md consultés ; dépôt private selon get_repo ; PR #22/#25/#26/#27/#28 ouvertes selon search_prs. PR #28 reviews=[] ; aucun merge ni déploiement.
+- PREUVES : GitHub fetch_commit_workflow_runs sur SHA `46d4e66090968273432529a03eb824e1289e4ae9` retourne [CI 43218891785](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43218891785) completed/success et [Docker/PostgreSQL 43218891794](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43218891794) completed/success. Job CI `131185054175` completed/success ; TypeScript, unit tests, build, migrations PostgreSQL, intégration et backfill ont réussi. Aucune attestation de données réelles, de licence, de runtime permanent ou de S1.
+- TRAVAIL EFFECTIF : commit [1d3647af](https://github.com/Patricked-code/africafunds-market-data-pipeline/commit/1d3647af1d507ce4a20610108969af81b4ec3798) sur branche PR #28 corrige `docs/06_CURRENT_STATUS_AND_GAPS.md`, dont l'entrée obsolète indiquait encore quatre tests et aucun changement de production : l'état courant est neuf tests et correction minimale du prédicat `undefined` dans `src/quality/validate.ts`. Aucun code supplémentaire n'a été écrit durant cette intervention ; aucune autre branche modifiée.
+- BLOCK_REASON : PR Draft sans revue indépendante, merge gates non attestés ; contrats officiels CBE/GOSDMX, échantillons/licences, writer financier et complétude historique toujours non certifiés. Les CI des commits documentaires de cette intervention ne sont pas encore attestées.
+- NEXT_ACTION : contrôler les CI exact-HEAD de la présente documentation ; solliciter un reviewer indépendant habilité lorsque la PR est prête ; ne pas fusionner sans gates. Reprendre en parallèle un travail de code indépendant dans les lots 0–13 après vérification des claims, priorité à l'issue #14 ou #15, sans chevauchement avec les PR #22/#25/#26/#27.
+- ROLLBACK : revert ciblé des deux commits documentaires sur la branche Draft ; aucun impact main, sources originelles ou S1.
+
+---
+
+
 ## 2026-11-12 13:31 Europe/Paris — PR #28 : validation CI des 9 tests et correctif undefined (lot 11 / issue #15)
 
 - RECONCILIATION : GitHub get_repo indique visibility=private, default_branch=main ; PR #28 OPEN/Draft sur branche `test/quality-row-admission-regression-20261112`. Les PR #22/#25/#26/#27 restent listées OPEN dans la recherche GitHub. Aucun SHA historique de main n'est réutilisé comme HEAD actuel ; aucune fusion autorisée. AGENTS.md, docs/15, journal de PR #28 et checkpoint 2026-11-06 relus.
