@@ -5,7 +5,7 @@ import { env } from './env.js';
 
 const endpointSchema = z.object({
   id: z.string(), label: z.string(), url: z.string().url(),
-  dataFamily: z.enum(['EQUITY_INDEX','MONEY_MARKET_RATE','MONEY_MARKET_INDEX','TREASURY_RATE','YIELD_CURVE','FX','INFLATION']),
+  dataFamily: z.enum(['EQUITY_INDEX','MONEY_MARKET_RATE','MONEY_MARKET_INDEX','TREASURY_RATE','YIELD_CURVE','FX','INFLATION','FUND_NAV']),
   collector: z.enum(['HTML_TABLE','HTML_TABLE_CSV','HTML_LINK_INDEX','DOCUMENT_LINK_INDEX','PDF_LINK_INDEX','XLSX_LINK_INDEX','MANUAL_API_DISCOVERY']),
   frequency: z.string(), enabled: z.boolean().optional().default(true),
 });
@@ -24,16 +24,32 @@ const manifestSchema = z.object({
 export type SourceEndpoint = z.infer<typeof endpointSchema> & { marketCode: string; currency: string };
 export type Registry = z.infer<typeof registrySchema>;
 
+/** Reject ambiguous source identifiers before ingestion or filtering. */
+export function assertUniqueSourceIds(markets: readonly { endpoints: readonly { id: string }[] }[]): void {
+  const seen = new Set<string>();
+  for (const market of markets) {
+    for (const endpoint of market.endpoints) {
+      if (seen.has(endpoint.id)) throw new Error(`DUPLICATE_SOURCE_ID: ${endpoint.id}`);
+      seen.add(endpoint.id);
+    }
+  }
+}
+
 export async function loadRegistry(): Promise<Registry> {
   const raw = JSON.parse(await readFile(env.SOURCE_REGISTRY_PATH, 'utf8')) as unknown;
   const monolithic = registrySchema.safeParse(raw);
-  if (monolithic.success) return monolithic.data;
+  if (monolithic.success) {
+    assertUniqueSourceIds(monolithic.data.markets);
+    return monolithic.data;
+  }
   const manifest = manifestSchema.parse(raw);
   const base = dirname(resolve(env.SOURCE_REGISTRY_PATH));
   const markets = await Promise.all(manifest.marketFiles.map(async (file) =>
     marketSchema.parse(JSON.parse(await readFile(resolve(base, file), 'utf8'))),
   ));
-  return registrySchema.parse({ ...manifest, markets });
+  const registry = registrySchema.parse({ ...manifest, markets });
+  assertUniqueSourceIds(registry.markets);
+  return registry;
 }
 
 export async function listEndpoints(filters?: { market?: string; family?: string }): Promise<SourceEndpoint[]> {
