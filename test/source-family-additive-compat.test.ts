@@ -165,3 +165,10 @@ test('issue #16: runtime registry rejects duplicate IDs within one market and em
     { code: 'SYNTHETIC_EMPTY', endpoints: [] },
   ]));
 });
+
+
+test('issue #16: registry schema rejects blank identifiers before ingestion', () => {
+  const registrySource = readFileSync(new URL('../src/config/registry.ts', import.meta.url), 'utf8');
+  assert.match(registrySource, /id: z\\.string\\(\\)\\.trim\\(\\)\\.min\\(1\\)/);
+  assert.match(registrySource, /code: z\\.string\\(\\)\\.trim\\(\\)\\.min\\(1\\)/);
+});
