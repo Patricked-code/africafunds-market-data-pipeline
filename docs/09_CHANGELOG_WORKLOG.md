@@ -1,5 +1,16 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-13 09:37 Europe/Paris — PR #29 : CI du quatrième test vérifiée, qualification officielle encore bloquée (PARTIAL)
+
+- **RECONCILIATION** : PR #1 vérifiée `closed/merged` ; main base SHA de PR #29 `73256f48d81d38ce8ff6f51be9e024b25cf5dadb` (SHA de base de la PR, non preuve de HEAD main actuel). Dépôt `private` vérifié via métadonnées GitHub ; six PR ouvertes #22/#25/#26/#27/#28/#29. PR #29 `open/draft`, HEAD exact `50300380c7a32bf7a097cc83678ec95112f8e36b`. Lecture des documents obligatoires AGENTS, docs/00–15, dernier worklog, checkpoint historique 2026-11-06, test et config du catalogue.
+- **CI EXACT-HEAD** : commit `50300380c7a32bf7a097cc83678ec95112f8e36b`, workflow CI [#43387565332](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43387565332), `completed/success` ; cela valide la suite présente sur ce commit, dont le quatrième test de politiques d'accès. Aucun test local, preuve d'accès officiel, données témoins, historique réel ou S1 n'est inféré.
+- **TRAVAIL** : contrôle des preuves, lecture de la configuration réelle `config/sources.json` (respectRobotsTxt=true, doNotBypassCaptcha=true, doNotBypassAuthentication=true, requestsPerSecond=0.5). Aucune nouvelle source réelle ni changement de code : la qualification contractuelle officielle est un prérequis non satisfait. Pas de création d'un autre registre ni de modification des PR concurrentes.
+- **BLOCK_REASON** : sources officielles FX/INFLATION/FUND_NAV sans licence de réutilisation, contrat, format et observation témoin autorisée vérifiés ; PR Draft, revue indépendante et gates non attestés ; aucune preuve de collecte financière. La réussite de tests synthétiques ne certifie pas l'issue #16.
+- **NEXT_ACTION** : vérifier la CI du présent commit documentaire ; qualifier et consigner dans l'issue #16 une source primaire officielle avec URL, licence, format, fréquence, date économique et observation témoin autorisée ; seulement ensuite implémenter une entrée réelle et un adaptateur sur branche non concurrente, avec tests et CI. En parallèle, privilégier une correction fonctionnelle indépendante issue #17 après vérification des claims. Revue indépendante avant fusion ; aucun merge implicite ni S1.
+- **ROLLBACK** : revert ciblé du présent commit sur la branche PR #29, sans toucher à main, aux 44 sources, secrets ni S1.
+
+---
+
 ## 2026-11-13 08:40 Europe/Paris — PR #29 : conservation des politiques d'accès lors d'extensions du catalogue (PARTIAL)
 
 - **RECONCILIATION** : lecture de AGENTS.md, docs/00–15, du dernier checkpoint 07:37 et du NEXT_ACTION ; six PR ouvertes #22/#25/#26/#27/#28/#29 consultées. Travail limité à la branche existante PR #29, issue #16, sans collision avec les adaptateurs ni la normalisation.
