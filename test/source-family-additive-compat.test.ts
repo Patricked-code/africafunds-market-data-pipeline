@@ -167,8 +167,30 @@ test('issue #16: runtime registry rejects duplicate IDs within one market and em
 });
 
 
-test('issue #16: registry schema rejects blank identifiers before ingestion', () => {
-  const registrySource = readFileSync(new URL('../src/config/registry.ts', import.meta.url), 'utf8');
-  assert.match(registrySource, /id: z\\.string\\(\\)\\.trim\\(\\)\\.min\\(1\\)/);
-  assert.match(registrySource, /code: z\\.string\\(\\)\\.trim\\(\\)\\.min\\(1\\)/);
+test('issue #16: runtime schema rejects blank source IDs and market codes', async () => {
+  process.env.DATABASE_URL ??= 'postgresql://localhost:5432/registry_test';
+  const { parseRegistry } = await import('../src/config/registry.js');
+  const markets = loadExisting();
+  const base = { version: 'test', generatedAt: '2026-11-13', defaultPolicies: {}, markets };
+  assert.doesNotThrow(() => parseRegistry(base));
+  const firstMarket = markets[0];
+  assert.ok(firstMarket, 'expected an original market');
+  const firstEndpoint = firstMarket.endpoints[0];
+  assert.ok(firstEndpoint, 'expected an original source');
+  for (const invalidId of ['', '   ']) {
+    const invalidMarkets = markets.map((market, index) => index === 0
+      ? { ...market, endpoints: [{ ...firstEndpoint, id: invalidId }, ...market.endpoints.slice(1)] }
+      : market);
+    assert.throws(() => parseRegistry({ ...base, markets: invalidMarkets }), /too_small|Too small|String must contain|expected/i);
+  }
+  for (const invalidCode of ['', '   ']) {
+    const invalidMarkets = markets.map((market, index) => index === 0
+      ? { ...market, code: invalidCode }
+      : market);
+    assert.throws(() => parseRegistry({ ...base, markets: invalidMarkets }), /too_small|Too small|String must contain|expected/i);
+  }
+  const duplicateCodeAfterTrim = markets.map((market, index) => index === 1
+    ? { ...market, code: ` ${firstMarket.code} ` }
+    : market);
+  assert.throws(() => parseRegistry({ ...base, markets: duplicateCodeAfterTrim }), /DUPLICATE_MARKET_CODE/);
 });
