@@ -54,6 +54,10 @@ test('issue #16: additive FX/INFLATION/FUND_NAV entries do not mutate legacy sou
   }));
   assert.equal(JSON.stringify(markets), before, 'legacy catalog must remain untouched');
   assert.equal(extended.flatMap((market) => market.endpoints).length, 47);
-  assert.deepEqual(extended[0].endpoints.slice(0, markets[0].endpoints.length), markets[0].endpoints);
-  assert.deepEqual(extended[0].endpoints.slice(-3).map((endpoint) => endpoint.dataFamily), extraFamilies);
+  const originalFirstMarket = markets[0];
+  const extendedFirstMarket = extended[0];
+  assert.ok(originalFirstMarket, 'expected at least one original market');
+  assert.ok(extendedFirstMarket, 'expected at least one extended market');
+  assert.deepEqual(extendedFirstMarket.endpoints.slice(0, originalFirstMarket.endpoints.length), originalFirstMarket.endpoints);
+  assert.deepEqual(extendedFirstMarket.endpoints.slice(-3).map((endpoint) => endpoint.dataFamily), extraFamilies);
 });
