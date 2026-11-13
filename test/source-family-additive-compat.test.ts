@@ -227,3 +227,25 @@ test('issue #16: parsed synthetic financial families preserve the original 44-so
     version: 'test', generatedAt: '2026-11-13', defaultPolicies: {}, markets: trimmedCollision,
   }), /DUPLICATE_SOURCE_ID/);
 });
+
+
+test('issue #16: runtime schema fails closed for unregistered financial families and malformed URLs', async () => {
+  process.env.DATABASE_URL ??= 'postgresql://localhost:5432/registry_test';
+  const { parseRegistry } = await import('../src/config/registry.js');
+  const original = loadExisting();
+  const first = original[0]?.endpoints[0];
+  assert.ok(first, 'expected an existing endpoint');
+  const snapshot = JSON.stringify(original);
+  const base = { version: 'test', generatedAt: '2026-11-13', defaultPolicies: {}, markets: original };
+  assert.doesNotThrow(() => parseRegistry(base));
+  for (const override of [
+    { dataFamily: 'UNREVIEWED_FINANCIAL_FAMILY' },
+    { url: 'not-an-official-url' },
+  ]) {
+    const markets = original.map((market, index) => index === 0
+      ? { ...market, endpoints: [{ ...first, ...override }, ...market.endpoints.slice(1)] }
+      : market);
+    assert.throws(() => parseRegistry({ ...base, markets }), 'unregistered family or malformed URL must be rejected');
+  }
+  assert.equal(JSON.stringify(original), snapshot, 'invalid fixtures must not mutate the 44 historical sources');
+});
