@@ -1,5 +1,18 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-13 04:32 Europe/Paris — Issue #16 : tests de compatibilité additive du registre (PARTIAL)
+
+- **RECONCILIATION** : PR #1 fusionnée ; PR #22/#25/#26/#27/#28 ouvertes ; PR #28 HEAD `bebd543671f92d23ed38b4da0fb1a3dfe7ea7c5e`, base main `73256f48d81d38ce8ff6f51be9e024b25cf5dadb` au contrôle. Dépôt privé. AGENTS.md, docs/00–15, dernier worklog et checkpoint 2026-11-06 relus. Aucune branche concurrente modifiée.
+- **PREUVE CI PR #28** : SHA exact `bebd543671f92d23ed38b4da0fb1a3dfe7ea7c5e`, GitHub Actions #43353534331 (Docker/PostgreSQL) et #43353534550 (CI), tous deux `completed/success`. Pas de preuve S1 ni données réelles.
+- **ACTION CODE** : branche `test/source-family-additive-compat-20261113` issue de main ; commit `8a71f3fb140e390c933c0881728abf459c7a4d38` ajoute `test/source-family-additive-compat.test.ts` : inventaire invariant 11 marchés / 44 endpoints, IDs uniques, URLs HTTPS et métadonnées requises ; extension synthétique en mémoire FX/INFLATION/FUND_NAV qui préserve intégralement les entrées initiales. Commit `eadd2ea8f2e7bf886d5c7befe82cb2973605bef9` actualise docs/06.
+- **TEST_EVIDENCE** : tests locaux NOT_RUN, CI du nouveau code NOT_YET_ATTESTED au moment de l'écriture. Les trois nouvelles entrées sont fictives et ne sont pas committées dans le catalogue. Aucune collecte réelle, licence ou méthode financière certifiée.
+- **BLOCK_REASON** : revue indépendante, CI du nouveau HEAD et preuves officielles de contrats/licences manquantes ; PR #26/#27 occupent déjà adaptateurs et admission financière ; aucun claim transactionnel attesté.
+- **NEXT_ACTION** : ouvrir/contrôler la PR Draft de cette branche, vérifier CI exact-HEAD et corriger tout échec. Puis qualifier les contrats officiels FX/inflation/VL par marché et ajouter uniquement les entrées autorisées, sans toucher aux 44 sources historiques ; préserver PR #26/#27. Ne pas fusionner, déployer S1 ni déclarer HISTORY_COMPLETE.
+- **ROLLBACK** : revert ciblé des commits de cette branche Draft ; aucune donnée ni infrastructure modifiée.
+
+---
+
+
 ## 2026-11-07 — SadiaAF S1 : première installation staging gouvernée, archives persistantes et autorisation des vhosts
 
 - **MANDAT** : l'utilisateur autorise désormais la modification des deux vhosts `sadiaaf.wealthtechinnovations.com` et `api.sadiaaf.wealthtechinnovations.com`, et la suppression d'une archive identifiable. Audit S1 répété : API vhost 16 Ko, frontend 36 Ko ; uniquement pages Plesk d'origine, dossiers historiques `.well-known`, `e-vote`, `sadiaaf_project-v2` ; **aucune archive détectée dans ces vhosts**. Les archives AMF-UMOA, sauvegardes Plesk et autres données hors vhosts ne sont pas autorisées à suppression indifférenciée. Aucune suppression S1 effectuée.
