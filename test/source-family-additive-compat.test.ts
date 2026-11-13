@@ -106,3 +106,18 @@ test('issue #16: catalogue extension preserves restrictive access policies', () 
   assert.equal(JSON.stringify(syntheticExtension.defaultPolicies), before, 'additive registration must not weaken access controls');
   assert.equal(JSON.stringify(catalog.defaultPolicies), before, 'original policy must remain unchanged');
 });
+
+test('issue #16: runtime registry rejects cross-market source ID collisions', async () => {
+  // Import after supplying the minimal environment required by the existing config module.
+  process.env.DATABASE_URL ??= 'postgresql://localhost:5432/registry_test';
+  const { assertUniqueSourceIds } = await import('../src/config/registry.js');
+  const markets = loadExisting();
+  assert.doesNotThrow(() => assertUniqueSourceIds(markets));
+  const first = markets[0]?.endpoints[0];
+  assert.ok(first, 'expected a legacy source');
+  const collision = [...markets, { code: 'SYNTHETIC', endpoints: [{ ...first }] }];
+  assert.throws(() => assertUniqueSourceIds(collision), /DUPLICATE_SOURCE_ID/);
+  assert.doesNotThrow(() => assertUniqueSourceIds([...markets, {
+    code: 'SYNTHETIC', endpoints: [{ ...first, id: 'synthetic-unique-nav', dataFamily: 'FUND_NAV' }],
+  }]));
+});
