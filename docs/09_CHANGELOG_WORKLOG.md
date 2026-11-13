@@ -1,5 +1,17 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-13 15:40 Europe/Paris — PR #29 : CI rouge reproduite par GitHub et test runtime négatif (#16, PARTIAL)
+
+- **RECONCILIATION** : PR #1 closed/merged, PR #29 open/Draft, HEAD initial `b81d194951a47401e10825f04bf68f892b94e9c5`, issue #16 open ; PR concurrentes #22/#25/#26/#27/#28 identifiées. Lecture AGENTS.md, docs/15, worklog, checkpoint historique et code/test de registre. Pas de modification main, S1, secrets ou 44 sources historiques.
+- **PREUVES CI EXACT-HEAD** : sur `b81d194951a47401e10825f04bf68f892b94e9c5`, [CI #43435123510](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43435123510) = `completed/failure` ; job validate : TypeScript SUCCESS, Unit tests FAILURE, étapes ultérieures SKIPPED. [Docker/PostgreSQL #43435123397](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43435123397) = `completed/success`. Le huitième contrôle était une assertion regex statique fragile ; le détail de la stack d'échec n'est pas disponible dans les jobs lus. Aucun test local effectué.
+- **CODE** : [b721d36a](https://github.com/Patricked-code/africafunds-market-data-pipeline/commit/b721d36ace7fb1aa45a98edf85a60c19b97c98ef) expose `parseRegistry(raw)` pur, réutilisant schéma Zod et unicité ; les chemins monolithique/manifest continuent à passer par la même validation.
+- **TEST** : [d67149e9](https://github.com/Patricked-code/africafunds-market-data-pipeline/commit/d67149e923da8b253e7ab0fde1fa8f6f8a0d9161) remplace l'assertion statique par un scénario runtime sur catalogue réel en mémoire : rejet d'ID/code vide ou blanc et collision après trim. Tests locaux NOT_RUN ; résultat CI du nouveau HEAD NOT_YET_ATTESTED ; aucun RED/GREEN revendiqué.
+- **BLOCK_REASON** : CI exacte des nouveaux commits non attestée ; PR Draft, revue indépendante absente ; droits/licences, formats et observations témoins FX/INFLATION/FUND_NAV non qualifiés. Aucune collecte ou couverture historique certifiée.
+- **NEXT_ACTION** : vérifier CI et Docker du nouveau HEAD, corriger immédiatement si rouge ; qualifier une source officielle avec URL, contrat/licence, format, fréquence et observation témoin autorisée dans issue #16 ; poursuivre les tâches indépendantes sans collision PR #26/#27. Revue/gates requis avant toute fusion ; aucun déploiement S1.
+- **ROLLBACK** : revert ciblé des commits b721d36a/d67149e9 et de ce checkpoint sur branche #29, jamais de reset main.
+
+---
+
 ## 2026-11-13 14:35 Europe/Paris — PR #29 : CI exacte et validation des identifiants non vides (PARTIAL)
 
 - **RECONCILIATION** : PR #29 open/Draft, branche `test/source-family-additive-compat-20261113`, HEAD initial `cfe852c639bd22c4a6a2c9da72b2fea00ca8494d`; issue #16 open ; PR #22/#25/#26/#27/#28 ouvertes. AGENTS.md, docs/15, dernier worklog, checkpoint 2026-11-06 et code de registre relus. Les anciens SHA de main ne sont pas considérés comme actuels.
