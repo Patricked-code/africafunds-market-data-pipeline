@@ -1,5 +1,16 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-13 18:37 Europe/Paris — PR #29 : validation CI et garde-fou runtime familles/URL (#16, PARTIAL)
+
+- **RECONCILIATION** : branche PR #29 HEAD avant écriture `e48983957148f53a44d1833aa2dd1d675564abe8`, base main `73256f48d81d38ce8ff6f51be9e024b25cf5dadb` selon GitHub ; PR #29 ouverte Draft ; autres PR ouvertes #22/#25/#26/#27/#28 identifiées ; issue #16 ouverte. Lecture AGENTS.md, docs/15_AUTONOMOUS_AGENT_EXECUTION.md, présent journal, src/config/registry.ts et tests. Aucun SHA historique utilisé comme HEAD actuel.
+- **PREUVES CI EXACT-HEAD** : sur `e48983957148f53a44d1833aa2dd1d675564abe8`, CI GitHub Actions [#43463691959](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43463691959) = completed/success et Docker/PostgreSQL [#43463691513](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43463691513) = completed/success. Ne prouvent pas collecte officielle, licence, couverture historique ni déploiement.
+- **ACTION CODE/TEST** : [commit 531eab7](https://github.com/Patricked-code/africafunds-market-data-pipeline/commit/531eab7ac56f69fe31774c3a2ce7699da71732c9) ajoute un dixième test runtime négatif : parseRegistry rejette une famille financière non enregistrée et une URL malformée, sans muter les 44 sources historiques. Aucun endpoint réel, secret, migration, policy ou serveur modifié. Tests locaux NOT_RUN ; CI du nouveau HEAD NON ATTESTÉE.
+- **BLOCK_REASON** : preuves juridiques, formats, fréquence et observation témoin de sources officielles FX/INFLATION/FUND_NAV toujours manquants ; revue indépendante et gates de fusion non attestés, PR Draft. Aucun HISTORY_COMPLETE ou DONE métier revendiqué.
+- **NEXT_ACTION** : vérifier CI/Docker sur le HEAD après ce checkpoint et corriger toute défaillance ; prioriser qualification primaire source/licence/format/témoin issue #16, puis intégration additive autorisée ; si bloqué, travailler sur issue #17 seulement après claims des PR #26/#27. Aucune fusion implicite, aucun push main, aucun S1.
+- **ROLLBACK** : revert ciblé des commits de test/checkpoint sur branche PR #29, jamais reset main.
+
+---
+
 ## 2026-11-13 17:31 Europe/Paris — PR #29 : CI confirmée et test runtime des trois familles financières (#16, PARTIAL)
 
 - **RECONCILIATION** : AGENTS.md, docs/15_AUTONOMOUS_AGENT_EXECUTION.md, journal PR #29, checkpoint historique et code/test de registre relus. PR ouvertes #22/#25/#26/#27/#28/#29 consultées ; branches concurrentes intactes. PR #1 déjà fusionnée selon dernier checkpoint, mais aucun SHA main historique n'est repris comme actuel.
