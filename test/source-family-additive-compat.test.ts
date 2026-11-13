@@ -194,3 +194,36 @@ test('issue #16: runtime schema rejects blank source IDs and market codes', asyn
     : market);
   assert.throws(() => parseRegistry({ ...base, markets: duplicateCodeAfterTrim }), /DUPLICATE_MARKET_CODE/);
 });
+
+test('issue #16: parsed synthetic financial families preserve the original 44-source registry', async () => {
+  process.env.DATABASE_URL ??= 'postgresql://localhost:5432/registry_test';
+  const { parseRegistry } = await import('../src/config/registry.js');
+  const original = loadExisting();
+  const originalSnapshot = JSON.stringify(original);
+  const firstMarket = original[0];
+  const firstSource = firstMarket?.endpoints[0];
+  assert.ok(firstMarket && firstSource, 'expected the historical catalog');
+  const added = (['FX', 'INFLATION', 'FUND_NAV'] as const).map((dataFamily, index) => ({
+    ...firstSource,
+    id: `synthetic-runtime-family-${index}`,
+    url: `https://example.invalid/financial-fixture/${index}`,
+    dataFamily,
+    collector: 'MANUAL_API_DISCOVERY' as const,
+  }));
+  const extended = original.map((market, index) => index === 0
+    ? { ...market, endpoints: [...market.endpoints, ...added] }
+    : market);
+  const parsed = parseRegistry({
+    version: 'test', generatedAt: '2026-11-13', defaultPolicies: {}, markets: extended,
+  });
+  assert.equal(parsed.markets.flatMap((market) => market.endpoints).length, 47);
+  assert.deepEqual(parsed.markets[0]?.endpoints.slice(-3).map((source) => source.dataFamily),
+    ['FX', 'INFLATION', 'FUND_NAV']);
+  assert.equal(JSON.stringify(original), originalSnapshot, 'historical fixtures must not mutate');
+  const trimmedCollision = extended.map((market, index) => index === 0
+    ? { ...market, endpoints: [...market.endpoints, { ...added[0]!, id: ` ${firstSource.id} ` }] }
+    : market);
+  assert.throws(() => parseRegistry({
+    version: 'test', generatedAt: '2026-11-13', defaultPolicies: {}, markets: trimmedCollision,
+  }), /DUPLICATE_SOURCE_ID/);
+});
