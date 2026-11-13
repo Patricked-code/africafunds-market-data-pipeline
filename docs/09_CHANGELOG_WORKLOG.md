@@ -1,5 +1,17 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-13 16:34 Europe/Paris — PR #29 : validation CI exacte du test runtime négatif (#16, PARTIAL)
+
+- **RECONCILIATION** : relecture de AGENTS.md, docs/15_AUTONOMOUS_AGENT_EXECUTION.md, du dernier worklog, du checkpoint 2026-11-06, de src/config/registry.ts et de test/source-family-additive-compat.test.ts sur la branche PR #29 ; recherche GitHub des PR ouvertes. Le HEAD de référence de cette validation est `2314e2c76a7461664cb26b2bbd8701357f476d2e` ; les SHAs historiques de main ne sont pas réutilisés comme état courant. Les PR concurrentes restent hors périmètre.
+- **PREUVES EXACT-HEAD** : [CI #43445430939](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43445430939) = `completed/success` ; [Docker/PostgreSQL #43445430915](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43445430915) = `completed/success`. Ces runs sont associés par GitHub au commit `2314e2c7` et couvrent les correctifs `b721d36a` et `d67149e9`. Aucun test local revendiqué, aucune donnée officielle, licence, historique complet ou S1 certifié.
+- **ACTION** : réconciliation de la CI rouge antérieure `#43435123510` avec les deux runs verts du HEAD corrigé ; aucun nouveau correctif n'est nécessaire sur la base de ces résultats. Journal canonique actualisé ; aucun changement de code ni des 44 sources, aucune fusion.
+- **BLOCK_REASON** : qualification juridique et technique des sources officielles FX/INFLATION/FUND_NAV (droits, contrat, format, fréquence, observation témoin) toujours absente ; PR Draft et revue indépendante non attestée ; CI du présent commit documentaire à revérifier. Les claims des PR #26/#27 interdisent leur modification sans réconciliation.
+- **NEXT_ACTION** : vérifier CI exacte de ce nouveau checkpoint ; qualifier une source primaire officielle avec preuve d'accès/licence et observation témoin dans issue #16 avant tout endpoint réel. En cas de blocage, reprendre une tâche indépendante issue #17 après examen des claims ; obtenir revue indépendante et gates avant fusion. Pas de S1, secrets ni push main.
+- **ROLLBACK** : revert ciblé du présent commit documentaire sur branche #29 ; ne pas reset main.
+
+---
+
+
 ## 2026-11-13 15:40 Europe/Paris — PR #29 : CI rouge reproduite par GitHub et test runtime négatif (#16, PARTIAL)
 
 - **RECONCILIATION** : PR #1 closed/merged, PR #29 open/Draft, HEAD initial `b81d194951a47401e10825f04bf68f892b94e9c5`, issue #16 open ; PR concurrentes #22/#25/#26/#27/#28 identifiées. Lecture AGENTS.md, docs/15, worklog, checkpoint historique et code/test de registre. Pas de modification main, S1, secrets ou 44 sources historiques.
