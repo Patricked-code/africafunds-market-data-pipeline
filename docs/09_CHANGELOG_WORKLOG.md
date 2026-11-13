@@ -1,5 +1,16 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-13 22:35 Europe/Paris — PR #29 : validation CI et symlinks imbriqués (#16, PARTIAL)
+
+- **RÉCONCILIATION** : PR #29 ouverte Draft, HEAD avant écriture `bb0caf8b4880359a85d4f43f316f75ed9dd38aeb`, base `73256f48d81d38ce8ff6f51be9e024b25cf5dadb`. PR #22/#25/#26/#27/#28 toujours ouvertes ; issue #16 ouverte ; dépôt privé. Documents AGENTS.md, docs/15_AUTONOMOUS_AGENT_EXECUTION.md et journal courant relus.
+- **PREUVES CI EXACT-HEAD PRÉCÉDENT** : GitHub Actions runs [#43503116675](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43503116675) et [#43503116644](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43503116644) : completed/success sur `bb0caf8b4880359a85d4f43f316f75ed9dd38aeb`. Ces runs ne prouvent ni absence totale de TOCTOU ni collecte financière réelle.
+- **TEST ADDITIF** : commit `de34ab230be97f7f09f3eb6cf1fc1a0bd2de67c8` ajoute des cas de symlink de répertoire imbriqué sortant du registre (refus INVALID_MARKET_FILE_PATH) et de lien cassé (ENOENT) au test runtime existant. Aucun changement de source officielle, manifest, production, S1 ou secret. Test local NOT_RUN, CI de ce nouveau commit NON ATTESTÉE au moment de cette entrée.
+- **BLOCK_REASON** : la lecture `realpath` puis `readFile` n'est pas une opération atomique contre un adversaire modifiant les chemins en concurrence ; licences/contrats/formats et observations témoins FX/INFLATION/FUND_NAV non qualifiés ; revue indépendante et gates de fusion absents.
+- **NEXT_ACTION** : vérifier CI et Docker/PostgreSQL du commit `de34ab2` puis du checkpoint, corriger toute régression. Évaluer ensuite un modèle d'ouverture atomique bornée si le manifest est modifiable par un acteur non fiable ; prioriser surtout une source officielle autorisée avec licence/format/témoin pour l'issue #16. En cas de blocage, sélectionner une tâche indépendante après vérification des claims.
+- **ROLLBACK** : revert ciblé du test et de cette entrée sur la branche PR #29, sans reset ni fusion main.
+
+---
+
 ## 2026-11-13 21:35 Europe/Paris — PR #29 : symlink confinement (#16, PARTIAL)
 
 - **RECONCILIATION** : relu AGENTS.md, docs/15_AUTONOMOUS_AGENT_EXECUTION.md, dernier journal et checkpoint historique sur GitHub. PR #29 ouverte ; PR #22/#25/#26/#27/#28 ouvertes ; issue #16 ouverte. Le contrôle des workflow runs PR du HEAD précédent `60c33b1f8be1fe7f81cf8feed2512210cb8c0819` a retourné une liste vide : CI **NON ATTESTÉE** (cela ne prouve pas qu'aucun autre déclencheur n'existe).
