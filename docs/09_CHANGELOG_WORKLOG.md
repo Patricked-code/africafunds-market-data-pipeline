@@ -1,5 +1,16 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-13 23:30 Europe/Paris — PR #29 : CI exacte et régression alias racine (#16, PARTIAL)
+
+- **RÉCONCILIATION** : PR #29 ouverte Draft, HEAD initial `e1565cfe0a86918e2144972a87a7b206e099f2b2`, base `73256f48d81d38ce8ff6f51be9e024b25cf5dadb`. PR concurrentes #22/#25/#26/#27/#28 ouvertes ; issues #13–#17 toujours à suivre. Lecture de AGENTS.md, docs/15_AUTONOMOUS_AGENT_EXECUTION.md, docs/00_PROJECT_MEMORY.md, docs/06_CURRENT_STATUS_AND_GAPS.md et dernier checkpoint du présent journal. Aucune branche concurrente modifiée.
+- **PREUVES CI EXACT-HEAD** : sur `e1565cfe0a86918e2144972a87a7b206e099f2b2`, [CI #43512207680](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43512207680) et [Docker/PostgreSQL #43512207625](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43512207625) = completed/success. Ces runs couvrent les tests de symlinks imbriqués du HEAD précédent ; pas les nouveaux commits.
+- **TEST ADDITIF** : commit `3fde0b3db0181ad168f5c1fca47ca176f4315f83` ajoute un témoin de lien symbolique pointant vers la racine du registre ; le chargeur doit le refuser par `INVALID_MARKET_FILE_PATH` plutôt que le traiter comme un JSON. Test local NOT_RUN, CI de ce commit NON ATTESTÉE au moment de l'écriture. Aucun changement des 44 endpoints ni du code de production.
+- **BLOCK_REASON** : CI du nouveau HEAD et revue indépendante non attestées ; risque TOCTOU résiduel entre realpath et readFile ; contrats/licences/formats/observations témoins FX, inflation et FUND_NAV non qualifiés ; aucune collecte réelle ou publication certifiée.
+- **NEXT_ACTION** : vérifier les runs PR exact-HEAD du nouveau checkpoint et corriger toute CI rouge ; prioriser la qualification officielle d'une source FX/inflation/VL avec droit d'accès, licence, format, fréquence et observation témoin avant intégration additive. Si cette qualification est bloquée, reprendre une tâche indépendante après réconciliation des claims. Ne pas confondre tests synthétiques et HISTORY_COMPLETE.
+- **ROLLBACK** : revert ciblé du test et du checkpoint sur branche PR #29 uniquement ; aucun push main, merge, S1 ni secret.
+
+---
+
 ## 2026-11-13 22:35 Europe/Paris — PR #29 : validation CI et symlinks imbriqués (#16, PARTIAL)
 
 - **RÉCONCILIATION** : PR #29 ouverte Draft, HEAD avant écriture `bb0caf8b4880359a85d4f43f316f75ed9dd38aeb`, base `73256f48d81d38ce8ff6f51be9e024b25cf5dadb`. PR #22/#25/#26/#27/#28 toujours ouvertes ; issue #16 ouverte ; dépôt privé. Documents AGENTS.md, docs/15_AUTONOMOUS_AGENT_EXECUTION.md et journal courant relus.
