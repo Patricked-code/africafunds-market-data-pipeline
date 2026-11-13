@@ -260,3 +260,26 @@ test('issue #16: manifest paths cannot escape the source registry directory', as
     assert.throws(() => resolveMarketFile(base, invalid), /INVALID_MARKET_FILE_PATH/, invalid);
   }
 });
+
+test('issue #16: manifest realpath validation rejects symlink escapes', async () => {
+  process.env.DATABASE_URL ??= 'postgresql://localhost:5432/registry_test';
+  const { resolveMarketFileSafe } = await import('../src/config/registry.js');
+  const { mkdtemp, mkdir, writeFile, symlink, rm } = await import('node:fs/promises');
+  const { tmpdir } = await import('node:os');
+  const { join } = await import('node:path');
+  const root = await mkdtemp(join(tmpdir(), 'sadia-registry-'));
+  try {
+    const base = join(root, 'registry');
+    await mkdir(base);
+    await writeFile(join(base, 'valid.json'), '{}');
+    await writeFile(join(root, 'outside.json'), '{}');
+    await symlink(join(root, 'outside.json'), join(base, 'escape.json'));
+    await symlink(join(base, 'valid.json'), join(base, 'inside.json'));
+    assert.equal(await resolveMarketFileSafe(base, 'valid.json'), join(base, 'valid.json'));
+    assert.equal(await resolveMarketFileSafe(base, 'inside.json'), join(base, 'valid.json'));
+    await assert.rejects(resolveMarketFileSafe(base, 'escape.json'), /INVALID_MARKET_FILE_PATH/);
+    await assert.rejects(resolveMarketFileSafe(base, '../outside.json'), /INVALID_MARKET_FILE_PATH/);
+  } finally {
+    await rm(root, { recursive: true, force: true });
+  }
+});
