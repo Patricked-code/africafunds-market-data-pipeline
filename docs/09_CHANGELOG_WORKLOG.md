@@ -1,5 +1,17 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-13 01:33 Europe/Paris — PR #28 : preuve CI du HEAD précédent et description réconciliée (PARTIAL)
+
+- **SOURCE** : GitHub Patricked-code ; PR #1 confirmée fusionnée, dépôt privé, PR #22/#25/#26/#27/#28 ouvertes. Branche de travail : `test/quality-row-admission-regression-20261112` ; SHA de départ exact `acfe02076423c7f97bbb4238808c18a7e444006e`. Aucune écriture sur les branches concurrentes.
+- **PREUVES CI** : [CI 43330922621](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43330922621) et [Docker/PostgreSQL 43330922671](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43330922671) : `completed/success` pour le SHA de départ. 23 tests de régression structurelle présents ; pas de RED local, ni données témoins financières, ni attestation S1.
+- **ACTION GITHUB** : description PR #28 réconciliée (ancien chiffre 13 tests et ancien SHA remplacés par 23 et preuves exactes). Code de production et tests non modifiés durant cette intervention : éviter l'accumulation de tests périphériques avant la collecte et normalisation réelles.
+- **BLOCK_REASON** : PR #28 Draft, `reviews=[]`, gates de fusion non démontrés. Contrats/licences et fixtures officiels CBE/GOSDMX non attestés ; writer financier, données historiques et publication API incomplets. Les PR #22/#25/#26/#27 occupent déjà les périmètres backfill, audit, adaptateurs et admission financière ; claim inter-agent non attesté.
+- **NEXT_ACTION** : vérifier CI du présent commit documentaire ; obtenir revue indépendante et gates de fusion avant toute intégration de #28. Réconcilier les claims/branches des PR #26/#27, puis travailler prioritairement sur la connexion effective des observations financières et tests d'intégration dans un périmètre libre ; sinon chercher une autre tâche indépendante des lots 0–13. Ne pas déclarer HISTORY_COMPLETE ni DONE sans témoins officiels.
+- **ROLLBACK** : revert ciblé de ce seul commit sur la branche Draft ; aucun changement main/S1/44 sources/secrets.
+
+---
+
+
 ## 2026-11-13 00:40 Europe/Paris — Lot 11 / issue #15 : dictionnaires sans prototype (PR #28, PARTIAL)
 
 - **RECONCILIATION** : AGENTS.md, docs/15, docs/09, checkpoint de continuité le plus récent, code et tests relus sur GitHub. PR #22/#25/#26/#27 toujours ouvertes ; aucun fichier concurrent modifié. PR #28 Draft, reviews=[].
