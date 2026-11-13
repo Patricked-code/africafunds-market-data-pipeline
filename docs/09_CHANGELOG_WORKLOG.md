@@ -1,5 +1,17 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-13 02:34 Europe/Paris — PR #28 : CI exacte confirmée, transition vers intégration métier (PARTIAL)
+
+- **RECONCILIATION** : branche `test/quality-row-admission-regression-20261112`, dernier commit documenté `cbf012611672a3b17a4721b9b574a1c4b3f179cc`; PR #28 OPEN/Draft, `reviews=[]`. PR #22/#25/#26/#27 ouvertes, leurs périmètres respectés. AGENTS.md, docs/15, journal et checkpoint 2026-11-06 relus ; les états historiques ne valent pas état courant.
+- **TEST_EVIDENCE** : pour le SHA exact `cbf012611672a3b17a4721b9b574a1c4b3f179cc`, [CI #43338127399](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43338127399) et [Docker/PostgreSQL #43338127190](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43338127190) sont `completed/success`. Cela valide les contrôles de la PR #28 à ce SHA, **pas** les contrats financiers, les données officielles, l'historique réel ou S1.
+- **ACTION** : contrôle GitHub des workflows et des reviews ; aucun changement supplémentaire de prédicat structurel, pour éviter la dérive hors du raccordement métier prioritaire. Aucune modification des branches concurrentes ni de main.
+- **BLOCK_REASON** : PR #28 Draft, aucune revue indépendante, gates de fusion non attestés. Les PR #26/#27 occupent adaptateurs et admission financière ; claims atomiques inter-agents non démontrés. Contrats CBE/GOSDMX, fixtures autorisées, writer financier et publication restent non certifiés.
+- **NEXT_ACTION** : contrôler la CI du présent commit documentaire ; organiser la revue indépendante de #28. Réconcilier ensuite les branches et claims #26/#27 avant d'implémenter le raccordement brut → observations canoniques avec provenance/date/méthode et tests d'intégration sur périmètre libre. Si collision persistante, choisir une tâche indépendante issue #16/#17. Ne jamais déclarer HISTORY_COMPLETE/DONE sans preuve.
+- **ROLLBACK** : revert ciblé de ce checkpoint sur la branche Draft ; aucun déploiement S1, merge, secret ni modification des 44 sources.
+
+---
+
+
 ## 2026-11-13 01:33 Europe/Paris — PR #28 : preuve CI du HEAD précédent et description réconciliée (PARTIAL)
 
 - **SOURCE** : GitHub Patricked-code ; PR #1 confirmée fusionnée, dépôt privé, PR #22/#25/#26/#27/#28 ouvertes. Branche de travail : `test/quality-row-admission-regression-20261112` ; SHA de départ exact `acfe02076423c7f97bbb4238808c18a7e444006e`. Aucune écriture sur les branches concurrentes.
