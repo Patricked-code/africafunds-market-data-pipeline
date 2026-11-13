@@ -142,3 +142,26 @@ test('issue #16: runtime registry rejects duplicate market codes even with disti
   assert.throws(() => assertUniqueSourceIds([...markets, duplicateMarket]), /DUPLICATE_MARKET_CODE/);
   assert.doesNotThrow(() => assertUniqueSourceIds([...markets, { ...duplicateMarket, code: 'SYNTHETIC' }]));
 });
+
+
+test('issue #16: runtime registry rejects duplicate IDs within one market and empty-market duplicates', async () => {
+  process.env.DATABASE_URL ??= 'postgresql://localhost:5432/registry_test';
+  const { assertUniqueSourceIds } = await import('../src/config/registry.js');
+  const markets = loadExisting();
+  const firstMarket = markets[0];
+  assert.ok(firstMarket, 'expected a legacy market');
+  const firstSource = firstMarket.endpoints[0];
+  assert.ok(firstSource, 'expected a legacy endpoint');
+  const duplicatedWithinMarket = markets.map((market, index) => index === 0
+    ? { ...market, endpoints: [...market.endpoints, { ...firstSource }] }
+    : market);
+  assert.throws(() => assertUniqueSourceIds(duplicatedWithinMarket), /DUPLICATE_SOURCE_ID/);
+  assert.throws(() => assertUniqueSourceIds([
+    ...markets,
+    { code: firstMarket.code, endpoints: [] },
+  ]), /DUPLICATE_MARKET_CODE/);
+  assert.doesNotThrow(() => assertUniqueSourceIds([
+    ...markets,
+    { code: 'SYNTHETIC_EMPTY', endpoints: [] },
+  ]));
+});
