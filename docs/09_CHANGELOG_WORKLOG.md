@@ -1,5 +1,17 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-13 17:31 Europe/Paris — PR #29 : CI confirmée et test runtime des trois familles financières (#16, PARTIAL)
+
+- **RECONCILIATION** : AGENTS.md, docs/15_AUTONOMOUS_AGENT_EXECUTION.md, journal PR #29, checkpoint historique et code/test de registre relus. PR ouvertes #22/#25/#26/#27/#28/#29 consultées ; branches concurrentes intactes. PR #1 déjà fusionnée selon dernier checkpoint, mais aucun SHA main historique n'est repris comme actuel.
+- **PREUVES CI EXACT-HEAD** : commit précédent `5b47d70427a5be8d8673a2f52ed1d0b370b75022` : [CI #43454014827](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43454014827) completed/success ; [Docker/PostgreSQL #43454014802](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43454014802) completed/success, d'après la recherche GitHub des workflows associés à ce commit. Cela ne prouve ni données financières réelles ni déploiement S1.
+- **ACTION CODE/TEST** : commit [ffe81e2d](https://github.com/Patricked-code/africafunds-market-data-pipeline/commit/ffe81e2df009ef9c0117c64de9a1644317101aba) ajoute un scénario runtime via `parseRegistry` : acceptation de trois extensions synthétiques FX/INFLATION/FUND_NAV, conservation des 44 sources originelles et rejet d'une collision d'ID après trim. Aucun endpoint réel, source historique, politique réseau, migration ou secret modifié. Tests locaux NOT_RUN ; CI du nouveau commit et du présent checkpoint NON ATTESTÉE.
+- **BLOCK_REASON** : droits de réutilisation, contrats, formats, fréquence et observations témoins officiels non qualifiés pour FX/INFLATION/FUND_NAV ; PR Draft et revue indépendante/gates de fusion non attestés. Aucune collecte, normalisation ou publication financière certifiée.
+- **NEXT_ACTION** : vérifier CI et Docker/PostgreSQL du nouveau HEAD exact ; corriger toute erreur ; qualifier une source officielle dans issue #16 avec preuve primaire et licence avant ajout réel ; sinon avancer sur issue #17 après contrôle des claims des PR concurrentes. Ne pas fusionner, pousser sur main, déployer S1 ou contourner les protections.
+- **ROLLBACK** : revert ciblé du commit de test et de ce checkpoint sur la branche PR #29 ; aucune modification serveur ni de données réelles.
+
+---
+
+
 ## 2026-11-13 16:34 Europe/Paris — PR #29 : validation CI exacte du test runtime négatif (#16, PARTIAL)
 
 - **RECONCILIATION** : relecture de AGENTS.md, docs/15_AUTONOMOUS_AGENT_EXECUTION.md, du dernier worklog, du checkpoint 2026-11-06, de src/config/registry.ts et de test/source-family-additive-compat.test.ts sur la branche PR #29 ; recherche GitHub des PR ouvertes. Le HEAD de référence de cette validation est `2314e2c76a7461664cb26b2bbd8701357f476d2e` ; les SHAs historiques de main ne sont pas réutilisés comme état courant. Les PR concurrentes restent hors périmètre.
