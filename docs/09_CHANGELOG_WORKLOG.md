@@ -1,5 +1,18 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-13 11:38 Europe/Paris — PR #29 : unicité des codes marchés avant ingestion (PARTIAL)
+
+- **RECONCILIATION** : lecture de `AGENTS.md`, `docs/00–15` (références sur main), checkpoint historique `docs/CONTINUITY_CHECKPOINT_2026-11-06.md`, dernier NEXT_ACTION et fichiers de PR #29 ; recherche des PR ouvertes #22/#25/#26/#27/#28/#29 et de l'issue #16. Le HEAD antérieur de PR #29 était `2f9d99ff72cbd5335cac013dc9ba40bd44ae86c6`. Les branches concurrentes sont restées intactes.
+- **PREUVE CI EXACT-HEAD ANTÉRIEUR** : `2f9d99ff72cbd5335cac013dc9ba40bd44ae86c6` : [CI #43402849796](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43402849796) et [Docker/PostgreSQL #43402849937](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43402849937), tous deux `completed/success`. Ne prouve ni licences, ni données financières témoins, ni S1.
+- **ACTION CODE** : [ebcc6401](https://github.com/Patricked-code/africafunds-market-data-pipeline/commit/ebcc64019ca691049eb26c3a9345dfbc116f3610) : le validateur de registre existant rejette désormais aussi les codes marchés dupliqués (`DUPLICATE_MARKET_CODE`) avant ingestion, même lorsque les IDs sources sont distincts. Préserve le rejet `DUPLICATE_SOURCE_ID`, les deux chemins de chargement et les 44 sources.
+- **ACTION TEST** : [1f0acf92](https://github.com/Patricked-code/africafunds-market-data-pipeline/commit/1f0acf92dbc6bdd4a320b50f0d58ead530c7fed0) : test de non-régression sur le registre existant, doublon de marché avec source distincte et extension valide avec nouveau marché. Tests locaux `NOT_RUN` ; CI du nouveau code `NOT_YET_ATTESTED` à cette écriture ; aucune affirmation RED/GREEN.
+- **BLOCK_REASON** : contrats/licences, formats et observations témoins officiels FX/INFLATION/FUND_NAV non vérifiés ; PR #29 Draft et revue indépendante/gates non attestés. Aucune intégration réelle de nouvelles sources ni historique complet.
+- **NEXT_ACTION** : contrôler la CI du nouveau HEAD et corriger tout échec ; qualifier une source primaire officielle, ses droits, format et fixture autorisée dans l'issue #16 avant toute nouvelle entrée réelle. En cas de blocage contractuel, reprendre une tâche indépendante issue #17 après vérification des claims PR #26/#27. Pas de fusion implicite ni S1.
+- **ROLLBACK** : revert ciblé des deux commits de code/test et du présent checkpoint sur la branche PR #29 ; aucun reset main, aucune modification des sources historiques ni des secrets.
+
+---
+
+
 ## 2026-11-13 10:35 Europe/Paris — PR #29 : validation effective des identifiants et famille FUND_NAV (PARTIAL)
 
 - **RECONCILIATION** : lecture AGENTS.md, docs/00–15 dans l'ordre prescrit, dernier checkpoint `docs/CONTINUITY_CHECKPOINT_2026-11-06.md`, journal courant, configuration, code `src/config/registry.ts`, PR ouvertes #22/#25/#26/#27/#28/#29 et issues #13–#17. Dépôt GitHub `private` confirmé ; PR #29 Draft, base `main`, HEAD avant travail `6027f2cecc7b7a1f6699756e801cc32eb2ef5d05`. Ne pas prendre la base SHA de la PR pour le HEAD actuel de main.
