@@ -1,5 +1,16 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-13 19:36 Europe/Paris — PR #29 : CI verte et confinement des chemins manifest (#16, PARTIAL)
+
+- **RÉCONCILIATION** : PR #29 Draft HEAD initial `39b7c24ef12c0028546ad08c55af56b3c9da71a2`, base main `73256f48d81d38ce8ff6f51be9e024b25cf5dadb` ; PR ouvertes #22/#25/#26/#27/#28/#29 ; dépôt private. Lecture des documents obligatoires de AGENTS.md, du journal, de docs/15_AUTONOMOUS_AGENT_EXECUTION.md et du code/test de registre ; aucune branche concurrente modifiée.
+- **PREUVES CI EXACT-HEAD** : [CI #43474721447](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43474721447) completed/success et [Docker/PostgreSQL #43474721613](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43474721613) completed/success sur `39b7c24e`. Aucune preuve S1 ou de collecte financière réelle.
+- **ACTION CODE/TEST** : commit `5a3c667b16ee1834168c2d8abd02a62d813b9d58` confine les chemins des fichiers de marché du manifest au répertoire du catalogue, refuse chemin absolu, remontée et répertoire racine ; commit `2c988f73aaa511e153b39211c66915f9caf3eed8` ajoute un test runtime positif/négatif. Les chemins existants `sources/*.json` restent admis ; 44 endpoints historiques intacts. Tests locaux NOT_RUN ; CI des nouveaux commits NON ATTESTÉE.
+- **BLOCK_REASON** : CI nouveau HEAD et revue indépendante non attestées ; droits de réutilisation, formats, fréquences et observations témoins officiels FX/INFLATION/FUND_NAV non qualifiés ; aucune couverture historique ou publication certifiée.
+- **NEXT_ACTION** : vérifier CI/Docker exact-HEAD après checkpoint et corriger tout échec ; qualifier dans issue #16 une source officielle avec contrat/licence/format/fréquence/observation témoin avant ajout réel ; si bloqué, travailler sur issue #17 uniquement après vérification des claims PR #26/#27. Pas de fusion implicite, main direct, secret ni S1.
+- **ROLLBACK** : revert ciblé des commits `5a3c667b`, `2c988f73` et checkpoint sur branche #29 ; ne pas reset main.
+
+---
+
 ## 2026-11-13 18:37 Europe/Paris — PR #29 : validation CI et garde-fou runtime familles/URL (#16, PARTIAL)
 
 - **RECONCILIATION** : branche PR #29 HEAD avant écriture `e48983957148f53a44d1833aa2dd1d675564abe8`, base main `73256f48d81d38ce8ff6f51be9e024b25cf5dadb` selon GitHub ; PR #29 ouverte Draft ; autres PR ouvertes #22/#25/#26/#27/#28 identifiées ; issue #16 ouverte. Lecture AGENTS.md, docs/15_AUTONOMOUS_AGENT_EXECUTION.md, présent journal, src/config/registry.ts et tests. Aucun SHA historique utilisé comme HEAD actuel.
