@@ -1,5 +1,14 @@
 # 06 — État réel et écarts
 
+## Issue #16 — Compatibilité additive du catalogue (2026-11-13, PARTIAL)
+
+- Branche `test/source-family-additive-compat-20261113` : test non destructif des 11 fichiers marchés et des 44 endpoints originels, unicité des IDs, et extension **synthétique en mémoire seulement** des familles FX, INFLATION et FUND_NAV.
+- Aucun endpoint, contrat, licence, URL réelle, VL ni adaptateur ajouté au catalogue. La recette de collecte, la couverture historique et la publication restent NON ATTESTÉES.
+- Tests locaux NOT_RUN ; CI exact-HEAD à vérifier dans la PR. Aucune certification de sources officielles.
+- BLOCK_REASON : licences et contrats primaires non qualifiés ; collecte réelle et writer non implémentés dans ce changement ; revue et CI requises.
+- NEXT_ACTION : contrôler la CI, qualifier institutions et licences par pays, puis étendre additivement les sources autorisées sur branche revue, sans toucher aux 44 entrées initiales.
+
+
 ## Audit S1 et sécurité de déploiement — 2026-11-07
 
 - **PREUVE SERVEUR READ-ONLY** : les domaines `sadiaaf.wealthtechinnovations.com` et `api.sadiaaf.wealthtechinnovations.com` existent et répondent tous deux **HTTP 500** à `curl -I` depuis S1 ; aucun dépôt Git racine dans leurs vhosts ; le seul conteneur Docker actif observé est le bridge MCP. Cela n'atteste pas l'absence d'autres bases/service hors Docker.
