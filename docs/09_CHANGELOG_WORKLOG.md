@@ -1,5 +1,18 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-13 21:35 Europe/Paris — PR #29 : symlink confinement (#16, PARTIAL)
+
+- **RECONCILIATION** : relu AGENTS.md, docs/15_AUTONOMOUS_AGENT_EXECUTION.md, dernier journal et checkpoint historique sur GitHub. PR #29 ouverte ; PR #22/#25/#26/#27/#28 ouvertes ; issue #16 ouverte. Le contrôle des workflow runs PR du HEAD précédent `60c33b1f8be1fe7f81cf8feed2512210cb8c0819` a retourné une liste vide : CI **NON ATTESTÉE** (cela ne prouve pas qu'aucun autre déclencheur n'existe).
+- **CODE** : commit `36d3a94d737263ee57d718184756ef99d6b6a6d0` ajoute `resolveMarketFileSafe` : vérification lexicale existante puis `realpath` du répertoire et du fichier avant lecture, afin de rejeter les symlinks pointant hors de la racine du registre. Le chargeur manifest utilise ce chemin vérifié ; le registre historique et ses 44 URLs restent inchangés.
+- **TEST** : commit `6fd09d7d9cabdd0bb6ccff92fd345ae57fabc0dc` ajoute un test isolé avec répertoire temporaire, fichier autorisé, symlink interne admis et symlink externe refusé. Tests locaux **NOT_RUN** ; CI nouveau HEAD **NON ATTESTÉE**.
+- **LIMITES** : protection contre les liens symboliques au moment du contrôle ; une modification concurrente du système de fichiers entre `realpath` et `readFile` (TOCTOU) n'est pas éliminée. Aucun accès officiel FX/inflation/VL ni donnée témoin certifiée. Aucun statut DONE/HISTORY_COMPLETE.
+- **BLOCK_REASON** : CI et revue indépendante à vérifier ; qualifications juridiques et formats des sources officielles manquants ; risque TOCTOU résiduel à évaluer selon le modèle de menace avant production.
+- **NEXT_ACTION** : vérifier CI exacte du nouveau HEAD, corriger les échecs éventuels, puis examiner l'atomicité du chargement du manifest et qualifier une source officielle autorisée avec licence, contrat et observation témoin. Si bloqué, prendre une tâche indépendante sans collision avec les PR #22/#25/#26/#27/#28.
+- **ROLLBACK** : revert ciblé des commits de la PR #29 ; aucun push main, aucune fusion, aucun S1, aucun secret.
+
+---
+
+
 ## 2026-11-13 20:34 Europe/Paris — PR #29 : confinement manifest multiplateforme (#16, PARTIAL)
 
 - **RECONCILIATION** : PR #1 fusionnée, PR #29 ouverte Draft ; PR concurrentes #22/#25/#26/#27/#28 ouvertes. Lecture AGENTS.md, docs/15_AUTONOMOUS_AGENT_EXECUTION.md, du journal courant et du code/test de registre. Le dernier checkpoint initial était le commit `3057e36a52a6f4ebbccfa31ee3a8532062391cf4` (à ne pas considérer comme preuve CI). La recherche GitHub des runs PR pour ce SHA a retourné zéro résultat ; statut CI **NON ATTESTÉ**, et non SUCCESS.
