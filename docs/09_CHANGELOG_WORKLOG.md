@@ -1,5 +1,17 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-14 00:38 Europe/Paris — PR #29 : CI exacte et refus des fichiers non réguliers (#16, PARTIAL)
+
+- **RECONCILIATION** : PR #29 ouverte Draft, base main `73256f48d81d38ce8ff6f51be9e024b25cf5dadb`, HEAD vérifié avant intervention `c44dfd1edf1b6f8a863a0c9bee9b0671a91373df`. PR concurrentes #22/#25/#26/#27/#28 ouvertes ; aucune branche concurrente modifiée. AGENTS.md, docs/15_AUTONOMOUS_AGENT_EXECUTION.md, docs/00_PROJECT_MEMORY.md, docs/06_CURRENT_STATUS_AND_GAPS.md et dernier checkpoint relus.
+- **PREUVES EXACT-HEAD** : sur `c44dfd1edf1b6f8a863a0c9bee9b0671a91373df`, [CI #43519970874](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43519970874) et [Docker/PostgreSQL #43519970869](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43519970869) : completed/success. Cela valide le précédent HEAD, non les nouveaux commits.
+- **CODE** : `a4f8dff179445c918dc039295a7d4ce3af43d208` ajoute une vérification `stat().isFile()` après `realpath` pour refuser un répertoire ou lien symbolique vers un répertoire comme fichier de marché, avec `INVALID_MARKET_FILE_TYPE` ; aucun changement des 44 endpoints.
+- **TEST** : `7dc5b98f9f74c2f171460077a7ece575968b75e9` ajoute des cas négatifs répertoire et alias de répertoire. Tests locaux NOT_RUN ; CI de ces nouveaux commits NON ATTESTÉE lors de l'écriture. Le risque TOCTOU entre contrôle et lecture subsiste.
+- **BLOCK_REASON** : CI nouveau HEAD et revue indépendante à vérifier ; qualification des licences/contrats/formats/fréquences/observations témoins FX/INFLATION/FUND_NAV toujours incomplète ; aucune collecte financière réelle, historique complet ni publication démontrés.
+- **NEXT_ACTION** : contrôler CI et Docker/PostgreSQL du nouveau HEAD et corriger toute régression ; qualifier prioritairement une source primaire officielle autorisée (contrat/licence/format/fréquence/témoin) dans issue #16 avant tout ajout au catalogue. Si bloqué, poursuivre une tâche indépendante après réconciliation des claims PR #22/#25/#26/#27/#28. Ne pas multiplier les durcissements périphériques au détriment de l'intégration métier.
+- **ROLLBACK** : revert ciblé des commits `a4f8dff`, `7dc5b98` et checkpoint sur branche PR #29 ; aucun push main, merge, S1 ni secret.
+
+---
+
 ## 2026-11-13 23:30 Europe/Paris — PR #29 : CI exacte et régression alias racine (#16, PARTIAL)
 
 - **RÉCONCILIATION** : PR #29 ouverte Draft, HEAD initial `e1565cfe0a86918e2144972a87a7b206e099f2b2`, base `73256f48d81d38ce8ff6f51be9e024b25cf5dadb`. PR concurrentes #22/#25/#26/#27/#28 ouvertes ; issues #13–#17 toujours à suivre. Lecture de AGENTS.md, docs/15_AUTONOMOUS_AGENT_EXECUTION.md, docs/00_PROJECT_MEMORY.md, docs/06_CURRENT_STATUS_AND_GAPS.md et dernier checkpoint du présent journal. Aucune branche concurrente modifiée.
