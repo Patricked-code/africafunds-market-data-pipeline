@@ -249,3 +249,14 @@ test('issue #16: runtime schema fails closed for unregistered financial families
   }
   assert.equal(JSON.stringify(original), snapshot, 'invalid fixtures must not mutate the 44 historical sources');
 });
+
+test('issue #16: manifest paths cannot escape the source registry directory', async () => {
+  process.env.DATABASE_URL ??= 'postgresql://localhost:5432/registry_test';
+  const { resolveMarketFile } = await import('../src/config/registry.js');
+  const { resolve } = await import('node:path');
+  const base = resolve('config');
+  assert.equal(resolveMarketFile(base, 'sources/MAR.json'), resolve(base, 'sources/MAR.json'));
+  for (const invalid of ['../package.json', 'sources/../../package.json', '.', '/etc/passwd']) {
+    assert.throws(() => resolveMarketFile(base, invalid), /INVALID_MARKET_FILE_PATH/, invalid);
+  }
+});
