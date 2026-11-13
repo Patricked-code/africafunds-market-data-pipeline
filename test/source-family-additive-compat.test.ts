@@ -61,3 +61,28 @@ test('issue #16: additive FX/INFLATION/FUND_NAV entries do not mutate legacy sou
   assert.deepEqual(extendedFirstMarket.endpoints.slice(0, originalFirstMarket.endpoints.length), originalFirstMarket.endpoints);
   assert.deepEqual(extendedFirstMarket.endpoints.slice(-3).map((endpoint) => endpoint.dataFamily), extraFamilies);
 });
+
+test('issue #16: additive catalog preserves every market and detects synthetic ID collisions', () => {
+  const original = loadExisting();
+  const legacyById = new Map(original.flatMap((market) => market.endpoints.map((endpoint) => [endpoint.id, JSON.stringify(endpoint)] as const)));
+  const added: Endpoint[] = [
+    { id: 'synthetic-fx', url: 'https://example.invalid/fx', dataFamily: 'FX', collector: 'MANUAL_API_DISCOVERY', frequency: 'DAILY' },
+    { id: 'synthetic-inflation', url: 'https://example.invalid/inflation', dataFamily: 'INFLATION', collector: 'MANUAL_API_DISCOVERY', frequency: 'MONTHLY' },
+    { id: 'synthetic-nav', url: 'https://example.invalid/nav', dataFamily: 'FUND_NAV', collector: 'MANUAL_API_DISCOVERY', frequency: 'DAILY' },
+  ];
+  const extended = original.map((market, index) => ({
+    ...market,
+    endpoints: index === original.length - 1 ? [...market.endpoints, ...added] : [...market.endpoints],
+  }));
+  assert.deepEqual(extended.map((market) => market.code), original.map((market) => market.code));
+  const all = extended.flatMap((market) => market.endpoints);
+  assert.equal(all.length, 47);
+  assert.equal(new Set(all.map((endpoint) => endpoint.id)).size, all.length, 'extension IDs must be globally unique');
+  for (const [id, serialized] of legacyById) {
+    const current = all.find((endpoint) => endpoint.id === id);
+    assert.ok(current, `missing legacy endpoint ${id}`);
+    assert.equal(JSON.stringify(current), serialized, `legacy endpoint changed: ${id}`);
+  }
+  const colliding = [...all, { ...added[0], id: original[0]?.endpoints[0]?.id ?? 'synthetic-fx' }];
+  assert.notEqual(new Set(colliding.map((endpoint) => endpoint.id)).size, colliding.length, 'collision fixture must be detected');
+});
