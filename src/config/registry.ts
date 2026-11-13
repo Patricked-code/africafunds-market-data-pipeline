@@ -25,12 +25,17 @@ export type SourceEndpoint = z.infer<typeof endpointSchema> & { marketCode: stri
 export type Registry = z.infer<typeof registrySchema>;
 
 /** Reject ambiguous source identifiers before ingestion or filtering. */
-export function assertUniqueSourceIds(markets: readonly { endpoints: readonly { id: string }[] }[]): void {
-  const seen = new Set<string>();
+export function assertUniqueSourceIds(markets: readonly { code?: string; endpoints: readonly { id: string }[] }[]): void {
+  const seenSources = new Set<string>();
+  const seenMarkets = new Set<string>();
   for (const market of markets) {
+    if (market.code !== undefined) {
+      if (seenMarkets.has(market.code)) throw new Error(`DUPLICATE_MARKET_CODE: ${market.code}`);
+      seenMarkets.add(market.code);
+    }
     for (const endpoint of market.endpoints) {
-      if (seen.has(endpoint.id)) throw new Error(`DUPLICATE_SOURCE_ID: ${endpoint.id}`);
-      seen.add(endpoint.id);
+      if (seenSources.has(endpoint.id)) throw new Error(`DUPLICATE_SOURCE_ID: ${endpoint.id}`);
+      seenSources.add(endpoint.id);
     }
   }
 }
