@@ -1,4 +1,4 @@
-import { readFile } from 'node:fs/promises';
+import { readFile, realpath } from 'node:fs/promises';
 import { dirname, isAbsolute, relative, resolve } from 'node:path';
 import { z } from 'zod';
 import { env } from './env.js';
@@ -54,6 +54,17 @@ export function resolveMarketFile(base: string, file: string): string {
   return target;
 }
 
+/** Check real paths as well as lexical paths, rejecting symlinks outside the registry root. */
+export async function resolveMarketFileSafe(base: string, file: string): Promise<string> {
+  const target = resolveMarketFile(base, file);
+  const [realBase, realTarget] = await Promise.all([realpath(base), realpath(target)]);
+  const rel = relative(realBase, realTarget);
+  if (!rel || rel === '..' || rel.startsWith('../') || rel.startsWith('..\\\\') || isAbsolute(rel)) {
+    throw new Error('INVALID_MARKET_FILE_PATH');
+  }
+  return realTarget;
+}
+
 /** Validate a complete registry without filesystem side effects. */
 export function parseRegistry(raw: unknown): Registry {
   const registry = registrySchema.parse(raw);
@@ -70,7 +81,7 @@ export async function loadRegistry(): Promise<Registry> {
   const manifest = manifestSchema.parse(raw);
   const base = dirname(resolve(env.SOURCE_REGISTRY_PATH));
   const markets = await Promise.all(manifest.marketFiles.map(async (file) =>
-    marketSchema.parse(JSON.parse(await readFile(resolveMarketFile(base, file), 'utf8'))),
+    marketSchema.parse(JSON.parse(await readFile(await resolveMarketFileSafe(base, file), 'utf8'))),
   ));
   return parseRegistry({ ...manifest, markets });
 }
