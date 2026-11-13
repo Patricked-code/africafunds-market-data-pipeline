@@ -1,5 +1,16 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-13 13:39 Europe/Paris — PR #29 : septième scénario validé par CI et smoke PostgreSQL (PARTIAL)
+
+- **RECONCILIATION** : PR #1 closed/merged ; PR #29 open/Draft, branche `test/source-family-additive-compat-20261113`, HEAD exact avant écriture `8fbce9182533f40bf6170f47a0b662de915825fa`. Documents `AGENTS.md`, `docs/15_AUTONOMOUS_AGENT_EXECUTION.md`, worklog et checkpoint historique 2026-11-06 relus. Issue #16 open ; branches concurrentes non modifiées. Anciennes références de main non reprises comme HEAD actuel.
+- **PREUVES CI EXACT-HEAD** : `8fbce9182533f40bf6170f47a0b662de915825fa` : [CI #43418277618](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43418277618) `completed/success` ; [Docker/PostgreSQL #43418277543](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43418277543) `completed/success`. Ces workflows couvrent le septième scénario committé auparavant, sans démontrer une collecte officielle, une licence ou une recette métier complète. Tests locaux NOT_RUN.
+- **ACTION** : contrôle GitHub exact-HEAD et inscription des preuves dans le journal canonique ; pas de nouveau code métier dans cette intervention, pas d'altération des 44 sources. Le prochain changement documentaire génère un nouveau HEAD dont les checks restent à vérifier.
+- **BLOCK_REASON** : qualification contractuelle et observation témoin officielle FX/INFLATION/FUND_NAV toujours absentes ; PR #29 Draft sans revue indépendante attestée ; aucune certification HISTORY_COMPLETE ou S1. Ne pas interférer avec les modules détenus par PR #26/#27.
+- **NEXT_ACTION** : vérifier la CI du présent HEAD documentaire, qualifier une source primaire officielle dans issue #16 avec licence, format, fréquence et observation témoin autorisée, puis développer un raccordement fonctionnel réel sur branche non concurrente. Si source non admissible, avancer sur une recette indépendante de l'issue #17 après réconciliation des claims. Obtenir revue indépendante avant toute fusion.
+- **ROLLBACK** : revert ciblé du présent commit documentaire sur la branche #29 ; aucune modification main, secret, S1 ou registre historique.
+
+---
+
 ## 2026-11-13 12:34 Europe/Paris — PR #29 : validation CI exact-HEAD et collisions intra-marché (PARTIAL)
 
 - **RECONCILIATION** : branche PR #29 `test/source-family-additive-compat-20261113`, HEAD initial `337b1ddc01e3ecdbe6995a1cce7905e377d94a39` vérifié via GitHub ; PR ouverte/Draft, revue indépendante `reviews=[]`. PR concurrentes #22/#25/#26/#27/#28 identifiées, aucune branche concurrente modifiée. AGENTS.md, docs/15, worklog et checkpoint historique 2026-11-06 relus ; aucun ancien SHA main réutilisé comme état actuel.
