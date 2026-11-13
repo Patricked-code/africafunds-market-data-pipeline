@@ -280,12 +280,16 @@ test('issue #16: manifest realpath validation rejects symlink escapes', async ()
     await symlink(join(base, 'missing.json'), join(base, 'dangling.json'));
     // A directory symlink resolving to the registry root is not a market JSON file.
     await symlink(base, join(base, 'root-alias'));
+    await mkdir(join(base, 'nested', 'directory-entry'));
+    await symlink(join(base, 'nested', 'directory-entry'), join(base, 'directory-alias'));
     assert.equal(await resolveMarketFileSafe(base, 'valid.json'), join(base, 'valid.json'));
     assert.equal(await resolveMarketFileSafe(base, 'inside.json'), join(base, 'valid.json'));
     await assert.rejects(resolveMarketFileSafe(base, 'escape.json'), /INVALID_MARKET_FILE_PATH/);
     await assert.rejects(resolveMarketFileSafe(base, 'nested/outside-dir/outside.json'), /INVALID_MARKET_FILE_PATH/);
     await assert.rejects(resolveMarketFileSafe(base, 'dangling.json'), /ENOENT/);
     await assert.rejects(resolveMarketFileSafe(base, 'root-alias'), /INVALID_MARKET_FILE_PATH/);
+    await assert.rejects(resolveMarketFileSafe(base, 'nested/directory-entry'), /INVALID_MARKET_FILE_TYPE/);
+    await assert.rejects(resolveMarketFileSafe(base, 'directory-alias'), /INVALID_MARKET_FILE_TYPE/);
     await assert.rejects(resolveMarketFileSafe(base, '../outside.json'), /INVALID_MARKET_FILE_PATH/);
   } finally {
     await rm(root, { recursive: true, force: true });
