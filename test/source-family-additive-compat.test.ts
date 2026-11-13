@@ -121,3 +121,24 @@ test('issue #16: runtime registry rejects cross-market source ID collisions', as
     code: 'SYNTHETIC', endpoints: [{ ...first, id: 'synthetic-unique-nav', dataFamily: 'FUND_NAV' }],
   }]));
 });
+
+test('issue #16: runtime registry rejects duplicate market codes even with distinct source IDs', async () => {
+  process.env.DATABASE_URL ??= 'postgresql://localhost:5432/registry_test';
+  const { assertUniqueSourceIds } = await import('../src/config/registry.js');
+  const markets = loadExisting();
+  assert.doesNotThrow(() => assertUniqueSourceIds(markets));
+  const firstMarket = markets[0];
+  assert.ok(firstMarket, 'expected a legacy market');
+  const duplicateMarket = {
+    code: firstMarket.code,
+    endpoints: [{
+      id: 'synthetic-distinct-source',
+      url: 'https://example.invalid/market-duplicate',
+      dataFamily: 'FUND_NAV',
+      collector: 'MANUAL_API_DISCOVERY',
+      frequency: 'DAILY',
+    }],
+  };
+  assert.throws(() => assertUniqueSourceIds([...markets, duplicateMarket]), /DUPLICATE_MARKET_CODE/);
+  assert.doesNotThrow(() => assertUniqueSourceIds([...markets, { ...duplicateMarket, code: 'SYNTHETIC' }]));
+});
