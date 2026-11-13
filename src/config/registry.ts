@@ -42,7 +42,10 @@ export function assertUniqueSourceIds(markets: readonly { code?: string; endpoin
 
 /** Resolve a manifest entry only within the registry directory. No network access. */
 export function resolveMarketFile(base: string, file: string): string {
-  if (isAbsolute(file)) throw new Error('INVALID_MARKET_FILE_PATH');
+  // Reject platform-dependent separators and drive-qualified paths before resolving on POSIX.
+  if (file.includes('\\') || file.includes('\0') || /^[A-Za-z]:/.test(file) || isAbsolute(file)) {
+    throw new Error('INVALID_MARKET_FILE_PATH');
+  }
   const target = resolve(base, file);
   const rel = relative(resolve(base), target);
   if (!rel || rel === '..' || rel.startsWith('../') || rel.startsWith('..\\\\') || isAbsolute(rel)) {
