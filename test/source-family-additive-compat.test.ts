@@ -275,9 +275,14 @@ test('issue #16: manifest realpath validation rejects symlink escapes', async ()
     await writeFile(join(root, 'outside.json'), '{}');
     await symlink(join(root, 'outside.json'), join(base, 'escape.json'));
     await symlink(join(base, 'valid.json'), join(base, 'inside.json'));
+    await mkdir(join(base, 'nested'));
+    await symlink(root, join(base, 'nested', 'outside-dir'));
+    await symlink(join(base, 'missing.json'), join(base, 'dangling.json'));
     assert.equal(await resolveMarketFileSafe(base, 'valid.json'), join(base, 'valid.json'));
     assert.equal(await resolveMarketFileSafe(base, 'inside.json'), join(base, 'valid.json'));
     await assert.rejects(resolveMarketFileSafe(base, 'escape.json'), /INVALID_MARKET_FILE_PATH/);
+    await assert.rejects(resolveMarketFileSafe(base, 'nested/outside-dir/outside.json'), /INVALID_MARKET_FILE_PATH/);
+    await assert.rejects(resolveMarketFileSafe(base, 'dangling.json'), /ENOENT/);
     await assert.rejects(resolveMarketFileSafe(base, '../outside.json'), /INVALID_MARKET_FILE_PATH/);
   } finally {
     await rm(root, { recursive: true, force: true });
