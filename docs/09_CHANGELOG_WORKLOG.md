@@ -1,5 +1,18 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-13 10:35 Europe/Paris — PR #29 : validation effective des identifiants et famille FUND_NAV (PARTIAL)
+
+- **RECONCILIATION** : lecture AGENTS.md, docs/00–15 dans l'ordre prescrit, dernier checkpoint `docs/CONTINUITY_CHECKPOINT_2026-11-06.md`, journal courant, configuration, code `src/config/registry.ts`, PR ouvertes #22/#25/#26/#27/#28/#29 et issues #13–#17. Dépôt GitHub `private` confirmé ; PR #29 Draft, base `main`, HEAD avant travail `6027f2cecc7b7a1f6699756e801cc32eb2ef5d05`. Ne pas prendre la base SHA de la PR pour le HEAD actuel de main.
+- **CI EXACT-HEAD PRÉCÉDENT** : commit `6027f2cecc7b7a1f6699756e801cc32eb2ef5d05`, [GitHub Actions #43394805222](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43394805222), `completed/success`. Ceci ne certifie aucune source financière ni S1.
+- **ACTION CODE** : commit [070f3a5](https://github.com/Patricked-code/africafunds-market-data-pipeline/commit/070f3a5afbffe5a86ff360164a54f08259c653df) complète l'enum runtime des familles par `FUND_NAV` (déjà prévue dans l'issue #16) et introduit `assertUniqueSourceIds`, appelée sur les deux formes de registre (monolithique et manifest) afin de refuser des IDs dupliqués entre marchés avant ingestion. Aucun des 44 endpoints modifié ; aucune nouvelle source externe ajoutée.
+- **ACTION TEST** : commit [93b6f3a](https://github.com/Patricked-code/africafunds-market-data-pipeline/commit/93b6f3a2fcc09e5e012070dda8a0c6bbf2fa5561) ajoute un test de non-collision sur le registre historique, de rejet de doublon inter-marchés et d'acceptation d'un ID synthétique unique. Tests locaux NOT_RUN ; CI du nouveau code NOT_YET_ATTESTED au checkpoint. Aucun RED/GREEN local revendiqué.
+- **BLOCK_REASON** : contrats/licences, formats et observations témoins officiels FX/INFLATION/FUND_NAV non vérifiés ; PR Draft sans revue indépendante/gates de fusion attestés. Les six adaptateurs, writer financier, historiques et S1 ne sont pas certifiés. Toute collision détectée dans un catalogue futur doit être corrigée, jamais ignorée.
+- **NEXT_ACTION** : contrôler la CI exacte du nouveau HEAD et corriger immédiatement toute erreur ; obtenir revue indépendante ; qualifier une source primaire et ses droits/format/fixture autorisée dans l'issue #16 avant tout ajout réel ; poursuivre ensuite les lots 0–13 sans collision avec PR #26/#27. Aucun merge implicite ni déploiement S1.
+- **ROLLBACK** : revert ciblé des commits de PR #29 ; aucun reset main, aucune modification des sources historiques, secrets, volumes ou serveurs.
+
+---
+
+
 ## 2026-11-13 09:37 Europe/Paris — PR #29 : CI du quatrième test vérifiée, qualification officielle encore bloquée (PARTIAL)
 
 - **RECONCILIATION** : PR #1 vérifiée `closed/merged` ; main base SHA de PR #29 `73256f48d81d38ce8ff6f51be9e024b25cf5dadb` (SHA de base de la PR, non preuve de HEAD main actuel). Dépôt `private` vérifié via métadonnées GitHub ; six PR ouvertes #22/#25/#26/#27/#28/#29. PR #29 `open/draft`, HEAD exact `50300380c7a32bf7a097cc83678ec95112f8e36b`. Lecture des documents obligatoires AGENTS, docs/00–15, dernier worklog, checkpoint historique 2026-11-06, test et config du catalogue.
