@@ -1,5 +1,17 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-13 14:35 Europe/Paris — PR #29 : CI exacte et validation des identifiants non vides (PARTIAL)
+
+- **RECONCILIATION** : PR #29 open/Draft, branche `test/source-family-additive-compat-20261113`, HEAD initial `cfe852c639bd22c4a6a2c9da72b2fea00ca8494d`; issue #16 open ; PR #22/#25/#26/#27/#28 ouvertes. AGENTS.md, docs/15, dernier worklog, checkpoint 2026-11-06 et code de registre relus. Les anciens SHA de main ne sont pas considérés comme actuels.
+- **PREUVES CI EXACT-HEAD** : commit `cfe852c639bd22c4a6a2c9da72b2fea00ca8494d` : [CI #43427072229](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43427072229) et [Docker/PostgreSQL #43427072122](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43427072122), `completed/success`. Aucun test local ni collecte réelle attesté.
+- **CODE** : commit `46a81ceefa77050d7a1dffd4360c9a995bc7e452` : les schémas Zod de `src/config/registry.ts` refusent désormais les IDs sources et codes marchés vides ou composés d'espaces ; les entrées existantes restent intactes.
+- **TEST** : commit `9363b1e7117ff82e93ce2e27a05547014155c2d2` : huitième scénario, garde statique de la déclaration de schéma. Il ne remplace pas un test runtime avec fixture ; CI du nouveau HEAD NON ATTESTÉE à ce checkpoint, tests locaux NOT_RUN.
+- **BLOCK_REASON** : qualification officielle des droits, formats et observations témoins FX/INFLATION/FUND_NAV manquante ; pas de collecte ni publication certifiée ; PR Draft sans revue indépendante ; CI des nouveaux changements à vérifier.
+- **NEXT_ACTION** : vérifier CI du présent HEAD et corriger tout échec ; remplacer/compléter le contrôle statique par test runtime négatif du schéma si admissible ; qualifier une source officielle avec licence et donnée témoin dans issue #16, puis poursuivre intégration fonctionnelle. Ne pas toucher aux branches PR #26/#27 sans claim. Aucune fusion ni S1 sans gates.
+- **ROLLBACK** : revert ciblé des deux commits de branche et du checkpoint ; ne pas modifier main, secrets ou 44 sources historiques.
+
+---
+
 ## 2026-11-13 13:39 Europe/Paris — PR #29 : septième scénario validé par CI et smoke PostgreSQL (PARTIAL)
 
 - **RECONCILIATION** : PR #1 closed/merged ; PR #29 open/Draft, branche `test/source-family-additive-compat-20261113`, HEAD exact avant écriture `8fbce9182533f40bf6170f47a0b662de915825fa`. Documents `AGENTS.md`, `docs/15_AUTONOMOUS_AGENT_EXECUTION.md`, worklog et checkpoint historique 2026-11-06 relus. Issue #16 open ; branches concurrentes non modifiées. Anciennes références de main non reprises comme HEAD actuel.
