@@ -256,7 +256,7 @@ test('issue #16: manifest paths cannot escape the source registry directory', as
   const { resolve } = await import('node:path');
   const base = resolve('config');
   assert.equal(resolveMarketFile(base, 'sources/MAR.json'), resolve(base, 'sources/MAR.json'));
-  for (const invalid of ['../package.json', 'sources/../../package.json', '.', '/etc/passwd', '..\\\\package.json', 'C:\\\\Windows\\\\system.ini', 'sources\\\\MAR.json', 'sources/MA\\u0000R.json']) {
+  for (const invalid of ['../package.json', 'sources/../../package.json', '.', '/etc/passwd', '..\\\\package.json', 'C:\\\\Windows\\\\system.ini', 'sources\\\\MAR.json', `sources/MA${String.fromCharCode(0)}R.json`]) {
     assert.throws(() => resolveMarketFile(base, invalid), /INVALID_MARKET_FILE_PATH/, invalid);
   }
 });
