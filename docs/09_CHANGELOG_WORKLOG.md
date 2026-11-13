@@ -1,5 +1,17 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-13 12:34 Europe/Paris — PR #29 : validation CI exact-HEAD et collisions intra-marché (PARTIAL)
+
+- **RECONCILIATION** : branche PR #29 `test/source-family-additive-compat-20261113`, HEAD initial `337b1ddc01e3ecdbe6995a1cce7905e377d94a39` vérifié via GitHub ; PR ouverte/Draft, revue indépendante `reviews=[]`. PR concurrentes #22/#25/#26/#27/#28 identifiées, aucune branche concurrente modifiée. AGENTS.md, docs/15, worklog et checkpoint historique 2026-11-06 relus ; aucun ancien SHA main réutilisé comme état actuel.
+- **CI EXACT-HEAD ANTÉRIEUR** : SHA `337b1ddc01e3ecdbe6995a1cce7905e377d94a39`, [CI #43410761918](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43410761918) et [Docker/PostgreSQL #43410762065](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43410762065) : tous deux `completed/success` via GitHub Actions. Ces contrôles ne prouvent ni droits sur sources officielles, ni historique complet, ni S1.
+- **ACTION TEST** : [commit 0bd8e488](https://github.com/Patricked-code/africafunds-market-data-pipeline/commit/0bd8e48803b3c7919bdb9476039c9cc056262b5b) ajoute un septième scénario au test de registre existant : rejet de deux IDs identiques dans un même marché, rejet d'un code marché dupliqué même avec zéro endpoint, acceptation d'un nouveau marché vide et distinct. Aucun changement de code de production ni des 44 sources. Tests locaux `NOT_RUN` ; CI du nouveau code `NOT_YET_ATTESTED` à cette écriture.
+- **BLOCK_REASON** : contrats/licences, formats et observations témoins FX/INFLATION/FUND_NAV non qualifiés ; revue indépendante et gates de fusion non attestés. Pas d'intégration réelle ni de certification de données. Les claims des PR #26/#27 empêchent toute modification non réconciliée de leurs modules.
+- **NEXT_ACTION** : contrôler CI exact-HEAD après ce checkpoint, corriger tout échec ; qualifier dans issue #16 une source primaire officielle (URL, conditions de réutilisation, format, fréquence, observation témoin autorisée) avant ajout réel. Si qualification bloquée, sélectionner une tâche fonctionnelle indépendante issue #17 après vérification des claims. Obtenir revue indépendante avant toute fusion ; aucun push main, merge implicite ou déploiement S1.
+- **ROLLBACK** : revert ciblé du test et du présent checkpoint sur PR #29 ; aucun reset main, changement de secret, source historique ou serveur.
+
+---
+
+
 ## 2026-11-13 11:38 Europe/Paris — PR #29 : unicité des codes marchés avant ingestion (PARTIAL)
 
 - **RECONCILIATION** : lecture de `AGENTS.md`, `docs/00–15` (références sur main), checkpoint historique `docs/CONTINUITY_CHECKPOINT_2026-11-06.md`, dernier NEXT_ACTION et fichiers de PR #29 ; recherche des PR ouvertes #22/#25/#26/#27/#28/#29 et de l'issue #16. Le HEAD antérieur de PR #29 était `2f9d99ff72cbd5335cac013dc9ba40bd44ae86c6`. Les branches concurrentes sont restées intactes.
