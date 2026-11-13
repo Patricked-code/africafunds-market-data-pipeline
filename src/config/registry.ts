@@ -4,14 +4,14 @@ import { z } from 'zod';
 import { env } from './env.js';
 
 const endpointSchema = z.object({
-  id: z.string(), label: z.string(), url: z.string().url(),
+  id: z.string().trim().min(1), label: z.string(), url: z.string().url(),
   dataFamily: z.enum(['EQUITY_INDEX','MONEY_MARKET_RATE','MONEY_MARKET_INDEX','TREASURY_RATE','YIELD_CURVE','FX','INFLATION','FUND_NAV']),
   collector: z.enum(['HTML_TABLE','HTML_TABLE_CSV','HTML_LINK_INDEX','DOCUMENT_LINK_INDEX','PDF_LINK_INDEX','XLSX_LINK_INDEX','MANUAL_API_DISCOVERY']),
   frequency: z.string(), enabled: z.boolean().optional().default(true),
 });
 const institutionSchema = z.object({ name: z.string(), url: z.string().url() });
 const marketSchema = z.object({
-  code: z.string(), name: z.string(), currency: z.string().length(3), allShareIndex: z.string().nullable(),
+  code: z.string().trim().min(1), name: z.string(), currency: z.string().length(3), allShareIndex: z.string().nullable(),
   institutions: z.record(institutionSchema), endpoints: z.array(endpointSchema),
 });
 const registrySchema = z.object({
