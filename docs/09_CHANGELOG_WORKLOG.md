@@ -1,5 +1,18 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-13 08:40 Europe/Paris — PR #29 : conservation des politiques d'accès lors d'extensions du catalogue (PARTIAL)
+
+- **RECONCILIATION** : lecture de AGENTS.md, docs/00–15, du dernier checkpoint 07:37 et du NEXT_ACTION ; six PR ouvertes #22/#25/#26/#27/#28/#29 consultées. Travail limité à la branche existante PR #29, issue #16, sans collision avec les adaptateurs ni la normalisation.
+- **CI EXACTE** : HEAD documentaire précédent `32e596f32b5719bcbbbab3a09241f14686a4de75` : GitHub Actions [#43380144630](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43380144630), workflow CI, `completed/success`. Ceci ne prouve ni licences, ni ingestion réelle, ni données historiques.
+- **ACTION CODE/TEST** : commit [`de295fbda03475d108a9b67fc8e13572febf945f`](https://github.com/Patricked-code/africafunds-market-data-pipeline/commit/de295fbda03475d108a9b67fc8e13572febf945f) ajoute un test des politiques effectives `respectRobotsTxt`, `doNotBypassCaptcha`, `doNotBypassAuthentication` et `requestsPerSecond` du registre canonique ; l'extension synthétique de `marketFiles` doit préserver ces politiques. Aucun endpoint ni paramètre réel modifié.
+- **TEST_EVIDENCE** : test committé ; local NOT_RUN, CI du nouveau HEAD NOT_YET_ATTESTED. Revue indépendante non attestée ; PR reste Draft.
+- **BLOCK_REASON** : contrats/licences/fixtures officiels FX/INFLATION/FUND_NAV non qualifiés ; la compatibilité structurelle et les politiques d'accès ne démontrent pas la collecte. Claims des autres PR non repris.
+- **NEXT_ACTION** : vérifier CI sur le nouveau HEAD exact et corriger tout échec ; poursuivre qualification juridique/technique des sources primaires issue #16 avant tout endpoint réel ; revue indépendante avant intégration. Si qualification bloquée, sélectionner tâche indépendante après réconciliation des claims.
+- **ROLLBACK** : revert ciblé des deux commits de branche ; main, les 44 endpoints, S1 et les secrets restent intacts.
+
+---
+
+
 ## 2026-11-13 07:37 Europe/Paris — PR #29 : contrôle global de compatibilité des sources (PARTIAL)
 
 - **RECONCILIATION** : AGENTS.md, docs/15_AUTONOMOUS_AGENT_EXECUTION.md, checkpoint 2026-11-06 et dernier NEXT_ACTION du worklog relus sur la branche PR #29 ; issues ouvertes et PR ouvertes consultées via GitHub. PR #1 historiquement fusionnée selon journal ; aucun ancien SHA considéré comme HEAD courant sans preuve. Pas de modification de branches concurrentes.
