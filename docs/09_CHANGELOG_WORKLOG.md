@@ -1,5 +1,17 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-13 20:34 Europe/Paris — PR #29 : confinement manifest multiplateforme (#16, PARTIAL)
+
+- **RECONCILIATION** : PR #1 fusionnée, PR #29 ouverte Draft ; PR concurrentes #22/#25/#26/#27/#28 ouvertes. Lecture AGENTS.md, docs/15_AUTONOMOUS_AGENT_EXECUTION.md, du journal courant et du code/test de registre. Le dernier checkpoint initial était le commit `3057e36a52a6f4ebbccfa31ee3a8532062391cf4` (à ne pas considérer comme preuve CI). La recherche GitHub des runs PR pour ce SHA a retourné zéro résultat ; statut CI **NON ATTESTÉ**, et non SUCCESS.
+- **CODE** : commit `92474f077ae63248fc5d85b905dfb8b4e4f5d4ad` rejette les séparateurs Windows, chemins préfixés par lettre de lecteur et NUL dans les entrées du manifest, pour éviter les interprétations différentes entre OS ; les chemins historiques POSIX relatifs restent admis.
+- **TEST** : commit `622a7add2801af6079a34f811ca3ac923aff712c` ajoute des cas négatifs multiplateformes au test runtime existant. Tests locaux **NOT_RUN**, CI de ces commits **NON ATTESTÉE**. Aucune donnée financière réelle ou couverture historique démontrée.
+- **BLOCK_REASON** : CI exact-HEAD et revue indépendante non attestées ; contrats/licences, formats, fréquences et observations témoins officiels FX/INFLATION/FUND_NAV non qualifiés. La validation lexicale ne protège pas contre les symlinks sortants : évaluer une protection realpath avec test isolé avant toute ingestion de manifest non fiable.
+- **NEXT_ACTION** : vérifier CI/Docker sur HEAD exact de la PR #29, corriger toute erreur ; renforcer si admissible la résolution canonique des symlinks ; prioriser ensuite qualification d'une source officielle avec droits, format et témoin autorisé issue #16. Coordonner claims PR #26/#27 avant tout travail sur leurs modules. Aucune fusion, main direct, secret ou S1.
+- **ROLLBACK** : revert ciblé des commits `92474f0`, `622a7ad` et du présent checkpoint sur branche #29, sans reset main.
+
+---
+
+
 ## 2026-11-13 19:36 Europe/Paris — PR #29 : CI verte et confinement des chemins manifest (#16, PARTIAL)
 
 - **RÉCONCILIATION** : PR #29 Draft HEAD initial `39b7c24ef12c0028546ad08c55af56b3c9da71a2`, base main `73256f48d81d38ce8ff6f51be9e024b25cf5dadb` ; PR ouvertes #22/#25/#26/#27/#28/#29 ; dépôt private. Lecture des documents obligatoires de AGENTS.md, du journal, de docs/15_AUTONOMOUS_AGENT_EXECUTION.md et du code/test de registre ; aucune branche concurrente modifiée.
