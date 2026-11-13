@@ -1,4 +1,4 @@
-import { readFile, realpath } from 'node:fs/promises';
+import { readFile, realpath, stat } from 'node:fs/promises';
 import { dirname, isAbsolute, relative, resolve } from 'node:path';
 import { z } from 'zod';
 import { env } from './env.js';
@@ -61,6 +61,10 @@ export async function resolveMarketFileSafe(base: string, file: string): Promise
   const rel = relative(realBase, realTarget);
   if (!rel || rel === '..' || rel.startsWith('../') || rel.startsWith('..\\\\') || isAbsolute(rel)) {
     throw new Error('INVALID_MARKET_FILE_PATH');
+  }
+  // A manifest market entry must resolve to a regular file, never a directory or device.
+  if (!(await stat(realTarget)).isFile()) {
+    throw new Error('INVALID_MARKET_FILE_TYPE');
   }
   return realTarget;
 }
