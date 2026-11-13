@@ -1,5 +1,17 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-13 03:37 Europe/Paris — CI exact-HEAD PR #28 et qualification du prochain lot métier (PARTIAL)
+
+- **RECONCILIATION** : PR #28 OPEN/Draft, HEAD `6acec40a58c0e9d29c87a562a83fbc43a6270b98`; PR #22/#25/#26/#27 encore ouvertes selon recherche GitHub. `AGENTS.md`, `docs/00–15` requis, journal, dernier checkpoint et code qualité relus depuis GitHub. La PR #1 est historique fusionnée ; aucune ancienne SHA utilisée comme HEAD actuel.
+- **TEST_EVIDENCE** : pour SHA exact `6acec40a58c0e9d29c87a562a83fbc43a6270b98`, GitHub Actions runs [43346029575](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43346029575) et [43346029588](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43346029588) : `completed/success`. Leurs résultats ne certifient ni données financières réelles ni S1. Tests locaux NOT_RUN.
+- **DISCOVERY** : issue #16 toujours OPEN : FX (une seule source initiale), inflation (aucune), fonds/VL (aucune) selon son mandat ; l'ajout au catalogue reste subordonné aux institutions officielles, licences, dates économiques, méthodes et exemples autorisés. Issue #17 OPEN : chaîne source→API et historiques non certifiés. PR #26 occupe les adaptateurs et PR #27 l'admission financière : aucune écriture concurrente effectuée. Aucun nouvel adaptateur ni source ajouté sans contrat officiel.
+- **ACTION** : contrôle CI exact-HEAD, inventaire des dépendances #16/#17 et préservation des branches concurrentes. Aucun changement de code métier sur cette intervention.
+- **BLOCK_REASON** : PR #28 Draft sans revue indépendante ni gates de fusion attestés ; contrats/fixtures CBE-GOSDMX et sources FX/inflation/VL non qualifiés ; claims transactionnels entre agents non démontrés. L'existence de runs CI ne démontre pas un runner agent autonome 24/7.
+- **NEXT_ACTION** : vérifier CI du présent checkpoint ; obtenir revue indépendante habilitée pour #28 ; sur une branche dédiée non revendiquée, examiner le schéma du registre des sources et préparer un test de compatibilité additif pour les familles FX/INFLATION/FUND_NAV de l'issue #16, puis ne raccorder que les sources officielles dont licence et contrat sont attestés. Vérifier les claims des PR #26/#27 avant toute intégration métier. Aucun merge, aucune production S1, aucun HISTORY_COMPLETE.
+- **ROLLBACK** : revert ciblé du présent commit documentaire sur la branche Draft, jamais reset ou push main.
+
+---
+
 ## 2026-11-13 02:34 Europe/Paris — PR #28 : CI exacte confirmée, transition vers intégration métier (PARTIAL)
 
 - **RECONCILIATION** : branche `test/quality-row-admission-regression-20261112`, dernier commit documenté `cbf012611672a3b17a4721b9b574a1c4b3f179cc`; PR #28 OPEN/Draft, `reviews=[]`. PR #22/#25/#26/#27 ouvertes, leurs périmètres respectés. AGENTS.md, docs/15, journal et checkpoint 2026-11-06 relus ; les états historiques ne valent pas état courant.
