@@ -1,5 +1,15 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-13 06:39 Europe/Paris — PR #29 : CI TypeScript corrigée et vérifiée (PARTIAL)
+
+- **RECONCILIATION** : PR #1 fusionnée, dépôt privé, PR #29 ouverte/Draft sur `test/source-family-additive-compat-20261113`, SHA contrôlé `02501c2a69b0c2a9c9a6c1d4eb0005dca5094f1c`. Les issues #14/#15/#16/#17/#20 demeurent des chantiers fonctionnels ; ne pas confondre couverture structurelle et données certifiées. AGENTS.md, docs/15, checkpoint 2026-11-06 et worklog de branche consultés.
+- **CI EXACTE** : [GitHub Actions #43366530240](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43366530240), workflow CI — AfricaFunds Market Data Pipeline, `completed/success` pour le SHA `02501c2a69b0c2a9c9a6c1d4eb0005dca5094f1c`. Le correctif TS2532 du test de compatibilité de l'issue #16 passe ainsi la CI principale. Aucune preuve de test local, de données témoins officielles ou de recette S1 n'est déduite de ce succès. Revue indépendante : `reviews=[]`.
+- **BLOCK_REASON** : PR Draft et revue/gates non satisfaits ; pas de licence, de protocole officiel vérifié ni de fixture autorisée pour ajouter des endpoints FX/INFLATION/FUND_NAV réels ; aucune complétude historique certifiée. Les PR fonctionnelles concurrentes doivent être réconciliées avant modification.
+- **NEXT_ACTION** : contrôler la CI du présent commit documentaire ; demander revue indépendante sur PR #29, puis qualifier une source primaire FX/inflation/VL avec URL contractuelle, conditions de réutilisation, format, fréquence et observation témoin avant tout ajout additif réel. Si contrat indisponible, conserver BLOCKED_SOURCE et sélectionner une tâche indépendante des lots 0–13.
+- **ROLLBACK** : revert ciblé de ce commit de branche uniquement ; aucune modification de main, S1, secrets ou des 44 sources historiques.
+
+---
+
 ## 2026-11-13 05:35 Europe/Paris — PR #29 : correction TypeScript de la CI issue #16 (PARTIAL)
 
 - **RECONCILIATION** : PR #1 fusionnée ; PR #29 Draft sur `test/source-family-additive-compat-20261113`, issue #16 ouverte ; autres PR #22/#25/#26/#27/#28 ouvertes lors de la recherche. Documents `AGENTS.md`, `docs/15_AUTONOMOUS_AGENT_EXECUTION.md` et dernier checkpoint du worklog consultés. Aucun changement main/S1.
