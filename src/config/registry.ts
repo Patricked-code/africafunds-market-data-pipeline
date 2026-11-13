@@ -40,21 +40,25 @@ export function assertUniqueSourceIds(markets: readonly { code?: string; endpoin
   }
 }
 
+/** Validate a complete registry without filesystem side effects. */
+export function parseRegistry(raw: unknown): Registry {
+  const registry = registrySchema.parse(raw);
+  assertUniqueSourceIds(registry.markets);
+  return registry;
+}
+
 export async function loadRegistry(): Promise<Registry> {
   const raw = JSON.parse(await readFile(env.SOURCE_REGISTRY_PATH, 'utf8')) as unknown;
   const monolithic = registrySchema.safeParse(raw);
   if (monolithic.success) {
-    assertUniqueSourceIds(monolithic.data.markets);
-    return monolithic.data;
+    return parseRegistry(monolithic.data);
   }
   const manifest = manifestSchema.parse(raw);
   const base = dirname(resolve(env.SOURCE_REGISTRY_PATH));
   const markets = await Promise.all(manifest.marketFiles.map(async (file) =>
     marketSchema.parse(JSON.parse(await readFile(resolve(base, file), 'utf8'))),
   ));
-  const registry = registrySchema.parse({ ...manifest, markets });
-  assertUniqueSourceIds(registry.markets);
-  return registry;
+  return parseRegistry({ ...manifest, markets });
 }
 
 export async function listEndpoints(filters?: { market?: string; family?: string }): Promise<SourceEndpoint[]> {
