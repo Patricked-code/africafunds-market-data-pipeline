@@ -1,5 +1,18 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-13 05:35 Europe/Paris — PR #29 : correction TypeScript de la CI issue #16 (PARTIAL)
+
+- **RECONCILIATION** : PR #1 fusionnée ; PR #29 Draft sur `test/source-family-additive-compat-20261113`, issue #16 ouverte ; autres PR #22/#25/#26/#27/#28 ouvertes lors de la recherche. Documents `AGENTS.md`, `docs/15_AUTONOMOUS_AGENT_EXECUTION.md` et dernier checkpoint du worklog consultés. Aucun changement main/S1.
+- **CI EXACTE ÉCHOUÉE** : commit `b2ace41376f8c74269557390e0bc5aff864cdcc3`, [run #43359808062](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43359808062) `completed/failure`. Job `validate` #131670354308 : `Verify TypeScript types` FAIL, quatre diagnostics `TS2532` dans `test/source-family-additive-compat.test.ts` lignes 57–58 (indexation potentiellement undefined avec noUncheckedIndexedAccess). Tests unitaires et étapes suivantes SKIPPED : ne pas les déclarer réussis.
+- **ACTION CODE** : commit [`0a4f2162981bca58825b97678b93a6f11762747f`](https://github.com/Patricked-code/africafunds-market-data-pipeline/commit/0a4f2162981bca58825b97678b93a6f11762747f) : extraction des premiers marchés et vérification `assert.ok` avant accès aux endpoints, sans modifier le registre, les 44 sources ni les contrats.
+- **TEST_EVIDENCE** : correction committée, exécution locale NOT_RUN ; CI du nouveau HEAD NOT_YET_ATTESTED. Revue indépendante PR #29 : `reviews=[]` au contrôle.
+- **BLOCK_REASON** : CI de la correction non encore attestée, revue/gates manquants ; contrats officiels, droits et données témoins FX/INFLATION/FUND_NAV absents. Aucun statut DONE ni HISTORY_COMPLETE.
+- **NEXT_ACTION** : vérifier les workflows PR #29 sur le SHA exact incluant ce checkpoint ; corriger tout échec sans toucher aux PR concurrentes ; obtenir revue indépendante, puis qualifier les contrats/licences et fixtures officiels de l'issue #16 avant ajout réel de sources. En parallèle sélectionner un travail indépendant seulement après contrôle des claims.
+- **ROLLBACK** : revert ciblé des commits de branche PR #29 ; aucune écriture main, base, secrets ou S1.
+
+---
+
+
 ## 2026-11-13 04:32 Europe/Paris — Issue #16 : tests de compatibilité additive du registre (PARTIAL)
 
 - **RECONCILIATION** : PR #1 fusionnée ; PR #22/#25/#26/#27/#28 ouvertes ; PR #28 HEAD `bebd543671f92d23ed38b4da0fb1a3dfe7ea7c5e`, base main `73256f48d81d38ce8ff6f51be9e024b25cf5dadb` au contrôle. Dépôt privé. AGENTS.md, docs/00–15, dernier worklog et checkpoint 2026-11-06 relus. Aucune branche concurrente modifiée.
