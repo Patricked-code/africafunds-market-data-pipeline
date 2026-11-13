@@ -86,3 +86,23 @@ test('issue #16: additive catalog preserves every market and detects synthetic I
   const colliding = [...all, { ...added[0], id: original[0]?.endpoints[0]?.id ?? 'synthetic-fx' }];
   assert.notEqual(new Set(colliding.map((endpoint) => endpoint.id)).size, colliding.length, 'collision fixture must be detected');
 });
+
+
+test('issue #16: catalogue extension preserves restrictive access policies', () => {
+  const catalog = readJson<Catalog & { defaultPolicies: {
+    respectRobotsTxt: boolean;
+    doNotBypassCaptcha: boolean;
+    doNotBypassAuthentication: boolean;
+    requestsPerSecond: number;
+  } }>('sources.json');
+  assert.equal(catalog.defaultPolicies.respectRobotsTxt, true);
+  assert.equal(catalog.defaultPolicies.doNotBypassCaptcha, true);
+  assert.equal(catalog.defaultPolicies.doNotBypassAuthentication, true);
+  assert.ok(Number.isFinite(catalog.defaultPolicies.requestsPerSecond));
+  assert.ok(catalog.defaultPolicies.requestsPerSecond > 0);
+  assert.ok(catalog.defaultPolicies.requestsPerSecond <= 1, 'catalogue access rate must remain conservative');
+  const before = JSON.stringify(catalog.defaultPolicies);
+  const syntheticExtension = { ...catalog, marketFiles: [...catalog.marketFiles, 'sources/SYNTHETIC.json'] };
+  assert.equal(JSON.stringify(syntheticExtension.defaultPolicies), before, 'additive registration must not weaken access controls');
+  assert.equal(JSON.stringify(catalog.defaultPolicies), before, 'original policy must remain unchanged');
+});
