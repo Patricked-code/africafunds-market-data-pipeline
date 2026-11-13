@@ -1,5 +1,17 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-13 07:37 Europe/Paris — PR #29 : contrôle global de compatibilité des sources (PARTIAL)
+
+- **RECONCILIATION** : AGENTS.md, docs/15_AUTONOMOUS_AGENT_EXECUTION.md, checkpoint 2026-11-06 et dernier NEXT_ACTION du worklog relus sur la branche PR #29 ; issues ouvertes et PR ouvertes consultées via GitHub. PR #1 historiquement fusionnée selon journal ; aucun ancien SHA considéré comme HEAD courant sans preuve. Pas de modification de branches concurrentes.
+- **CI PREUVE** : commit `bccdbd346e58bf55997448bf2c254c723f49dc36`, GitHub Actions [#43373522334](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43373522334) `completed/success` (workflow CI, première page des runs PR retournée). Aucun résultat Docker/S1 supplémentaire revendiqué.
+- **ACTION TEST** : commit [`2325812fecc44e383cd01b05937364957d5648ac`](https://github.com/Patricked-code/africafunds-market-data-pipeline/commit/2325812fecc44e383cd01b05937364957d5648ac) ajoute un test d'extension synthétique vérifiant la conservation de chaque endpoint historique des onze marchés, l'ordre des marchés, l'unicité globale des IDs et la détection d'une collision volontaire. Aucun ajout au registre réel ; aucun protocole ou licence source supposé.
+- **VALIDATION** : nouveau test committé ; exécution locale NOT_RUN ; CI du nouveau code NOT_YET_ATTESTED au moment du checkpoint. Les fixtures `example.invalid` sont strictement synthétiques.
+- **BLOCK_REASON** : PR Draft et revue indépendante/gates de fusion non attestés ; licences, URLs contractuelles, formats et observations témoins officiels FX/INFLATION/FUND_NAV non qualifiés. Aucune preuve de données réelles, HISTORY_COMPLETE ou déploiement S1.
+- **NEXT_ACTION** : contrôler CI sur SHA exact du nouveau HEAD documentaire ; corriger tout échec ; obtenir revue indépendante ; qualifier source primaire et licence/format/fixture officielle de l'issue #16 avant tout enrichissement réel. Si bloqué, poursuivre une tâche indépendante après réconciliation des claims des PR #26/#27.
+- **ROLLBACK** : revert ciblé des commits de la branche PR #29, sans toucher à main, aux 44 sources, secrets ou S1.
+
+---
+
 ## 2026-11-13 06:39 Europe/Paris — PR #29 : CI TypeScript corrigée et vérifiée (PARTIAL)
 
 - **RECONCILIATION** : PR #1 fusionnée, dépôt privé, PR #29 ouverte/Draft sur `test/source-family-additive-compat-20261113`, SHA contrôlé `02501c2a69b0c2a9c9a6c1d4eb0005dca5094f1c`. Les issues #14/#15/#16/#17/#20 demeurent des chantiers fonctionnels ; ne pas confondre couverture structurelle et données certifiées. AGENTS.md, docs/15, checkpoint 2026-11-06 et worklog de branche consultés.
