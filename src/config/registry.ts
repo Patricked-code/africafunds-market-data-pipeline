@@ -4,7 +4,7 @@ import { z } from 'zod';
 import { env } from './env.js';
 
 const endpointSchema = z.object({
-  id: z.string().trim().min(1), label: z.string(), url: z.string().url(),
+  id: z.string().trim().min(1), label: z.string(), url: z.string().url().refine((value) => new URL(value).protocol === 'https:', 'HTTPS_SOURCE_REQUIRED'),
   dataFamily: z.enum(['EQUITY_INDEX','MONEY_MARKET_RATE','MONEY_MARKET_INDEX','TREASURY_RATE','YIELD_CURVE','FX','INFLATION','FUND_NAV']),
   collector: z.enum(['HTML_TABLE','HTML_TABLE_CSV','HTML_LINK_INDEX','DOCUMENT_LINK_INDEX','PDF_LINK_INDEX','XLSX_LINK_INDEX','MANUAL_API_DISCOVERY']),
   frequency: z.string(), enabled: z.boolean().optional().default(true),
