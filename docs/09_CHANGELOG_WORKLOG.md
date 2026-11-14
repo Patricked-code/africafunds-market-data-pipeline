@@ -1,5 +1,18 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-14 12:34 Europe/Paris — Issue #17 : filtre conservateur de publication indices (PARTIAL)
+
+- RECONCILIATION : PR #1 fusionnée ; AGENTS.md, docs/15, checkpoint 06/11, dernier worklog et issue #17 relus. PR ouvertes #22/#25/#26/#27/#28/#29/#30 vérifiées ; aucun de leurs périmètres d'ingestion, qualité ou registre modifié. Repo private selon GitHub.
+- PREUVES CI EXACT-HEAD PRECEDENT : commit `de52d7a0d3378a7efcda39f9ff179ab11e183e99` : [Docker/PostgreSQL #43586064573](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43586064573) et [CI #43586064628](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43586064628) = completed/success selon GitHub.
+- TEST (commit `9df44f47ed68f0b46684a6f937e62dda6cf6f18c`) : test/api-index-publication-visibility.test.ts vérifie statiquement la présence des clauses SQL et la paramétrisation ; aucun RED exécuté ni test PostgreSQL de recette.
+- CODE (commit `f53254b831255eb84ed69317ebad57ffdb03a2e3`) : src/api/queries.ts::indices() ajoute un filtre fail-closed `d.publication_status = 'PUBLISHED'`, `v.publication_date IS NOT NULL` et `v.publication_date <= CURRENT_DATE` ; préserve filtres market/currency et LIMIT. `PUBLISHED` est une convention de travail **à valider** avec le contrat métier avant fusion ; aucun statut de publication existant en base n'a été observé.
+- LIMITES : pas de test PostgreSQL sur fixtures DRAFT/PUBLISHED/futur/NULL, ni de preuve de dates réelles, ni revue indépendante. rates() inchangé et à auditer. Aucune donnée, migration, 44 sources, secret ou S1 modifié. CI du nouveau HEAD non attestée au moment du commit.
+- BLOCK_REASON : contrat de statut publiable, traitement historique publication_date=NULL et cas de recette SQL réels à valider ; revues/gates non satisfaits.
+- NEXT_ACTION : vérifier CI exact-HEAD, corriger toute erreur ; réaliser test PostgreSQL intégré pour DRAFT/PUBLISHED/future/NULL et valider la convention PUBLISHED et la règle NULL avant fusion. Puis auditer rates() et poursuivre la chaîne de données officielles autorisées sans collision.
+- ROLLBACK : revert ciblé des commits de test et du filtre sur la branche Draft ; aucune fusion autorisée.
+
+---
+
 ## 2026-11-14 11:35 Europe/Paris — PR #30, issue #17 : CI attestée et risque de publication (PARTIAL)
 
 - RECONCILIATION : PR #1 fusionnée ; AGENTS.md, docs/15, checkpoint historique 06/11 et dernier worklog lus ; issue #17 et PR ouvertes #22/#25/#26/#27/#28/#29/#30 consultées. HEAD PR #30 observé 42b249e9f236c5fa6190607c60e65cf75497d7cf, base 73256f48d81d38ce8ff6f51be9e024b25cf5dadb. Aucune branche concurrente touchée.
