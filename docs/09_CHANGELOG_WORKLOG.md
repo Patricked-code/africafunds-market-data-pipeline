@@ -1,5 +1,17 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-14 20:38 Europe/Paris — Issue #17 : CI exacte confirmée, filtres indices en recette PostgreSQL (PARTIAL)
+
+- RECONCILIATION : PR #1 closed/merged ; PR #30 open/Draft, HEAD avant écriture `1609c9e7e7bf4e0bd8b93219a08a4bfd83d77765`, base main `73256f48d81d38ce8ff6f51be9e024b25cf5dadb` (33 ahead / 0 behind au contrôle). Lecture AGENTS.md, docs/15, worklog, checkpoint historique 06/11, code `src/api/queries.ts`, recette PostgreSQL indices et taux, PR ouvertes #22/#25/#26/#27/#28/#29 et issues #13–#17. Aucun périmètre concurrent modifié.
+- PREUVES CI EXACT-HEAD : GitHub associe au commit `1609c9e7e7bf4e0bd8b93219a08a4bfd83d77765` [CI #43627071841](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43627071841) et [Docker/PostgreSQL #43627071825](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43627071825), tous deux `completed/success`. Cette preuve précède les nouveaux commits et n'atteste pas le nouveau HEAD.
+- CODE/TEST : commit [b38338f](https://github.com/Patricked-code/africafunds-market-data-pipeline/commit/b38338f5099bff7692a478661ea2e9b74b97530d) complète `test/integration/api-index-publication.test.ts` avec deux assertions PostgreSQL réelles : marché inconnu et devise inconnue ne doivent pas exposer de valeurs publiées. Réutilisation de la transaction synthétique et du rollback existants ; aucune modification de requête de production, migration, source historique, secret ou serveur.
+- VALIDATION : tests locaux NOT_RUN ; CI du commit de test et du HEAD documentaire à venir NOT_ATTESTED. Données synthétiques uniquement ; aucune preuve de collecte officielle, de licence, de normalisation financière complète, de publication réelle ni de HISTORY_COMPLETE.
+- BLOCK_REASON : CI exact nouveau HEAD et revue indépendante manquantes ; arbitrages de publication/qualité, droits de redistribution, observations témoins officielles et chaîne bout-en-bout toujours non attestés. PR #26 ingestion et #27 admission financière restent des périmètres concurrents.
+- NEXT_ACTION : contrôler les workflows exact-HEAD de la PR #30 après ce checkpoint et corriger tout échec. Puis identifier une source officielle avec licence et témoin autorisés ; réconcilier les claims #26/#27 et raccorder source → archive SHA-256 → normalisation/qualité → calcul → API sur une surface libre. Si contrats indisponibles, travailler sur une tâche indépendante non revendiquée ; aucun merge ni S1 avant gates.
+- ROLLBACK : revert ciblé du test et du checkpoint sur la branche Draft ; aucun changement durable des données.
+
+---
+
 ## 2026-11-14 19:30 Europe/Paris — Issue #17 : CI exact-HEAD et recette indices renforcée (PARTIAL)
 
 - RECONCILIATION : PR #1 fusionnée, PR #30 ouverte Draft sur `fix/api-cors-origin-admission-20261114` ; lecture de AGENTS.md, docs/00–15 selon protocole, dernier checkpoint historique, dernier NEXT_ACTION, code API et recettes indices/taux ; PR concurrentes préservées. GitHub demeure autorité unique.
