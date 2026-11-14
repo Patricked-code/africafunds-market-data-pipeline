@@ -1,5 +1,17 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-14 11:35 Europe/Paris — PR #30, issue #17 : CI attestée et risque de publication (PARTIAL)
+
+- RECONCILIATION : PR #1 fusionnée ; AGENTS.md, docs/15, checkpoint historique 06/11 et dernier worklog lus ; issue #17 et PR ouvertes #22/#25/#26/#27/#28/#29/#30 consultées. HEAD PR #30 observé 42b249e9f236c5fa6190607c60e65cf75497d7cf, base 73256f48d81d38ce8ff6f51be9e024b25cf5dadb. Aucune branche concurrente touchée.
+- PREUVES CI EXACT-HEAD : [CI #43581040185](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43581040185) et [Docker/PostgreSQL #43581040181](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43581040181), completed/success sur HEAD 42b249e9f236c5fa6190607c60e65cf75497d7cf. Ces runs ne certifient ni la publication financière ni S1.
+- CONSTAT CODE (FR-022, NFR-004) : src/api/queries.ts::indices() lit calc.index_daily_values sans filtrer calc.index_definitions.publication_status ou publication_date, alors que ces colonnes figurent dans sql/migrations/002_market_calc.sql. Risque potentiel de diffusion de séries DRAFT ou de données avant leur publication, NON attesté comme incident réel. Le contrat de rates() exige une revue distincte.
+- LIMITES : aucune observation officielle primaire autorisée, aucun test local ni preuve de non-anticipation, revue indépendante absente. Le correctif CORS ne constitue pas une autorisation de lecture.
+- BLOCK_REASON : politique des statuts publiables, dates de diffusion et lignes historiques publication_date=NULL non validée ; ne pas inventer un statut SQL ou changer silencieusement la compatibilité.
+- NEXT_ACTION : établir dans issue #17 le contrat de visibilité, puis ajouter tests de recette SQL/API pour DRAFT, PUBLISHED, date future et NULL, et corriger indices() minimalement sur surface coordonnée. Revoir rates() et les claims #26/#27 ; reprendre les données officielles dès que contrats et fixtures autorisés sont disponibles. Pas de merge, push main, secret ni S1.
+- ROLLBACK : revert ciblé de ce checkpoint sur la branche Draft.
+
+---
+
 ## 2026-11-14 10:31 Europe/Paris — PR #30, issue #17 : CI du correctif CORS confirmée et cas de sécurité supplémentaires (PARTIAL)
 
 - **RECONCILIATION** : AGENTS.md, docs/15, worklog/dernier checkpoint de la branche PR #30, issue #17, PR ouvertes #22/#25/#26/#27/#28/#29/#30, main et comparaison main...PR #30 consultés. main base vérifiée `73256f48d81d38ce8ff6f51be9e024b25cf5dadb`, PR #30 avant écriture à 5 commits d'avance, 0 de retard ; aucune branche concurrente touchée.
