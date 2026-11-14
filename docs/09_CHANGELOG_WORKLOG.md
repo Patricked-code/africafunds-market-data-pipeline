@@ -1,5 +1,17 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-14 21:36 Europe/Paris — Issue #17 : contrôle de publication sans filtres, CI précédente exacte (PARTIAL)
+
+- RECONCILIATION : dépôt privé (GitHub), PR #1 fusionnée selon suivi courant, PR #30 Draft, branche `fix/api-cors-origin-admission-20261114`, base main `73256f48d81d38ce8ff6f51be9e024b25cf5dadb` (35 ahead / 0 behind avant écriture). AGENTS.md, docs/15, worklog et checkpoint 06/11, matrice de recette, code API et tests PostgreSQL relus ; PR concurrentes #22/#25/#26/#27/#28/#29 et issues #13–#17 réconciliées. Pas de modification de leur périmètre.
+- PREUVE CI EXACT-HEAD PRÉCÉDENT : commit `b9da1deb6a6b8836f3d6702346da98e323926df3` : [CI #43633260434](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43633260434) et [Docker/PostgreSQL #43633260562](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43633260562) = completed/success, selon GitHub. Ne pas extrapoler à la modification suivante.
+- TEST : [commit 4add6cd](https://github.com/Patricked-code/africafunds-market-data-pipeline/commit/4add6cd932a791374e7b9fd41c4afb95c0a6fb94) étend la recette transactionnelle `test/integration/api-index-publication.test.ts` à une lecture publique **sans** filtres marché/devise ; assertions positives sur observations admissibles et négatives sur DRAFT/publication future/NULL/date économique future. Le filtrage de contrôle cible les index synthétiques du test. Code de production, migrations, sources initiales et S1 inchangés.
+- VALIDATION : tests locaux NOT_RUN ; CI exact nouveau HEAD NOT_ATTESTED. La CI précédente prouve les assertions précédentes uniquement. Observations synthétiques, pas de preuve de données officielles, droits de redistribution, pipeline financier bout-en-bout ni HISTORY_COMPLETE.
+- BLOCK_REASON : CI du nouveau HEAD et revue indépendante non attestées ; licences et échantillons officiels, politique métier de publication/qualité et raccordement #26/#27 restent bloquants. La recette sans filtre suppose une base d'intégration suffisamment petite pour inclure ses fixtures dans LIMIT 1000 ; surveiller cette précondition en CI.
+- NEXT_ACTION : contrôler CI et Docker/PostgreSQL du HEAD issu de ce checkpoint ; corriger tout échec. Puis qualifier une source officielle et un témoin autorisé, coordonner les claims PR #26/#27 avant tout changement ingestion/qualité, et démontrer source → archive SHA-256 → normalisation → qualité → calcul → API. Si indisponible, choisir un chantier indépendant libre, sans tests périphériques répétitifs.
+- ROLLBACK : revert ciblé du commit test et de ce checkpoint sur PR Draft ; aucun push main, merge, secret ou déploiement S1.
+
+---
+
 ## 2026-11-14 20:38 Europe/Paris — Issue #17 : CI exacte confirmée, filtres indices en recette PostgreSQL (PARTIAL)
 
 - RECONCILIATION : PR #1 closed/merged ; PR #30 open/Draft, HEAD avant écriture `1609c9e7e7bf4e0bd8b93219a08a4bfd83d77765`, base main `73256f48d81d38ce8ff6f51be9e024b25cf5dadb` (33 ahead / 0 behind au contrôle). Lecture AGENTS.md, docs/15, worklog, checkpoint historique 06/11, code `src/api/queries.ts`, recette PostgreSQL indices et taux, PR ouvertes #22/#25/#26/#27/#28/#29 et issues #13–#17. Aucun périmètre concurrent modifié.
