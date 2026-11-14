@@ -72,7 +72,7 @@ test('issue #17: public indices omit DRAFT, future publication, future observati
     // The same fail-closed policy must hold when clients omit both optional filters.
     // Restrict assertions to this transaction's synthetic index IDs to avoid assuming
     // that an otherwise populated integration database has no unrelated observations.
-    const unfiltered = await indices(new URL('http://localhost/api/v1/indices'), 1000)
+    const unfiltered = (await indices(new URL('http://localhost/api/v1/indices'), 1000))
       as Array<{ index_code: string; index_level: string }>;
     const ownUnfiltered = unfiltered.filter(row => row.index_code.startsWith('CI_VISIBILITY_'));
     assert.ok(ownUnfiltered.some(row => Number(row.index_level) === 102),
