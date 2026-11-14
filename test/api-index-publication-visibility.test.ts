@@ -10,6 +10,7 @@ test('issue #17: index API cannot expose draft definitions or future/unpublished
   assert.match(indicesSql, /d\.publication_status\s*=\s*'PUBLISHED'/);
   assert.match(indicesSql, /v\.publication_date\s+IS\s+NOT\s+NULL/i);
   assert.match(indicesSql, /v\.publication_date\s*<=\s*CURRENT_DATE/i);
+  assert.match(indicesSql, /v\.observation_date\s*<=\s*CURRENT_DATE/i);
   assert.match(indicesSql, /WHERE\s+\$\{clauses\.join\(' AND '\)\}/);
 });
 
