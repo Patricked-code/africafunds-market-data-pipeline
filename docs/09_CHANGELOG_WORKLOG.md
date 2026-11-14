@@ -1,5 +1,18 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-14 02:34 Europe/Paris — PR #29 : réconciliation BAM FX et garde anti-doublon (#16, PARTIAL)
+
+- **RECONCILIATION** : AGENTS.md, docs/15_AUTONOMOUS_AGENT_EXECUTION.md, dernier checkpoint du présent journal, issue #16 et PR ouvertes #22/#25/#26/#27/#28/#29 relus. Dépôt GitHub privé selon get_repo ; aucune branche concurrente modifiée. Branch PR #29 : `test/source-family-additive-compat-20261113`.
+- **PREUVES CI** : pour le HEAD antérieur `b21d17da8b8a9a9399e77581e4102b247b8a1d7b`, [CI #43535113195](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43535113195) et [Docker/PostgreSQL #43535113199](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43535113199) : completed/success. Elles ne prouvent PAS les commits ci-dessous.
+- **CODE/TEST** : commit `4bf618ab235e5da8323e04f1091703f3acdd57c9` ajoute un test de non-régression de l'unique source BAM FX existante `mar-bam-fx` (famille FX, collecteur HTML_TABLE_CSV, URL historique), de la conservation des 44 endpoints et de l'absence d'un second identifiant. Test local NOT_RUN ; CI nouveau HEAD non attestée au moment de l'écriture.
+- **QUALIFICATION** : commit `cdc696fd3d4fd988fb3e96d32b1b2bc6c88f1738` complète la note BAM après lecture directe de `config/sources.json` et `config/sources/MAR.json`. La fréquence DAILY est une déclaration du registre, pas une fréquence API officiellement certifiée. Pas de nouvelle source ni de donnée réelle.
+- **BLOCK_REASON** : contrat API BAM précis, droits de conservation/redistribution, réponse témoin officielle autorisée, checksum, revue indépendante et CI du nouveau HEAD restent à vérifier. Aucun HISTORY_COMPLETE, collecte ni publication certifiés.
+- **NEXT_ACTION** : vérifier les runs GitHub Actions des nouveaux commits, corriger toute CI rouge ; poursuivre la qualification BAM directement auprès de la documentation primaire autorisée (contrat, licence, dates, formats et témoin) ; vérifier le mapping/dédoublonnage de `mar-bam-fx` avant toute extension. Si bloqué, sélectionner une tâche indépendante de l'issue #17 après réconciliation des claims. Aucune fusion/main/S1/secret.
+- **ROLLBACK** : revert ciblé des commits de test, de qualification et de checkpoint sur la branche PR #29 uniquement.
+
+---
+
+
 ## 2026-11-14 01:34 Europe/Paris — PR #29 : source primaire BAM, qualification sans ingestion (#16, PARTIAL)
 
 - **RECONCILIATION** : documents AGENTS.md et docs/15_AUTONOMOUS_AGENT_EXECUTION.md lus sur main, worklog et dernier checkpoint lus sur branche PR #29 ; PR ouvertes #22/#25/#26/#27/#28/#29, sans modification de leurs autres branches. HEAD de la branche avant écriture selon dernier checkpoint : dc08375aad48f00d51f4e642acc7f3def91ad0bc (à réconcilier avant toute écriture concurrente ultérieure).
