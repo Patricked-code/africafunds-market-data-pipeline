@@ -1,5 +1,18 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-14 06:31 Europe/Paris — PR #29 : refus des secrets dans les URL sources (#16, PARTIAL)
+
+- **RECONCILIATION** : PR #29 Draft sur `test/source-family-additive-compat-20261113`, issue #16 ouverte, PR concurrentes #22/#25/#26/#27/#28 inchangées ; AGENTS.md, protocole docs/15 et dernier checkpoint lus. La PR #1 est fusionnée selon la réconciliation antérieure ; aucun SHA historique considéré comme courant sans lecture.
+- **PREUVES** : HEAD précédent `2de37b05de0ddb07303645601e163f70f66adef0` : GitHub Actions CI [#43557329432](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43557329432) et Docker/PostgreSQL [#43557329451](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43557329451) = completed/success. Ne couvre pas les commits suivants.
+- **RED (test committé, exécution locale NOT_RUN)** : `3c6c67e28f6213a5468940ed31d511dc92cc13e3` ajoute au test runtime `parseRegistry` le rejet d'URL HTTPS contenant userinfo, mot de passe ou fragment, sans altérer les 44 sources.
+- **GREEN (code committé, CI nouveau HEAD PENDING)** : `8e64bc82dc3080c669be4e8bd24fd71a4af4ff17` complète le schéma Zod existant : HTTPS uniquement, sans identifiants intégrés ni fragments. Aucun nouvel adaptateur, endpoint, secret ou collecte.
+- **BLOCK_REASON** : licence et contrat BAM FX, observation primaire et SHA-256 absents ; les 6 adaptateurs officiels et l'intégration financière restent non attestés ; revue et CI du HEAD modifié à vérifier. Ce correctif protège la configuration mais ne prouve ni l'absence de SSRF ni la qualification des données.
+- **NEXT_ACTION** : contrôler les runs CI/Docker du HEAD modifié et corriger tout échec ; qualifier une réponse et les droits BAM sans dupliquer `mar-bam-fx`, sinon poursuivre un cas de recette indépendant #17 après contrôle des claims. Ne pas fusionner, déployer S1, exposer de secret ni modifier main.
+- **ROLLBACK** : revert ciblé des commits de branche PR #29 ; aucune opération runtime.
+
+---
+
+
 ## 2026-11-14 05:34 Europe/Paris — PR #29 : CI exact-HEAD et qualification BAM bloquée (#16, PARTIAL)
 
 - **RECONCILIATION** : PR #29 ouverte Draft, branche `test/source-family-additive-compat-20261113`, HEAD `a02bf6c1429f0568d8b2d77f23258e9103780a9d`, base `73256f48d81d38ce8ff6f51be9e024b25cf5dadb` ; PR ouvertes #22/#25/#26/#27/#28/#29 ; issue #16 ouverte. AGENTS.md, docs/00..15 et dernier checkpoint relus. Aucun claim concurrent déplacé.
