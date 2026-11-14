@@ -311,3 +311,22 @@ test('issue #16: existing Bank Al-Maghrib FX source is retained without duplicat
   assert.equal(all.filter((endpoint) => endpoint.id === 'mar-bam-fx').length, 1);
   assert.equal(all.length, 44, 'qualification must not silently register a second FX endpoint');
 });
+
+
+test('issue #16: registry refuses insecure or non-HTTP source transports without altering historical sources', async () => {
+  process.env.DATABASE_URL ??= 'postgresql://localhost:5432/registry_test';
+  const { parseRegistry } = await import('../src/config/registry.js');
+  const original = loadExisting();
+  const snapshot = JSON.stringify(original);
+  const first = original[0]?.endpoints[0];
+  assert.ok(first, 'expected an original source');
+  for (const url of ['http://example.invalid/rates', 'ftp://example.invalid/rates', 'file:///etc/passwd']) {
+    const markets = original.map((market, index) => index === 0
+      ? { ...market, endpoints: [{ ...first, url }, ...market.endpoints.slice(1)] }
+      : market);
+    assert.throws(() => parseRegistry({
+      version: 'test', generatedAt: '2026-11-14', defaultPolicies: {}, markets,
+    }), 'non-HTTPS source URL must be rejected');
+  }
+  assert.equal(JSON.stringify(original), snapshot, 'legacy sources must remain unchanged');
+});
