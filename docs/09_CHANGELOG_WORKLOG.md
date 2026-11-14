@@ -1,5 +1,17 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-14 19:30 Europe/Paris — Issue #17 : CI exact-HEAD et recette indices renforcée (PARTIAL)
+
+- RECONCILIATION : PR #1 fusionnée, PR #30 ouverte Draft sur `fix/api-cors-origin-admission-20261114` ; lecture de AGENTS.md, docs/00–15 selon protocole, dernier checkpoint historique, dernier NEXT_ACTION, code API et recettes indices/taux ; PR concurrentes préservées. GitHub demeure autorité unique.
+- PREUVES CI EXACT-HEAD : commit `1c9cd6af08e52e44dbe172a7d8f57363b6e0262f` : [CI #43622179696](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43622179696) completed/success ; [Docker/PostgreSQL #43622179705](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43622179705) completed/success. Ces runs précèdent les nouveaux commits.
+- CODE/TEST : [6fc2f72](https://github.com/Patricked-code/africafunds-market-data-pipeline/commit/6fc2f72ff40e02eae56a618e5ffce375738baf67) ajoute le cas indice publié à CURRENT_DATE et vérifie LIMIT=1 après filtrage ; [438f8a2](https://github.com/Patricked-code/africafunds-market-data-pipeline/commit/438f8a2ae76a7c2c54a0699b6b9f7d136a1ae3d8) corrige la fixture pour garantir l'unicité (index_id,observation_date). Aucun changement de production, de migration, de source historique ou de serveur.
+- VALIDATION : nouveaux tests committés, tests locaux NOT_RUN ; CI du HEAD après ces commits NOT_ATTESTED. Données synthétiques transactionnelles seulement ; pas de certification financière ni de HISTORY_COMPLETE.
+- BLOCK_REASON : CI nouveau HEAD, revue indépendante, arbitrages métier de publication, contrats de redistribution et observations officielles non attestés. Les PR #26/#27 restent des périmètres concurrents à réconcilier avant changement.
+- NEXT_ACTION : contrôler les workflows exact-HEAD de la présente branche, corriger toute régression ; poursuivre la chaîne source officielle autorisée → archive SHA-256 → normalisation/qualité → calcul → API après vérification des claims et contrats. Aucune fusion sans protections, revues et gates.
+- ROLLBACK : revert ciblé des commits de test sur la PR Draft. Aucune donnée durable, aucun push main, aucune fusion ni déploiement S1.
+
+---
+
 ## 2026-11-14 18:37 Europe/Paris — Issue #17 : CI recette taux confirmée et bornes de publication testées (PARTIAL)
 
 - RECONCILIATION : dépôt privé confirmé par GitHub, PR #30 ouverte ; lecture de AGENTS.md, docs/15_AUTONOMOUS_AGENT_EXECUTION.md, journal et checkpoint de reprise, code rates()/indices(), recettes PostgreSQL et issue #17. PR concurrentes laissées intactes. Branche de travail : `fix/api-cors-origin-admission-20261114`.
