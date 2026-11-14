@@ -29,17 +29,17 @@ test('issue #17: public indices omit DRAFT, future and undated values', async ()
       );
       ids[status] = definition.rows[0]!.index_id;
     }
-    for (const [status, offset, level] of [
-      ['DRAFT', -1, 101], ['PUBLISHED', -1, 102],
-      ['PUBLISHED', 1, 103], ['PUBLISHED', null, 104],
+    for (const [status, observationOffset, offset, level] of [
+      ['DRAFT', -3, -1, 101], ['PUBLISHED', -2, -1, 102],
+      ['PUBLISHED', -1, 1, 103], ['PUBLISHED', 0, null, 104],
     ] as const) {
       await client.query(
         `INSERT INTO calc.index_daily_values
          (index_id,observation_date,calculation_date,publication_date,currency_code,currency_context,index_level)
-         VALUES ($1,CURRENT_DATE,CURRENT_DATE,
-                 CASE WHEN $2::integer IS NULL THEN NULL ELSE CURRENT_DATE + $2::integer END,
-                 $3,'LOCAL',$4)`,
-        [ids[status], offset, market.currency_code, level],
+         VALUES ($1,CURRENT_DATE + $2::integer,CURRENT_DATE,
+                 CASE WHEN $3::integer IS NULL THEN NULL ELSE CURRENT_DATE + $3::integer END,
+                 $4,'LOCAL',$5)`,
+        [ids[status], observationOffset, offset, market.currency_code, level],
       );
     }
     // Keep all SELECTs on the same transaction connection, including uncommitted fixtures.
