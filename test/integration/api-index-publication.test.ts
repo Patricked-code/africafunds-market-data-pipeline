@@ -19,13 +19,16 @@ test('issue #17: public indices omit DRAFT, future publication, future observati
     const market = seeded.rows[0];
     assert.ok(market, 'seeded market and currency required');
     const ids: Record<string, string> = {};
+    const fixtureCodes = new Set<string>();
     for (const status of ['DRAFT', 'PUBLISHED']) {
+      const indexCode = `CI_VISIBILITY_${status}_${Date.now()}_${Math.random().toString(36).slice(2)}`;
+      fixtureCodes.add(indexCode);
       const definition = await client.query<{ index_id: string }>(
         `INSERT INTO calc.index_definitions
          (index_code,index_name,index_family,market_code,base_currency_code,base_date,return_type,calculation_method,publication_status)
          VALUES ($1,$1,'TEST',$2,$3,CURRENT_DATE,'PRICE','TEST',$4)
          RETURNING index_id`,
-        [`CI_VISIBILITY_${status}_${Date.now()}`, market.market_code, market.currency_code, status],
+        [indexCode, market.market_code, market.currency_code, status],
       );
       ids[status] = definition.rows[0]!.index_id;
     }
@@ -73,7 +76,7 @@ test('issue #17: public indices omit DRAFT, future publication, future observati
     // Restrict assertions to this transaction's synthetic index IDs to avoid assuming
     // that an otherwise populated integration database has no unrelated observations.
     const unfiltered = (await indices(new URL('http://localhost/api/v1/indices'), 1000)) as Array<{ index_code: string; index_level: string }>;
-    const ownUnfiltered = unfiltered.filter(row => row.index_code.startsWith('CI_VISIBILITY_'));
+    const ownUnfiltered = unfiltered.filter(row => fixtureCodes.has(row.index_code));
     assert.ok(ownUnfiltered.some(row => Number(row.index_level) === 102),
       'unfiltered public read retains eligible historical observations');
     assert.ok(ownUnfiltered.some(row => Number(row.index_level) === 106),
