@@ -1,5 +1,14 @@
 # 06 — État réel et écarts
 
+## Issue #17 — API CORS allowlist (2026-11-14, PARTIAL)
+
+- Branche `fix/api-cors-origin-admission-20261114` : correction ciblée du comportement de `src/api/server.ts` qui envoyait `Access-Control-Allow-Origin` pour le premier domaine autorisé même quand l'origine de la requête n'était pas autorisée. La nouvelle fonction pure `resolveCorsOrigin` refuse l'origine inconnue et conserve le mode wildcard historique. Tests de régression dans `test/api-cors-origin-admission.test.ts`.
+- **Portée** : contrôle CORS des navigateurs uniquement ; ce n'est ni une authentification ni une protection des données/API, et ne certifie aucune publication financière. L'API reste un socle de lecture non authentifié, sans recette métier complète.
+- Tests locaux NOT_RUN ; CI exact-HEAD et revue indépendante à attester. Aucune modification aux 44 endpoints, schémas PostgreSQL, S1 ou données.
+- **BLOCK_REASON** : validation CI/revue en attente, authentification/quotas/API de publication et observations financières réelles non certifiés.
+- **NEXT_ACTION** : contrôler la CI exact-HEAD, corriger tout échec et poursuivre la recette API issue #17 sur données témoins autorisées, après vérification des claims des PR concurrentes.
+
+
 ## Audit S1 et sécurité de déploiement — 2026-11-07
 
 - **PREUVE SERVEUR READ-ONLY** : les domaines `sadiaaf.wealthtechinnovations.com` et `api.sadiaaf.wealthtechinnovations.com` existent et répondent tous deux **HTTP 500** à `curl -I` depuis S1 ; aucun dépôt Git racine dans leurs vhosts ; le seul conteneur Docker actif observé est le bridge MCP. Cela n'atteste pas l'absence d'autres bases/service hors Docker.
