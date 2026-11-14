@@ -1,5 +1,19 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-14 15:37 Europe/Paris — Issue #17 : lecture publique des taux, filtre conservateur (PARTIAL)
+
+- RECONCILIATION : PR #1 fusionnée, PR #30 Draft HEAD avant intervention `bbd74ca25412595a94380017d15ecc7b27d1cb70` ; docs AGENTS, 09, 15, checkpoint 06/11, schémas 002_market et 002_market_calc et requêtes API relus. PR #22/#25/#26/#27/#28/#29 ouvertes, périmètres conservés.
+- PREUVES CI : [CI #43600474728](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43600474728) et [Docker/PostgreSQL #43600474770](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43600474770) = completed/success, associés par GitHub au HEAD précédent `bbd74ca` uniquement.
+- TEST : `test/api-rate-publication-visibility.test.ts`, commit `e1837a035c7947b85e25a718eb9a052c08821a23`, spécifie date de publication non NULL, publication et observation non futures, filtres marché/famille et limite paramétrés. RED local NOT_RUN.
+- CODE : `src/api/queries.ts::rates()`, commit `d51b4df0f05293d72d4132ea42a9e9d4d299fa36`, ajoute les trois clauses de lecture publique, sans changer la projection, les filtres existants, la base, les 44 sources ni les autres PR.
+- LIMITES : règle de publication NULL conservatrice proposée, non approuvée ; pas de filtre de statut qualité décidé sans politique officielle ; aucun test PostgreSQL taux avec fixtures ni donnée financière réelle ; CI du nouveau HEAD NOT_ATTESTED, tests locaux NOT_RUN.
+- BLOCK_REASON : validation CI exacte, revue indépendante, contrat de publication/qualité des taux, preuves officielles et licences toujours manquants. Aucun DONE/HISTORY_COMPLETE.
+- NEXT_ACTION : contrôler les workflows exact-HEAD, corriger tout échec, créer une recette PostgreSQL transactionnelle des taux (publié, futur, NULL, date économique future), puis arbitrer statut qualité et politique NULL ; poursuivre la chaîne de collecte officielle autorisée.
+- ROLLBACK : revert ciblé des deux commits fonctionnels sur PR Draft ; pas de déploiement S1, fusion, secret ou écriture main.
+
+---
+
+
 ## 2026-11-14 14:34 Europe/Paris — Issue #17 : non-anticipation des dates économiques dans l'API indices (PARTIAL)
 
 - RECONCILIATION : PR #1 fusionnée ; PR #30 ouverte Draft, HEAD initial `dc32333ae295fe4cc0ae340fd74bf3448699e9ef`, base main observée `73256f48d81d38ce8ff6f51be9e024b25cf5dadb`. AGENTS.md, docs/15, dernier worklog, checkpoint 06/11, issue #17, PR ouvertes #22/#25/#26/#27/#28/#29 et code/migration de publication relus. Repo privé selon connecteur GitHub. Aucun autre périmètre de PR modifié.
