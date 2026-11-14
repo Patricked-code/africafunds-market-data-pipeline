@@ -1,5 +1,18 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-14 22:30 Europe/Paris — Issue #17 : échec CI exact-HEAD diagnostiqué et correction TS1434 (PARTIAL)
+
+- RECONCILIATION : PR #1 closed/merged ; PR #30 open/Draft, HEAD avant correction `812e7415347a05e173360779171d198b0c842230`, branche `fix/api-cors-origin-admission-20261114`. Lecture AGENTS.md, docs/00–15 sur main, worklog de branche, checkpoint 06/11 et recette concernée. Aucun push main, merge ni déploiement.
+- PREUVES EXACT-HEAD : [CI #43638421645](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43638421645) completed/FAILURE (job 132580286432, étape Verify TypeScript types) ; [Docker/PostgreSQL #43638421705](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43638421705) completed/FAILURE (job 132580342227, build npm run build). Cause commune : `test/integration/api-index-publication.test.ts(76,7): error TS1434: Unexpected keyword or identifier` ; cast `as Array<...>` après un `await` non parenthésé sur deux lignes. Le Docker build s'arrête avant la recette runtime ; ne pas attribuer cet échec à PostgreSQL.
+- CORRECTION : [commit 54ad361](https://github.com/Patricked-code/africafunds-market-data-pipeline/commit/54ad3610bcb45624fa07ff5f3346bef8bc9a1ca0) parenthèse `await indices(...)` avant le cast TypeScript ; changement minimal d'un test uniquement. Aucun changement API, migration, sources ou données.
+- VALIDATION : correction committée ; tests locaux NOT_RUN ; CI exact-HEAD après correction NOT_ATTESTED. Ne pas conclure GREEN sans nouveau run. La précondition LIMIT 1000 de la recette sans filtres reste à surveiller.
+- BLOCK_REASON : CI du HEAD corrigé non attestée, revue indépendante, politiques métier et droits de redistribution/observations officielles manquants ; PR #26/#27 concurrentes non revendiquées.
+- NEXT_ACTION : relever le HEAD courant et les runs CI/Docker du commit 54ad361 et du checkpoint suivant, corriger toute erreur. Si GREEN, choisir un travail indépendant libre contribuant à la chaîne source officielle autorisée → archive SHA-256 → normalisation/qualité → calcul → API, sans collision ni certification fictive.
+- ROLLBACK : revert ciblé du correctif test et du présent checkpoint sur PR Draft ; aucun secret, main ou S1 modifié.
+
+---
+
+
 ## 2026-11-14 21:36 Europe/Paris — Issue #17 : contrôle de publication sans filtres, CI précédente exacte (PARTIAL)
 
 - RECONCILIATION : dépôt privé (GitHub), PR #1 fusionnée selon suivi courant, PR #30 Draft, branche `fix/api-cors-origin-admission-20261114`, base main `73256f48d81d38ce8ff6f51be9e024b25cf5dadb` (35 ahead / 0 behind avant écriture). AGENTS.md, docs/15, worklog et checkpoint 06/11, matrice de recette, code API et tests PostgreSQL relus ; PR concurrentes #22/#25/#26/#27/#28/#29 et issues #13–#17 réconciliées. Pas de modification de leur périmètre.
