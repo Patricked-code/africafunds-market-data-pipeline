@@ -1,5 +1,17 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-14 18:37 Europe/Paris — Issue #17 : CI recette taux confirmée et bornes de publication testées (PARTIAL)
+
+- RECONCILIATION : dépôt privé confirmé par GitHub, PR #30 ouverte ; lecture de AGENTS.md, docs/15_AUTONOMOUS_AGENT_EXECUTION.md, journal et checkpoint de reprise, code rates()/indices(), recettes PostgreSQL et issue #17. PR concurrentes laissées intactes. Branche de travail : `fix/api-cors-origin-admission-20261114`.
+- PREUVES CI EXACT-HEAD : commit `5c8fd4bf63f56f711cde6784943e639661a5d468` : [Docker/PostgreSQL #43616181503](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43616181503) completed/success et [CI #43616181611](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43616181611) completed/success. La recette PostgreSQL des taux du commit précédent est donc couverte par ces workflows, sans preuve de collecte réelle.
+- CODE/TEST : commit [3a687b7](https://github.com/Patricked-code/africafunds-market-data-pipeline/commit/3a687b7676560cd00c8ea6b2160b744243ca4f51) étend `test/integration/api-rate-publication.test.ts` : date économique et publication égales à CURRENT_DATE visibles (frontière inclusive), observations futures/NULL invisibles, ordre et LIMIT=1 vérifiés sur la requête réelle. Aucune modification de production, de schéma, de source ou de S1. Tests locaux NOT_RUN ; CI du nouveau HEAD NOT_ATTESTED.
+- BLOCK_REASON : revue indépendante, CI nouveau HEAD, validation des politiques métier publication/qualité et preuves de licences/observations officielles toujours manquantes ; les tests utilisent des données synthétiques. Aucun HISTORY_COMPLETE ni DONE.
+- NEXT_ACTION : vérifier les workflows exact-HEAD du test de frontière, lire les logs et corriger toute régression. Réconcilier ensuite les claims PR #26/#27, sélectionner une source officielle autorisée et relier archive brute SHA-256 → normalisation/qualité → calcul → publication avec preuves réelles ; ne pas fusionner sans gates.
+- ROLLBACK : revert ciblé du commit test sur cette branche Draft ; aucune donnée persistée, aucun push main, aucune fusion ni déploiement.
+
+---
+
+
 ## 2026-11-14 17:31 Europe/Paris — Issue #17 : CI corrigée confirmée et recette PostgreSQL taux ajoutée (PARTIAL)
 
 - RECONCILIATION : PR #1 fusionnée ; PR #30 ouverte Draft sur `fix/api-cors-origin-admission-20261114` ; PR concurrentes #22/#25/#26/#27/#28/#29 identifiées et laissées intactes. Lecture AGENTS.md, docs/15, dernier worklog/checkpoint, issue #17, src/api/queries.ts, migrations 002_market et 002_market_calc, recette PostgreSQL indices et contrat de test taux. Pas de push main ni de fusion.
