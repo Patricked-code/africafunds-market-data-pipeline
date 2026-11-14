@@ -14,7 +14,7 @@ test('issue #17: index API cannot expose draft definitions or future/unpublished
 });
 
 test('issue #17: optional market and currency predicates remain parameterized', () => {
-  assert.match(indicesSql, /d\.market_code=\$\{values\.length\}/);
-  assert.match(indicesSql, /v\.currency_code=\$\{values\.length\}/);
-  assert.match(indicesSql, /LIMIT \$\{values\.length\}/);
+  assert.match(indicesSql, /d\.market_code=\$\$\{values\.length\}/);
+  assert.match(indicesSql, /v\.currency_code=\$\$\{values\.length\}/);
+  assert.match(indicesSql, /LIMIT \$\$\{values\.length\}/);
 });
