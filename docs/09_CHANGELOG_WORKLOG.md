@@ -1,5 +1,17 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-14 07:36 Europe/Paris — PR #29 : preuve de chargement du manifeste réel (#16, PARTIAL)
+
+- **RECONCILIATION** : PR #1 fusionnée ; PR #29 ouverte Draft, branche `test/source-family-additive-compat-20261113`, HEAD avant intervention `ccc1fa5b11b91635bf455361832fb3bb43e4f069` ; PR concurrentes #22/#25/#26/#27/#28 non modifiées. AGENTS.md, docs/15, checkpoint 2026-11-06 et dernier NEXT_ACTION relus.
+- **PREUVES EXACT-HEAD** : HEAD `ccc1fa5b11b91635bf455361832fb3bb43e4f069` : [CI #43561983096](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43561983096) et [Docker/PostgreSQL #43561983091](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43561983091) : completed/success via GitHub. Ces runs ne couvrent pas le nouveau commit.
+- **CODE/TEST** : commit `60e88861183616f31e0ba21d4da4f95a7bafa228` ajoute un test d'intégration du vrai `loadRegistry()` (manifest et fichiers marché) et `listEndpoints()`, pour détecter régression sur 11 marchés, 44 IDs originaux, unicité et `mar-bam-fx`. Test local NOT_RUN ; résultat CI du nouveau HEAD NON ATTESTÉ. Aucune donnée ou source historique modifiée.
+- **BLOCK_REASON** : spécifications/licence BAM et observation primaire datée avec SHA-256 toujours manquantes ; aucun adaptateur financier réel ni preuve de publication ; revue indépendante et gates de fusion non attestés. Les PR #26/#27 ont un périmètre concurrent à respecter.
+- **NEXT_ACTION** : vérifier CI et Docker/PostgreSQL exact-HEAD de ce nouveau test ; corriger tout échec. Puis reprendre qualification d'une source primaire officiellement réutilisable, mapping réel et tests métier ; sinon avancer sur recette #17 non revendiquée après vérification des claims. Ne pas fusionner, déployer S1, toucher aux secrets ou main.
+- **ROLLBACK** : revert ciblé du commit test et de ce checkpoint sur la seule branche PR #29.
+
+---
+
+
 ## 2026-11-14 06:31 Europe/Paris — PR #29 : refus des secrets dans les URL sources (#16, PARTIAL)
 
 - **RECONCILIATION** : PR #29 Draft sur `test/source-family-additive-compat-20261113`, issue #16 ouverte, PR concurrentes #22/#25/#26/#27/#28 inchangées ; AGENTS.md, protocole docs/15 et dernier checkpoint lus. La PR #1 est fusionnée selon la réconciliation antérieure ; aucun SHA historique considéré comme courant sans lecture.
