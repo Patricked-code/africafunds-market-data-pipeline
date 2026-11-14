@@ -16,3 +16,12 @@ test('issue #17: wildcard preserves historical public-read CORS behavior', () =>
 test('issue #17: empty allowlist does not grant cross-origin access', () => {
   assert.equal(resolveCorsOrigin('https://any.example.org', []), undefined);
 });
+
+test('issue #17: origin matching is exact, not a suffix, prefix, or substring check', () => {
+  const allowlist = ['https://dashboard.example.org'];
+  assert.equal(resolveCorsOrigin('https://dashboard.example.org.evil.invalid', allowlist), undefined);
+  assert.equal(resolveCorsOrigin('https://evil.invalid/dashboard.example.org', allowlist), undefined);
+  assert.equal(resolveCorsOrigin('http://dashboard.example.org', allowlist), undefined);
+  assert.equal(resolveCorsOrigin('https://dashboard.example.org:8443', allowlist), undefined);
+  assert.equal(resolveCorsOrigin('null', allowlist), undefined);
+});
