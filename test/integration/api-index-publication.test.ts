@@ -58,6 +58,17 @@ test('issue #17: public indices omit DRAFT, future publication, future observati
     ) as Array<{ index_level: string }>;
     assert.equal(limited.length, 1, 'LIMIT applies after the visibility filter');
     assert.equal(Number(limited[0]!.index_level), 106, 'latest eligible published observation is returned first');
+    // Parameterized optional filters must not return observations from unrelated scopes.
+    assert.deepEqual(
+      await indices(new URL(`http://localhost/api/v1/indices?market=NONEXISTENT_${Date.now()}&currency=${market.currency_code}`), 1000),
+      [],
+      'unknown market must not expose published indices',
+    );
+    assert.deepEqual(
+      await indices(new URL(`http://localhost/api/v1/indices?market=${encodeURIComponent(market.market_code)}&currency=NONEXISTENT_${Date.now()}`), 1000),
+      [],
+      'unknown currency must not expose published indices',
+    );
     for (const forbidden of [101, 103, 104, 105]) {
       assert.ok(!levels.includes(forbidden), `unpublished fixture ${forbidden} must be hidden`);
     }
