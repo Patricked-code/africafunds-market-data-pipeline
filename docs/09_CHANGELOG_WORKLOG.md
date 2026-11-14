@@ -1,5 +1,18 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-14 14:34 Europe/Paris — Issue #17 : non-anticipation des dates économiques dans l'API indices (PARTIAL)
+
+- RECONCILIATION : PR #1 fusionnée ; PR #30 ouverte Draft, HEAD initial `dc32333ae295fe4cc0ae340fd74bf3448699e9ef`, base main observée `73256f48d81d38ce8ff6f51be9e024b25cf5dadb`. AGENTS.md, docs/15, dernier worklog, checkpoint 06/11, issue #17, PR ouvertes #22/#25/#26/#27/#28/#29 et code/migration de publication relus. Repo privé selon connecteur GitHub. Aucun autre périmètre de PR modifié.
+- PREUVES CI HEAD PRECEDENT : [CI #43595915250](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43595915250) et [Docker/PostgreSQL #43595915249](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43595915249), `completed/success` associés par GitHub au commit `dc32333ae295fe4cc0ae340fd74bf3448699e9ef`. Ne pas extrapoler au nouveau HEAD.
+- TEST : commit `25a0d3ac339c572c954c6521b32d6847db4da17f` ajoute l'invariant statique `v.observation_date <= CURRENT_DATE`. Commit `2fb67b2e024036804d3dafef52455e84bcbd4639` ajoute une observation synthétique future avec date de publication passée (niveau 105), qui doit rester invisible dans la recette PostgreSQL transactionnelle existante.
+- CODE : commit `e7a5660cfb20e0662b50d2f92a191c0cd6260f67` ajoute le filtre `v.observation_date <= CURRENT_DATE` à `indices()`, en conservant statut PUBLISHED, date de publication, paramètres marché/devise et LIMIT. Pas de migration ni de modification des 44 endpoints.
+- LIMITES : tests locaux NOT_RUN, pas de RED/GREEN exécuté, CI exact nouveau HEAD non attestée à ce checkpoint ; les fixtures sont synthétiques et ne certifient aucune source officielle ni une publication métier. Le statut PUBLISHED et la règle NULL demeurent soumis à validation de politique.
+- BLOCK_REASON : attendre CI du nouveau HEAD et revue indépendante ; contrats/licences/observations officielles et recette financière complète manquants ; politiques de publication et historiques à arbitrer.
+- NEXT_ACTION : vérifier les workflows exact-HEAD, inspecter logs en cas d'échec et corriger ; auditer `rates()` avec le schéma réel et les claims #26/#27 avant modification ; obtenir une observation officielle autorisée pour recette source→archive→qualité→calcul→API. Ne pas fusionner ni déployer S1.
+- ROLLBACK : revert ciblé des commits de test/filtre sur la branche Draft ; aucune donnée persistée par la recette transactionnelle.
+
+---
+
 ## 2026-11-14 13:38 Europe/Paris — Issue #17 : CI rouge corrigée et recette PostgreSQL transactionnelle ajoutée (PARTIAL)
 
 - RECONCILIATION : PR #1 fusionnée, PR #30 ouverte Draft, HEAD avant travail `1b8b9d4e4fbea3029736c63615961cc4d74e6ad0`, base `73256f48d81d38ce8ff6f51be9e024b25cf5dadb`. AGENTS.md, docs/15, checkpoint 06/11, worklog courant, issue #17 et PR concurrentes #22/#25/#26/#27/#28/#29 relus. Aucune branche concurrente modifiée.
