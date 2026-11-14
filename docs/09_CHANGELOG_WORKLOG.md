@@ -1,5 +1,17 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-14 16:30 Europe/Paris — Issue #17 : CI rouge sur filtre marché des taux, correction SQL (PARTIAL)
+
+- RECONCILIATION : PR #1 fusionnée ; PR #30 Draft, HEAD initial `5c96353c6436d2d3a872151cc3b6d2616971ae67`. Lecture de `AGENTS.md`, `docs/15_AUTONOMOUS_AGENT_EXECUTION.md`, dernier worklog et checkpoint historique ; revue de `src/api/queries.ts`, recette indices et migration 002. PR concurrentes #22/#25/#26/#27/#28/#29 identifiées, non modifiées.
+- PREUVE CI EXACT-HEAD : [CI #43605974538](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43605974538) = completed/failure ; job `132480587879`, étape Unit tests : 33 PASS / 1 FAIL, `issue #17: rate market/family filters and LIMIT remain parameterized`. [Docker/PostgreSQL #43605974458](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43605974458) = completed/success, pour le HEAD initial seulement. Le test échoué révélait un vrai défaut SQL : `s.market_code=${values.length}` au lieu de `s.market_code=${values.length}`.
+- CODE : commit [`45bee8c`](https://github.com/Patricked-code/africafunds-market-data-pipeline/commit/45bee8c512f99b3df640e9047269161186e42d20) remplace uniquement le filtre marché dans `rates()` par un placeholder PostgreSQL paramétré, sans modifier la famille, le LIMIT, le schéma, les sources ni les autres branches. Deux commits intermédiaires `1803a00` et `00e0aaf` ont été créés sans changement effectif du blob ; ne pas les compter comme corrections fonctionnelles.
+- TEST : test statique existant `test/api-rate-publication-visibility.test.ts` détecte déjà le défaut. Test local NOT_RUN. Aucun PASS CI attribué au nouveau HEAD avant contrôle des runs exacts.
+- BLOCK_REASON : CI du HEAD corrigé et recette PostgreSQL taux non encore attestées ; revue indépendante, politique métier de publication et données/licences officielles toujours manquantes. Aucun DONE/HISTORY_COMPLETE.
+- NEXT_ACTION : vérifier les workflows exact-HEAD de la correction ; corriger tout échec ; ajouter une recette PostgreSQL transactionnelle des taux (publication passée/future/NULL, observation future, filtre marché et famille), en réutilisant la DB CI ; poursuivre ensuite la chaîne de données officielles sans collision avec PR #26/#27.
+- ROLLBACK : revert ciblé du correctif sur cette branche Draft ; aucun merge, push main, secret, S1 ou modification des 44 sources.
+
+---
+
 ## 2026-11-14 15:37 Europe/Paris — Issue #17 : lecture publique des taux, filtre conservateur (PARTIAL)
 
 - RECONCILIATION : PR #1 fusionnée, PR #30 Draft HEAD avant intervention `bbd74ca25412595a94380017d15ecc7b27d1cb70` ; docs AGENTS, 09, 15, checkpoint 06/11, schémas 002_market et 002_market_calc et requêtes API relus. PR #22/#25/#26/#27/#28/#29 ouvertes, périmètres conservés.
