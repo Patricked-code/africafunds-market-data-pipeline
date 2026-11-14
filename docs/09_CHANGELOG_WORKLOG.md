@@ -1,5 +1,16 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-14 01:34 Europe/Paris — PR #29 : source primaire BAM, qualification sans ingestion (#16, PARTIAL)
+
+- **RECONCILIATION** : documents AGENTS.md et docs/15_AUTONOMOUS_AGENT_EXECUTION.md lus sur main, worklog et dernier checkpoint lus sur branche PR #29 ; PR ouvertes #22/#25/#26/#27/#28/#29, sans modification de leurs autres branches. HEAD de la branche avant écriture selon dernier checkpoint : dc08375aad48f00d51f4e642acc7f3def91ad0bc (à réconcilier avant toute écriture concurrente ultérieure).
+- **PREUVES CI** : sur dc08375aad48f00d51f4e642acc7f3def91ad0bc, CI https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43528760281 et Docker/PostgreSQL https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43528758305 : completed/success. Ce sont des preuves du HEAD précédent, pas de la nouvelle note.
+- **TRAVAIL CONCRET** : commit b89b8a8b201d380f891ac2b2e2290fbabf71ecd6 crée docs/SOURCE_CANDIDATE_BAM_API_20261114.md : portail officiel Bank Al-Maghrib https://apihelpdesk.centralbankofmorocco.ma/ confirmé comme entrée développeurs, souscription gratuite à une clé API ; aucun droit de redistribution ou endpoint FX officiel précis déduit. Pas d'ajout au registre historique (FX Maroc déjà représenté), pas de donnée inventée, aucun secret.
+- **BLOCK_REASON** : documentation contractuelle détaillée de l'API FX, droits de conservation/redistribution, accès autorisé, réponse témoin primaire et checksum non obtenus ; revue indépendante de la PR Draft non attestée ; aucune collecte réelle, normalisation ni HISTORY_COMPLETE.
+- **NEXT_ACTION** : vérifier CI du nouveau HEAD et corriger si rouge ; inspecter documentation FX et conditions de réutilisation directement auprès de BAM, capturer un témoin autorisé daté/archivé, vérifier doublons avec FX Maroc historique, puis seulement coder l'adaptateur et les tests dans les modules existants. Si bloqué, poursuivre issue #17 sur une surface non revendiquée après réconciliation des claims. Aucun merge/main/S1/secret.
+- **ROLLBACK** : revert ciblé de la note et de ce checkpoint sur branche PR #29.
+
+---
+
 ## 2026-11-14 00:38 Europe/Paris — PR #29 : CI exacte et refus des fichiers non réguliers (#16, PARTIAL)
 
 - **RECONCILIATION** : PR #29 ouverte Draft, base main `73256f48d81d38ce8ff6f51be9e024b25cf5dadb`, HEAD vérifié avant intervention `c44dfd1edf1b6f8a863a0c9bee9b0671a91373df`. PR concurrentes #22/#25/#26/#27/#28 ouvertes ; aucune branche concurrente modifiée. AGENTS.md, docs/15_AUTONOMOUS_AGENT_EXECUTION.md, docs/00_PROJECT_MEMORY.md, docs/06_CURRENT_STATUS_AND_GAPS.md et dernier checkpoint relus.
