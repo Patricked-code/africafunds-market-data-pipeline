@@ -1,5 +1,18 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-14 05:34 Europe/Paris — PR #29 : CI exact-HEAD et qualification BAM bloquée (#16, PARTIAL)
+
+- **RECONCILIATION** : PR #29 ouverte Draft, branche `test/source-family-additive-compat-20261113`, HEAD `a02bf6c1429f0568d8b2d77f23258e9103780a9d`, base `73256f48d81d38ce8ff6f51be9e024b25cf5dadb` ; PR ouvertes #22/#25/#26/#27/#28/#29 ; issue #16 ouverte. AGENTS.md, docs/00..15 et dernier checkpoint relus. Aucun claim concurrent déplacé.
+- **PREUVES EXACT-HEAD** : pour `a02bf6c1429f0568d8b2d77f23258e9103780a9d`, [CI #43552509088](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43552509088) et [Docker/PostgreSQL #43552509092](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43552509092) = completed/success selon GitHub. Ces preuves valident le HEAD précédent ; pas de test local.
+- **CONSTAT FONCTIONNEL** : le catalogue MAR possède déjà `mar-bam-fx` ; aucune licence de redistribution, contrat API FX BAM, observation primaire autorisée ni SHA-256 témoin n'est attesté. Ne pas créer un second endpoint ni simuler un historique. Les autres PR Draft #26/#27 portent les adaptateurs et l'admission financière : aucune modification concurrente de leurs modules.
+- **TRAVAIL** : réconciliation des CI exactes et actualisation de la continuité GitHub, sans modification de code ni données. Les tests de sécurité précédents ne doivent pas être confondus avec une validation métier de collecte.
+- **BLOCK_REASON** : accès contractuel/licence BAM et observation primaire manquants ; revue indépendante, gates d'intégration et preuves métier non attestés ; aucune donnée réelle à mapper sans invention.
+- **NEXT_ACTION** : obtenir la documentation officielle BAM FX, droits de conservation/redistribution et une réponse témoin datée avec SHA-256 ; vérifier l'identité de série contre `mar-bam-fx`, puis implémenter le parseur et les tests dans les modules existants. En parallèle, vérifier les claims PR #26/#27 et sélectionner une tâche issue #17 non revendiquée si disponible. Vérifier les CI du nouveau checkpoint avant tout autre changement ; pas de merge, main, S1 ou secret.
+- **ROLLBACK** : revert ciblé de ce seul checkpoint sur la branche PR #29 ; aucun changement aux 44 sources.
+
+---
+
+
 ## 2026-11-14 04:35 Europe/Paris — PR #29 : validation CI précédente et transport HTTPS (#16, PARTIAL)
 
 - **RECONCILIATION** : PR #1 fusionnée ; PR #29 ouverte Draft sur `test/source-family-additive-compat-20261113`, HEAD avant intervention `316049d9e033559f4ff7132711d2963d55930a1b` ; AGENTS.md, docs/15_AUTONOMOUS_AGENT_EXECUTION.md, checkpoint historique 2026-11-06 et dernier NEXT_ACTION du worklog relus ; issue #16 et PR ouvertes consultées. Pas d'intervention sur une autre branche.
