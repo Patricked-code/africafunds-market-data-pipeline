@@ -295,3 +295,19 @@ test('issue #16: manifest realpath validation rejects symlink escapes', async ()
     await rm(root, { recursive: true, force: true });
   }
 });
+
+
+test('issue #16: existing Bank Al-Maghrib FX source is retained without duplicate registration', () => {
+  const markets = loadExisting();
+  const morocco = markets.find((market) => market.code === 'MAR');
+  assert.ok(morocco, 'Morocco must remain registered');
+  const existing = morocco.endpoints.filter((endpoint) => endpoint.id === 'mar-bam-fx');
+  assert.equal(existing.length, 1, 'canonical Bank Al-Maghrib FX ID must be unique');
+  assert.equal(existing[0]?.dataFamily, 'FX');
+  assert.equal(existing[0]?.collector, 'HTML_TABLE_CSV');
+  assert.equal(existing[0]?.frequency, 'DAILY');
+  assert.equal(existing[0]?.url, 'https://www.bkam.ma/Marches/Principaux-indicateurs/Marche-des-changes/Cours-de-change/Cours-de-reference');
+  const all = markets.flatMap((market) => market.endpoints);
+  assert.equal(all.filter((endpoint) => endpoint.id === 'mar-bam-fx').length, 1);
+  assert.equal(all.length, 44, 'qualification must not silently register a second FX endpoint');
+});
