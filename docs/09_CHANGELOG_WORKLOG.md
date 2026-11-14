@@ -1,5 +1,18 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-15 00:35 Europe/Paris — Issue #17 : CI exacte GREEN et isolation des fixtures de recette (PARTIAL)
+
+- RECONCILIATION : lecture AGENTS.md, docs/15_AUTONOMOUS_AGENT_EXECUTION.md, dernier worklog, checkpoint historique 2026-11-06, PR #30 Draft, issue #17 et PR ouvertes. GitHub reste autorité unique. Aucune fusion, aucun push main, aucun déploiement S1.
+- PREUVES EXACT-HEAD : commit `cfd7b31ad8d07c5276ae736bde4e32fb43fed67c` : GitHub Actions [CI #43649255538](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43649255538) completed/success et [Docker/PostgreSQL #43649255586](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43649255586) completed/success. La correction TS1434 précédente est validée par ces workflows ; aucune preuve d'observations financières officielles.
+- CODE/TEST : [commit 101a0ba](https://github.com/Patricked-code/africafunds-market-data-pipeline/commit/101a0ba5e5f7eb6da1b139194d41d7a04aaee5c7) restreint les assertions de lecture sans filtres de `test/integration/api-index-publication.test.ts` aux `index_code` créés dans la transaction courante. Le préfixe partagé `CI_VISIBILITY_` pouvait inclure des fixtures étrangères et créer des faux positifs/négatifs. Codes aléatoires dédiés au test, aucune donnée durable ; transaction et ROLLBACK conservés.
+- VALIDATION : modification committée ; tests locaux NOT_RUN ; CI du nouveau HEAD NOT_ATTESTED. Précondition LIMIT 1000 inchangée, à surveiller sur base d'intégration volumineuse.
+- BLOCK_REASON : CI exact nouveau HEAD et revue indépendante en attente ; licences, observations officielles, décisions métier et raccordement #26/#27 non attestés.
+- NEXT_ACTION : relever CI et Docker/PostgreSQL exact-HEAD après ce checkpoint ; corriger toute régression. Puis qualifier un témoin officiel autorisé et vérifier la chaîne source → archive SHA-256 → normalisation → qualité → calcul → API sans collision avec PR #26/#27. Ne pas déclarer HISTORY_COMPLETE.
+- ROLLBACK : revert ciblé du test et du checkpoint sur branche Draft, aucun impact production.
+
+---
+
+
 ## 2026-11-14 23:38 Europe/Paris — Issue #17 : CI rouge persistante TS1434, correction syntaxique exacte (PARTIAL)
 
 - RECONCILIATION : PR #30 ouverte Draft, branche `fix/api-cors-origin-admission-20261114`, main base `73256f48d81d38ce8ff6f51be9e024b25cf5dadb` (39 ahead / 0 behind avant écriture), dépôt privé. AGENTS.md, docs/15, dernier worklog et checkpoint relus ; issues #13–#17 et périmètres concurrents conservés. Pas de merge, S1 ni push main.
