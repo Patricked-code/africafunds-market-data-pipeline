@@ -31,7 +31,7 @@ test('issue #17: public indices omit DRAFT, future publication, future observati
     }
     for (const [status, observationOffset, offset, level] of [
       ['DRAFT', -3, -1, 101], ['PUBLISHED', -2, -1, 102],
-      ['PUBLISHED', -1, 1, 103], ['PUBLISHED', 0, null, 104], ['PUBLISHED', 1, -1, 105],
+      ['PUBLISHED', -1, 1, 103], ['PUBLISHED', -4, null, 104], ['PUBLISHED', 1, -1, 105],
       ['PUBLISHED', 0, 0, 106],
     ] as const) {
       await client.query(
