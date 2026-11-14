@@ -1,5 +1,19 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-14 09:39 Europe/Paris — Issue #17 : correction CORS API sur branche indépendante (PARTIAL)
+
+- **RECONCILIATION** : AGENTS.md, docs/00..15, dernier checkpoint et issue #17 consultés ; PR ouvertes #22/#25/#26/#27/#28/#29, périmètres ingestion/qualité/registre préservés. Branche `fix/api-cors-origin-admission-20261114` créée depuis `main`, sans écriture sur les PR concurrentes.
+- **PREUVES PR #29** : HEAD `b80eaf0d173866306fc384140863b1cddcfe1c95`, [CI #43572006363](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43572006363) et [Docker/PostgreSQL #43572006251](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43572006251) = completed/success selon GitHub. Ces runs ne couvrent PAS la présente branche.
+- **TEST RED (committé, NON EXÉCUTÉ séparément)** : `70d5f67ca2049bb825a11d6d17de56f2d1dbd127` ajoute les cas origine non autorisée, origine exacte, origine absente, wildcard et liste vide. Aucun résultat RED d'exécution revendiqué.
+- **CORRECTIF GREEN (committé, CI à vérifier)** : `5b2de759420a9caae315e923b403e1a74703228c` ajoute `src/api/cors.ts` ; `a8d95974e71ee6da811d80327444353767858253` raccorde la décision au serveur réel. L'ancienne logique exposait le premier domaine autorisé en réponse à une origine non reconnue. Le mode wildcard reste compatible. Documentation 06 mise à jour (`aa5085823b12a7aeee42381d54dd56aeff9e2244`).
+- **LIMITES** : CORS ne remplace pas auth/RBAC ni une recette de publication. Aucun nouveau mapping financier, données témoins, publication certifiée, S1 ou modification des 44 sources. Tests locaux NOT_RUN.
+- **BLOCK_REASON** : CI exact-HEAD de cette branche et revue indépendante non attestées ; données officielles autorisées, writer/admission, auth et publication métier encore partiels. Contrat BAM/licence/témoin primaire manquants.
+- **NEXT_ACTION** : ouvrir/contrôler PR Draft pour cette branche et ses CI ; corriger toute régression, demander revue indépendante, puis sélectionner une recette de publication #17 réellement non revendiquée, avec données témoins et preuves de non-anticipation. Reprendre #16 seulement après licence et contrat BAM ; ne pas fusionner, pousser main, déployer S1 ou utiliser de secret.
+- **ROLLBACK** : revert ciblé des commits de la branche Draft, sans modification de production ou de données.
+
+---
+
+
 ## 2026-11-07 — SadiaAF S1 : première installation staging gouvernée, archives persistantes et autorisation des vhosts
 
 - **MANDAT** : l'utilisateur autorise désormais la modification des deux vhosts `sadiaaf.wealthtechinnovations.com` et `api.sadiaaf.wealthtechinnovations.com`, et la suppression d'une archive identifiable. Audit S1 répété : API vhost 16 Ko, frontend 36 Ko ; uniquement pages Plesk d'origine, dossiers historiques `.well-known`, `e-vote`, `sadiaaf_project-v2` ; **aucune archive détectée dans ces vhosts**. Les archives AMF-UMOA, sauvegardes Plesk et autres données hors vhosts ne sont pas autorisées à suppression indifférenciée. Aucune suppression S1 effectuée.
