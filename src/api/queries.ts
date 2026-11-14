@@ -90,7 +90,7 @@ export async function indices(url: URL, limit: number): Promise<unknown[]> {
   const currency = url.searchParams.get('currency');
   const values: unknown[] = [];
   // Conservative public-read gate; NULL publication dates remain private until approved policy. 
-  const clauses: string[] = ["d.publication_status = 'PUBLISHED'", 'v.publication_date IS NOT NULL', 'v.publication_date <= CURRENT_DATE'];
+  const clauses: string[] = ["d.publication_status = 'PUBLISHED'", 'v.publication_date IS NOT NULL', 'v.publication_date <= CURRENT_DATE', 'v.observation_date <= CURRENT_DATE'];
   if (market) { values.push(market); clauses.push(`d.market_code=$${values.length}`); }
   if (currency) { values.push(currency); clauses.push(`v.currency_code=$${values.length}`); }
   values.push(limit);
