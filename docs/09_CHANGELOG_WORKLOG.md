@@ -1,5 +1,16 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-14 08:37 Europe/Paris — PR #29 : validation exact-HEAD du chargement réel et arbitrage de la prochaine tâche (#16, PARTIAL)
+
+- **RECONCILIATION** : dépôt privé selon GitHub get_repo ; PR #29 ouverte Draft, HEAD exact avant intervention `65171214b4bc2c1f6674d467daa56845c9d6a033`, base `main` ; PR concurrentes #22/#25/#26/#27/#28 ouvertes. AGENTS.md et docs/15 relus sur main ; entrée de continuité la plus récente lue sur branche PR #29 ; PR #26/#27 relues pour éviter les collisions sur ingestion et qualité. Aucun SHA historique réutilisé comme état courant.
+- **PREUVES EXACT-HEAD** : pour `65171214b4bc2c1f6674d467daa56845c9d6a033`, [CI #43567252297](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43567252297) et [Docker/PostgreSQL #43567252313](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43567252313) sont `completed/success` selon fetch_commit_workflow_runs. Ces runs valident le HEAD précédent incluant le test loadRegistry/listEndpoints, non le présent checkpoint documentaire. Aucun test local exécuté.
+- **TRAVAIL** : réconciliation CI et dépendances de #16/#17 ; PR #26 réserve le chemin ingestion MANUAL_API_DISCOVERY, PR #27 le gate d'admission financière. Aucune écriture sur ces branches, aucune nouvelle source non autorisée, aucune prétention d'historique complet. Le développement BAM demeure bloqué par l'absence de contrat et témoin autorisé ; ne pas substituer des tests de sécurité périphériques à une intégration métier.
+- **BLOCK_REASON** : spécification FX officielle BAM, licence de conservation/redistribution, observation primaire datée et archive SHA-256 absentes ; pas de preuve de pipeline complet ni de revue indépendante. Aucun adaptateur CBE/GOSDMX certifié. Les périmètres ingestion/qualité sont revendiqués par PR #26/#27 et nécessitent une coordination avant modification.
+- **NEXT_ACTION** : vérifier CI du présent checkpoint si déclenchée ; obtenir contrat/licence/témoin primaire BAM puis mapping/parseur/test métier sans doublon `mar-bam-fx`. Si indisponible, examiner le code existant de publication/recette #17, sélectionner un fichier et scénario réellement non revendiqués, ouvrir un claim GitHub borné avant toute modification, créer test RED et correctif GREEN avec CI ; ne pas prolonger indéfiniment la série de tests périphériques. Aucun merge, push main, S1 ni secret.
+- **ROLLBACK** : revert ciblé de ce checkpoint documentaire sur branche PR #29 ; aucune écriture runtime ou donnée historique.
+
+---
+
 ## 2026-11-14 07:36 Europe/Paris — PR #29 : preuve de chargement du manifeste réel (#16, PARTIAL)
 
 - **RECONCILIATION** : PR #1 fusionnée ; PR #29 ouverte Draft, branche `test/source-family-additive-compat-20261113`, HEAD avant intervention `ccc1fa5b11b91635bf455361832fb3bb43e4f069` ; PR concurrentes #22/#25/#26/#27/#28 non modifiées. AGENTS.md, docs/15, checkpoint 2026-11-06 et dernier NEXT_ACTION relus.
