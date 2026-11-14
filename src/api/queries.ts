@@ -105,7 +105,7 @@ export async function rates(url: URL, limit: number): Promise<unknown[]> {
   const family = url.searchParams.get('family');
   const values: unknown[] = [];
   const clauses: string[] = ['o.publication_date IS NOT NULL', 'o.publication_date <= CURRENT_DATE', 'o.observation_date <= CURRENT_DATE'];
-  if (market) { values.push(market); clauses.push(`s.market_code=${values.length}`); }
+  if (market) { values.push(market); clauses.push(`s.market_code=$${values.length}`); }
   if (family) { values.push(family); clauses.push(`s.rate_family=$${values.length}`); }
   values.push(limit);
   return (await pool.query(`SELECT s.series_code,s.series_name,s.market_code,s.currency_code,s.rate_family,s.tenor_code,s.tenor_days,
