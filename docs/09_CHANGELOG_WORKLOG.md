@@ -1,5 +1,17 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-14 04:35 Europe/Paris — PR #29 : validation CI précédente et transport HTTPS (#16, PARTIAL)
+
+- **RECONCILIATION** : PR #1 fusionnée ; PR #29 ouverte Draft sur `test/source-family-additive-compat-20261113`, HEAD avant intervention `316049d9e033559f4ff7132711d2963d55930a1b` ; AGENTS.md, docs/15_AUTONOMOUS_AGENT_EXECUTION.md, checkpoint historique 2026-11-06 et dernier NEXT_ACTION du worklog relus ; issue #16 et PR ouvertes consultées. Pas d'intervention sur une autre branche.
+- **PREUVES EXACT-HEAD** : pour `316049d9e033559f4ff7132711d2963d55930a1b`, [CI #43547149829](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43547149829) et [Docker/PostgreSQL #43547149771](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43547149771) = completed/success selon GitHub Actions. Ces runs précèdent les changements ci-dessous.
+- **TEST** : commit `cf45d70eba892613f256157144a960c4f5093994` ajoute un test du vrai `parseRegistry()` rejetant les URL sources `http:`, `ftp:` et `file:`, en conservant les 44 sources historiques.
+- **CODE** : commit `7c8a91d141797448af4f686de07ed7eb1ef00b42` impose le protocole HTTPS dans le schéma des endpoints du registre. Aucun endpoint ajouté, supprimé ou modifié ; restriction d'admission des nouvelles URL. Test local NOT_RUN ; CI du nouveau HEAD non encore attestée.
+- **BLOCK_REASON** : spécification officielle BAM FX, licence de conservation/redistribution, observation témoin primaire et empreinte SHA-256 manquantes ; PR Draft, revue indépendante et CI exact-HEAD nouveau non attestées. Le protocole HTTPS seul ne certifie ni licence, ni authenticité des données, ni disponibilité.
+- **NEXT_ACTION** : vérifier les CI exact-HEAD de cette modification et corriger tout échec ; obtenir contrat/licence/témoin BAM autorisé et vérifier la déduplication avec `mar-bam-fx`. Si les droits restent bloquants, reprendre une tâche indépendante de l'issue #17 après vérification des claims PR #26/#27. Pas de fusion/main/S1/secret.
+- **ROLLBACK** : revert ciblé des deux commits code/test et de ce checkpoint sur la branche PR #29 uniquement ; aucun changement de catalogue historique.
+
+---
+
 ## 2026-11-14 03:34 Europe/Paris — PR #29 : CI exact-HEAD et contrat d'admission BAM (#16, PARTIAL)
 
 - **RECONCILIATION** : PR #1 et #18 fusionnées ; PR #22/#25/#26/#27/#28/#29 ouvertes Draft ; PR #29 HEAD initial `f4b50408e4f06ecfb8061b074b330f6f21043b40`, base `73256f48d81d38ce8ff6f51be9e024b25cf5dadb`. AGENTS.md, docs/15_AUTONOMOUS_AGENT_EXECUTION.md, dernier checkpoint et issue #16 relus ; aucune branche concurrente modifiée.
