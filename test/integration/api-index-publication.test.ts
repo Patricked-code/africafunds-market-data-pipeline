@@ -32,6 +32,7 @@ test('issue #17: public indices omit DRAFT, future publication, future observati
     for (const [status, observationOffset, offset, level] of [
       ['DRAFT', -3, -1, 101], ['PUBLISHED', -2, -1, 102],
       ['PUBLISHED', -1, 1, 103], ['PUBLISHED', 0, null, 104], ['PUBLISHED', 1, -1, 105],
+      ['PUBLISHED', 0, 0, 106],
     ] as const) {
       await client.query(
         `INSERT INTO calc.index_daily_values
@@ -50,6 +51,13 @@ test('issue #17: public indices omit DRAFT, future publication, future observati
     ) as Array<{ index_level: string }>;
     const levels = rows.map(row => Number(row.index_level));
     assert.ok(levels.includes(102), 'published historical value must remain visible');
+    assert.ok(levels.includes(106), 'same-day economic observation and publication must remain visible');
+    const limited = await indices(
+      new URL(`http://localhost/api/v1/indices?market=${encodeURIComponent(market.market_code)}&currency=${market.currency_code}`),
+      1,
+    ) as Array<{ index_level: string }>;
+    assert.equal(limited.length, 1, 'LIMIT applies after the visibility filter');
+    assert.equal(Number(limited[0]!.index_level), 106, 'latest eligible published observation is returned first');
     for (const forbidden of [101, 103, 104, 105]) {
       assert.ok(!levels.includes(forbidden), `unpublished fixture ${forbidden} must be hidden`);
     }
