@@ -1,5 +1,17 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-14 23:38 Europe/Paris — Issue #17 : CI rouge persistante TS1434, correction syntaxique exacte (PARTIAL)
+
+- RECONCILIATION : PR #30 ouverte Draft, branche `fix/api-cors-origin-admission-20261114`, main base `73256f48d81d38ce8ff6f51be9e024b25cf5dadb` (39 ahead / 0 behind avant écriture), dépôt privé. AGENTS.md, docs/15, dernier worklog et checkpoint relus ; issues #13–#17 et périmètres concurrents conservés. Pas de merge, S1 ni push main.
+- PREUVES EXACT-HEAD : commit `8cced0973ec0412d79853e8b65885d7113047947` : [CI #43643388869](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43643388869) completed/FAILURE (job 132595649391, Verify TypeScript types), [Docker/PostgreSQL #43643388884](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43643388884) completed/FAILURE (job 132595649439, npm run build). Logs : `test/integration/api-index-publication.test.ts(76,7): error TS1434: Unexpected keyword or identifier`. Docker ne parvient pas à la recette PostgreSQL.
+- CAUSE : le commit précédent avait parenthésé `await indices(...)` mais laissé `as Array<...>` sur une ligne suivante non rattachée grammaticalement à la déclaration ; le défaut TS1434 persistait. Correction minimale réelle : assertion `as Array<...>` sur la même ligne que `(await indices(...))` dans [commit 1e71b00](https://github.com/Patricked-code/africafunds-market-data-pipeline/commit/1e71b00450f4080ad82166b1249d9caab2372c1f).
+- VALIDATION : code committé ; tests locaux NOT_RUN ; CI du nouveau HEAD NOT_ATTESTED. Ne pas déclarer GREEN avant runs exact-HEAD. Aucun changement API, migration, registre 44 sources ni données.
+- BLOCK_REASON : CI exact-HEAD corrigé et revue indépendante en attente ; observations financières officielles, licences, politiques de publication et raccordement #26/#27 non attestés.
+- NEXT_ACTION : relever les deux workflows exact-HEAD après le présent checkpoint ; lire les logs et corriger si rouge. Si GREEN, sélectionner une tâche libre pour la chaîne source autorisée → SHA-256 → normalisation → qualité → calcul → API, sans modifier les PR concurrentes ni déclarer HISTORY_COMPLETE.
+- ROLLBACK : revert ciblé du test et checkpoint sur branche Draft, aucune action serveur.
+
+---
+
 ## 2026-11-14 22:30 Europe/Paris — Issue #17 : échec CI exact-HEAD diagnostiqué et correction TS1434 (PARTIAL)
 
 - RECONCILIATION : PR #1 closed/merged ; PR #30 open/Draft, HEAD avant correction `812e7415347a05e173360779171d198b0c842230`, branche `fix/api-cors-origin-admission-20261114`. Lecture AGENTS.md, docs/00–15 sur main, worklog de branche, checkpoint 06/11 et recette concernée. Aucun push main, merge ni déploiement.
