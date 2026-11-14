@@ -69,6 +69,20 @@ test('issue #17: public indices omit DRAFT, future publication, future observati
       [],
       'unknown currency must not expose published indices',
     );
+    // The same fail-closed policy must hold when clients omit both optional filters.
+    // Restrict assertions to this transaction's synthetic index IDs to avoid assuming
+    // that an otherwise populated integration database has no unrelated observations.
+    const unfiltered = await indices(new URL('http://localhost/api/v1/indices'), 1000)
+      as Array<{ index_code: string; index_level: string }>;
+    const ownUnfiltered = unfiltered.filter(row => row.index_code.startsWith('CI_VISIBILITY_'));
+    assert.ok(ownUnfiltered.some(row => Number(row.index_level) === 102),
+      'unfiltered public read retains eligible historical observations');
+    assert.ok(ownUnfiltered.some(row => Number(row.index_level) === 106),
+      'unfiltered public read retains eligible same-day observations');
+    for (const forbidden of [101, 103, 104, 105]) {
+      assert.ok(!ownUnfiltered.some(row => Number(row.index_level) === forbidden),
+        `unfiltered public read must hide fixture ${forbidden}`);
+    }
     for (const forbidden of [101, 103, 104, 105]) {
       assert.ok(!levels.includes(forbidden), `unpublished fixture ${forbidden} must be hidden`);
     }
