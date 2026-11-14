@@ -1,5 +1,18 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-14 10:31 Europe/Paris — PR #30, issue #17 : CI du correctif CORS confirmée et cas de sécurité supplémentaires (PARTIAL)
+
+- **RECONCILIATION** : AGENTS.md, docs/15, worklog/dernier checkpoint de la branche PR #30, issue #17, PR ouvertes #22/#25/#26/#27/#28/#29/#30, main et comparaison main...PR #30 consultés. main base vérifiée `73256f48d81d38ce8ff6f51be9e024b25cf5dadb`, PR #30 avant écriture à 5 commits d'avance, 0 de retard ; aucune branche concurrente touchée.
+- **PREUVES CI** : HEAD précédent `a1eb559888c739e3bdb9430c0fdfb63a7353d1b5` : [CI #43576930647](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43576930647) et [Docker/PostgreSQL #43576930612](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43576930612), tous deux `completed/success` selon GitHub. Aucun résultat local RED/GREEN revendiqué.
+- **CODE/TEST** : commit `96b7b091b3705fd573f577ba2c78784012905c24` étend les tests `test/api-cors-origin-admission.test.ts` pour interdire domaines ressemblants, schéma HTTP, port différent et origine opaque `null` ; le code de production `resolveCorsOrigin()` préserve la comparaison exacte. Nouveau HEAD à contrôler en CI.
+- **LIMITES** : correction CORS = contrôle de lecture navigateur, ni authentification, ni filtrage de publication de données financières. Aucun mapping/writer financier, donnée témoin, attestation de licence, couverture historique ou déploiement S1. Tests ajoutés NON EXÉCUTÉS localement.
+- **BLOCK_REASON** : nouvelle CI exact-HEAD et revue indépendante non attestées ; contrat/licence BAM et observation primaire autorisée manquants ; publication financière et preuve de non-anticipation restent incomplètes. Aucun statut HISTORY_COMPLETE/DONE.
+- **NEXT_ACTION** : vérifier CI et Docker exact-HEAD de PR #30 et corriger si échec ; revue indépendante. Puis sélectionner une surface métier #17 non revendiquée et produire une recette réelle autorisée source→raw SHA→parser→quality→canonical→API, avec dates de publication/économiques et tests de non-anticipation, en coordination avec PR #26/#27. Aucun merge, push main, secret ni S1.
+- **ROLLBACK** : revert ciblé du commit de test et du checkpoint sur la branche Draft, sans altérer main ni les données.
+
+---
+
+
 ## 2026-11-14 09:39 Europe/Paris — Issue #17 : correction CORS API sur branche indépendante (PARTIAL)
 
 - **RECONCILIATION** : AGENTS.md, docs/00..15, dernier checkpoint et issue #17 consultés ; PR ouvertes #22/#25/#26/#27/#28/#29, périmètres ingestion/qualité/registre préservés. Branche `fix/api-cors-origin-admission-20261114` créée depuis `main`, sans écriture sur les PR concurrentes.
