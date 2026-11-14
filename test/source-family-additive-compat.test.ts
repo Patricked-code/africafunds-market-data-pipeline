@@ -352,3 +352,23 @@ test('issue #16: source URLs never embed credentials or fragments in the registr
   }
   assert.equal(JSON.stringify(original), snapshot, 'legacy registry must not mutate');
 });
+
+
+test('issue #16: production manifest loader retains the 11 real markets and 44 original endpoints', async () => {
+  // Exercise the actual manifest and per-market file loader, not only synthetic parseRegistry fixtures.
+  process.env.DATABASE_URL ??= 'postgresql://localhost:5432/registry_test';
+  const { loadRegistry, listEndpoints } = await import('../src/config/registry.js');
+  const registry = await loadRegistry();
+  const endpoints = registry.markets.flatMap((market) => market.endpoints);
+  const expected = loadExisting();
+  assert.equal(registry.markets.length, 11);
+  assert.equal(endpoints.length, 44);
+  assert.deepEqual(registry.markets.map((market) => market.code), expected.map((market) => market.code));
+  assert.deepEqual(endpoints.map((endpoint) => endpoint.id),
+    expected.flatMap((market) => market.endpoints.map((endpoint) => endpoint.id)));
+  const listed = await listEndpoints();
+  assert.equal(listed.length, 44);
+  assert.equal(new Set(listed.map((endpoint) => endpoint.id)).size, 44);
+  assert.equal(listed.filter((endpoint) => endpoint.id === 'mar-bam-fx').length, 1);
+  // A passing test demonstrates configuration loading only, never a successful financial ingestion.
+});
