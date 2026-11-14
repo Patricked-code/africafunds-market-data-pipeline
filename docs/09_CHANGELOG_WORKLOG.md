@@ -1,5 +1,18 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-14 03:34 Europe/Paris — PR #29 : CI exact-HEAD et contrat d'admission BAM (#16, PARTIAL)
+
+- **RECONCILIATION** : PR #1 et #18 fusionnées ; PR #22/#25/#26/#27/#28/#29 ouvertes Draft ; PR #29 HEAD initial `f4b50408e4f06ecfb8061b074b330f6f21043b40`, base `73256f48d81d38ce8ff6f51be9e024b25cf5dadb`. AGENTS.md, docs/15_AUTONOMOUS_AGENT_EXECUTION.md, dernier checkpoint et issue #16 relus ; aucune branche concurrente modifiée.
+- **PREUVES CI EXACT-HEAD PRÉCÉDENT** : `f4b50408e4f06ecfb8061b074b330f6f21043b40` : [CI #43541532873](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43541532873) et [Docker/PostgreSQL #43541532983](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43541532983) = completed/success. Aucune réussite CI revendiquée pour les commits documentaires nouveaux.
+- **TRAVAIL CONCRET** : qualification technique enrichie dans `docs/SOURCE_CANDIDATE_BAM_API_20261114.md` : matrice de six gates vérifiables (identité économique, licence, temporalité, témoin brut, dédoublonnage, validation) ; distinction URL de transport/série économique, maintien de `mar-bam-fx` et des 44 sources. Aucun ajout non autorisé au registre.
+- **TESTS** : nouveaux tests locaux NOT_RUN ; aucun nouveau code d'ingestion sans contrat officiel et témoin primaire. Preuves CI antérieures uniquement.
+- **BLOCK_REASON** : spécification officielle de l'API FX BAM, licence conservation/redistribution, réponse témoin primaire avec SHA-256 et revue indépendante manquantes ; aucun HISTORY_COMPLETE ou publication certifiés.
+- **NEXT_ACTION** : contrôler les CI du HEAD documentaire produit ; obtenir le contrat FX et la licence officiels, un témoin autorisé, comparer l'identité économique avec `mar-bam-fx`, puis coder parser/normalisation/test dans les modules existants. Si ces preuves restent absentes, poursuivre une tâche indépendante de l'issue #17 après réconciliation des claims. Aucun merge/main/S1/secret.
+- **ROLLBACK** : revert ciblé des commits documentaires sur branche PR #29 uniquement.
+
+---
+
+
 ## 2026-11-14 02:34 Europe/Paris — PR #29 : réconciliation BAM FX et garde anti-doublon (#16, PARTIAL)
 
 - **RECONCILIATION** : AGENTS.md, docs/15_AUTONOMOUS_AGENT_EXECUTION.md, dernier checkpoint du présent journal, issue #16 et PR ouvertes #22/#25/#26/#27/#28/#29 relus. Dépôt GitHub privé selon get_repo ; aucune branche concurrente modifiée. Branch PR #29 : `test/source-family-additive-compat-20261113`.
