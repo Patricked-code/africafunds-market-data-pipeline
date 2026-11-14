@@ -330,3 +330,25 @@ test('issue #16: registry refuses insecure or non-HTTP source transports without
   }
   assert.equal(JSON.stringify(original), snapshot, 'legacy sources must remain unchanged');
 });
+
+test('issue #16: source URLs never embed credentials or fragments in the registry', async () => {
+  process.env.DATABASE_URL ??= 'postgresql://localhost:5432/registry_test';
+  const { parseRegistry } = await import('../src/config/registry.js');
+  const original = loadExisting();
+  const first = original[0]?.endpoints[0];
+  assert.ok(first, 'expected historical source');
+  const snapshot = JSON.stringify(original);
+  for (const url of [
+    'https://username:password@example.invalid/rates',
+    'https://username@example.invalid/rates',
+    'https://example.invalid/rates#private-token',
+  ]) {
+    const markets = original.map((market, index) => index === 0
+      ? { ...market, endpoints: [{ ...first, url }, ...market.endpoints.slice(1)] }
+      : market);
+    assert.throws(() => parseRegistry({
+      version: 'test', generatedAt: '2026-11-14', defaultPolicies: {}, markets,
+    }), 'embedded credentials and fragments must be rejected');
+  }
+  assert.equal(JSON.stringify(original), snapshot, 'legacy registry must not mutate');
+});
