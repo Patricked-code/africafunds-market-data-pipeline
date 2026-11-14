@@ -28,7 +28,7 @@ test('issue #17: public rates exclude undated/future publications and future eco
     );
     const seriesId = series.rows[0]!.rate_series_id;
     for (const [observationOffset, publicationOffset, value] of [
-      [-4, -1, 101], [-3, 1, 102], [-2, null, 103], [1, -1, 104],
+      [-4, -1, 101], [-3, 1, 102], [-2, null, 103], [1, -1, 104], [0, 0, 106],
     ] as const) {
       await client.query(
         `INSERT INTO market.official_rate_observations
@@ -41,7 +41,9 @@ test('issue #17: public rates exclude undated/future publications and future eco
     (pool as unknown as { query: typeof client.query }).query = client.query.bind(client);
     const base = `http://localhost/api/v1/rates?market=${encodeURIComponent(market.market_code)}&family=CI_FAMILY_${suffix}`;
     const rows = await rates(new URL(base), 1000) as Array<{ selected_rate: string }>;
-    assert.deepEqual(rows.map(row => Number(row.selected_rate)), [101], 'only published historical observation is visible');
+    assert.deepEqual(rows.map(row => Number(row.selected_rate)), [106, 101], 'publication and economic dates equal to today remain visible, future and undated rows remain hidden');
+    const limited = await rates(new URL(base), 1) as Array<{ selected_rate: string }>;
+    assert.deepEqual(limited.map(row => Number(row.selected_rate)), [106], 'LIMIT applies after public visibility filtering');
     assert.deepEqual(await rates(new URL(`http://localhost/api/v1/rates?market=NONEXISTENT_${suffix}&family=CI_FAMILY_${suffix}`), 1000), [], 'market filter is applied');
     assert.deepEqual(await rates(new URL(`http://localhost/api/v1/rates?market=${encodeURIComponent(market.market_code)}&family=OTHER_${suffix}`), 1000), [], 'family filter is applied');
   } finally {
