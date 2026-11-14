@@ -1,5 +1,18 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-14 13:38 Europe/Paris — Issue #17 : CI rouge corrigée et recette PostgreSQL transactionnelle ajoutée (PARTIAL)
+
+- RECONCILIATION : PR #1 fusionnée, PR #30 ouverte Draft, HEAD avant travail `1b8b9d4e4fbea3029736c63615961cc4d74e6ad0`, base `73256f48d81d38ce8ff6f51be9e024b25cf5dadb`. AGENTS.md, docs/15, checkpoint 06/11, worklog courant, issue #17 et PR concurrentes #22/#25/#26/#27/#28/#29 relus. Aucune branche concurrente modifiée.
+- PREUVE CI HEAD PRECEDENT : [CI #43590693195](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43590693195) = completed/FAILURE, étape Unit tests ; logs job 132434578720 : test `issue #17: optional market and currency predicates remain parameterized` en échec (regex test incorrecte). [Docker/PostgreSQL #43590693217](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43590693217) = completed/SUCCESS sur le même HEAD. Ne pas présenter la CI comme verte.
+- CORRECTION : commit `2444fd2e4499b89b4b5f18079caabf33d86cfafe` corrige les trois expressions régulières du test statique pour refléter le dollar littéral des placeholders SQL `$\${values.length}`. Aucun contrat de requête de production modifié.
+- RECETTE : `test/integration/api-index-publication.test.ts` ajouté sur branche (commits `b992439fbeb5a4c18375adff7b6423c12ef5c99c`, `0da2986acb718f2f46aedb18144e2b52a66bd19f`). Test PostgreSQL transactionnel appelle `indices()` avec définitions DRAFT/PUBLISHED, observations publiées, futures et sans date, puis ROLLBACK. Contrôle une série publiée visible et les trois cas exclus. Ne prouve pas de données officielles ; fixture synthétique isolée. CI de ces commits non encore attestée, tests locaux NOT_RUN.
+- BLOCK_REASON : attendre CI exacte du nouveau HEAD, revue indépendante, validation du statut PUBLISHED et de la politique NULL ; observation officielle, droits et recette financière complète absents. Aucune fusion ni statut DONE/HISTORY_COMPLETE.
+- NEXT_ACTION : contrôler CI et logs du HEAD actuel, corriger toute erreur TypeScript/PostgreSQL ; valider politique de publication et qualité des observations, puis auditer `rates()` sur une surface coordonnée, avec tests d'intégration. Ne pas modifier les PR concurrentes ni S1.
+- ROLLBACK : revert ciblé des trois changements de tests sur branche Draft ; transaction ROLLBACK sans persistance.
+
+---
+
+
 ## 2026-11-14 12:34 Europe/Paris — Issue #17 : filtre conservateur de publication indices (PARTIAL)
 
 - RECONCILIATION : PR #1 fusionnée ; AGENTS.md, docs/15, checkpoint 06/11, dernier worklog et issue #17 relus. PR ouvertes #22/#25/#26/#27/#28/#29/#30 vérifiées ; aucun de leurs périmètres d'ingestion, qualité ou registre modifié. Repo private selon GitHub.
