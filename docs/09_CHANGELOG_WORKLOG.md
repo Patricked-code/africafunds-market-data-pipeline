@@ -1,5 +1,18 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-14 17:31 Europe/Paris — Issue #17 : CI corrigée confirmée et recette PostgreSQL taux ajoutée (PARTIAL)
+
+- RECONCILIATION : PR #1 fusionnée ; PR #30 ouverte Draft sur `fix/api-cors-origin-admission-20261114` ; PR concurrentes #22/#25/#26/#27/#28/#29 identifiées et laissées intactes. Lecture AGENTS.md, docs/15, dernier worklog/checkpoint, issue #17, src/api/queries.ts, migrations 002_market et 002_market_calc, recette PostgreSQL indices et contrat de test taux. Pas de push main ni de fusion.
+- PREUVES CI EXACT-HEAD : commit `b7f4985fd77024f66619975d1016997fcb845903` : [CI #43610835940](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43610835940) = completed/success ; [Docker/PostgreSQL #43610836086](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43610836086) = completed/success. Ces runs valident uniquement le HEAD précédent ; ne pas extrapoler aux commits de cette session.
+- CODE/TEST : commit [`b94d1db`](https://github.com/Patricked-code/africafunds-market-data-pipeline/commit/b94d1db0b9acd672d515d7d6721fb112550b8a76) crée `test/integration/api-rate-publication.test.ts` : vraie requête `rates()` sur PostgreSQL isolé dans une transaction avec ROLLBACK, séries et observations synthétiques, cas publication passée/future/NULL, date économique future, filtres marché et famille. Aucune donnée officielle réelle ni statut de qualité certifié. Tests locaux NOT_RUN ; CI exact nouveau HEAD NOT_ATTESTED.
+- NOTE DE TRAÇABILITE : l'entrée précédente affichait deux chaînes SQL identiques dans la description avant/après à cause de l'interpolation documentaire ; le défaut réel corrigé était l'absence du caractère dollar devant le placeholder de `s.market_code`, désormais visible dans `src/api/queries.ts`. Ne pas interpréter cette coquille du journal comme une absence de correctif.
+- BLOCK_REASON : CI de la nouvelle recette et revue indépendante non attestées ; politique de publication/qualité des taux, contrats officiels, droits de redistribution et observations témoins réelles manquants. Aucun DONE/HISTORY_COMPLETE, ni S1.
+- NEXT_ACTION : contrôler les workflows du commit de recette puis du HEAD documentaire exact ; si rouge, lire logs et corriger. Vérifier la recette PostgreSQL en CI et les risques de collision de `pool.query` dans les tests ; ensuite reprendre l'intégration source officielle → archive SHA-256 → qualité → calcul → API sur surface non revendiquée, en coordination avec #26/#27. Obtenir décision explicite sur les politiques NULL et qualité avant merge.
+- ROLLBACK : revert ciblé du test et de ce checkpoint sur la PR Draft ; aucune migration, secret, 44 sources ou donnée persistante modifiée.
+
+---
+
+
 ## 2026-11-14 16:30 Europe/Paris — Issue #17 : CI rouge sur filtre marché des taux, correction SQL (PARTIAL)
 
 - RECONCILIATION : PR #1 fusionnée ; PR #30 Draft, HEAD initial `5c96353c6436d2d3a872151cc3b6d2616971ae67`. Lecture de `AGENTS.md`, `docs/15_AUTONOMOUS_AGENT_EXECUTION.md`, dernier worklog et checkpoint historique ; revue de `src/api/queries.ts`, recette indices et migration 002. PR concurrentes #22/#25/#26/#27/#28/#29 identifiées, non modifiées.
