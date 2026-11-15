@@ -1,5 +1,17 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-15 09:40 Europe/Paris — Issue #17 : CI du HEAD documentaire attestée ; audit de publication, dépendances réelles (PARTIAL)
+
+- RECONCILIATION : PR #30 Draft branche `fix/api-cors-origin-admission-20261114` ; compare main `73256f48d81d38ce8ff6f51be9e024b25cf5dadb` ahead 56 / behind 0 ; PR #22/#25/#26/#27/#28/#29 ouvertes et préservées. AGENTS.md, docs/15_AUTONOMOUS_AGENT_EXECUTION.md, worklog courant et checkpoint historique, matrice docs/14 et requêtes API/tests d'intégration consultés. PR #1 documentaire déjà fusionnée selon état GitHub antérieur, sans réouverture.
+- PREUVE CI EXACT-HEAD : commit `da5cc40d148965cc2089072b9bcaba3fe59228b3`, [CI #43690624530](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43690624530) completed/success et [Docker/PostgreSQL #43690624533](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43690624533) completed/success (fetch_commit_workflow_runs). Ces résultats ne valident pas un commit ultérieur.
+- AUDIT CODE : `indices()` filtre publication PUBLISHED, dates économiques/publication non futures ; `rates()` filtre dates non futures. Tests transactionnels synthétiques présents ; aucune observation primaire officielle, aucune licence ni archive réelle démontrées. Le test de taux couvre des fixtures synthétiques uniquement. Aucun seuil financier supplémentaire introduit sans arbitrage, aucune écriture sur PR concurrentes. Les contrats d'ingestion (#26) et d'admission (#27) restent revendiqués ; aucun claim partagé établi.
+- VALIDATION : deux workflows GitHub exact-HEAD SUCCESS ; tests locaux NOT_RUN ; source→archive SHA-256→normalisation→qualité→calcul→API sur observation officielle NOT_ATTESTED ; HISTORY_COMPLETE/DONE interdit. Rulesets 403 au dernier contrôle documenté ; revue et gates non attestés.
+- BLOCK_REASON : source primaire autorisée et licence conservation/redistribution manquantes ; politiques de qualité et de publication non arbitrées ; claims concurrents #26/#27 ; absence de preuve de revue indépendante et de protections de main. Aucun déploiement S1 autorisé.
+- NEXT_ACTION : obtenir la preuve officielle datée/licence/empreinte et coordonner un claim GitHub sur les composants #26/#27 ; implémenter ensuite mapping et tests de recette de bout en bout sur modules existants. En parallèle, vérifier CI du nouveau HEAD documentaire, traiter les retours de revue, et reprendre un défaut indépendant reproductible des lots 0–13 si l'accès source reste bloqué. Ne pas produire de nouveaux tests purement périphériques comme substitut à la recette métier.
+- ROLLBACK : revert ciblé de cette entrée sur branche Draft ; aucun push main, merge, secret, S1 ou modification des 44 sources.
+
+---
+
 ## 2026-11-15 08:33 Europe/Paris — Issue #17 : CI exacte GREEN ; protection GitHub non vérifiable ; intégration financière bloquée (PARTIAL)
 
 - RECONCILIATION : PR #1 merged, PR #30 open/Draft HEAD `9f6c13683dbe1ee08349283e1040a0da9fee8c84`; main `73256f48d81d38ce8ff6f51be9e024b25cf5dadb` ; compare ahead 55 / behind 0. AGENTS.md, docs/15_AUTONOMOUS_AGENT_EXECUTION.md, worklog, checkpoint 2026-11-06, code API et test PostgreSQL relus. PR #22/#25/#26/#27/#28/#29 ouvertes ; pas de modification de leurs branches.
