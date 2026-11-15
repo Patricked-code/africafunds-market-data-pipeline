@@ -1,5 +1,16 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-15 20:30 Europe/Paris — Issue #17 : CI exacte GREEN et tests limites supplémentaires (WAITING_CI / WAITING_REVIEW)
+- RECONCILIATION : PR #32 Draft, HEAD précédent ab2496d707dc12644edfb9fdbe8040d4e1faf7c8, base main 73256f48d81d38ce8ff6f51be9e024b25cf5dadb ; PR #31 et autres claims distincts conservés ; AGENTS.md, docs/15, worklog et checkpoint relus. Aucune revue indépendante enregistrée pour PR #32.
+- PREUVES GITHUB sur SHA exact ab2496d707dc12644edfb9fdbe8040d4e1faf7c8 : CI #43748147153 completed/success (https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43748147153) ; smoke Docker/PostgreSQL #43748147113 completed/success (https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43748147113). Ces deux preuves ne s'appliquent pas aux commits suivants.
+- TRAVAIL : commit 5f151c8b0a35b2900dbe36f6d767a4483867c81e ajoute deux scénarios de non-régression dans test/bond-financial-inputs.test.ts : débordement de l'actualisation malgré des entrées finies et rendement débordant avec prix précédent subnormal positif. Aucun changement de formule, source, schéma, API ou infrastructure.
+- TESTS : exécution locale NOT_RUN ; CI exacte du nouveau HEAD à vérifier, aucun PASS présumé. Données synthétiques seulement ; aucun historique réel certifié.
+- BLOCK_REASON : CI du HEAD après les nouveaux tests non attestée ; revue indépendante absente ; données témoins et licences officielles pour recette financière complète indisponibles.
+- NEXT_ACTION : vérifier CI et smoke Docker/PostgreSQL du HEAD de PR #32 après ce checkpoint ; corriger tout échec ; obtenir revue indépendante avant fusion ; reprendre #17 avec données officielles autorisées, et les autres lots sans collision des claims #26/#27.
+- ROLLBACK : revert ciblé du commit de tests et de ce checkpoint sur la branche ; aucun push main, merge, secret ni S1.
+
+---
+
 ## 2026-11-15 19:39 Europe/Paris — Issue #17 : garde des calculs obligataires non finis (PARTIAL / WAITING_CI)
 - BASE : main 73256f48d81d38ce8ff6f51be9e024b25cf5dadb vérifié ; PR #31 distincte, 12 ahead/0 behind ; autres PR #22/#25–#30 préservées. Règles, documents 00–15 et checkpoint lus.
 - CODE : branche fix/bond-financial-nonfinite-guard-20261115 ; commit test RED-candidat 88dcf69a5a873cff5a1ea1b5b0d29f7d34486493 ; correctif 44f97ccd4eafedfafd7c9a128d45c005171a180a. Entrées et sorties obligataires non finies rejetées ; formules valides conservées.
