@@ -1,5 +1,14 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-15 21:35 Europe/Paris — Issue #17 : CI exacte attestée et garde du taux interpolé (WAITING_CI / WAITING_REVIEW)
+- PREUVES : sur HEAD précédent 69d4bd835c542e503c047bd6e0009250d3966ffe, CI #43752880306 completed/success et Docker/PostgreSQL #43752880518 completed/success (GitHub Actions). Ne pas attribuer ces preuves au HEAD suivant.
+- CODE : src/calc/bonds.ts refuse désormais un taux interpolé non fini ou <= -1 avant actualisation (commit 3661584e4b2f5bf275c48159542f318ee3fd109c). Tests de courbe extrême ajoutés puis corrigés dans test/bond-financial-inputs.test.ts (commits edfe8203ad6b79d9513b4e0d05d30889baa5432e et 8793efc3aa6f40c5cd9421fbd7837a79a4913e38). Les taux sources sont déjà bornés ; la garde est défensive. Pas de preuve RED ni d'exécution locale ; ne pas présenter ce test comme une reproduction d'overflow d'interpolation.
+- BLOCK_REASON : CI du nouveau HEAD non vérifiée, revue indépendante PR #32 absente selon dernier checkpoint, données officielles et droits de redistribution non certifiés.
+- NEXT_ACTION : contrôler les deux workflows exact-HEAD de PR #32, corriger tout échec, obtenir revue indépendante ; ensuite reprendre une recette #17 sur données officielles autorisées sans collision #26/#27.
+- ROLLBACK : revert ciblé sur branche ; aucune fusion main, déploiement S1, secret ou modification des 44 sources.
+
+---
+
 ## 2026-11-15 20:30 Europe/Paris — Issue #17 : CI exacte GREEN et tests limites supplémentaires (WAITING_CI / WAITING_REVIEW)
 - RECONCILIATION : PR #32 Draft, HEAD précédent ab2496d707dc12644edfb9fdbe8040d4e1faf7c8, base main 73256f48d81d38ce8ff6f51be9e024b25cf5dadb ; PR #31 et autres claims distincts conservés ; AGENTS.md, docs/15, worklog et checkpoint relus. Aucune revue indépendante enregistrée pour PR #32.
 - PREUVES GITHUB sur SHA exact ab2496d707dc12644edfb9fdbe8040d4e1faf7c8 : CI #43748147153 completed/success (https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43748147153) ; smoke Docker/PostgreSQL #43748147113 completed/success (https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43748147113). Ces deux preuves ne s'appliquent pas aux commits suivants.
