@@ -1,5 +1,17 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-15 10:39 Europe/Paris — Lot 12/13 : correction du gate S1 circulaire (PARTIAL, Draft)
+
+- **RECONCILIATION** : PR #1 fusionnée ; main vérifié `73256f48d81d38ce8ff6f51be9e024b25cf5dadb` ; PR #30 Draft HEAD `c4504755daaacbe1b4682f8ab495a737bbdb0654` et workflows exact-HEAD [CI #43695656590](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43695656590) / [Docker #43695656597](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43695656597), tous deux completed/success. Branches PR #22/#25/#26/#27/#28/#29 non modifiées.
+- **DEFAUT REPRODUIT DOCUMENTAIREMENT** : `docs/10_DEPLOYMENT_GATES.md` exigeait avant tout premier déploiement des contrôles `/health`, premier login, sauvegarde et rapport post-déploiement, qui ne peuvent être exécutés qu'après le déploiement ; `docs/14_MATRICE_EXIGENCES_RECETTE.md` répétait cette condition circulaire. Signalement historique en revue PR #1 (discussion_r4502512646).
+- **CORRECTION** : séparation explicite des gates préalables (sections Cadrage à S1, approbation humaine) et des preuves post-déploiement, obligatoires avant déclaration de succès ; aucun gate préalable retiré, aucun accès S1 accordé. Commits `7a85cdb26048ac8255c6df3135bd49047ba4e85b` et `654e66bb44b69efded739736b4567b8aa7e48779`.
+- **VALIDATION** : cohérence textuelle des deux documents contrôlée ; tests locaux NOT_RUN ; CI de cette branche NOT_ATTESTED ; aucune exécution S1, aucune approbation, aucune donnée financière réelle.
+- **BLOCK_REASON** : revue indépendante, CI exacte et protections GitHub non attestées ; les licences, témoins financiers et claims PR #26/#27 restent nécessaires pour la recette financière globale.
+- **NEXT_ACTION** : suivre la CI/revue de cette PR documentaire et corriger tout échec ; sur le chantier principal, reprendre la qualification officielle issue #13/#16 et la chaîne source→archive SHA-256→normalisation→qualité→calcul→API après coordination des claims #26/#27. Ne pas fusionner ni déployer sans gates.
+- **ROLLBACK** : revert des deux changements documentaires sur cette branche ; aucun effet runtime, aucune migration, aucun secret, aucune fusion main.
+
+---
+
 ## 2026-11-07 — SadiaAF S1 : première installation staging gouvernée, archives persistantes et autorisation des vhosts
 
 - **MANDAT** : l'utilisateur autorise désormais la modification des deux vhosts `sadiaaf.wealthtechinnovations.com` et `api.sadiaaf.wealthtechinnovations.com`, et la suppression d'une archive identifiable. Audit S1 répété : API vhost 16 Ko, frontend 36 Ko ; uniquement pages Plesk d'origine, dossiers historiques `.well-known`, `e-vote`, `sadiaaf_project-v2` ; **aucune archive détectée dans ces vhosts**. Les archives AMF-UMOA, sauvegardes Plesk et autres données hors vhosts ne sont pas autorisées à suppression indifférenciée. Aucune suppression S1 effectuée.
