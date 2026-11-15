@@ -1,5 +1,17 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-15 15:34 Europe/Paris — PR #31 : correction du test S1 après CI rouge (WAITING_CI)
+
+- **RECONCILIATION** : main `73256f48d81d38ce8ff6f51be9e024b25cf5dadb`, PR #31 Draft, branche 8 commits ahead / 0 behind avant correction, reviews=[] ; PR #22/#25/#26/#27/#28/#29/#30 conservées, aucune fusion. Dépôt privé selon API GitHub.
+- **PREUVE RED** : [workflow #43720050273](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43720050273) `completed/failure` pour le checkpoint précédent. Job validate #132829873002 : `Unit tests` FAILURE, 28 tests PASS / 1 FAIL, les étapes ultérieures SKIPPED. Le test `S1 preflight and post-deployment gates are separate and ordered` cherchait `/health API et web en 200` sans les backticks Markdown présents dans la checklist réelle (`\`/health\``). Aucun défaut de gate S1 démontré par cet échec.
+- **CORRECTION** : commit [ab71b6d](https://github.com/Patricked-code/africafunds-market-data-pipeline/commit/ab71b6df5fd9846c4c8dbbb9c592b26d890d11ba), modification ciblée du test pour vérifier exactement la syntaxe Markdown réelle du contrôle `/health` ; aucun gate supprimé, aucune modification de production, migrations, secrets ou 44 sources.
+- **VALIDATION** : RED attesté par CI, GREEN `NOT_ATTESTED` jusqu'à workflow du nouveau HEAD ; tests locaux `NOT_RUN`. PR maintenue Draft sans revue indépendante.
+- **BLOCK_REASON** : CI exacte du correctif non vérifiée ; revue indépendante et protections de branche non attestées ; droits/licences et témoins financiers officiels toujours manquants pour certification réelle, claims PR #26/#27 non coordonnés.
+- **NEXT_ACTION** : contrôler CI exact-HEAD `ab71b6d` puis corriger si échec, demander revue indépendante avant toute fusion. Ensuite choisir une tâche fonctionnelle indépendante des lots 0–13 ; qualifier sources officielles, droits et témoins avant tout raccordement financier concurrent.
+- **ROLLBACK** : revert ciblé du commit de test sur la branche Draft ; main/S1 inchangés.
+
+---
+
 ## 2026-11-15 14:37 Europe/Paris — PR #31 : test anti-régression des gates S1 (PARTIAL)
 
 - **RECONCILIATION** : PR #31 ouverte Draft sur `docs/s1-gates-pre-post-separation-20261115`, HEAD précédent `666a88ece38126406b26d5697d5f08e61fff3d3b`; PR #22/#25/#26/#27/#28/#29/#30 préservées. Sources de gouvernance relues : `AGENTS.md`, `docs/15_AUTONOMOUS_AGENT_EXECUTION.md`, présent journal, matrice de recette et audit historique des 44 sources.
