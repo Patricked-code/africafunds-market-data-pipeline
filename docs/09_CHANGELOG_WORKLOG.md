@@ -1,5 +1,17 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-16 00:31 Europe/Paris — Issue #17 : non-régression sur débordement cumulé (WAITING_CI / WAITING_REVIEW)
+- RECONCILIATION : main=73256f48d81d38ce8ff6f51be9e024b25cf5dadb ; PR #32 13 ahead/0 behind avant ce nouvel incrément ; reviews=[] ; autres PR ouvertes #22/#25–#31 identifiées et non modifiées. Règles AGENTS.md, docs/15, checkpoint historique et journal relus. Aucun transfert des claims #26/#27.
+- PREUVES exactes du HEAD précédent 6191fd9c95b1fffaed33a4519fbb14a709033702 : CI #43769781113 completed/success (https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43769781113) ; Docker/PostgreSQL #43769781124 completed/success (https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43769781124). Ces runs ne valident PAS le nouveau commit.
+- TRAVAIL : commit 00f86db3ddfa4a7fd124eaaf4864d34b2db61a47, test additionnel dans test/bond-financial-inputs.test.ts : deux flux actualisés individuellement finis dont la somme dépasse Number.MAX_VALUE doivent déclencher la garde de valorisation existante. Aucune formule, source, migration, API ou infrastructure modifiée.
+- TESTS : local NOT_RUN ; CI du nouveau HEAD NOT_VERIFIED ; RED non attesté. Test synthétique, aucune donnée financière officielle ni certification de bout en bout.
+- BLOCK_REASON : revue indépendante absente ; protections/gates de fusion non attestés ; droits de redistribution et témoins officiels non qualifiés ; claims ingestion/admission #26/#27 non transférés.
+- NEXT_ACTION : contrôler CI et Docker/PostgreSQL exact-HEAD après ce checkpoint, corriger toute régression ; obtenir revue indépendante ; reprendre la recette financière #17 avec source officielle/licence/témoin autorisé et coordination des claims. Ne pas multiplier les checkpoints CI sans progrès métier. Aucun HISTORY_COMPLETE/DONE.
+- ROLLBACK : revert ciblé du test et du checkpoint sur branche Draft ; aucun push main, merge, secret, S1 ni altération des 44 sources.
+
+---
+
+
 ## 2026-11-15 23:31 Europe/Paris — Issue #17 : CI exacte du HEAD PR #32 confirmée (WAITING_REVIEW)
 - RECONCILIATION : main=73256f48d81d38ce8ff6f51be9e024b25cf5dadb ; branche PR #32 12 ahead/0 behind avant cette écriture ; PR #32 ouverte Draft, reviews=[] ; PR #18 et PR #25–#31 ouvertes selon recherche GitHub, claims distincts préservés. AGENTS.md, docs/15 et dernier checkpoint relus.
 - PREUVES exactes pour commit 75624a51d2c9240ec045edf900d8bd1da3a9aef8 : CI #43764684820 completed/success (https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43764684820) ; Docker/PostgreSQL #43764684827 completed/success (https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43764684827). Aucun test local, donnée officielle, certification financière ni déploiement S1 attestés. Ces preuves ne couvrent pas le présent commit documentaire.
