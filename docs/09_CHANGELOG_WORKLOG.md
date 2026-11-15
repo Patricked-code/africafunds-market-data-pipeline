@@ -1,5 +1,18 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-15 02:39 Europe/Paris — Issue #17 : CI exacte verte et assertion LIMIT déterministe (PARTIAL)
+
+- RECONCILIATION : AGENTS.md, docs/00–15 selon l'ordre d'arrivée, dernier worklog et checkpoint, PR #30 Draft et PR ouvertes relus sur GitHub. Avant écriture, main `73256f48d81d38ce8ff6f51be9e024b25cf5dadb`, PR #30 HEAD `c8874b23bd734db3421ca113d45cd58bbae7fa78`, ahead 45 / behind 0. Aucun périmètre concurrent modifié.
+- PREUVES EXACT-HEAD : pour `c8874b23bd734db3421ca113d45cd58bbae7fa78`, [CI #43659297474](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43659297474) completed/success et [Docker/PostgreSQL #43659297469](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43659297469) completed/success. Ces résultats ne prouvent pas la nouvelle modification.
+- TEST : [commit a534228](https://github.com/Patricked-code/africafunds-market-data-pipeline/commit/a5342286a8dfa8a79fe61fa872c84be69cc25510) corrige dans `test/integration/api-index-publication.test.ts` une assertion fragile : `LIMIT=1` supposait que la fixture de niveau 106 serait toujours première, même avec des observations publiées existantes du même marché à la même date. L'assertion compare désormais le premier résultat limité au premier résultat de la même requête ordonnée sans cette limite ; la visibilité de la fixture 106 reste contrôlée séparément. Aucune modification de production, migration, registre ou source.
+- VALIDATION : tests locaux NOT_RUN ; CI du nouveau HEAD NOT_ATTESTED. La comparaison porte sur `index_level`, et ne constitue pas une certification de tri stable entre lignes de même niveau ; pas de données officielles démontrées.
+- BLOCK_REASON : CI exact nouveau HEAD et revue indépendante non attestées ; droits de redistribution, échantillons financiers officiels, règles de qualité/publication et raccordement source→API toujours incomplets.
+- NEXT_ACTION : contrôler les deux workflows du HEAD après ce checkpoint et corriger tout échec. Puis prioriser la preuve de chaîne officielle autorisée source → archive SHA-256 → normalisation → qualité → calcul → API, en réconciliant claims et périmètres des PR #26/#27. Ne déclarer ni HISTORY_COMPLETE ni DONE ni déploiement S1.
+- ROLLBACK : revert ciblé de a534228 et du checkpoint sur branche Draft ; aucun push main, merge, secret ni S1.
+
+---
+
+
 ## 2026-11-15 01:39 Europe/Paris — Issue #17 : CI exacte GREEN et recette sans plafond fixe (PARTIAL)
 
 - RECONCILIATION : lecture AGENTS.md, docs/15_AUTONOMOUS_AGENT_EXECUTION.md, journal de branche, checkpoint historique 2026-11-06, PR #30 et PR ouvertes. Comparaison main → branche PR #30 : base main `73256f48d81d38ce8ff6f51be9e024b25cf5dadb`, ahead 43 / behind 0 avant écriture. Pas de modification des PR concurrentes.
