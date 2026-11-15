@@ -1,5 +1,17 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-15 05:31 Europe/Paris — Issue #17 : cardinalité exacte des fixtures publiables (PARTIAL)
+
+- RECONCILIATION : lecture de AGENTS.md, docs/15_AUTONOMOUS_AGENT_EXECUTION.md, journal de branche, checkpoint 2026-11-06, code API et recette PostgreSQL ; PR #30 ouverte et Draft, PR concurrentes #22/#25/#26/#27/#28/#29 non modifiées ; main vs branche : ahead 51 / behind 0 avant écriture. Le checkpoint historique ne remplace pas le HEAD actuel.
+- PREUVES EXACT-HEAD PRECEDENT : commit `74c10fbad80a2d7bf72f51bd787e5e58e829fa59`, GitHub Actions [run #43673116190](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43673116190) et [run #43673116212](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43673116212) : completed/success. Ces runs ne prouvent pas le nouveau commit.
+- TEST : commit [0d608e8](https://github.com/Patricked-code/africafunds-market-data-pipeline/commit/0d608e8d862116571cd6cf0b1c70732150e49dbe) ajoute deux assertions d'égalité exacte des niveaux des fixtures [102,106], avec et sans filtres. Les anciennes vérifications `includes` pouvaient tolérer une duplication d'une observation autorisée ; désormais une duplication ou une ligne indue appartenant aux fixtures fait échouer la recette. Transaction BEGIN/ROLLBACK inchangée, aucune donnée persistée.
+- VALIDATION : modification committée ; tests locaux NOT_RUN ; CI du commit de test et du checkpoint courant NOT_ATTESTED. Aucun témoin financier officiel ni chaîne de bout en bout démontrés.
+- BLOCK_REASON : revue indépendante et CI exact-HEAD à confirmer ; licences, observations officielles, règles métier et raccordement source→archive→normalisation→qualité→calcul→API non certifiés ; périmètres PR #26/#27 non revendiqués.
+- NEXT_ACTION : vérifier CI et Docker/PostgreSQL du HEAD de ce checkpoint et corriger toute régression. Ensuite arrêter les améliorations périphériques de recette et qualifier une source officielle autorisée avec échantillon et licence, puis établir la chaîne financière bout en bout après réconciliation explicite des claims PR #26/#27. Si impossible, sélectionner une tâche indépendante des lots 0–13. Aucun HISTORY_COMPLETE/DONE, merge ni déploiement S1.
+- ROLLBACK : revert ciblé du commit 0d608e8 et de cette entrée sur branche Draft ; aucune écriture main, secret ni action S1.
+
+---
+
 ## 2026-11-15 04:35 Europe/Paris — Issue #17 : CI exacte GREEN et isolation des assertions filtrées (PARTIAL)
 
 - RECONCILIATION : PR #1 closed/merged ; PR #30 open/Draft sur `fix/api-cors-origin-admission-20261114` ; dépôt privé confirmé par GitHub. AGENTS.md, docs/15_AUTONOMOUS_AGENT_EXECUTION.md, dernier journal, checkpoint 2026-11-06, matrice de recette et requête API relus ; PR ouvertes concurrentes #22/#25/#26/#27/#28/#29 identifiées, non modifiées. Les SHA historiques ne sont pas utilisés comme HEAD actuel.
