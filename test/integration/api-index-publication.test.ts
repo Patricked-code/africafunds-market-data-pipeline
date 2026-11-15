@@ -52,7 +52,8 @@ test('issue #17: public indices omit DRAFT, future publication, future observati
       new URL(`http://localhost/api/v1/indices?market=${encodeURIComponent(market.market_code)}&currency=${market.currency_code}`),
       1000,
     ) as Array<{ index_code: string; observation_date: Date; index_level: string }>;
-    const levels = rows.map(row => Number(row.index_level));
+    const ownRows = rows.filter(row => fixtureCodes.has(row.index_code));
+    const levels = ownRows.map(row => Number(row.index_level));
     assert.ok(levels.includes(102), 'published historical value must remain visible');
     assert.ok(levels.includes(106), 'same-day economic observation and publication must remain visible');
     const limited = await indices(
