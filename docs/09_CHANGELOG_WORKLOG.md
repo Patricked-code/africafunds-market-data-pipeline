@@ -1,5 +1,17 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-15 03:36 Europe/Paris — Issue #17 : CI exacte GREEN et assertion d'identité d'observation (PARTIAL)
+
+- RECONCILIATION : PR #1 merged, PR #30 open/Draft, HEAD avant écriture `6f744206529206ee9a527142751310e2493a0329`; AGENTS.md, docs/15, journal et checkpoint historique relus. PR ouvertes #22/#25/#26/#27/#28/#29 identifiées et non modifiées. Le dépôt GitHub reste l'unique autorité.
+- PREUVES EXACT-HEAD : pour `6f744206529206ee9a527142751310e2493a0329`, [CI #43664175071](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43664175071) completed/success et [Docker/PostgreSQL #43664175101](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43664175101) completed/success. Ces preuves précèdent la modification.
+- TEST : [commit d663853](https://github.com/Patricked-code/africafunds-market-data-pipeline/commit/d663853378bab3af67590861d7b4940f1e50fd4f) remplace la comparaison fragile du seul `index_level` sous LIMIT=1 par l'identité publique complète (`index_code`, `observation_date`, `index_level`) dans la recette PostgreSQL transactionnelle. Deux indices différents peuvent partager le même niveau numérique. Code métier, migrations, sources historiques et données durables inchangés.
+- VALIDATION : tests locaux NOT_RUN ; CI exact-HEAD après ce checkpoint NOT_ATTESTED ; test synthétique, pas une preuve de données officielles ni de publication réelle. Aucun RED distinct exécuté.
+- BLOCK_REASON : CI exact-HEAD du nouveau commit et revue indépendante non attestées ; licences, observations témoins officielles, qualité financière et intégration source→API non certifiées. Les périmètres ingestion/qualité des PR #26/#27 restent réservés.
+- NEXT_ACTION : contrôler les workflows CI et Docker/PostgreSQL du nouveau HEAD, corriger toute régression. Prioriser ensuite la qualification d'un témoin officiel autorisé et la chaîne archive SHA-256 → normalisation → qualité → calcul → API, après réconciliation explicite des claims #26/#27 ; sinon sélectionner une tâche indépendante non revendiquée. Ne déclarer ni HISTORY_COMPLETE ni DONE, ne pas fusionner ni déployer S1.
+- ROLLBACK : revert ciblé du commit de test et de ce checkpoint sur la branche Draft, sans push main, secret ou S1.
+
+---
+
 ## 2026-11-15 02:39 Europe/Paris — Issue #17 : CI exacte verte et assertion LIMIT déterministe (PARTIAL)
 
 - RECONCILIATION : AGENTS.md, docs/00–15 selon l'ordre d'arrivée, dernier worklog et checkpoint, PR #30 Draft et PR ouvertes relus sur GitHub. Avant écriture, main `73256f48d81d38ce8ff6f51be9e024b25cf5dadb`, PR #30 HEAD `c8874b23bd734db3421ca113d45cd58bbae7fa78`, ahead 45 / behind 0. Aucun périmètre concurrent modifié.
