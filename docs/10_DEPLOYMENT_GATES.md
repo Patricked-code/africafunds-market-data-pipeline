@@ -1,6 +1,6 @@
 # 10 — Critères obligatoires avant production S1
 
-Aucun déploiement sur S1 n’est autorisé tant que chaque section n’est pas explicitement validée.
+**Gate d'autorisation préalable :** aucun premier déploiement sur S1 n'est autorisé tant que les sections **Cadrage, Sécurité, Données, Calculs financiers, API et cockpit, Tests et observabilité, Staging et S1** ne sont pas explicitement validées avec preuves et approbation humaine. Les vérifications de la section **Après déploiement** ne sont pas des prérequis au premier déploiement : elles sont obligatoires **après son exécution** et **avant de déclarer le déploiement réussi ou la mise en production achevée**. Toute vérification post-déploiement échouée ou non exécutée interdit la déclaration de succès et impose le traitement de l'incident ou le rollback prévu. Cette séparation ne dispense d'aucun gate préalable et n'autorise aucun déploiement automatique.
 
 ## Cadrage
 
