@@ -51,17 +51,30 @@ test('issue #17: public indices omit DRAFT, future publication, future observati
     const rows = await indices(
       new URL(`http://localhost/api/v1/indices?market=${encodeURIComponent(market.market_code)}&currency=${market.currency_code}`),
       1000,
-    ) as Array<{ index_level: string }>;
+    ) as Array<{ index_code: string; observation_date: Date; index_level: string }>;
     const levels = rows.map(row => Number(row.index_level));
     assert.ok(levels.includes(102), 'published historical value must remain visible');
     assert.ok(levels.includes(106), 'same-day economic observation and publication must remain visible');
     const limited = await indices(
       new URL(`http://localhost/api/v1/indices?market=${encodeURIComponent(market.market_code)}&currency=${market.currency_code}`),
       1,
-    ) as Array<{ index_level: string }>;
+    ) as Array<{ index_code: string; observation_date: Date; index_level: string }>;
     assert.equal(limited.length, 1, 'LIMIT applies after the visibility filter');
-    assert.equal(Number(limited[0]!.index_level), Number(rows[0]!.index_level),
-      'LIMIT=1 must return the first eligible row from the same ordered public query');
+    // Compare the complete public observation identity, not just its numeric level:
+    // two unrelated indices may legitimately share the same level.
+    assert.deepEqual(
+      {
+        index_code: limited[0]!.index_code,
+        observation_date: limited[0]!.observation_date,
+        index_level: limited[0]!.index_level,
+      },
+      {
+        index_code: rows[0]!.index_code,
+        observation_date: rows[0]!.observation_date,
+        index_level: rows[0]!.index_level,
+      },
+      'LIMIT=1 must return the same published observation as the unbounded ordered query',
+    );
     // Parameterized optional filters must not return observations from unrelated scopes.
     assert.deepEqual(
       await indices(new URL(`http://localhost/api/v1/indices?market=NONEXISTENT_${Date.now()}&currency=${market.currency_code}`), 1000),
