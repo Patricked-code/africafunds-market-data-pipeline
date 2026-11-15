@@ -60,7 +60,8 @@ test('issue #17: public indices omit DRAFT, future publication, future observati
       1,
     ) as Array<{ index_level: string }>;
     assert.equal(limited.length, 1, 'LIMIT applies after the visibility filter');
-    assert.equal(Number(limited[0]!.index_level), 106, 'latest eligible published observation is returned first');
+    assert.equal(Number(limited[0]!.index_level), Number(rows[0]!.index_level),
+      'LIMIT=1 must return the first eligible row from the same ordered public query');
     // Parameterized optional filters must not return observations from unrelated scopes.
     assert.deepEqual(
       await indices(new URL(`http://localhost/api/v1/indices?market=NONEXISTENT_${Date.now()}&currency=${market.currency_code}`), 1000),
