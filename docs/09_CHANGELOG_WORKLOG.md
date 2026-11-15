@@ -1,5 +1,14 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-15 23:31 Europe/Paris — Issue #17 : CI exacte du HEAD PR #32 confirmée (WAITING_REVIEW)
+- RECONCILIATION : main=73256f48d81d38ce8ff6f51be9e024b25cf5dadb ; branche PR #32 12 ahead/0 behind avant cette écriture ; PR #32 ouverte Draft, reviews=[] ; PR #18 et PR #25–#31 ouvertes selon recherche GitHub, claims distincts préservés. AGENTS.md, docs/15 et dernier checkpoint relus.
+- PREUVES exactes pour commit 75624a51d2c9240ec045edf900d8bd1da3a9aef8 : CI #43764684820 completed/success (https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43764684820) ; Docker/PostgreSQL #43764684827 completed/success (https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43764684827). Aucun test local, donnée officielle, certification financière ni déploiement S1 attestés. Ces preuves ne couvrent pas le présent commit documentaire.
+- BLOCK_REASON : PR #32 Draft sans revue indépendante ; protections/gates de fusion non attestés ; source officielle datée et droits de redistribution non qualifiés pour recette #17 ; claims #26/#27 non transférés.
+- NEXT_ACTION : obtenir revue indépendante et vérifier protections avant toute fusion ; identifier une observation financière officielle et sa licence pour une recette reproductible source→archive→normalisation→qualité→calcul→API, sans modifier les branches concurrentes. Éviter de nouveaux checkpoints purement CI sans avancée fonctionnelle.
+- ROLLBACK : revert ciblé du présent checkpoint sur la branche Draft ; aucun push main, merge, secret, S1 ou modification des 44 sources.
+
+---
+
 ## 2026-11-15 22:36 Europe/Paris — Issue #17 : validation exacte de la PR #32 (WAITING_REVIEW)
 - RECONCILIATION : main=73256f48d81d38ce8ff6f51be9e024b25cf5dadb ; branche PR #32 11 ahead/0 behind avant ce checkpoint ; PR #32 ouverte Draft, reviews=[] ; PR concurrentes #22/#25–#31 conservées, sans écriture sur leurs branches. Dépôt GitHub déclaré private au contrôle.
 - PREUVES exactes pour HEAD dacb4db138056620a54e24d811df4364e38cc073 : CI #43759049925 completed/success (https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43759049925) ; Docker/PostgreSQL #43759049919 completed/success (https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43759049919). Ces preuves concernent exclusivement dacb4db, pas ce nouveau commit documentaire. Tests locaux NOT_RUN ; aucune recette financière officielle ni S1.
