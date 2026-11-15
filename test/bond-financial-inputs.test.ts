@@ -27,5 +27,5 @@ test('bond total return rejects non-finite prices and distributions', () => {
 
 test('valid bond calculations preserve existing financial formulas', () => {
   assert.equal(priceCashflows([{ timeYears: 1, amount: 105 }], [{ timeYears: 1, zeroRate: 0.05 }]), 100);
-  assert.equal(bondTotalReturn({ previousDirtyPrice: 100, currentDirtyPrice: 102, cashflowsReceived: 3 }), 0.05);
+  assert.ok(Math.abs(bondTotalReturn({ previousDirtyPrice: 100, currentDirtyPrice: 102, cashflowsReceived: 3 }) - 0.05) < 1e-12);
 });
