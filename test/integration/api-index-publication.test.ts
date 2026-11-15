@@ -54,6 +54,8 @@ test('issue #17: public indices omit DRAFT, future publication, future observati
     ) as Array<{ index_code: string; observation_date: Date; index_level: string }>;
     const ownRows = rows.filter(row => fixtureCodes.has(row.index_code));
     const levels = ownRows.map(row => Number(row.index_level));
+    assert.deepEqual([...levels].sort((a, b) => a - b), [102, 106],
+      'filtered public read must expose each eligible fixture exactly once and no blocked fixture');
     assert.ok(levels.includes(102), 'published historical value must remain visible');
     assert.ok(levels.includes(106), 'same-day economic observation and publication must remain visible');
     const limited = await indices(
@@ -97,6 +99,8 @@ test('issue #17: public indices omit DRAFT, future publication, future observati
     assert.ok(Number.isSafeInteger(unfilteredLimit) && unfilteredLimit > 0, 'safe integration row bound required');
     const unfiltered = (await indices(new URL('http://localhost/api/v1/indices'), unfilteredLimit)) as Array<{ index_code: string; index_level: string }>;
     const ownUnfiltered = unfiltered.filter(row => fixtureCodes.has(row.index_code));
+    assert.deepEqual(ownUnfiltered.map(row => Number(row.index_level)).sort((a, b) => a - b), [102, 106],
+      'unfiltered public read must expose each eligible fixture exactly once and no blocked fixture');
     assert.ok(ownUnfiltered.some(row => Number(row.index_level) === 102),
       'unfiltered public read retains eligible historical observations');
     assert.ok(ownUnfiltered.some(row => Number(row.index_level) === 106),
