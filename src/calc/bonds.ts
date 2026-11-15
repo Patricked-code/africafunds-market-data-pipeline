@@ -38,6 +38,7 @@ export function priceCashflows(cashflows: Cashflow[], curve: CurvePoint[]): numb
     }
     if (!Number.isFinite(cashflow.amount)) throw new Error('Montant de flux invalide');
     const rate = interpolateRate(curve, cashflow.timeYears);
+    if (!Number.isFinite(rate) || rate <= -1) throw new Error('Taux interpolé invalide');
     const discounted = cashflow.amount / ((1 + rate) ** cashflow.timeYears);
     const total = price + discounted;
     if (!Number.isFinite(total)) throw new Error('Valorisation obligataire non finie');
