@@ -53,3 +53,12 @@ test('extreme but finite curve interpolation retains finite valuation', () => {
   assert.ok(Number.isFinite(result));
   assert.ok(result >= 0);
 });
+
+
+test('finite discounted cashflows whose aggregate overflows are rejected', () => {
+  // Each discounted cashflow is finite; the accumulated valuation is not.
+  assert.throws(() => priceCashflows(
+    [{ timeYears: 1, amount: Number.MAX_VALUE }, { timeYears: 1, amount: Number.MAX_VALUE }],
+    [{ timeYears: 1, zeroRate: 0 }],
+  ), /Valorisation obligataire non finie/);
+});
