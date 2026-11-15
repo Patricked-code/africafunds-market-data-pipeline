@@ -1,5 +1,16 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-15 14:37 Europe/Paris — PR #31 : test anti-régression des gates S1 (PARTIAL)
+
+- **RECONCILIATION** : PR #31 ouverte Draft sur `docs/s1-gates-pre-post-separation-20261115`, HEAD précédent `666a88ece38126406b26d5697d5f08e61fff3d3b`; PR #22/#25/#26/#27/#28/#29/#30 préservées. Sources de gouvernance relues : `AGENTS.md`, `docs/15_AUTONOMOUS_AGENT_EXECUTION.md`, présent journal, matrice de recette et audit historique des 44 sources.
+- **PREUVE CI EXACT-HEAD PRECEDENT** : workflow [#43714508382](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43714508382) `completed/success` pour `666a88ece38126406b26d5697d5f08e61fff3d3b`. Aucun second workflow Docker/PostgreSQL attesté pour ce SHA.
+- **TRAVAIL CONCRET** : ajout de `test/s1-deployment-gates.test.ts` (commit [d0e673d](https://github.com/Patricked-code/africafunds-market-data-pipeline/commit/d0e673d007487ce68646a9c5429c9583432bc017)) avec 3 tests Node sur l'ordre des sections, l'absence de circularité /health et les obligations postflight, l'approbation humaine et le maintien de tous les items non cochés. Tests locaux `NOT_RUN`; nouvelle CI `NOT_ATTESTED` tant que les workflows du nouveau HEAD ne sont pas vérifiés. Aucun résultat RED/GREEN revendiqué sans exécution.
+- **BLOCK_REASON** : revue indépendante et protections de fusion non attestées ; source financière primaire datée, licence de rétention/redistribution et claim coordonné des PR #26/#27 non disponibles ; pas de preuve runtime S1. PR #31 reste Draft.
+- **NEXT_ACTION** : vérifier les workflows exact-HEAD de la PR #31 après ajout du test et corriger tout échec ; obtenir revue indépendante avant fusion. Reprendre ensuite les lots financiers via source primaire officielle autorisée et échantillon SHA-256, sans toucher aux branches revendiquées, ou identifier un autre incrément indépendant testable.
+- **ROLLBACK** : revert ciblé du test et de ce checkpoint sur branche Draft ; aucun changement sur main, S1, secrets, migrations ou 44 sources historiques.
+
+---
+
 ## 2026-11-15 13:33 Europe/Paris — PR #31 : CI du checkpoint et sélection de tâche indépendante (PARTIAL)
 
 - **RECONCILIATION** : PR #31 toujours Draft, comparaison GitHub `main=73256f48d81d38ce8ff6f51be9e024b25cf5dadb`, branche 5 commits ahead / 0 behind avant écriture. PR #22/#25/#26/#27/#28/#29/#30 ouvertes, leurs périmètres non modifiés. Issues #13/#14/#15/#16/#17 ouvertes ; ne pas présumer de nouvelles autorisations.
