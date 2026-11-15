@@ -1,5 +1,17 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-15 07:38 Europe/Paris — Issue #17 : validation CI du checkpoint documentaire, blocage métier maintenu (PARTIAL)
+
+- RECONCILIATION : PR #1 merged ; PR #30 open/Draft, HEAD avant écriture `9a33ced68da26a498dfe28c911c09e6582244e2f`, base main `73256f48d81d38ce8ff6f51be9e024b25cf5dadb` (métadonnées PR). AGENTS.md, docs/15, worklog et checkpoint du 06/11 relus ; code de `src/api/queries.ts` et test PostgreSQL de publication examinés. PR #22/#25/#26/#27/#28/#29 identifiées comme travaux concurrents, aucune écriture sur leurs branches.
+- PREUVES EXACT-HEAD : commit `9a33ced68da26a498dfe28c911c09e6582244e2f` : [CI #43682039677](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43682039677) completed/success et [Docker/PostgreSQL #43682039699](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43682039699) completed/success, selon GitHub Actions. Ce résultat confirme le checkpoint précédent, pas le commit documentaire présent.
+- ACTION : revue des filtres de publication des fonctions `indices()` et `rates()` et de la recette transactionnelle existante. Aucun changement métier sans politique de qualité/publication et données officielles validées ; ne pas inventer de nouveau seuil ni dupliquer les PR #26/#27. Checkpoint et preuves GitHub mis à jour.
+- VALIDATION : tests locaux NOT_RUN ; aucune donnée financière officielle ni archive brute SHA-256 certifiée ; aucune recette historique de bout en bout. Nouveau HEAD CI NOT_ATTESTED. Pas de preuve de runner permanent.
+- BLOCK_REASON : licence de conservation/redistribution et échantillon primaire officiel daté manquants, claims des composants ingestion/qualité réservés aux PR #26/#27, règles de qualité/publication à arbitrer, revue indépendante et gates de fusion non attestés.
+- NEXT_ACTION : vérifier les runs du nouveau HEAD ; obtenir licence et témoin officiel (avec date, source, SHA-256) puis réconcilier explicitement les claims #26/#27 avant toute écriture sur ces composants. Exécuter une recette source→archive→normalisation→qualité→calcul→API sur les modules existants, comparer historiques/révisions par marché. Si ces prérequis restent absents, sélectionner un défaut indépendant et reproductible dans les lots 0–13, sans tests périphériques supplémentaires.
+- ROLLBACK : revert ciblé de cette entrée sur branche Draft. Aucun merge, push main, déploiement S1, secret ou altération des 44 endpoints.
+
+---
+
 ## 2026-11-15 06:39 Europe/Paris — Issue #17 : CI exact-HEAD confirmée ; priorité à la chaîne financière réelle (PARTIAL)
 
 - RECONCILIATION : PR #1 closed/merged ; PR #30 open/Draft, HEAD initial `0459ccd995a5d52e3d0f74ffc7808da1a4068ae7` ; main `73256f48d81d38ce8ff6f51be9e024b25cf5dadb` via compare (ahead 53 / behind 0). AGENTS.md, docs/15, worklog, checkpoint 2026-11-06, requêtes API et test PostgreSQL lus. PR concurrentes #22/#25/#26/#27/#28/#29 identifiées sans modification.
