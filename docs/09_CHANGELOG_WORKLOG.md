@@ -1,5 +1,15 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-15 22:36 Europe/Paris — Issue #17 : validation exacte de la PR #32 (WAITING_REVIEW)
+- RECONCILIATION : main=73256f48d81d38ce8ff6f51be9e024b25cf5dadb ; branche PR #32 11 ahead/0 behind avant ce checkpoint ; PR #32 ouverte Draft, reviews=[] ; PR concurrentes #22/#25–#31 conservées, sans écriture sur leurs branches. Dépôt GitHub déclaré private au contrôle.
+- PREUVES exactes pour HEAD dacb4db138056620a54e24d811df4364e38cc073 : CI #43759049925 completed/success (https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43759049925) ; Docker/PostgreSQL #43759049919 completed/success (https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43759049919). Ces preuves concernent exclusivement dacb4db, pas ce nouveau commit documentaire. Tests locaux NOT_RUN ; aucune recette financière officielle ni S1.
+- BLOCK_REASON : revue indépendante PR #32 absente ; protections et gates de fusion non attestés ; observations financières officielles, licences et chaîne source→archive→normalisation→calcul→publication non certifiées. Claims #26/#27 non transférés.
+- NEXT_ACTION : vérifier les checks exact-HEAD après ce checkpoint si nécessaires, obtenir revue indépendante et vérification des protections avant toute fusion. En parallèle, sélectionner un travail métier #13–#17 non revendiqué, avec témoin officiel et droits documentés ; ne pas substituer des checkpoints CI à la recette financière. Aucun HISTORY_COMPLETE/DONE.
+- ROLLBACK : revert ciblé sur la branche Draft ; aucune écriture main, merge, secret, S1 ni modification des 44 sources.
+
+---
+
+
 ## 2026-11-15 21:35 Europe/Paris — Issue #17 : CI exacte attestée et garde du taux interpolé (WAITING_CI / WAITING_REVIEW)
 - PREUVES : sur HEAD précédent 69d4bd835c542e503c047bd6e0009250d3966ffe, CI #43752880306 completed/success et Docker/PostgreSQL #43752880518 completed/success (GitHub Actions). Ne pas attribuer ces preuves au HEAD suivant.
 - CODE : src/calc/bonds.ts refuse désormais un taux interpolé non fini ou <= -1 avant actualisation (commit 3661584e4b2f5bf275c48159542f318ee3fd109c). Tests de courbe extrême ajoutés puis corrigés dans test/bond-financial-inputs.test.ts (commits edfe8203ad6b79d9513b4e0d05d30889baa5432e et 8793efc3aa6f40c5cd9421fbd7837a79a4913e38). Les taux sources sont déjà bornés ; la garde est défensive. Pas de preuve RED ni d'exécution locale ; ne pas présenter ce test comme une reproduction d'overflow d'interpolation.
