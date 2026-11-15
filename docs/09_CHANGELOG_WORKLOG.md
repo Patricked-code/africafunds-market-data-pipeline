@@ -1,5 +1,18 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-15 13:33 Europe/Paris — PR #31 : CI du checkpoint et sélection de tâche indépendante (PARTIAL)
+
+- **RECONCILIATION** : PR #31 toujours Draft, comparaison GitHub `main=73256f48d81d38ce8ff6f51be9e024b25cf5dadb`, branche 5 commits ahead / 0 behind avant écriture. PR #22/#25/#26/#27/#28/#29/#30 ouvertes, leurs périmètres non modifiés. Issues #13/#14/#15/#16/#17 ouvertes ; ne pas présumer de nouvelles autorisations.
+- **PREUVE CI EXACT-HEAD** : commit `f97195563954e7517579eace142981df78234325`, [workflow #43710076104](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43710076104) `completed/success` (résultat connecteur GitHub). Un seul workflow retourné ; Docker/PostgreSQL non attesté pour ce commit. Tests locaux NOT_RUN ; runtime S1 NOT_VERIFIED.
+- **REVUE** : PR #31 `reviews=[]` au contrôle ; aucune fusion ni promotion de Draft. PR #31 concerne uniquement la séparation des gates documentaires pré/post S1, pas la validation du déploiement.
+- **TRAVAIL ADMISSIBLE RECHERCHÉ** : PR #22 revendique backfill, #25 audit, #26 ingestion, #27 admission financière, #28 qualité, #29 registre, #30 API. Ne pas écrire sur ces branches ou modifier leurs composants sans claim/réconciliation. Le prochain incrément fonctionnel doit se faire sur une branche dédiée avec preuve RED/GREEN et périmètre sans collision ; aucun code fonctionnel ajouté dans ce checkpoint.
+- **BLOCK_REASON** : revue indépendante et protections de fusion non attestées ; absence de source primaire datée avec droits de conservation/redistribution validés, et claims non coordonnés des composants financiers ; pas de preuve de chaîne réelle ni de staging S1. CI du présent commit documentaire non attestée.
+- **NEXT_ACTION** : contrôler la CI exacte du nouveau HEAD ; obtenir revue indépendante PR #31 et vérifier gates GitHub. Reprendre en priorité une tâche fonctionnelle indépendante des lots 0–13, en auditant ses fichiers et claims avant branche/PR, avec tests et preuve CI ; pour les issues #13/#16 qualifier une source officielle/licence/échantillon SHA-256 sans contournement, puis raccorder la chaîne existante après coordination #26/#27. Ne pas multiplier les checkpoints documentaires sans progression métier ou preuve nouvelle.
+- **ROLLBACK** : revert ciblé du présent ajout documentaire sur branche Draft ; aucune écriture sur main, S1, secrets ou 44 sources historiques.
+
+---
+
+
 ## 2026-11-15 12:40 Europe/Paris — PR #31 : contrôle CI et gouvernance exact-HEAD (PARTIAL)
 
 - **RECONCILIATION** : branche PR #31 `docs/s1-gates-pre-post-separation-20261115` ouverte Draft ; comparaison GitHub `main` base `73256f48d81d38ce8ff6f51be9e024b25cf5dadb`, branche 4 commits ahead / 0 behind au contrôle. Dépôt déclaré `private` par GitHub ; aucune modification de visibilité. PR #22/#25/#26/#27/#28/#29/#30 non modifiées.
