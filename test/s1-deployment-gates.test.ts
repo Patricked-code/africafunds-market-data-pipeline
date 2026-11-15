@@ -16,8 +16,8 @@ test('S1 preflight and post-deployment gates are separate and ordered', () => {
   const after = gates.slice(postStart);
   assert.ok(postStart > 0);
   assert.match(before, /Validation humaine explicite de mise en production/);
-  assert.doesNotMatch(before, /^- \[ \] \/health API et web en 200$/m);
-  assert.match(after, /^- \[ \] \/health API et web en 200$/m);
+  assert.doesNotMatch(before, /^- \[ \] `\/health` API et web en 200$/m);
+  assert.match(after, /^- \[ \] `\/health` API et web en 200$/m);
   assert.match(after, /^- \[ \] Premier login Super Admin réussi$/m);
   assert.match(after, /^- \[ \] Sauvegarde post-déploiement créée$/m);
   assert.match(after, /^- \[ \] Rapport de déploiement ajouté au dépôt$/m);
