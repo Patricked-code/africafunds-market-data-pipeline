@@ -1,5 +1,15 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-15 19:39 Europe/Paris — Issue #17 : garde des calculs obligataires non finis (PARTIAL / WAITING_CI)
+- BASE : main 73256f48d81d38ce8ff6f51be9e024b25cf5dadb vérifié ; PR #31 distincte, 12 ahead/0 behind ; autres PR #22/#25–#30 préservées. Règles, documents 00–15 et checkpoint lus.
+- CODE : branche fix/bond-financial-nonfinite-guard-20261115 ; commit test RED-candidat 88dcf69a5a873cff5a1ea1b5b0d29f7d34486493 ; correctif 44f97ccd4eafedfafd7c9a128d45c005171a180a. Entrées et sorties obligataires non finies rejetées ; formules valides conservées.
+- PREUVE CONNEXE : PR #31, commit 71546f82c2b9d3e0a807763a9f43c125ee8f82e8 : workflow https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43736818803 completed/success ; ne valide PAS la présente branche. Tests locaux NOT_RUN ; RED/GREEN non attestés.
+- BLOCK_REASON : CI/revue de cette branche non attestées ; licences, données officielles, historique, méthodes et publication non certifiés ; PR #31 Draft sans revue.
+- NEXT_ACTION : ouvrir PR Draft, contrôler CI exact-HEAD, corriger si rouge et demander revue indépendante. Reprendre ensuite recette financière #17 avec témoins officiels autorisés et coordonner claims #26/#27 avant intégration.
+- ROLLBACK : revert ciblé sur branche/PR ; aucun merge, main, secret, S1 ou donnée brute modifié.
+
+---
+
 ## 2026-11-07 — SadiaAF S1 : première installation staging gouvernée, archives persistantes et autorisation des vhosts
 
 - **MANDAT** : l'utilisateur autorise désormais la modification des deux vhosts `sadiaaf.wealthtechinnovations.com` et `api.sadiaaf.wealthtechinnovations.com`, et la suppression d'une archive identifiable. Audit S1 répété : API vhost 16 Ko, frontend 36 Ko ; uniquement pages Plesk d'origine, dossiers historiques `.well-known`, `e-vote`, `sadiaaf_project-v2` ; **aucune archive détectée dans ces vhosts**. Les archives AMF-UMOA, sauvegardes Plesk et autres données hors vhosts ne sont pas autorisées à suppression indifférenciée. Aucune suppression S1 effectuée.
