@@ -1,5 +1,18 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-15 06:39 Europe/Paris — Issue #17 : CI exact-HEAD confirmée ; priorité à la chaîne financière réelle (PARTIAL)
+
+- RECONCILIATION : PR #1 closed/merged ; PR #30 open/Draft, HEAD initial `0459ccd995a5d52e3d0f74ffc7808da1a4068ae7` ; main `73256f48d81d38ce8ff6f51be9e024b25cf5dadb` via compare (ahead 53 / behind 0). AGENTS.md, docs/15, worklog, checkpoint 2026-11-06, requêtes API et test PostgreSQL lus. PR concurrentes #22/#25/#26/#27/#28/#29 identifiées sans modification.
+- PREUVES EXACT-HEAD : `0459ccd995a5d52e3d0f74ffc7808da1a4068ae7` — [CI #43677165046](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43677165046) completed/success ; [Docker/PostgreSQL #43677165071](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43677165071) completed/success. Les deux workflows valident ce HEAD précis, pas le nouveau commit documentaire.
+- ACTION : contrôle de l'identité et des tests de publication sur branche, vérification des claims et périmètres concurrents ; aucun changement fonctionnel admissible sur ingestion/admission financière sans coordination des PR #26/#27 et sans échantillon officiel légalement exploitable. Cette entrée corrige le statut CI historique et préserve les preuves, sans inventer de chaîne financière ni multiplier les tests périphériques.
+- VALIDATION : tests locaux NOT_RUN ; aucune donnée officielle collectée, aucun artefact brut SHA-256 réel vérifié, aucune certification historique ; CI du nouveau commit documentaire NOT_ATTESTED.
+- BLOCK_REASON : contrats officiels et droits de conservation/redistribution, échantillon daté et versionné, mappings source→observation, arbitrage de qualité/publication, claim non conflictuel sur ingestion/admission, revue indépendante et gates de fusion manquants. Les six adaptateurs dynamiques ne sont pas déclarés opérationnels.
+- NEXT_ACTION : (1) contrôler les runs du nouveau HEAD ; (2) sélectionner avec preuve de licence et fixture une source officielle et coordonner le claim avec PR #26/#27 ; (3) implémenter un mapping minimal sur les modules existants et prouver source→archive SHA-256→normalisation→qualité→calcul→API, puis comparer dates, révisions et historiques par marché ; (4) si les droits restent bloquants, travailler sur un lot indépendant non revendiqué, sans nouveau registre ni orchestrateur.
+- ROLLBACK : revert de cette seule entrée documentaire sur branche Draft. Aucune fusion, push main, déploiement S1, secret ou altération des 44 sources.
+
+---
+
+
 ## 2026-11-15 05:31 Europe/Paris — Issue #17 : cardinalité exacte des fixtures publiables (PARTIAL)
 
 - RECONCILIATION : lecture de AGENTS.md, docs/15_AUTONOMOUS_AGENT_EXECUTION.md, journal de branche, checkpoint 2026-11-06, code API et recette PostgreSQL ; PR #30 ouverte et Draft, PR concurrentes #22/#25/#26/#27/#28/#29 non modifiées ; main vs branche : ahead 51 / behind 0 avant écriture. Le checkpoint historique ne remplace pas le HEAD actuel.
