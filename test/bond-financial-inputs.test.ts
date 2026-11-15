@@ -29,3 +29,18 @@ test('valid bond calculations preserve existing financial formulas', () => {
   assert.equal(priceCashflows([{ timeYears: 1, amount: 105 }], [{ timeYears: 1, zeroRate: 0.05 }]), 100);
   assert.ok(Math.abs(bondTotalReturn({ previousDirtyPrice: 100, currentDirtyPrice: 102, cashflowsReceived: 3 }) - 0.05) < 1e-12);
 });
+
+
+test('finite inputs that overflow the financial result are rejected', () => {
+  // A finite cashflow and valid near-minus-one discount rate can overflow.
+  assert.throws(() => priceCashflows(
+    [{ timeYears: 2, amount: Number.MAX_VALUE }],
+    [{ timeYears: 2, zeroRate: -0.9999999999999999 }],
+  ), /Valorisation obligataire non finie/);
+
+  // A strictly positive but subnormal previous price can overflow the ratio.
+  assert.throws(() => bondTotalReturn({
+    previousDirtyPrice: Number.MIN_VALUE,
+    currentDirtyPrice: 1,
+  }), /Rendement obligataire non fini/);
+});
