@@ -1,3 +1,9 @@
+## 2026-11-15 — Calcul obligataire : garde des valeurs non finies (PARTIAL)
+- src/calc/bonds.ts rejette les entrées de courbe/flux non finies, taux <= -100 %, prix non finis, prix courants négatifs et résultats non finis ; formules valides préservées.
+- Tests test/bond-financial-inputs.test.ts : NaN/Infinity, échéances, taux invalides, formules valides. Tests locaux NOT_RUN ; CI à vérifier par PR. RED-candidat n'est pas un RED exécuté.
+- Limites : aucun témoin officiel, méthode versionnée, historique ni publication certifiés ; FR-013 et issue #17 restent PARTIAL. Aucun S1, migration ou changement de source.
+
+---
 # 06 — État réel et écarts
 
 ## Audit S1 et sécurité de déploiement — 2026-11-07
