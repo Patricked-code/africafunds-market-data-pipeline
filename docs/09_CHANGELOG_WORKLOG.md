@@ -1,5 +1,18 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-15 11:30 Europe/Paris — PR #31 : CI exacte et audit de dépendances (PARTIAL)
+
+- **RECONCILIATION** : PR #31 ouverte Draft, HEAD exact `2558c1d36b46ce31341f4382ed47c9763fca5de3`, base `main` `73256f48d81d38ce8ff6f51be9e024b25cf5dadb`, non fusionnée ; revue indépendante GitHub `reviews=[]` lors de ce contrôle. Les PR #22/#25/#26/#27/#28/#29/#30 restent indépendantes et non modifiées.
+- **PREUVE CI EXACT-HEAD** : [CI #43700397258](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43700397258) pour `2558c1d36b46ce31341f4382ed47c9763fca5de3` : `completed/success` ; le connecteur ne retourne qu'un workflow pour ce HEAD, **aucun second workflow Docker/PostgreSQL attesté**. Tests locaux NOT_RUN, aucune validation runtime S1.
+- **AUDIT SOURCES RECONCILIE** : [issue #13](https://github.com/Patricked-code/africafunds-market-data-pipeline/issues/13) toujours ouverte ; matrice historique `docs/SOURCE_AUDIT_RUN_42314547906.md` sur main, 44 endpoints/11 marchés : 22 NOT_PROBED, 7 HEAD 403, 1 HEAD 404, 14 HEAD 200 non vérifiés en contenu. Ce sont des résultats historiques, **aucune nouvelle sonde exécutée** ; pas de contournement robots. [Issue #16](https://github.com/Patricked-code/africafunds-market-data-pipeline/issues/16) ouverte ; FX/inflation/VL officiels et licences non certifiés.
+- **VALIDATION** : correction documentaire pré/post S1 maintenue sur branche Draft ; CI ci-dessus atteste le HEAD, sans démontrer revue, protections, droits sources, données réelles ou déploiement. Aucun `HISTORY_COMPLETE` ni `DONE` métier.
+- **BLOCK_REASON** : revue indépendante absente, protection/rulesets GitHub non attestés ; données témoins officielles, licences de conservation/redistribution, qualification robots et coordination des claims ingestion/admission PR #26/#27 manquantes. Aucun merge ou S1 admissible.
+- **NEXT_ACTION** : obtenir revue indépendante et contrôle des protections pour PR #31 sans fusion implicite ; priorité métier sur branche dédiée non revendiquée : qualifier un témoin primaire officiel et ses droits pour issue #13/#16, puis implémenter et tester un adaptateur/mapping dans les modules existants après claim GitHub coordonné avec #26/#27. Vérifier la CI exacte de tout nouveau HEAD ; si absence de droits, conserver BLOCKED et rechercher une correction fonctionnelle indépendante dans les lots 0–13.
+- **ROLLBACK** : revert ciblé de ce checkpoint documentaire sur PR #31 ; aucun effet sur main, S1, secrets ou données historiques.
+
+---
+
+
 ## 2026-11-15 10:39 Europe/Paris — Lot 12/13 : correction du gate S1 circulaire (PARTIAL, Draft)
 
 - **RECONCILIATION** : PR #1 fusionnée ; main vérifié `73256f48d81d38ce8ff6f51be9e024b25cf5dadb` ; PR #30 Draft HEAD `c4504755daaacbe1b4682f8ab495a737bbdb0654` et workflows exact-HEAD [CI #43695656590](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43695656590) / [Docker #43695656597](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43695656597), tous deux completed/success. Branches PR #22/#25/#26/#27/#28/#29 non modifiées.
