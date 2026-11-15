@@ -1,5 +1,17 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-15 04:35 Europe/Paris — Issue #17 : CI exacte GREEN et isolation des assertions filtrées (PARTIAL)
+
+- RECONCILIATION : PR #1 closed/merged ; PR #30 open/Draft sur `fix/api-cors-origin-admission-20261114` ; dépôt privé confirmé par GitHub. AGENTS.md, docs/15_AUTONOMOUS_AGENT_EXECUTION.md, dernier journal, checkpoint 2026-11-06, matrice de recette et requête API relus ; PR ouvertes concurrentes #22/#25/#26/#27/#28/#29 identifiées, non modifiées. Les SHA historiques ne sont pas utilisés comme HEAD actuel.
+- PREUVES EXACT-HEAD : pour `919ea31e95488c4aa3e2ce0e8aca66d57805dda7`, [Docker/PostgreSQL #43668628987](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43668628987) completed/success et [CI #43668628993](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43668628993) completed/success. Ces runs précèdent le nouveau changement.
+- TEST : [commit a8147bc](https://github.com/Patricked-code/africafunds-market-data-pipeline/commit/a8147bc7840fb11c090776c4a1e009494a335e65) limite les assertions `levels` de la lecture filtrée des indices aux `index_code` créés par cette transaction. Auparavant, une observation étrangère de niveau 101/103/104/105 pouvait produire un faux échec ou une observation étrangère de niveau 102/106 un faux positif. Les assertions `LIMIT=1` sur l'ordre public et le rollback restent inchangés. Aucun changement production, migrations, registre de 44 sources ou données durables.
+- VALIDATION : tests locaux NOT_RUN ; CI exact-HEAD après le nouveau commit NOT_ATTESTED. Les fixtures sont synthétiques et ne démontrent pas de collecte réelle.
+- BLOCK_REASON : CI du nouveau HEAD, revue indépendante, données témoins officielles, licences de redistribution et chaîne source→archive→qualité→calcul→API non certifiées. Les PR #26/#27 réservent des composants ingestion/qualité ; aucun claim concurrent acquis.
+- NEXT_ACTION : contrôler CI et Docker/PostgreSQL du HEAD issu de ce checkpoint ; corriger toute régression. Puis reprendre un témoin financier officiel autorisé et la chaîne complète, après réconciliation des claims #26/#27, ou une tâche indépendante. Ne pas déclarer HISTORY_COMPLETE/DONE, fusionner ni déployer S1.
+- ROLLBACK : revert ciblé du commit a8147bc et de cette entrée sur branche Draft ; aucun push main, secret ni action S1.
+
+---
+
 ## 2026-11-15 03:36 Europe/Paris — Issue #17 : CI exacte GREEN et assertion d'identité d'observation (PARTIAL)
 
 - RECONCILIATION : PR #1 merged, PR #30 open/Draft, HEAD avant écriture `6f744206529206ee9a527142751310e2493a0329`; AGENTS.md, docs/15, journal et checkpoint historique relus. PR ouvertes #22/#25/#26/#27/#28/#29 identifiées et non modifiées. Le dépôt GitHub reste l'unique autorité.
