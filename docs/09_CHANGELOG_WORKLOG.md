@@ -1,5 +1,18 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-15 01:39 Europe/Paris — Issue #17 : CI exacte GREEN et recette sans plafond fixe (PARTIAL)
+
+- RECONCILIATION : lecture AGENTS.md, docs/15_AUTONOMOUS_AGENT_EXECUTION.md, journal de branche, checkpoint historique 2026-11-06, PR #30 et PR ouvertes. Comparaison main → branche PR #30 : base main `73256f48d81d38ce8ff6f51be9e024b25cf5dadb`, ahead 43 / behind 0 avant écriture. Pas de modification des PR concurrentes.
+- PREUVES EXACT-HEAD : commit `3ea8a7c2c79bf0c9a6c9d7b6cd0ab41d98e9f722` : [CI #43654011476](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43654011476) completed/success ; [Docker/PostgreSQL #43654011478](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43654011478) completed/success. Ces preuves ne concernent pas le nouveau commit.
+- CODE/TEST : [commit ad98c41](https://github.com/Patricked-code/africafunds-market-data-pipeline/commit/ad98c419911dcf6b753551bfa1bed397bf3386aa) : la recette `test/integration/api-index-publication.test.ts` calcule maintenant un plafond depuis `count(*)` de `calc.index_daily_values` dans la même transaction avant l'appel public sans filtres. Elle refuse un plafond non entier sûr. L'ancien `LIMIT 1000` pouvait exclure les fixtures quand la base de CI grossit, provoquant un faux échec. Le code de production, les schémas, les 44 sources, les données persistantes et les PR #26/#27 restent inchangés.
+- VALIDATION : tests locaux NOT_RUN ; CI exact nouveau HEAD NOT_ATTESTED ; l'exécution de la recette modifiée reste à prouver. Les fixtures sont synthétiques et la transaction se termine par ROLLBACK.
+- BLOCK_REASON : revue indépendante, CI du nouveau HEAD, observations officielles et droits de redistribution, politique métier de qualité/publication et raccordement bout-en-bout #26/#27 non attestés.
+- NEXT_ACTION : contrôler les deux workflows GitHub Actions du HEAD après ce checkpoint ; corriger toute régression. Ensuite reprendre une intégration témoin officielle légalement autorisée de source → archive SHA-256 → normalisation → qualité → calcul → API en respectant les claims des PR #26/#27. Ne déclarer ni HISTORY_COMPLETE ni S1 prêt.
+- ROLLBACK : revert ciblé de ad98c41 et du checkpoint sur la branche Draft ; aucune écriture main/S1 ni secret.
+
+---
+
+
 ## 2026-11-15 00:35 Europe/Paris — Issue #17 : CI exacte GREEN et isolation des fixtures de recette (PARTIAL)
 
 - RECONCILIATION : lecture AGENTS.md, docs/15_AUTONOMOUS_AGENT_EXECUTION.md, dernier worklog, checkpoint historique 2026-11-06, PR #30 Draft, issue #17 et PR ouvertes. GitHub reste autorité unique. Aucune fusion, aucun push main, aucun déploiement S1.
