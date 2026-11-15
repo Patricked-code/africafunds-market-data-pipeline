@@ -1,5 +1,17 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-15 12:40 Europe/Paris — PR #31 : contrôle CI et gouvernance exact-HEAD (PARTIAL)
+
+- **RECONCILIATION** : branche PR #31 `docs/s1-gates-pre-post-separation-20261115` ouverte Draft ; comparaison GitHub `main` base `73256f48d81d38ce8ff6f51be9e024b25cf5dadb`, branche 4 commits ahead / 0 behind au contrôle. Dépôt déclaré `private` par GitHub ; aucune modification de visibilité. PR #22/#25/#26/#27/#28/#29/#30 non modifiées.
+- **PREUVE CI EXACT-HEAD** : commit `95c8ef7ed172e880723e24623adc9644aafb4ae4` : [CI #43704439447](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43704439447) `completed/success`. Un seul workflow retourné par le connecteur ; Docker/PostgreSQL non attesté sur ce commit. Tests locaux NOT_RUN ; aucune preuve runtime S1.
+- **REVUE** : PR #31 `reviews=[]` au contrôle GitHub. Correction documentaire pré/post S1 maintenue Draft ; aucune fusion autorisée. Les droits admin du connecteur ne remplacent pas la revue indépendante ni les gates.
+- **ISSUES** : #13 et #16 ouvertes ; aucune nouvelle sonde réseau ni licence/source témoin attestée. PR #26 et #27 revendiquent ingestion/admission : pas de modification concurrente sans claim. Aucune certification `HISTORY_COMPLETE`/`DONE`.
+- **BLOCK_REASON** : revue indépendante absente ; protections/rulesets non attestés ; contrats/licences, échantillons primaires datés et coordination claims #26/#27 non obtenus. Aucun déploiement S1 ni merge admissible.
+- **NEXT_ACTION** : contrôler la CI du nouveau checkpoint et obtenir revue indépendante PR #31. Sur branche fonctionnelle distincte après claim, qualifier une source officielle, droits, document témoin et SHA-256 ; poursuivre le mapping/parseur dans les modules existants et démontrer source→archive→normalisation→qualité→calcul→API. Si ces prérequis manquent, chercher une correction fonctionnelle indépendante des lots 0–13 sans modifier les branches revendiquées.
+- **ROLLBACK** : revert ciblé de ce checkpoint sur branche Draft ; main, secrets, S1, 44 sources et données historiques inchangés.
+
+---
+
 ## 2026-11-15 11:30 Europe/Paris — PR #31 : CI exacte et audit de dépendances (PARTIAL)
 
 - **RECONCILIATION** : PR #31 ouverte Draft, HEAD exact `2558c1d36b46ce31341f4382ed47c9763fca5de3`, base `main` `73256f48d81d38ce8ff6f51be9e024b25cf5dadb`, non fusionnée ; revue indépendante GitHub `reviews=[]` lors de ce contrôle. Les PR #22/#25/#26/#27/#28/#29/#30 restent indépendantes et non modifiées.
