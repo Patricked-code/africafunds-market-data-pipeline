@@ -1,5 +1,19 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-15 08:33 Europe/Paris — Issue #17 : CI exacte GREEN ; protection GitHub non vérifiable ; intégration financière bloquée (PARTIAL)
+
+- RECONCILIATION : PR #1 merged, PR #30 open/Draft HEAD `9f6c13683dbe1ee08349283e1040a0da9fee8c84`; main `73256f48d81d38ce8ff6f51be9e024b25cf5dadb` ; compare ahead 55 / behind 0. AGENTS.md, docs/15_AUTONOMOUS_AGENT_EXECUTION.md, worklog, checkpoint 2026-11-06, code API et test PostgreSQL relus. PR #22/#25/#26/#27/#28/#29 ouvertes ; pas de modification de leurs branches.
+- PREUVES EXACT-HEAD : pour `9f6c13683dbe1ee08349283e1040a0da9fee8c84`, [CI #43686420539](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43686420539) completed/success et [Docker/PostgreSQL #43686420562](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43686420562) completed/success, via fetch_commit_workflow_runs. Aucun test local exécuté. Ces runs ne valident pas le présent checkpoint documentaire.
+- CONTROLE GOUVERNANCE : `GET /repos/Patricked-code/africafunds-market-data-pipeline/rulesets` retourne HTTP 403 : `Upgrade to GitHub Pro or make this repository public to enable this feature`. Cela ne prouve ni l'absence ni la présence de protections ; ne pas changer visibilité/plan, ne pas fusionner. Dépôt private=true selon REST courant ; l'alerte historique issue #3 reste à réconcilier sans modification de visibilité.
+- ACTION : inspection des requêtes `indices()`/`rates()` et du test transactionnel ; aucun changement métier sûr sans licence/observation officielle, politique de publication et coordination des claims #26/#27. Priorité à la preuve financière réelle, pas à de nouveaux tests périphériques. Checkpoint exact-HEAD consigné sur la branche PR #30.
+- VALIDATION : CI du précédent HEAD GREEN ; tests locaux NOT_RUN ; échantillon financier officiel/archives SHA-256/normalisation/qualité/calcul/API de bout en bout NOT_ATTESTED ; runner permanent et S1 NOT_ATTESTED.
+- BLOCK_REASON : droits de conservation/redistribution et témoin primaire officiel daté non établis ; règles métier de qualité/publication non arbitrées ; PR #26/#27 détiennent les composants ingestion/admission ; revue indépendante absente (reviews=[]), vérification des rulesets refusée 403. Pas de claim autorisant des écritures concurrentes.
+- NEXT_ACTION : (1) contrôler CI exact-HEAD du checkpoint présent ; (2) qualifier sur GitHub issue #13/#16 une source officielle avec licence, date, document primaire, SHA-256 et permission de traitement ; (3) réconcilier les claims PR #26/#27 avant mapping/parseur, puis réaliser une recette source→archive→normalisation→qualité→calcul→API et historique par marché ; (4) résoudre le gate de revue/protection sans contourner le 403. Si source indisponible, choisir un défaut indépendant et reproductible dans les lots 0–13. Aucun HISTORY_COMPLETE/DONE.
+- ROLLBACK : revert ciblé de cette entrée documentaire sur branche Draft. Aucun push main, merge, déploiement S1, secret ou modification des 44 sources.
+
+---
+
+
 ## 2026-11-15 07:38 Europe/Paris — Issue #17 : validation CI du checkpoint documentaire, blocage métier maintenu (PARTIAL)
 
 - RECONCILIATION : PR #1 merged ; PR #30 open/Draft, HEAD avant écriture `9a33ced68da26a498dfe28c911c09e6582244e2f`, base main `73256f48d81d38ce8ff6f51be9e024b25cf5dadb` (métadonnées PR). AGENTS.md, docs/15, worklog et checkpoint du 06/11 relus ; code de `src/api/queries.ts` et test PostgreSQL de publication examinés. PR #22/#25/#26/#27/#28/#29 identifiées comme travaux concurrents, aucune écriture sur leurs branches.
