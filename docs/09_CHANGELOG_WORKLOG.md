@@ -1,5 +1,16 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-15 17:40 Europe/Paris — PR #31 : CI exacte vérifiée ; attente de revue (WAITING_REVIEW)
+
+- **PREUVE CI EXACT-HEAD** : commit `65a86ff76b1fdc34f3967e4499052e95ba99bc17`, [GitHub Actions #43731128632](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43731128632), workflow `CI — AfricaFunds Market Data Pipeline`, run_number 404, `completed/success`. Le connecteur ne retourne qu'un workflow pour ce SHA ; aucune seconde validation Docker/PostgreSQL ni recette métier réelle attestée. Tests locaux `NOT_RUN`.
+- **RECONCILIATION** : PR #31 toujours ouverte Draft, `reviews=[]` ; comparaison GitHub `main=73256f48d81d38ce8ff6f51be9e024b25cf5dadb`, branche 11 commits ahead / 0 behind avant écriture. Les autres PR/claims restent hors de cette branche. Pas de fusion, déploiement ou changement de visibilité.
+- **TRAVAIL** : vérification CI et réconciliation de la gouvernance ; aucune correction supplémentaire du code n'est justifiée par le workflow vert. Ne pas transformer les succès de CI documentaire en preuve de couverture des 44 sources ou d'historiques financiers.
+- **BLOCK_REASON** : revue indépendante absente et protections/gates de fusion non attestées ; témoins financiers officiels et licences de conservation/redistribution non vérifiés ; claims d'ingestion/admission PR #26/#27 non coordonnés. Les tâches métier chevauchantes ne sont pas admissibles sans claim.
+- **NEXT_ACTION** : vérifier la CI de ce checkpoint uniquement si nécessaire ; solliciter une revue indépendante autorisée de PR #31 et confirmer les protections avant toute fusion. Priorité métier : sélectionner une tâche réellement non revendiquée dans les lots 0–13, vérifier les fichiers/claims, livrer test RED/GREEN et PR dédiée ; qualifier droits et témoin officiel pour #13/#16 avant toute collecte réelle. Éviter un autre checkpoint sans progrès technique ou preuve nouvelle.
+- **ROLLBACK** : revert ciblé de cette entrée sur la branche Draft ; `main`, S1, secrets et données brutes inchangés.
+
+---
+
 ## 2026-11-15 16:39 Europe/Paris — PR #31 : GREEN CI après correction du test S1 (WAITING_REVIEW)
 
 - **PREUVE GREEN EXACT-HEAD** : commit `58934c320f91ba33bfde11b85f840ef908c617ec`, [CI #43725164743](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43725164743) `completed/success` (GitHub Actions, run_number 403). La correction du test introduite par `ab71b6d` est donc couverte par le workflow réussi du checkpoint `58934c3`. Un seul workflow retourné ; aucun Docker/PostgreSQL attesté pour ce SHA. Tests locaux NOT_RUN.
