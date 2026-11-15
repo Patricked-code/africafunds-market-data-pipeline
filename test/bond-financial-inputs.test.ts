@@ -44,3 +44,11 @@ test('finite inputs that overflow the financial result are rejected', () => {
     currentDirtyPrice: 1,
   }), /Rendement obligataire non fini/);
 });
+
+test('interpolation overflow must not silently turn a valid cashflow into zero', () => {
+  // Both curve rates are finite and greater than -1; their difference can overflow.
+  assert.throws(() => priceCashflows(
+    [{ timeYears: 2, amount: 100 }],
+    [{ timeYears: 1, zeroRate: 0 }, { timeYears: 3, zeroRate: Number.MAX_VALUE }],
+  ), /Taux interpolé invalide|Valorisation obligataire non finie/);
+});
