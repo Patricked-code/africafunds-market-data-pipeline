@@ -75,7 +75,12 @@ test('issue #17: public indices omit DRAFT, future publication, future observati
     // The same fail-closed policy must hold when clients omit both optional filters.
     // Restrict assertions to this transaction's synthetic index IDs to avoid assuming
     // that an otherwise populated integration database has no unrelated observations.
-    const unfiltered = (await indices(new URL('http://localhost/api/v1/indices'), 1000)) as Array<{ index_code: string; index_level: string }>;
+    // Include every row potentially visible in this isolated transaction, even when
+    // the CI database grows beyond the former hard-coded 1000-row assumption.
+    const totalRows = await client.query<{ count: string }>('SELECT count(*)::text AS count FROM calc.index_daily_values');
+    const unfilteredLimit = Number(totalRows.rows[0]!.count) + 1;
+    assert.ok(Number.isSafeInteger(unfilteredLimit) && unfilteredLimit > 0, 'safe integration row bound required');
+    const unfiltered = (await indices(new URL('http://localhost/api/v1/indices'), unfilteredLimit)) as Array<{ index_code: string; index_level: string }>;
     const ownUnfiltered = unfiltered.filter(row => fixtureCodes.has(row.index_code));
     assert.ok(ownUnfiltered.some(row => Number(row.index_level) === 102),
       'unfiltered public read retains eligible historical observations');
