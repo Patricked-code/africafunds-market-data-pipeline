@@ -77,6 +77,14 @@ export async function fetchWithRetry(url: string, init: RequestInit = {}): Promi
         signal: controller.signal,
       });
       if (!response.ok) {
+        // Release the response stream on terminal and retryable errors alike.
+        // Otherwise repeated 429/5xx responses can retain HTTP connections.
+        // A cancellation failure must not hide the original HTTP status.
+        try {
+          await response.body?.cancel();
+        } catch {
+          // Preserve the authoritative HTTP error below.
+        }
         // 4xx fails immediately, except retryable 429; 5xx retries within policy.
         // Do not read or persist error bodies as market data.
         throw new HttpResponseError(response.status);
