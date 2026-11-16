@@ -117,3 +117,14 @@ test('mixed-sign cashflows retain algebraic valuation and caller ordering', () =
   assert.deepEqual(cashflows, cashflowSnapshot);
   assert.deepEqual(curve, curveSnapshot);
 });
+
+
+test('finite total-return components avoid intermediate numerator overflow', () => {
+  // Both dirty prices and the distribution are finite; the economic return is 100%.
+  // Summing the two positive amounts first would overflow Number.MAX_VALUE.
+  assert.ok(Math.abs(bondTotalReturn({
+    previousDirtyPrice: Number.MAX_VALUE,
+    currentDirtyPrice: Number.MAX_VALUE,
+    cashflowsReceived: Number.MAX_VALUE,
+  }) - 1) < 1e-12);
+});
