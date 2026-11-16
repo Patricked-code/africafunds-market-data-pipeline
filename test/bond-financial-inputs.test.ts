@@ -100,3 +100,20 @@ test('identical tenor duplicates preserve interior interpolation and boundary ex
   assert.ok(Math.abs(priceCashflows([{ timeYears: 4, amount: 100 * (1.2 ** 4) }], curve) - 100) < 1e-10);
   assert.deepEqual(curve, original);
 });
+
+
+test('mixed-sign cashflows retain algebraic valuation and caller ordering', () => {
+  // Net cashflows can be signed; rejecting negative amounts would break valid net valuation.
+  const cashflows = [
+    { timeYears: 2, amount: 121 },
+    { timeYears: 1, amount: -55 },
+    { timeYears: 0, amount: 10 },
+  ];
+  const curve = [{ timeYears: 1, zeroRate: 0.1 }, { timeYears: 2, zeroRate: 0.1 }];
+  const cashflowSnapshot = cashflows.map((point) => ({ ...point }));
+  const curveSnapshot = curve.map((point) => ({ ...point }));
+  // 121 / 1.1^2 - 55 / 1.1 + 10 = 60.
+  assert.ok(Math.abs(priceCashflows(cashflows, curve) - 60) < 1e-10);
+  assert.deepEqual(cashflows, cashflowSnapshot);
+  assert.deepEqual(curve, curveSnapshot);
+});
