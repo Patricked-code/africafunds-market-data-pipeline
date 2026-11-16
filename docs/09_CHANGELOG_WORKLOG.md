@@ -1,5 +1,16 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-16 01:39 Europe/Paris — Issue #17 : test d'interpolation obligataire et non-mutation (WAITING_CI / WAITING_REVIEW)
+- RECONCILIATION : PR #1 merged ; main=73256f48d81d38ce8ff6f51be9e024b25cf5dadb ; PR #32 ouverte Draft, HEAD initial 0765b7c2fee882439f12c554e5ae552c9e5a678b, 15 ahead/0 behind, reviews=[] ; PR concurrentes conservées. AGENTS.md, docs/15, dernier checkpoint du worklog relus.
+- PREUVES du HEAD initial 0765b7c2fee882439f12c554e5ae552c9e5a678b : CI #43775486625 completed/success (https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43775486625) ; Docker/PostgreSQL #43775486640 completed/success (https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43775486640).
+- TRAVAIL : commit 356ead5a5a231a536ea33b6867bda4c04946d99a ajoute un test de calcul d'interpolation linéaire (taux 10 % à 2 ans, flux 121), tolérance flottante et immutabilité des tableaux d'entrée. Aucune formule métier, source, schéma, API ou infrastructure modifiée.
+- VALIDATION : tests locaux NOT_RUN ; workflow du commit 356ead5 non encore retourné au contrôle ; ne pas attribuer les deux SUCCESS précédents au nouveau code. Test synthétique uniquement, aucune certification financière officielle ni HISTORY_COMPLETE.
+- BLOCK_REASON : nouvelle CI exact-HEAD à vérifier ; revue indépendante absente ; protections/gates non attestés ; observations officielles et licences de redistribution non qualifiées ; claims #26/#27 non transférés.
+- NEXT_ACTION : contrôler CI et Docker/PostgreSQL du nouveau HEAD, corriger tout échec, solliciter une revue indépendante ; préparer la recette #17 sur données officielles autorisées avec provenance/méthode/qualité et coordonner claims avant intégration. Ne pas multiplier les commits de statut seuls.
+- ROLLBACK : revert ciblé du test et de cette entrée sur branche Draft ; aucun push main, merge, secret, S1 ni modification des 44 sources.
+
+---
+
 ## 2026-11-16 00:31 Europe/Paris — Issue #17 : non-régression sur débordement cumulé (WAITING_CI / WAITING_REVIEW)
 - RECONCILIATION : main=73256f48d81d38ce8ff6f51be9e024b25cf5dadb ; PR #32 13 ahead/0 behind avant ce nouvel incrément ; reviews=[] ; autres PR ouvertes #22/#25–#31 identifiées et non modifiées. Règles AGENTS.md, docs/15, checkpoint historique et journal relus. Aucun transfert des claims #26/#27.
 - PREUVES exactes du HEAD précédent 6191fd9c95b1fffaed33a4519fbb14a709033702 : CI #43769781113 completed/success (https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43769781113) ; Docker/PostgreSQL #43769781124 completed/success (https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43769781124). Ces runs ne valident PAS le nouveau commit.
