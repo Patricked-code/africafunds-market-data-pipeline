@@ -56,6 +56,15 @@ async function readLimitedBody(response: Response, maxBytes: number): Promise<Ui
       }
       chunks.push(next.value);
     }
+  } catch (error) {
+    // A failed read must not leave a response stream held by the retry loop.
+    // Cancellation errors must not replace the original network/body failure.
+    try {
+      await reader.cancel();
+    } catch {
+      // Preserve the original read error.
+    }
+    throw error;
   } finally {
     reader.releaseLock();
   }
