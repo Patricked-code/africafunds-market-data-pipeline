@@ -1,5 +1,14 @@
 # 06 — État réel et écarts
 
+## 2026-11-16 — Lot 4/11 : correction HTTP en attente de validation
+
+- Une branche indépendante `fix/http-retry-dispose-response-20261116` corrige l'absence d'annulation des corps HTTP 4xx/5xx dans `src/http/fetcher.ts`, avec deux tests de non-régression sur 404 et 503.
+- **État : PARTIAL / WAITING_CI**. Code et tests committés, mais aucune réussite de CI ou revue n'est encore attestée pour ce changement ; ne pas déclarer DONE.
+- Aucune incidence sur les 44 sources originelles, les claims des PR #26/#27, les données officielles ni S1.
+
+---
+
+
 ## Audit S1 et sécurité de déploiement — 2026-11-07
 
 - **PREUVE SERVEUR READ-ONLY** : les domaines `sadiaaf.wealthtechinnovations.com` et `api.sadiaaf.wealthtechinnovations.com` existent et répondent tous deux **HTTP 500** à `curl -I` depuis S1 ; aucun dépôt Git racine dans leurs vhosts ; le seul conteneur Docker actif observé est le bridge MCP. Cela n'atteste pas l'absence d'autres bases/service hors Docker.
