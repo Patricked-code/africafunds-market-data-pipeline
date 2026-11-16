@@ -1,5 +1,16 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-16 11:14 Europe/Paris — Issue #17 : vérification CI du HEAD et réconciliation PR #32 (WAITING_REVIEW)
+- RECONCILIATION : PR #1 fusionnée ; PR #32 ouverte Draft HEAD `15c1e720f9b020ad042117d4e29f7bd0fb330565`, base main `73256f48d81d38ce8ff6f51be9e024b25cf5dadb` ; autres PR ouvertes #22/#25–#31 non modifiées. AGENTS.md, docs/15, dernier checkpoint de ce journal et checkpoint 06/11 consultés. Aucune reprise des claims #26/#27.
+- PREUVES exact-HEAD : [CI #43817891614](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43817891614) completed/success et [Docker/PostgreSQL #43817891599](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43817891599) completed/success pour `15c1e720f9b020ad042117d4e29f7bd0fb330565`. Description PR #32 corrigée avec ces preuves. Tests locaux NOT_RUN, aucune observation officielle, aucun test runtime S1.
+- TRAVAIL : validation externe du HEAD précédent et correction de la description PR ; aucun changement fonctionnel admissible identifié sur les fichiers de calcul sans ajouter de tests périphériques non prioritaires. Ce checkpoint documentaire ne doit pas être confondu avec une progression de la collecte/distribution.
+- BLOCK_REASON : PR #32 sans revue indépendante ; protections de main/gates de fusion non attestés ; source officielle, licence, observation témoin datée et recette source→archive→normalisation→qualité→calcul→API non certifiées ; claims ingestion/admission #26/#27 non transférés. FR-013 PARTIAL ; aucun HISTORY_COMPLETE/DONE.
+- NEXT_ACTION : obtenir revue indépendante habilitée et contrôle des protections/gates ; qualifier observation officielle légalement exploitable puis coordonner les claims #26/#27 pour implémenter une recette intégrée reproductible de l'issue #17. Ne pas prolonger la série de checkpoints sans code métier, donnée témoin ou décision de revue. CI du présent commit documentaire NOT_VERIFIED.
+- ROLLBACK : revert ciblé de ce seul ajout documentaire sur la branche Draft ; aucune fusion, aucun push main, secret, S1 ou modification des 44 sources.
+
+---
+
+
 ## 2026-11-16 07:35 Europe/Paris — Issue #17 : CI exacte vérifiée, PR #32 réconciliée (WAITING_REVIEW)
 - RECONCILIATION : AGENTS.md, docs/15, dernier checkpoint du journal et checkpoint 06/11 relus ; PR #1 fusionnée ; PR #32 ouverte Draft HEAD `6214e29de3b6164c43212a4bdaaee97b684361bb`, base main `73256f48d81d38ce8ff6f51be9e024b25cf5dadb`, 29 ahead / 0 behind, reviews=[] ; autres PR ouvertes #22 et #25–#31 préservées ; dépôt déclaré privé par GitHub. Aucun claim #26/#27 transféré.
 - PREUVES exact-HEAD : [CI #43810909328](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43810909328) completed/success ; [Docker/PostgreSQL #43810909052](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43810909052) completed/success, tous deux associés au SHA `6214e29de3b6164c43212a4bdaaee97b684361bb`. La description PR #32 a été actualisée pour supprimer l'ancienne affirmation CI non vérifiée. Tests locaux NOT_RUN, aucune donnée financière officielle ou recette S1.
