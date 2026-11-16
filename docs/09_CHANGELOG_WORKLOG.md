@@ -1,5 +1,16 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-16 — PR #33 : correction du test sur flux HTTP en erreur (lot 4/11)
+
+- **CI HEAD initial** : commit `603f64d816b4e58d0ffb428e4a1ee9cc58c9620e` ; [CI 43961140873](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43961140873) `completed/failure` (31 tests réussis, 1 échec : `stream read failure cancels the reader...`, assertion `0 !== 1`). [Docker/PostgreSQL 43961141011](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43961141011) `completed/success`. La CI a exécuté le SHA de merge synthétique `54f6ddf177c514bfec5827f707aa51dab2dfc2c0` ; ne pas confondre avec HEAD de branche.
+- **Diagnostic reproductible** : lorsqu'un `ReadableStream` est déjà `errored` après `pull()` rejeté, `reader.cancel()` rejette sans invoquer `underlyingSource.cancel()`. Le test antérieur exigeait à tort ce callback. Le comportement requis est la conservation de l'erreur originale et la libération du verrou du reader.
+- **Correction concrète** : commit `2caa269e4721b24421dd9b4de8b960e933b492f5` sur la même branche Draft ; le test observe désormais `stream.locked === false` et conserve l'assertion sur l'erreur d'origine. Le code de production n'a pas été modifié. Tests locaux NOT_RUN.
+- **BLOCK_REASON** : CI sur HEAD corrigé non encore attestée ; revue indépendante et gates de fusion non attestés ; issue #17 toujours dépendante des licences, observations officielles et coordination PR #26/#27.
+- **NEXT_ACTION** : vérifier CI et Docker/PostgreSQL associés à la nouvelle PR revision ; si échec, lire logs et corriger. Ensuite obtenir revue indépendante, vérifier protections et poursuivre un travail métier admissible sans collision ; ne pas fusionner ni déployer S1.
+- **Rollback** : revert ciblé du commit de test ; aucune donnée, migration, source officielle, secret ou action S1.
+
+---
+
 ## 2026-11-16 — Lot 4/11 : échec de lecture HTTP, annulation du reader (PR #33)
 
 - **Réconciliation CI** : SHA antérieur `2902af89d25653515f4f4c28a1c0268f1937ce3b` : CI [43952215926](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43952215926) et Docker/PostgreSQL [43952215949](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43952215949) `completed/success`. Ces runs ne couvrent pas les nouveaux commits.
