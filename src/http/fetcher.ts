@@ -28,6 +28,11 @@ export class HttpBodyTooLargeError extends Error {
 async function readLimitedBody(response: Response, maxBytes: number): Promise<Uint8Array> {
   const declared = Number(response.headers.get('content-length'));
   if (Number.isFinite(declared) && declared > maxBytes) {
+    try {
+      await response.body?.cancel();
+    } catch {
+      // Preserve the size-limit error even when stream cancellation fails.
+    }
     throw new HttpBodyTooLargeError(maxBytes);
   }
   if (!response.body) return new Uint8Array();
@@ -42,7 +47,11 @@ async function readLimitedBody(response: Response, maxBytes: number): Promise<Ui
       if (!next.value) continue;
       total += next.value.byteLength;
       if (total > maxBytes) {
-        await reader.cancel();
+        try {
+          await reader.cancel();
+        } catch {
+          // Preserve the size-limit error even when stream cancellation fails.
+        }
         throw new HttpBodyTooLargeError(maxBytes);
       }
       chunks.push(next.value);
