@@ -1,5 +1,10 @@
 # 06 — État réel et écarts
 
+## 2026-11-16 — Correctif HTTP additif en PR #33 (lot 4/11)
+
+Le lecteur HTTP annule maintenant le flux si Content-Length excède la limite, et préserve HttpBodyTooLargeError si l'annulation du lecteur échoue après dépassement en streaming. Tests dédiés ajoutés avant correctif ; CI du nouveau SHA en attente de vérification, revue indépendante requise. Aucun changement des sources officielles, de la base, ni de S1.
+
+
 ## 2026-11-16 — Lot 4/11 : correction HTTP en attente de validation
 
 - Une branche indépendante `fix/http-retry-dispose-response-20261116` corrige l'absence d'annulation des corps HTTP 4xx/5xx dans `src/http/fetcher.ts`, avec deux tests de non-régression sur 404 et 503.
