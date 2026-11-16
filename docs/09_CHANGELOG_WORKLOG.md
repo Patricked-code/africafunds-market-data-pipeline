@@ -1,5 +1,16 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-16 03:32 Europe/Paris — Issue #17 : doublons de maturité identiques, interpolation et extrapolation (WAITING_CI / WAITING_REVIEW)
+- REPRISE : AGENTS.md, docs/15, journal de la branche PR #32 et checkpoint historique du 06/11 relus ; ne pas confondre ce checkpoint ancien avec l'état GitHub actuel. Branche dédiée `fix/bond-financial-nonfinite-guard-20261115` ; aucune écriture sur main ni sur les branches des PR concurrentes.
+- PREUVE exacte du précédent HEAD `ed28382736ace2880ff02c68a5f2642afab9940a` : CI [#43787601941](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43787601941) completed/success et Docker/PostgreSQL [#43787601992](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43787601992) completed/success. Aucune de ces preuves ne couvre le nouveau test.
+- CODE/TEST : commit `9bd87f1164b1c2aaab2ec56c8ecbc9992d5ef33b` complète `test/bond-financial-inputs.test.ts` : observations identiques répétées à une même maturité, interpolation intérieure, extrapolation de part et d'autre, absence de mutation des données de courbe. Aucune formule, schéma, source ou API modifié. Tests locaux NOT_RUN ; RED/GREEN non revendiqués ; CI du nouveau HEAD non encore attestée.
+- BLOCK_REASON : validation CI exacte et revue indépendante de PR #32 manquantes ; sources officielles datées/licences et chaîne source→qualité→calcul→API non certifiées ; claims #26/#27 non transférés. Ne pas déclarer FR-013 DONE ni HISTORY_COMPLETE.
+- NEXT_ACTION : vérifier CI et Docker/PostgreSQL du nouveau HEAD ; corriger tout échec ; obtenir revue indépendante avant fusion. Poursuivre ensuite la recette #17 sur observations officielles autorisées et méthode versionnée, avec coordination des claims GitHub, sans ajouter de simples checkpoints répétitifs.
+- ROLLBACK : revert ciblé du test et du présent journal sur la branche Draft ; aucun merge, push main, secret, S1 ou changement des 44 sources.
+
+---
+
+
 ## 2026-11-16 02:39 Europe/Paris — Issue #17 : rejet des courbes obligataires contradictoires (WAITING_CI / WAITING_REVIEW)
 - RECONCILIATION : PR #1 fusionnée ; PR #32 Draft, HEAD initial `145b489b50a0e56135529c6258eba3f776ee4506`, base `73256f48d81d38ce8ff6f51be9e024b25cf5dadb`. Huit PR ouvertes #22 et #25–#32 ; claims #26/#27 non transférés. GitHub déclare le dépôt `private` au contrôle. AGENTS.md, docs/15, worklog, checkpoint historique et méthodologie obligataire relus.
 - PREUVES exact-HEAD initial `145b489b50a0e56135529c6258eba3f776ee4506` : CI [#43781768326](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43781768326) `completed/success` ; Docker/PostgreSQL [#43781768222](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43781768222) `completed/success`. Ces runs ne valident PAS les nouveaux commits.
