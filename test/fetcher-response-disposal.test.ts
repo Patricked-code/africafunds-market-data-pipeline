@@ -96,3 +96,24 @@ test('HTTP request preserves Headers instance and tuple header inputs', async ()
     globalThis.fetch = originalFetch;
   }
 });
+
+
+test('stream read failure cancels the reader before propagating the original error', async () => {
+  const originalFetch = globalThis.fetch;
+  const originalRetries = env.HTTP_MAX_RETRIES;
+  env.HTTP_MAX_RETRIES = 0;
+  let cancelled = 0;
+  const readFailure = new Error('source stream failed');
+  globalThis.fetch = async () => new Response(new ReadableStream<Uint8Array>({
+    pull() { throw readFailure; },
+    cancel() { cancelled += 1; },
+  }), { status: 200 });
+  try {
+    await assert.rejects(fetchWithRetry('https://example.invalid/read-failure'),
+      (error: unknown) => error === readFailure);
+    assert.equal(cancelled, 1, 'failed body reads must release their stream');
+  } finally {
+    env.HTTP_MAX_RETRIES = originalRetries;
+    globalThis.fetch = originalFetch;
+  }
+});
