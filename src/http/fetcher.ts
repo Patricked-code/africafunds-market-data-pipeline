@@ -75,13 +75,14 @@ export async function fetchWithRetry(url: string, init: RequestInit = {}): Promi
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), env.HTTP_TIMEOUT_MS);
     try {
+      // RequestInit.headers also accepts Headers and [name, value][]; object
+      // spread silently discards those representations.
+      const headers = new Headers(init.headers);
+      if (!headers.has('user-agent')) headers.set('user-agent', env.HTTP_USER_AGENT);
+      if (!headers.has('accept')) headers.set('accept', '*/*');
       const response = await fetch(url, {
         ...init,
-        headers: {
-          'user-agent': env.HTTP_USER_AGENT,
-          accept: '*/*',
-          ...init.headers,
-        },
+        headers,
         redirect: 'follow',
         signal: controller.signal,
       });
