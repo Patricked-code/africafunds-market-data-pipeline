@@ -1,5 +1,17 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-16 02:39 Europe/Paris — Issue #17 : rejet des courbes obligataires contradictoires (WAITING_CI / WAITING_REVIEW)
+- RECONCILIATION : PR #1 fusionnée ; PR #32 Draft, HEAD initial `145b489b50a0e56135529c6258eba3f776ee4506`, base `73256f48d81d38ce8ff6f51be9e024b25cf5dadb`. Huit PR ouvertes #22 et #25–#32 ; claims #26/#27 non transférés. GitHub déclare le dépôt `private` au contrôle. AGENTS.md, docs/15, worklog, checkpoint historique et méthodologie obligataire relus.
+- PREUVES exact-HEAD initial `145b489b50a0e56135529c6258eba3f776ee4506` : CI [#43781768326](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43781768326) `completed/success` ; Docker/PostgreSQL [#43781768222](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43781768222) `completed/success`. Ces runs ne valident PAS les nouveaux commits.
+- CODE/TEST : `2c5764cc123e5f62d4fc61bbc7b568efdcdadfe8` ajoute un test de taux zéro contradictoires pour une même échéance et de doublons identiques compatibles ; `9c092b557ae1ccc532ae061f73a4dfe2723e5fd5` rejette ces contradictions avant actualisation, sans modifier les courbes d'entrée ni les formules valides ; `14b809d1394173e8236da74e4c4f5a89d7597aec` met à jour docs/06. Aucun catalogue, migration, API ou S1 modifié.
+- VALIDATION : tests locaux NOT_RUN ; aucun workflow retourné pour `14b809d1394173e8236da74e4c4f5a89d7597aec` au contrôle. RED non exécuté localement, GREEN non revendiqué pour le nouveau HEAD. Données synthétiques uniquement ; FR-013 PARTIAL, aucun HISTORY_COMPLETE/DONE.
+- BLOCK_REASON : CI exact-HEAD et revue indépendante PR #32 à obtenir ; gates/protections de fusion non attestés ; courbes financières officielles et licences non qualifiées ; chaîne complète ingestion→provenance→qualité→calcul→API non certifiée et claims #26/#27 non transférés.
+- NEXT_ACTION : vérifier CI et Docker/PostgreSQL sur HEAD après ce checkpoint, corriger tout échec ; obtenir revue indépendante avant toute fusion. Prioriser ensuite une recette #17 sur courbe officielle datée et autorisée, avec provenance, version de méthode, validation qualité et publication ; coordonner claims #26/#27 sur GitHub. Éviter les commits de statut seuls.
+- ROLLBACK : revert ciblé des commits de branche Draft, jamais reset/push main. Aucun merge, secret, déploiement S1 ni altération des 44 sources.
+
+---
+
+
 ## 2026-11-16 01:39 Europe/Paris — Issue #17 : test d'interpolation obligataire et non-mutation (WAITING_CI / WAITING_REVIEW)
 - RECONCILIATION : PR #1 merged ; main=73256f48d81d38ce8ff6f51be9e024b25cf5dadb ; PR #32 ouverte Draft, HEAD initial 0765b7c2fee882439f12c554e5ae552c9e5a678b, 15 ahead/0 behind, reviews=[] ; PR concurrentes conservées. AGENTS.md, docs/15, dernier checkpoint du worklog relus.
 - PREUVES du HEAD initial 0765b7c2fee882439f12c554e5ae552c9e5a678b : CI #43775486625 completed/success (https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43775486625) ; Docker/PostgreSQL #43775486640 completed/success (https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43775486640).
