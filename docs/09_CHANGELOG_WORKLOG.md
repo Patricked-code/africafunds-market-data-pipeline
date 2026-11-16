@@ -1,5 +1,16 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-16 07:35 Europe/Paris — Issue #17 : CI exacte vérifiée, PR #32 réconciliée (WAITING_REVIEW)
+- RECONCILIATION : AGENTS.md, docs/15, dernier checkpoint du journal et checkpoint 06/11 relus ; PR #1 fusionnée ; PR #32 ouverte Draft HEAD `6214e29de3b6164c43212a4bdaaee97b684361bb`, base main `73256f48d81d38ce8ff6f51be9e024b25cf5dadb`, 29 ahead / 0 behind, reviews=[] ; autres PR ouvertes #22 et #25–#31 préservées ; dépôt déclaré privé par GitHub. Aucun claim #26/#27 transféré.
+- PREUVES exact-HEAD : [CI #43810909328](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43810909328) completed/success ; [Docker/PostgreSQL #43810909052](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43810909052) completed/success, tous deux associés au SHA `6214e29de3b6164c43212a4bdaaee97b684361bb`. La description PR #32 a été actualisée pour supprimer l'ancienne affirmation CI non vérifiée. Tests locaux NOT_RUN, aucune donnée financière officielle ou recette S1.
+- CODE : aucun changement fonctionnel dans cette intervention ; correctif précédent e34de3d et test 6628ec4 maintenant couverts par ces deux runs. Aucune nouvelle correction indépendante n'a été admise sans source/licence ou transfert de claim ; ne pas multiplier les tests périphériques.
+- BLOCK_REASON : revue indépendante absente ; protections/gates de fusion non attestés ; source officielle/licence/témoin daté et recette source→archive→normalisation→qualité→calcul→API manquants ; claims #26/#27 non transférés. FR-013 PARTIAL, aucun HISTORY_COMPLETE/DONE.
+- NEXT_ACTION : obtenir revue indépendante habilitée et contrôler les protections/gates ; qualifier une source officielle légalement exploitable et son observation datée ; coordonner claims #26/#27 pour une recette intégrée reproductible #17. Recontrôler la CI de tout nouveau HEAD avant intégration ; ne pas créer de simple checkpoint répétitif.
+- ROLLBACK : revert ciblé du seul ajout documentaire sur la branche Draft. Aucun push main, fusion, secret, modification des 44 sources ou déploiement S1.
+
+---
+
+
 ## 2026-11-16 06:32 Europe/Paris — Issue #17 : validation CI exacte du correctif total return (WAITING_REVIEW)
 - RECONCILIATION : PR #1 fusionnée, PR #32 ouverte Draft sur branche fix/bond-financial-nonfinite-guard-20261115 ; autres PR ouvertes #22 et #25–#31 conservées. AGENTS.md, docs/15, journal et checkpoint historique consultés. Aucun claim #26/#27 transféré.
 - PREUVES GitHub exact-SHA `1e7c9e98d299f977d0b5dffd3daaf99c5d303a2a` : [CI #43804596325](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43804596325) completed/success et [Docker/PostgreSQL #43804596461](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43804596461) completed/success. Ces deux preuves valident le HEAD du correctif e34de3d et du test 6628ec4, pas le commit de journal suivant. Tests locaux NOT_RUN ; RED non exécuté ; données officielles non utilisées.
