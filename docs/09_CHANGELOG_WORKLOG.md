@@ -1,5 +1,16 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-16 — Lot 4/11 : validation CI du correctif HTTP PR #33 (HEAD 813cfd9)
+
+- **Réconciliation** : branche `fix/http-retry-dispose-response-20261116`, HEAD observé `813cfd986625a11b69a1f227a17edbf09b282ef1` ; dépôt GitHub `private`. Ne pas réutiliser ce SHA sans nouvelle lecture.
+- **Preuves GitHub Actions au SHA exact** : CI run [43910328616](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43910328616) `completed/success` ; Docker/PostgreSQL run [43910328599](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43910328599) `completed/success`. Ces résultats valident le HEAD antérieur, **pas le présent commit documentaire** ; ils ne prouvent pas une exécution RED locale, une revue indépendante ou une recette financière réelle.
+- **Travail fonctionnel déjà présent** : `src/http/fetcher.ts` annule le flux des réponses non-2xx avant de lever `HttpResponseError` ; `test/fetcher-response-disposal.test.ts` couvre 404 et 503 avec retry. Aucun changement fonctionnel supplémentaire lors de ce checkpoint.
+- **BLOCK_REASON** : revue indépendante, protections/gates de fusion et CI du nouveau HEAD documentaire non attestées ; observation officielle datée, droits d'accès et redistribution non qualifiés pour issue #17 ; claims PR #26/#27 à coordonner.
+- **NEXT_ACTION** : contrôler les workflows déclenchés par ce nouveau HEAD et corriger tout échec ; obtenir une revue indépendante de PR #33 et vérifier protections de `main` avant fusion. Ensuite sélectionner une tâche indépendante de l'issue #17 sur branche dédiée, après qualification d'une observation officielle/licence et coordination des claims PR #26/#27. Ne jamais déclarer HISTORY_COMPLETE sans recette source→archive→normalisation→qualité→calcul→API.
+- **Rollback** : revert documentaire sur cette branche seulement ; aucune action S1, migration ou secret.
+
+---
+
 ## 2026-11-16 — Lot 4/11 : libération des flux HTTP rejetés (issue #7)
 
 - **Branche** : `fix/http-retry-dispose-response-20261116`, créée depuis `main` courant ; aucune écriture directe sur `main`.
