@@ -1,5 +1,19 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-16 — Lot 4/11 : libération des flux HTTP rejetés (issue #7)
+
+- **Branche** : `fix/http-retry-dispose-response-20261116`, créée depuis `main` courant ; aucune écriture directe sur `main`.
+- **Défaut constaté par lecture du code** : `fetchWithRetry` levait `HttpResponseError` sur 4xx/5xx sans annuler le corps de réponse ; les retries 429/5xx pouvaient laisser des streams/connexions ouverts.
+- **Travail concret** : test de non-régression `test/fetcher-response-disposal.test.ts` (404 terminal, 503 réessayé), puis correction minimale `src/http/fetcher.ts` pour annuler le stream rejeté avant de lever l'erreur HTTP ; une erreur d'annulation ne masque pas le statut HTTP original.
+- **RED/GREEN** : test RED committé avant correctif (SHA `6c48c5b14b4a3e24400bdd199f8753eb31077caf`) ; correctif SHA `aecdc23f51d9e7672f29a5109e5b7f0e16e356b7`. **Aucune exécution RED ou GREEN locale attestée** : résultats à confirmer par CI GitHub au SHA de PR.
+- **Périmètre** : correction additive du fetcher existant, sans modification des 44 sources, adaptateurs concurrents, bases, licences, secrets ou S1.
+- **BLOCK_REASON** : validation CI/revue indépendante encore à obtenir ; les contrats officiels et données témoins de l'issue #17 restent non qualifiés ; aucun droit de fusion implicite.
+- **NEXT_ACTION** : ouvrir/contrôler PR et CI sur HEAD exact ; corriger tout échec ; solliciter revue indépendante. Puis poursuivre l'issue #17 après qualification légale d'une observation officielle et coordination des PR #26/#27, sans collision de claims.
+- **Rollback** : revert des commits de cette branche uniquement ; aucun changement de production.
+
+---
+
+
 ## 2026-11-07 — SadiaAF S1 : première installation staging gouvernée, archives persistantes et autorisation des vhosts
 
 - **MANDAT** : l'utilisateur autorise désormais la modification des deux vhosts `sadiaaf.wealthtechinnovations.com` et `api.sadiaaf.wealthtechinnovations.com`, et la suppression d'une archive identifiable. Audit S1 répété : API vhost 16 Ko, frontend 36 Ko ; uniquement pages Plesk d'origine, dossiers historiques `.well-known`, `e-vote`, `sadiaaf_project-v2` ; **aucune archive détectée dans ces vhosts**. Les archives AMF-UMOA, sauvegardes Plesk et autres données hors vhosts ne sont pas autorisées à suppression indifférenciée. Aucune suppression S1 effectuée.
