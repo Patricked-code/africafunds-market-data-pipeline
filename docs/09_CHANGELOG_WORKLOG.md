@@ -1,5 +1,16 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-16 04:33 Europe/Paris — Issue #17 : CI exacte et non-régression flux signés (WAITING_CI / WAITING_REVIEW)
+- RECONCILIATION : PR #1 fusionnée ; main `73256f48d81d38ce8ff6f51be9e024b25cf5dadb` ; PR #32 Draft HEAD avant écriture `f40c80a9112e6269b253189c80dc03aec5647de9`. Neuf PR ouvertes #22 et #25–#32, claims concurrents préservés. GitHub REST déclare le dépôt privé. AGENTS.md, docs/15 et checkpoint le plus récent du présent journal relus ; ancien checkpoint 06/11 non utilisé comme état courant.
+- PREUVES exact-HEAD précédent `f40c80a9112e6269b253189c80dc03aec5647de9` : [CI #43792817887](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43792817887) completed/success et [Docker/PostgreSQL #43792817845](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43792817845) completed/success. Les runs annulés sur `9bd87f1` ne sont pas des PASS ; le HEAD suivant n'est pas couvert par ces preuves.
+- CODE/TEST : commit `33c2746ea55cdb666e015f923edff28caac52380` ajoute un test de valorisation de plusieurs flux signés (121 à 2 ans, -55 à 1 an, 10 immédiat), résultat de référence 60, conservation de l'ordre et des entrées. Aucun changement des formules, sources, schémas, API ou infrastructure ; test local NOT_RUN, CI du nouveau commit NOT_VERIFIED.
+- BLOCK_REASON : CI exact-HEAD des nouveaux commits et revue indépendante PR #32 manquantes ; protections et gates de fusion non attestés ; données officielles datées, droits de redistribution, méthodes versionnées et chaîne source→qualité→calcul→API non certifiés. Claims #26/#27 non transférés. Aucun HISTORY_COMPLETE/DONE.
+- NEXT_ACTION : contrôler CI et Docker/PostgreSQL du nouveau HEAD et corriger toute défaillance ; obtenir une revue indépendante ; privilégier ensuite des données témoins officielles autorisées et leur provenance/licence pour la recette #17, ou un autre lot indépendant sans collision. Ne pas répéter les checkpoints purement documentaires.
+- ROLLBACK : revert ciblé du test et du présent journal sur la branche Draft ; aucun push main, merge, secret, S1 ou altération des 44 sources.
+
+---
+
+
 ## 2026-11-16 03:32 Europe/Paris — Issue #17 : doublons de maturité identiques, interpolation et extrapolation (WAITING_CI / WAITING_REVIEW)
 - REPRISE : AGENTS.md, docs/15, journal de la branche PR #32 et checkpoint historique du 06/11 relus ; ne pas confondre ce checkpoint ancien avec l'état GitHub actuel. Branche dédiée `fix/bond-financial-nonfinite-guard-20261115` ; aucune écriture sur main ni sur les branches des PR concurrentes.
 - PREUVE exacte du précédent HEAD `ed28382736ace2880ff02c68a5f2642afab9940a` : CI [#43787601941](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43787601941) completed/success et Docker/PostgreSQL [#43787601992](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43787601992) completed/success. Aucune de ces preuves ne couvre le nouveau test.
