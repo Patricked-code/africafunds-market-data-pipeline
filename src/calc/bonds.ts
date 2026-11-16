@@ -32,6 +32,16 @@ export function priceCashflows(cashflows: Cashflow[], curve: CurvePoint[]): numb
       throw new Error('Point de courbe invalide');
     }
   }
+  // Conflicting observations for one maturity are ambiguous financial inputs.
+  // Preserve identical duplicates and the caller-owned curve ordering.
+  const ratesByTenor = new Map<number, number>();
+  for (const point of curve) {
+    const previous = ratesByTenor.get(point.timeYears);
+    if (previous !== undefined && previous !== point.zeroRate) {
+      throw new Error('Taux contradictoires pour une même échéance');
+    }
+    ratesByTenor.set(point.timeYears, point.zeroRate);
+  }
   return cashflows.reduce((price, cashflow) => {
     if (!Number.isFinite(cashflow.timeYears) || cashflow.timeYears < 0) {
       throw new Error('Flux antérieur ou échéance invalide');
