@@ -72,3 +72,27 @@ test('oversized streamed response keeps size error when cancellation rejects', a
     globalThis.fetch = originalFetch;
   }
 });
+
+
+test('HTTP request preserves Headers instance and tuple header inputs', async () => {
+  const originalFetch = globalThis.fetch;
+  const observed: Array<Headers> = [];
+  globalThis.fetch = async (_url, init) => {
+    observed.push(new Headers(init?.headers));
+    return new Response('ok', { status: 200 });
+  };
+  try {
+    await fetchWithRetry('https://example.invalid/headers-instance', {
+      headers: new Headers({ 'x-source-token': 'instance-value' }),
+    });
+    await fetchWithRetry('https://example.invalid/headers-tuples', {
+      headers: [['x-source-token', 'tuple-value']],
+    });
+    assert.equal(observed[0]?.get('x-source-token'), 'instance-value');
+    assert.equal(observed[1]?.get('x-source-token'), 'tuple-value');
+    assert.equal(observed[0]?.get('user-agent'), env.HTTP_USER_AGENT);
+    assert.equal(observed[1]?.get('user-agent'), env.HTTP_USER_AGENT);
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
