@@ -1,3 +1,9 @@
+## 2026-11-16 — Issue #17 : courbes obligataires avec échéances contradictoires (PARTIAL)
+- `src/calc/bonds.ts` refuse deux taux zéro différents pour une même échéance, avant valorisation ; doublons strictement identiques restent compatibles. La courbe fournie n'est pas modifiée.
+- `test/bond-financial-inputs.test.ts` couvre le rejet de courbe contradictoire et la compatibilité des doublons identiques. Commits de branche : `2c5764cc123e5f62d4fc61bbc7b568efdcdadfe8` (test), `9c092b557ae1ccc532ae061f73a4dfe2723e5fd5` (correctif). Tests locaux NOT_RUN ; CI exacte à confirmer.
+- FR-013 reste PARTIAL : aucune courbe officielle, licence, provenance, méthode versionnée, historique ni recette API attestés ; aucune modification des 44 sources ou de S1.
+
+---
 ## 2026-11-15 — Calcul obligataire : garde des valeurs non finies (PARTIAL)
 - src/calc/bonds.ts rejette les entrées de courbe/flux non finies, taux <= -100 %, prix non finis, prix courants négatifs et résultats non finis ; formules valides préservées.
 - Tests test/bond-financial-inputs.test.ts : NaN/Infinity, échéances, taux invalides, formules valides. Tests locaux NOT_RUN ; CI à vérifier par PR. RED-candidat n'est pas un RED exécuté.
