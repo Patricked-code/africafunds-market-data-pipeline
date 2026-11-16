@@ -1,5 +1,17 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-16 — Lot 4/11 : contrôle de taille HTTP, flux libérés (PR #33)
+
+- **CI antérieure confirmée** : pour SHA `0159005cbb4f255ae467ba399fcbbe124228f09f`, CI run [43930608138](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43930608138) et Docker/PostgreSQL [43930608113](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43930608113) sont `completed/success` ; **ces preuves ne couvrent pas le présent correctif**.
+- **Défaut additionnel identifié** : `readLimitedBody` rejetait un `Content-Length` trop grand sans annuler le flux ; une exception de `reader.cancel()` lors d'un dépassement en streaming masquait l'erreur métier `HttpBodyTooLargeError`.
+- **TDD / code** : tests ajoutés d'abord (commit `cd0142092726fb1054d03dcd48fe3f2fe56a377b`), puis correction minimale (commit `7e9c023647c3e2faca1134a9d534ec46b3513d63`) ; aucune exécution RED locale attestée. Les tests vérifient l'annulation pour Content-Length excessif et la conservation de l'erreur de taille en cas d'échec de cancel.
+- **BLOCK_REASON** : CI du nouveau HEAD et revue indépendante à confirmer ; protections main et gates de fusion non attestés ; issue #17 reste dépendante des licences et données témoins officielles.
+- **NEXT_ACTION** : contrôler les runs CI et Docker/PostgreSQL du HEAD après ce checkpoint, corriger toute défaillance, obtenir revue indépendante ; poursuivre une tâche admissible indépendante sans collision avec PR #26/#27. Ne pas fusionner sans gates ; ne pas déployer S1.
+- **Rollback** : revert des commits de cette branche, aucune migration ni donnée brute modifiée.
+
+---
+
+
 ## 2026-11-16 — Lot 4/11 : CI du checkpoint PR #33 vérifiée (SHA 5e9f72c)
 
 - **Preuves vérifiées GitHub** : pour le commit `5e9f72cbdae650e6f9c8d5e79bafd575b538beae`, CI [43920468846](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43920468846) et Docker/PostgreSQL [43920468628](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43920468628) sont `completed/success`. Dépôt `private` au contrôle ; PR #33 ouverte. Le présent commit de journal constitue un SHA ultérieur non couvert par ces preuves.
