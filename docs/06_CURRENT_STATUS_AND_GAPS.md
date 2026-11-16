@@ -1,5 +1,9 @@
 # 06 — État réel et écarts
 
+## 2026-11-16 — PR #33 : préservation des en-têtes HTTP (lot 4/11)
+
+Les contrôles CI et Docker/PostgreSQL du HEAD précédent `7af04b15ee3b107b632b125c1921e46a5057a6d1` sont réussis (runs 43941785351 et 43941785594). Nouveau correctif sur la même PR : les en-têtes `Headers` et tableaux de tuples ne sont plus perdus lors de la construction de la requête HTTP. Test de non-régression ajouté avant le code ; CI du nouveau HEAD, revue indépendante et gates de fusion restent à vérifier. Aucune recette de données financières réelles ni modification S1.
+
 ## 2026-11-16 — Correctif HTTP additif en PR #33 (lot 4/11)
 
 Le lecteur HTTP annule maintenant le flux si Content-Length excède la limite, et préserve HttpBodyTooLargeError si l'annulation du lecteur échoue après dépassement en streaming. Tests dédiés ajoutés avant correctif ; CI du nouveau SHA en attente de vérification, revue indépendante requise. Aucun changement des sources officielles, de la base, ni de S1.
