@@ -62,3 +62,14 @@ test('finite discounted cashflows whose aggregate overflows are rejected', () =>
     [{ timeYears: 1, zeroRate: 0 }],
   ), /Valorisation obligataire non finie/);
 });
+
+
+test('interpolated discounting preserves inputs and the reference formula', () => {
+  const cashflows = [{ timeYears: 2, amount: 121 }];
+  const curve = [{ timeYears: 3, zeroRate: 0.2 }, { timeYears: 1, zeroRate: 0 }];
+  const originalCurve = curve.map((point) => ({ ...point }));
+  const expected = 121 / (1.1 ** 2);
+  assert.ok(Math.abs(priceCashflows(cashflows, curve) - expected) < 1e-10);
+  assert.deepEqual(curve, originalCurve, 'interpolation must not reorder caller-owned curve points');
+  assert.deepEqual(cashflows, [{ timeYears: 2, amount: 121 }]);
+});
