@@ -84,3 +84,19 @@ test('conflicting zero rates at the same tenor fail closed without mutating the 
     { timeYears: 1, zeroRate: 0.05 }, { timeYears: 1, zeroRate: 0.05 },
   ]) - 100) < 1e-10);
 });
+
+
+test('identical tenor duplicates preserve interior interpolation and boundary extrapolation', () => {
+  // Repeated identical observations must not introduce a zero-width interpolation interval.
+  const curve = [
+    { timeYears: 3, zeroRate: 0.2 },
+    { timeYears: 1, zeroRate: 0 },
+    { timeYears: 1, zeroRate: 0 },
+    { timeYears: 3, zeroRate: 0.2 },
+  ];
+  const original = curve.map((point) => ({ ...point }));
+  assert.ok(Math.abs(priceCashflows([{ timeYears: 2, amount: 121 }], curve) - 100) < 1e-10);
+  assert.ok(Math.abs(priceCashflows([{ timeYears: 0.5, amount: 100 }], curve) - 100) < 1e-10);
+  assert.ok(Math.abs(priceCashflows([{ timeYears: 4, amount: 100 * (1.2 ** 4) }], curve) - 100) < 1e-10);
+  assert.deepEqual(curve, original);
+});
