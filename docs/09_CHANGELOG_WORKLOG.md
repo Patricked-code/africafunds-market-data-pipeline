@@ -1,5 +1,15 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-16 — Lot 4/11 : CI du checkpoint PR #33 vérifiée (SHA 5e9f72c)
+
+- **Preuves vérifiées GitHub** : pour le commit `5e9f72cbdae650e6f9c8d5e79bafd575b538beae`, CI [43920468846](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43920468846) et Docker/PostgreSQL [43920468628](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43920468628) sont `completed/success`. Dépôt `private` au contrôle ; PR #33 ouverte. Le présent commit de journal constitue un SHA ultérieur non couvert par ces preuves.
+- **Périmètre** : correction HTTP 404/503 déjà présente ; aucune modification de source, de schéma, de secret ou de serveur. Ces CI ne prouvent ni RED local, ni revue indépendante, ni collecte financière autorisée.
+- **BLOCK_REASON** : revue indépendante et protections/gates de fusion à vérifier ; observation officielle/licence et claims PR #26/#27 requis avant la recette intégrée issue #17.
+- **NEXT_ACTION** : vérifier CI du HEAD documentaire et les règles de branche, obtenir revue indépendante PR #33 ; éviter les checkpoints répétitifs. Reprendre une tâche fonctionnelle indépendante dans les lots 0–13, avec tests et PR, sans empiéter sur les PR #26/#27 ; poursuivre la recette source→archive→qualité→calcul→API seulement après preuve de licence et observation témoin.
+- **Rollback** : revert du seul commit documentaire sur cette branche ; aucune action S1.
+
+---
+
 ## 2026-11-16 — Lot 4/11 : validation CI du correctif HTTP PR #33 (HEAD 813cfd9)
 
 - **Réconciliation** : branche `fix/http-retry-dispose-response-20261116`, HEAD observé `813cfd986625a11b69a1f227a17edbf09b282ef1` ; dépôt GitHub `private`. Ne pas réutiliser ce SHA sans nouvelle lecture.
