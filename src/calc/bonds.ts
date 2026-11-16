@@ -69,7 +69,12 @@ export function bondTotalReturn(input: {
   }
   const cashflows = input.cashflowsReceived ?? 0;
   if (!Number.isFinite(cashflows)) throw new Error('Flux reçu invalide');
-  const totalReturn = (input.currentDirtyPrice + cashflows) / input.previousDirtyPrice - 1;
+  const numerator = input.currentDirtyPrice + cashflows;
+  // Preserve the original formula for ordinary inputs. If finite components
+  // overflow only during addition, divide first to recover a finite return.
+  const totalReturn = Number.isFinite(numerator)
+    ? numerator / input.previousDirtyPrice - 1
+    : input.currentDirtyPrice / input.previousDirtyPrice + cashflows / input.previousDirtyPrice - 1;
   if (!Number.isFinite(totalReturn)) throw new Error('Rendement obligataire non fini');
   return totalReturn;
 }
