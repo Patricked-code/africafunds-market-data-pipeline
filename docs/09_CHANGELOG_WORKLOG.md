@@ -1,5 +1,15 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-16 — Lot 4/11 : CI PR #33 et normalisation des en-têtes HTTP
+
+- **Preuve CI vérifiée** : SHA `7af04b15ee3b107b632b125c1921e46a5057a6d1`, workflow CI [43941785351](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43941785351) `completed/success`, Docker/PostgreSQL [43941785594](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43941785594) `completed/success`. Ces preuves ne couvrent **pas** les commits ultérieurs.
+- **Défaut corrigé** : `RequestInit.headers` accepte `Headers`, tuples et objet ; le spread objet précédent perdait les en-têtes des deux premières représentations. Tests ajoutés d'abord (commit `f4eb98c1a74878f08094cd306a92df8f8d863b39`), correction (commit `0380bcaaaaa34957263a588a170b88bce191f290`) avec `new Headers(init.headers)` et valeurs par défaut conservées. Aucun test RED local attesté.
+- **BLOCK_REASON** : CI du présent correctif non encore attestée ; revue indépendante et protections/gates de fusion à vérifier. Recette métier issue #17 toujours bloquée par observations officielles/licences et coordination PR #26/#27.
+- **NEXT_ACTION** : contrôler les workflows GitHub Actions du HEAD après ce checkpoint, corriger toute régression, demander revue indépendante ; poursuivre les lots admissibles indépendants sans collision. Aucun merge sans gates et aucun déploiement S1.
+- **Rollback** : revert ciblé des commits de cette PR ; aucune migration, source historique, donnée brute ou secret modifié.
+
+---
+
 ## 2026-11-16 — Lot 4/11 : contrôle de taille HTTP, flux libérés (PR #33)
 
 - **CI antérieure confirmée** : pour SHA `0159005cbb4f255ae467ba399fcbbe124228f09f`, CI run [43930608138](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43930608138) et Docker/PostgreSQL [43930608113](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43930608113) sont `completed/success` ; **ces preuves ne couvrent pas le présent correctif**.
