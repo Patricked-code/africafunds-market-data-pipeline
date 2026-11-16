@@ -40,3 +40,35 @@ test('HTTP 503 disposes each response stream before retrying', async () => {
     globalThis.fetch = originalFetch;
   }
 });
+
+test('oversized Content-Length releases the response stream and preserves the size error', async () => {
+  const originalFetch = globalThis.fetch;
+  let cancelled = 0;
+  globalThis.fetch = async () => new Response(new ReadableStream<Uint8Array>({
+    cancel() { cancelled += 1; },
+  }), { status: 200, headers: { 'content-length': String(env.HTTP_MAX_RESPONSE_BYTES + 1) } });
+  try {
+    await assert.rejects(fetchWithRetry('https://example.invalid/oversized'), (error: unknown) =>
+      error instanceof Error && error.name === 'HttpBodyTooLargeError');
+    assert.equal(cancelled, 1);
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test('oversized streamed response keeps size error when cancellation rejects', async () => {
+  const originalFetch = globalThis.fetch;
+  const originalLimit = env.HTTP_MAX_RESPONSE_BYTES;
+  env.HTTP_MAX_RESPONSE_BYTES = 1;
+  globalThis.fetch = async () => new Response(new ReadableStream<Uint8Array>({
+    start(controller) { controller.enqueue(new Uint8Array([1, 2])); },
+    cancel() { throw new Error('cancel failed'); },
+  }), { status: 200 });
+  try {
+    await assert.rejects(fetchWithRetry('https://example.invalid/stream-oversized'), (error: unknown) =>
+      error instanceof Error && error.name === 'HttpBodyTooLargeError');
+  } finally {
+    env.HTTP_MAX_RESPONSE_BYTES = originalLimit;
+    globalThis.fetch = originalFetch;
+  }
+});
