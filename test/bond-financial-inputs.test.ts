@@ -73,3 +73,14 @@ test('interpolated discounting preserves inputs and the reference formula', () =
   assert.deepEqual(curve, originalCurve, 'interpolation must not reorder caller-owned curve points');
   assert.deepEqual(cashflows, [{ timeYears: 2, amount: 121 }]);
 });
+
+
+test('conflicting zero rates at the same tenor fail closed without mutating the curve', () => {
+  const curve = [{ timeYears: 1, zeroRate: 0.03 }, { timeYears: 1, zeroRate: 0.08 }];
+  const snapshot = curve.map((point) => ({ ...point }));
+  assert.throws(() => priceCashflows([{ timeYears: 1, amount: 100 }], curve), /Taux contradictoires/);
+  assert.deepEqual(curve, snapshot);
+  assert.ok(Math.abs(priceCashflows([{ timeYears: 1, amount: 105 }], [
+    { timeYears: 1, zeroRate: 0.05 }, { timeYears: 1, zeroRate: 0.05 },
+  ]) - 100) < 1e-10);
+});
