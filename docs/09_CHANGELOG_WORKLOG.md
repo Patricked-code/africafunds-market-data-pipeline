@@ -1,5 +1,17 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-17 — PR #33 : CI du test de lecture corrigé attestée (lot 4/11)
+
+- **Réconciliation GitHub** : PR #33 toujours ouverte Draft, HEAD de branche vérifié `8d358768d5731f6f27d0e0c9298a322f91252be5`, base `main`, sans revue indépendante attestée. Dépôt `private` au contrôle. Aucun droit de fusion implicite.
+- **PREUVES CI DU HEAD EXACT** : [CI #43971188627](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43971188627) et [Docker/PostgreSQL #43971188848](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43971188848), tous deux `completed/success` pour `8d358768d5731f6f27d0e0c9298a322f91252be5`. Cela atteste la correction du test de flux déjà errored après l'échec #43961140873, sans attester une exécution RED locale, une revue indépendante ni une recette financière.
+- **ÉCRITURES FONCTIONNELLES** : aucune dans cette reprise ; code/test antérieurs inchangés. Le présent checkpoint est documentaire et aura un SHA distinct, qui ne doit pas être présenté comme couvert par les deux runs ci-dessus.
+- **BLOCK_REASON** : PR Draft sans revue indépendante ; conditions de fusion à réconcilier ; source officielle datée et droits d'exploitation non qualifiés pour la recette issue #17 ; claims PR #26/#27 à préserver. Aucun déploiement S1 autorisé.
+- **NEXT_ACTION** : contrôler la CI du HEAD documentaire et demander une revue indépendante à un collaborateur distinct identifié ; poursuivre prioritairement une tâche de code/test indépendante dans les lots 0–13 (éviter de nouveaux checkpoints sans évolution), après lecture complète des documents requis et réconciliation des PR/claims. Pour issue #17, obtenir un témoin officiel licite avant certification source→archive→normalisation→qualité→calcul→API.
+- **ROLLBACK** : revert ciblé de ce checkpoint documentaire ; ne toucher ni aux sources, ni aux données, ni à `main`, ni à S1.
+
+---
+
+
 ## 2026-11-16 — PR #33 : correction du test sur flux HTTP en erreur (lot 4/11)
 
 - **CI HEAD initial** : commit `603f64d816b4e58d0ffb428e4a1ee9cc58c9620e` ; [CI 43961140873](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43961140873) `completed/failure` (31 tests réussis, 1 échec : `stream read failure cancels the reader...`, assertion `0 !== 1`). [Docker/PostgreSQL 43961141011](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43961141011) `completed/success`. La CI a exécuté le SHA de merge synthétique `54f6ddf177c514bfec5827f707aa51dab2dfc2c0` ; ne pas confondre avec HEAD de branche.
