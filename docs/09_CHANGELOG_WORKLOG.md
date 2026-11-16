@@ -1,5 +1,14 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-16 11:48 Europe/Paris — PR #32 : validation CI du SHA exact, revue et recette métier toujours ouvertes
+- **Réconciliation GitHub** : PR #1 fusionnée ; PR #32 Draft HEAD `ceabdf18e734ebfe6d7b7026d362aaad93c052ea`, base `73256f48d81d38ce8ff6f51be9e024b25cf5dadb`, revues `[]` ; PR #26/#27 Draft, claims non repris. AGENTS.md, docs/15 et checkpoint 06/11 relus ; le checkpoint historique ne prévaut pas sur les refs actuelles.
+- **Preuves CI exactes** : [CI #43847458655](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43847458655) `completed/success` ; [Docker/PostgreSQL #43847458660](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43847458660) `completed/success`, toutes deux sur `ceabdf18e734ebfe6d7b7026d362aaad93c052ea`. Description PR #32 actualisée. Aucun test local ou donnée financière officielle exécuté dans cette intervention.
+- **BLOCK_REASON** : absence de revue indépendante et gates de fusion non attestés ; données témoins officielles, licences, coordination d'admission #26/#27 et recette source→archive→qualité→calcul→API issue #17 non attestées. CI synthétique ne vaut pas HISTORY_COMPLETE ni S1.
+- **NEXT_ACTION** : éviter les incréments documentaires répétitifs ; identifier sur branche indépendante et après coordination des claims une source officielle exploitable et son observation témoin datée ; implémenter la recette d'intégration dans les modules existants avec tests et CI, puis revue indépendante de #32. Ne pas modifier main ni déployer S1.
+- **Rollback** : revert de ce seul commit documentaire sur la branche Draft ; aucune écriture S1.
+
+---
+
 ## 2026-11-16 11:14 Europe/Paris — Issue #17 : vérification CI du HEAD et réconciliation PR #32 (WAITING_REVIEW)
 - RECONCILIATION : PR #1 fusionnée ; PR #32 ouverte Draft HEAD `15c1e720f9b020ad042117d4e29f7bd0fb330565`, base main `73256f48d81d38ce8ff6f51be9e024b25cf5dadb` ; autres PR ouvertes #22/#25–#31 non modifiées. AGENTS.md, docs/15, dernier checkpoint de ce journal et checkpoint 06/11 consultés. Aucune reprise des claims #26/#27.
 - PREUVES exact-HEAD : [CI #43817891614](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43817891614) completed/success et [Docker/PostgreSQL #43817891599](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43817891599) completed/success pour `15c1e720f9b020ad042117d4e29f7bd0fb330565`. Description PR #32 corrigée avec ces preuves. Tests locaux NOT_RUN, aucune observation officielle, aucun test runtime S1.
