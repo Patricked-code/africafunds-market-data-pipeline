@@ -1,0 +1,42 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { fetchWithRetry, HttpResponseError } from '../src/http/fetcher.js';
+import { env } from '../src/config/env.js';
+
+test('HTTP 404 disposes its unconsumed response body before failing', async () => {
+  const originalFetch = globalThis.fetch;
+  let cancelled = 0;
+  globalThis.fetch = async () => new Response(new ReadableStream<Uint8Array>({
+    cancel() { cancelled += 1; },
+  }), { status: 404 });
+  try {
+    await assert.rejects(fetchWithRetry('https://example.invalid/not-found'),
+      (error: unknown) => error instanceof HttpResponseError && error.status === 404);
+    assert.equal(cancelled, 1, 'terminal HTTP error must release the response stream');
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test('HTTP 503 disposes each response stream before retrying', async () => {
+  const originalFetch = globalThis.fetch;
+  const originalRetries = env.HTTP_MAX_RETRIES;
+  let cancelled = 0;
+  let calls = 0;
+  env.HTTP_MAX_RETRIES = 1;
+  globalThis.fetch = async () => {
+    calls += 1;
+    return new Response(new ReadableStream<Uint8Array>({
+      cancel() { cancelled += 1; },
+    }), { status: 503 });
+  };
+  try {
+    await assert.rejects(fetchWithRetry('https://example.invalid/unavailable'),
+      (error: unknown) => error instanceof HttpResponseError && error.status === 503);
+    assert.equal(calls, 2);
+    assert.equal(cancelled, 2, 'every rejected response must release its stream');
+  } finally {
+    env.HTTP_MAX_RETRIES = originalRetries;
+    globalThis.fetch = originalFetch;
+  }
+});
