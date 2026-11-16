@@ -1,5 +1,18 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-16 05:30 Europe/Paris — Issue #17 : total return fini malgré débordement intermédiaire (WAITING_CI / WAITING_REVIEW)
+- RECONCILIATION : PR #1 fusionnée, PR #32 Draft ouverte, dépôt GitHub privé ; PR ouvertes #22 et #25–#32, branches concurrentes non modifiées. AGENTS.md, docs/15, dernier checkpoint (entrée 04:33) et checkpoint historique 06/11 relus ; source de vérité GitHub.
+- PREUVES : sur HEAD précédent `a6dc34772daf02e25cbcd79c985beaad04f8a8f6`, GitHub Actions [CI #43798941675](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43798941675) completed/success et [Docker/PostgreSQL #43798941659](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43798941659) completed/success. Ces preuves ne couvrent PAS les commits suivants.
+- TEST : `6628ec45837278e27a47854e21a01f4e4a4504af` ajoute un cas avec previousDirtyPrice/currentDirtyPrice/cashflowsReceived = Number.MAX_VALUE : rendement mathématique fini de 100 %, mais addition intermédiaire débordante. RED attendu par lecture du code antérieur, non exécuté.
+- CODE : `e34de3dca1e293ea46b1d020817f6e7689815f63` préserve le calcul historique quand le numérateur est fini ; lorsque l'addition de deux entrées finies déborde, effectue les divisions avant addition pour retrouver un rendement fini, avec garde finale Number.isFinite existante. Aucun changement des sources, schémas, API, ingestion, secrets ou S1.
+- VALIDATION : tests locaux NOT_RUN ; CI exact-HEAD du code et de ce journal NOT_VERIFIED. Le correctif est à valider par GitHub Actions ; aucune donnée financière officielle ni licence certifiée, aucun HISTORY_COMPLETE/DONE.
+- BLOCK_REASON : revue indépendante PR #32 absente, protections/gates de fusion non attestés, CI exact-HEAD à contrôler, observations officielles et chaîne source→qualité→calcul→API non certifiées ; claims #26/#27 non transférés.
+- NEXT_ACTION : vérifier CI et Docker/PostgreSQL du HEAD final, corriger toute défaillance ; obtenir une revue indépendante. Puis sélectionner une observation officielle datée et autorisée pour une recette #17 avec provenance, qualité, méthode versionnée et publication, sans collision de branches.
+- ROLLBACK : revert ciblé des deux commits fonctionnels et de cette entrée sur branche Draft ; aucun push direct main, fusion, secret, déploiement S1 ni modification des 44 sources.
+
+---
+
+
 ## 2026-11-16 04:33 Europe/Paris — Issue #17 : CI exacte et non-régression flux signés (WAITING_CI / WAITING_REVIEW)
 - RECONCILIATION : PR #1 fusionnée ; main `73256f48d81d38ce8ff6f51be9e024b25cf5dadb` ; PR #32 Draft HEAD avant écriture `f40c80a9112e6269b253189c80dc03aec5647de9`. Neuf PR ouvertes #22 et #25–#32, claims concurrents préservés. GitHub REST déclare le dépôt privé. AGENTS.md, docs/15 et checkpoint le plus récent du présent journal relus ; ancien checkpoint 06/11 non utilisé comme état courant.
 - PREUVES exact-HEAD précédent `f40c80a9112e6269b253189c80dc03aec5647de9` : [CI #43792817887](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43792817887) completed/success et [Docker/PostgreSQL #43792817845](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43792817845) completed/success. Les runs annulés sur `9bd87f1` ne sont pas des PASS ; le HEAD suivant n'est pas couvert par ces preuves.
