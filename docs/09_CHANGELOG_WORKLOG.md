@@ -1,5 +1,15 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-16 — Lot 4/11 : échec de lecture HTTP, annulation du reader (PR #33)
+
+- **Réconciliation CI** : SHA antérieur `2902af89d25653515f4f4c28a1c0268f1937ce3b` : CI [43952215926](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43952215926) et Docker/PostgreSQL [43952215949](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43952215949) `completed/success`. Ces runs ne couvrent pas les nouveaux commits.
+- **TDD/code** : test de non-régression de lecture de flux échouée, commit `56490e9ad43711ec8e5aeb615abfc31617397b84`, puis correction `95ab0b4668cd60483c78b14083904cd16f7147a1` dans `src/http/fetcher.ts` : `reader.cancel()` en cas d'exception de lecture, sans masquer l'erreur initiale. Aucun test RED local attesté.
+- **BLOCK_REASON** : CI sur nouveau HEAD non encore attestée ; revue indépendante et gates de fusion non attestés ; données officielles/licences et coordination PR #26/#27 requises pour issue #17.
+- **NEXT_ACTION** : vérifier CI et Docker/PostgreSQL sur HEAD exact, corriger les échecs, obtenir revue indépendante ; ensuite sélectionner une tâche admissible indépendante, sans fusion ni déploiement S1 implicite.
+- **Rollback** : revert ciblé des deux commits de code/test ; aucune migration, secret, source historique ni action S1.
+
+---
+
 ## 2026-11-16 — Lot 4/11 : CI PR #33 et normalisation des en-têtes HTTP
 
 - **Preuve CI vérifiée** : SHA `7af04b15ee3b107b632b125c1921e46a5057a6d1`, workflow CI [43941785351](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43941785351) `completed/success`, Docker/PostgreSQL [43941785594](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43941785594) `completed/success`. Ces preuves ne couvrent **pas** les commits ultérieurs.
