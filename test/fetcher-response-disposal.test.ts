@@ -227,3 +227,34 @@ test('nullable RequestInit.signal retains retry behavior without a caller abort 
     globalThis.fetch = originalFetch;
   }
 });
+
+
+test('internal HTTP timeout remains active when a caller supplies a non-aborted signal', async () => {
+  const originalFetch = globalThis.fetch;
+  const originalRetries = env.HTTP_MAX_RETRIES;
+  const originalTimeout = env.HTTP_TIMEOUT_MS;
+  env.HTTP_MAX_RETRIES = 0;
+  env.HTTP_TIMEOUT_MS = 25;
+  const caller = new AbortController();
+  let calls = 0;
+  globalThis.fetch = async (_url, init) => {
+    calls += 1;
+    return await new Promise<Response>((_resolve, reject) => {
+      const signal = init?.signal;
+      if (!signal) return reject(new Error('fetch must receive a timeout signal'));
+      if (signal.aborted) return reject(signal.reason);
+      signal.addEventListener('abort', () => reject(signal.reason), { once: true });
+    });
+  };
+  try {
+    await assert.rejects(fetchWithRetry('https://example.invalid/timeout-with-caller-signal', {
+      signal: caller.signal,
+    }), (error: unknown) => error instanceof Error && error.name === 'AbortError');
+    assert.equal(calls, 1, 'timeout must terminate the only allowed attempt');
+    assert.equal(caller.signal.aborted, false, 'internal timeout must not abort the caller signal');
+  } finally {
+    globalThis.fetch = originalFetch;
+    env.HTTP_MAX_RETRIES = originalRetries;
+    env.HTTP_TIMEOUT_MS = originalTimeout;
+  }
+});
