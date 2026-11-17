@@ -63,3 +63,10 @@ test('annual capitalisation rejects positive levels that underflow to zero while
   assert.throws(() => capitaliseAnnualRate({ previousLevel: Number.MIN_VALUE, annualRate: -0.5, elapsedDays: 360 }), /invalide|positif|nul/i);
   assert.equal(capitaliseAnnualRate({ previousLevel: 100, annualRate: 0.05, elapsedDays: 0 }), 100);
 });
+
+
+test('annual capitalisation preserves the smallest positive index on a zero-day window', () => {
+  // Zero elapsed days is an identity operation even at the IEEE-754 subnormal boundary.
+  assert.equal(capitaliseAnnualRate({ previousLevel: Number.MIN_VALUE, annualRate: -0.5, elapsedDays: 0 }), Number.MIN_VALUE);
+  assert.throws(() => capitaliseAnnualRate({ previousLevel: Number.MIN_VALUE, annualRate: -0.5, elapsedDays: -1 }), /invalide/i);
+});
