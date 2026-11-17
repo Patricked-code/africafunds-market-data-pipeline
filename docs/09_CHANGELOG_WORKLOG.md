@@ -1,5 +1,16 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-18 00:36 Europe/Paris — PR #34 : CI du HEAD précédent et couverture du quotient FX (issue #17)
+
+- RECONCILIATION : PR #1 merged ; PR #34 ouverte Draft, reviews=[] ; 11 PR et 12 issues ouvertes recensées ; dépôt privé selon get_repo. AGENTS.md, docs/15_AUTONOMOUS_AGENT_EXECUTION.md, worklog et checkpoint historique du 06/11 relus ; comparaison du code de calcul sur main et branche PR #34. Les autres PR et claims restent intacts.
+- PREUVES CI : commit exact `bfed19aae4cd20a1652018f5caa68191f277f8d0` : GitHub Actions [#44192210373](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/44192210373) et [#44192210240](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/44192210240), tous deux completed/success. Ces runs ne prouvent ni licence, ni collecte historique, ni S1.
+- ACTION TEST : commit `a6853b90e716d2ebe835e26e35aa14f582741e45` dans `test/indices-finite-output.test.ts` : quotient FX positif à partir de deux taux finis qui déborde en Infinity doit être rejeté ; cas ordinaire inchangé. Le garde `requireFinite(fxRatio)` existant suffit : aucune modification de formule ni de code production. Tests locaux NOT_RUN, CI du nouveau HEAD NOT_YET_VERIFIED ; aucune revendication de RED.
+- BLOCK_REASON : CI du nouveau HEAD non attestée ; PR Draft sans revue indépendante, protections et gates de fusion non attestés ; recette issue #17 sans observations officielles datées et licences vérifiées.
+- NEXT_ACTION : contrôler CI et Docker/PostgreSQL sur le nouveau HEAD documentaire ; corriger tout échec ; obtenir une revue indépendante des gardes numériques. Qualifier un témoin institutionnel officiellement exploitable pour la chaîne source→archive→normalisation→qualité→calcul→API, sinon sélectionner une tâche indépendante non revendiquée des lots 0–13. Aucune fusion ou déploiement S1.
+- ROLLBACK : revert ciblé du test et de ce checkpoint sur branche Draft ; main, migrations, secrets, 44 sources et S1 inchangés.
+
+---
+
 ## 2026-11-17 23:38 Europe/Paris — PR #34 : correction du sous-flux du rapport FX (issue #17)
 
 - RECONCILIATION : PR #1 fusionnée, PR #34 ouverte Draft, HEAD initial `c3a380bfa2f2a55c0dcb5ea3c6e04c4b9863b6cf`, reviews=[] ; dépôt GitHub privé selon get_repo. Documents AGENTS.md, docs/15_AUTONOMOUS_AGENT_EXECUTION.md, worklog, checkpoint 2026-11-06 et documents maîtres consultés. Les autres PR/claims n'ont pas été modifiés.
