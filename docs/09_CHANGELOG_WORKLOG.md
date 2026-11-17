@@ -1,5 +1,17 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-17 22:34 Europe/Paris — PR #34 : CI exacte et test identité IEEE-754 (issue #17)
+
+- RECONCILIATION : PR #1 merged ; PR #34 ouverte Draft HEAD initial `ce005f1fb97ce72458c3a02d622f79e214184be3`, base main `73256f48d81d38ce8ff6f51be9e024b25cf5dadb` selon GitHub ; 11 PR et 12 issues ouvertes consultées ; AGENTS.md, docs/15_AUTONOMOUS_AGENT_EXECUTION.md, journal et code/test de la branche relus. Les PR concurrentes ne sont pas modifiées. La vérification de main comme HEAD courant indépendant reste à compléter.
+- PREUVES CI exact-HEAD : sur `ce005f1fb97ce72458c3a02d622f79e214184be3`, [CI #44170409416](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/44170409416) et [Docker/PostgreSQL #44170409395](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/44170409395) : completed/success selon GitHub. Aucune preuve de données officielles ou de déploiement S1.
+- ACTION TEST : commit [6c52184c](https://github.com/Patricked-code/africafunds-market-data-pipeline/commit/6c52184c5dfff8843acc99e239b59ce381188439), test de frontière dans `test/indices-finite-output.test.ts` : durée zéro conserve exactement `Number.MIN_VALUE` (indice strictement positif sous-normal) et durée négative est rejetée. Aucun changement de formule ni de code production. Test local NOT_RUN ; nouveau commit CI NOT_YET_VERIFIED ; RED non revendiqué car invariant déjà implémenté.
+- BLOCK_REASON : nouveau HEAD CI non attesté, PR #34 Draft sans revue indépendante attestée ni gates de fusion ; recette financière officielle #17 sans données témoins/licences/chaîne complète certifiées. Aucun HISTORY_COMPLETE.
+- NEXT_ACTION : contrôler les workflows CI/Docker du HEAD exact après ce checkpoint ; corriger tout échec ; solliciter revue indépendante des choix numériques fail-closed et du cas limite ; reprendre un périmètre métier indépendant après qualification de sources officielles et coordination GitHub. Ne pas fusionner ni déployer S1.
+- ROLLBACK : revert ciblé du commit test 6c52184c et de cette entrée sur branche Draft ; aucune écriture main, secret, migration, catalogue historique ou S1.
+
+---
+
+
 ## 2026-11-17 21:31 Europe/Paris — PR #34 : preuve CI exacte et test frontière de capitalisation (issue #17)
 
 - RECONCILIATION : PR #1 fusionnée, PR #34 ouverte Draft, reviews=[] ; AGENTS.md, docs/15_AUTONOMOUS_AGENT_EXECUTION.md, journal courant et checkpoint historique du 06/11 relus sur la branche de PR #34 ; main et branche comparés par lecture du code existant. Dépôt GitHub private selon métadonnées du connecteur. PR concurrentes non modifiées.
