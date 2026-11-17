@@ -1,5 +1,16 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-17 23:38 Europe/Paris — PR #34 : correction du sous-flux du rapport FX (issue #17)
+
+- RECONCILIATION : PR #1 fusionnée, PR #34 ouverte Draft, HEAD initial `c3a380bfa2f2a55c0dcb5ea3c6e04c4b9863b6cf`, reviews=[] ; dépôt GitHub privé selon get_repo. Documents AGENTS.md, docs/15_AUTONOMOUS_AGENT_EXECUTION.md, worklog, checkpoint 2026-11-06 et documents maîtres consultés. Les autres PR/claims n'ont pas été modifiés.
+- PREUVES CI HEAD PRÉCÉDENT : pour `c3a380bfa2f2a55c0dcb5ea3c6e04c4b9863b6cf`, [CI #44181267737](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/44181267737) et [Docker/PostgreSQL #44181267696](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/44181267696) : completed/success. Ce ne sont pas des preuves de données financières réelles ni de S1.
+- TDD : test de non-régression ajouté `9af6dc5d6bc35fc1e4460225bb1cfe2844d1d4dd`, valeur de frontière corrigée `bb84f2faf884ba47289d3913c9fd7327f18f15ab` : `fxToday=Number.MIN_VALUE`, `fxPrevious=2` donnent un rapport arithmétique strictement positif mais arrondi à zéro en IEEE-754, auparavant transformé silencieusement en rendement -100%. Code `c070c8cbd6dd9324104ef3c12b3df9dd81ec99fe` : vérifier la finitude et la stricte positivité du rapport FX avant conversion ; contrats publics et formules conservés. RED déduit par inspection du code précédent, NON exécuté ; tests locaux NOT_RUN ; GREEN CI du nouveau HEAD NOT_YET_VERIFIED.
+- BLOCK_REASON : aucune revue indépendante, PR Draft et gates de fusion non attestés ; CI du correctif à vérifier ; données institutionnelles officielles, licences et recette complète #17 non attestées.
+- NEXT_ACTION : contrôler CI et Docker/PostgreSQL sur le HEAD exact de cette entrée et corriger si échec ; faire revoir les choix numériques fail-closed ; qualifier une observation financière officielle et sa licence pour une recette source→archive→normalisation→qualité→calcul→API ; sinon choisir un autre défaut indépendant non revendiqué dans les lots 0–13. Ne pas fusionner ni déployer S1.
+- ROLLBACK : revert ciblé des commits de test et code sur la branche Draft, aucune modification main, migration, secret, 44 sources ou S1.
+
+---
+
 ## 2026-11-17 22:34 Europe/Paris — PR #34 : CI exacte et test identité IEEE-754 (issue #17)
 
 - RECONCILIATION : PR #1 merged ; PR #34 ouverte Draft HEAD initial `ce005f1fb97ce72458c3a02d622f79e214184be3`, base main `73256f48d81d38ce8ff6f51be9e024b25cf5dadb` selon GitHub ; 11 PR et 12 issues ouvertes consultées ; AGENTS.md, docs/15_AUTONOMOUS_AGENT_EXECUTION.md, journal et code/test de la branche relus. Les PR concurrentes ne sont pas modifiées. La vérification de main comme HEAD courant indépendant reste à compléter.
