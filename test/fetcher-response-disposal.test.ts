@@ -310,3 +310,31 @@ test('caller abort after fetch resolves a successful response must not publish i
     env.HTTP_MAX_RETRIES = originalRetries;
   }
 });
+
+test('caller abort during successful response body consumption must not return archived bytes', async () => {
+  const originalFetch = globalThis.fetch;
+  const originalRetries = env.HTTP_MAX_RETRIES;
+  env.HTTP_MAX_RETRIES = 0;
+  const caller = new AbortController();
+  const reason = new DOMException('cancelled while reading body', 'AbortError');
+  let calls = 0;
+  globalThis.fetch = async () => {
+    calls += 1;
+    return new Response(new ReadableStream<Uint8Array>({
+      pull(controller) {
+        caller.abort(reason);
+        controller.enqueue(new Uint8Array([1, 2, 3]));
+        controller.close();
+      },
+    }), { status: 200 });
+  };
+  try {
+    await assert.rejects(fetchWithRetry('https://example.invalid/abort-during-body', {
+      signal: caller.signal,
+    }), (error: unknown) => error === reason);
+    assert.equal(calls, 1, 'caller cancellation must not trigger another request');
+  } finally {
+    globalThis.fetch = originalFetch;
+    env.HTTP_MAX_RETRIES = originalRetries;
+  }
+});
