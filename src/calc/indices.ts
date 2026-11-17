@@ -1,7 +1,13 @@
+function requireFinite(value: number, label: string): void {
+  if (!Number.isFinite(value)) throw new Error(`${label} invalide (non fini)`);
+}
+
 export function nextIndexLevel(previousLevel: number, dailyReturn: number): number {
   if (!Number.isFinite(previousLevel) || previousLevel <= 0) throw new Error('Niveau précédent invalide');
   if (!Number.isFinite(dailyReturn) || dailyReturn <= -1) throw new Error('Rendement journalier invalide');
-  return previousLevel * (1 + dailyReturn);
+  const result = previousLevel * (1 + dailyReturn);
+  requireFinite(result, 'Niveau calculé');
+  return result;
 }
 
 export function meanReturn(returns: number[]): number {
@@ -24,13 +30,23 @@ export function capitaliseAnnualRate(input: {
   dayCountBasis?: 360 | 365;
 }): number {
   const basis = input.dayCountBasis ?? 360;
+  requireFinite(input.previousLevel, 'Niveau précédent');
+  requireFinite(input.annualRate, 'Taux annuel');
+  requireFinite(input.elapsedDays, 'Nombre de jours');
+  if (input.previousLevel <= 0) throw new Error('Niveau précédent invalide');
   if (input.elapsedDays < 0) throw new Error('Nombre de jours invalide');
-  return input.previousLevel * (1 + input.annualRate * input.elapsedDays / basis);
+  const result = input.previousLevel * (1 + input.annualRate * input.elapsedDays / basis);
+  requireFinite(result, 'Niveau capitalisé');
+  return result;
 }
 
 export function realReturn(nominalReturn: number, inflationReturn: number): number {
+  requireFinite(nominalReturn, 'Rendement nominal');
+  requireFinite(inflationReturn, 'Inflation');
   if (inflationReturn <= -1) throw new Error('Inflation invalide');
-  return (1 + nominalReturn) / (1 + inflationReturn) - 1;
+  const result = (1 + nominalReturn) / (1 + inflationReturn) - 1;
+  requireFinite(result, 'Rendement réel');
+  return result;
 }
 
 export function convertReturn(input: {
@@ -38,6 +54,11 @@ export function convertReturn(input: {
   fxToday: number;
   fxPrevious: number;
 }): number {
+  requireFinite(input.localReturn, 'Rendement local');
+  requireFinite(input.fxToday, 'Taux de change courant');
+  requireFinite(input.fxPrevious, 'Taux de change précédent');
   if (input.fxToday <= 0 || input.fxPrevious <= 0) throw new Error('Taux de change invalide');
-  return (1 + input.localReturn) * (input.fxToday / input.fxPrevious) - 1;
+  const result = (1 + input.localReturn) * (input.fxToday / input.fxPrevious) - 1;
+  requireFinite(result, 'Rendement converti');
+  return result;
 }
