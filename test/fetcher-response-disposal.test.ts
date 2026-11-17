@@ -282,3 +282,31 @@ test('caller abort after a retryable HTTP response preserves its exact reason an
     env.HTTP_MAX_RETRIES = originalRetries;
   }
 });
+
+
+test('caller abort after fetch resolves a successful response must not publish its body', async () => {
+  const originalFetch = globalThis.fetch;
+  const originalRetries = env.HTTP_MAX_RETRIES;
+  env.HTTP_MAX_RETRIES = 2;
+  const caller = new AbortController();
+  const reason = new DOMException('cancelled before response processing', 'AbortError');
+  let calls = 0;
+  let cancelled = 0;
+  globalThis.fetch = async () => {
+    calls += 1;
+    caller.abort(reason);
+    return new Response(new ReadableStream<Uint8Array>({
+      cancel() { cancelled += 1; },
+    }), { status: 200 });
+  };
+  try {
+    await assert.rejects(fetchWithRetry('https://example.invalid/abort-after-200', {
+      signal: caller.signal,
+    }), (error: unknown) => error === reason);
+    assert.equal(calls, 1, 'caller cancellation must not cause another request');
+    assert.equal(cancelled, 1, 'aborted successful response must release its stream');
+  } finally {
+    globalThis.fetch = originalFetch;
+    env.HTTP_MAX_RETRIES = originalRetries;
+  }
+});
