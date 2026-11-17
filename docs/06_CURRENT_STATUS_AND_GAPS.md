@@ -1,5 +1,10 @@
 # 06 — État réel et écarts
 
+## 2026-11-17 — PR #33 : annulation pendant lecture du corps HTTP 200
+
+Test synthétique (279f796, 6397fd4) et correctif ciblé (c7a016f) : après la lecture du corps HTTP 200, le fetcher vérifie une dernière fois le signal du demandeur avant de rendre les octets archivables. Tests locaux NOT_RUN ; CI du nouveau HEAD non attestée. CI du HEAD antérieur 716295b réussie (#44048784765, #44048784958). PR Draft sans revue indépendante, aucune modification main/S1/sources. Voir le worklog pour BLOCK_REASON et NEXT_ACTION.
+
+
 ## 2026-11-17 — PR #33 : réponse HTTP 200 reçue après annulation du demandeur
 
 Test synthétique `a5a7172` et correctif `3b6ea64` : une réponse 200 résolue après annulation du demandeur est rejetée et son corps libéré avant toute lecture/publication ; la raison exacte d'annulation prime. CI précédente du HEAD `4224dca` réussie (#44040427887, #44040427972), CI du nouveau correctif non attestée. Tests locaux NOT_RUN, PR Draft sans revue indépendante. Aucun changement du catalogue, de PostgreSQL, de main ni de S1. Voir `docs/09_CHANGELOG_WORKLOG.md` pour preuves et NEXT_ACTION.
