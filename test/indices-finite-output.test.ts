@@ -77,3 +77,10 @@ test('FX conversion rejects an underflowed positive exchange-rate ratio', () => 
   assert.throws(() => convertReturn({ localReturn: 0, fxToday: Number.MIN_VALUE, fxPrevious: 2 }), /invalide|fini|taux|rapport/i);
   assert.equal(convertReturn({ localReturn: 0, fxToday: 1, fxPrevious: 1 }), 0);
 });
+
+
+test('FX conversion rejects an overflowing exchange-rate ratio without changing ordinary conversion', () => {
+  // Both quoted FX rates are positive and finite; the quotient itself overflows IEEE-754.
+  assert.throws(() => convertReturn({ localReturn: 0, fxToday: Number.MAX_VALUE, fxPrevious: Number.MIN_VALUE }), /invalide|fini|rapport/i);
+  assert.equal(convertReturn({ localReturn: 0.1, fxToday: 2, fxPrevious: 2 }), 0.10000000000000009);
+});
