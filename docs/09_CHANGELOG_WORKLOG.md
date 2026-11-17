@@ -1,5 +1,17 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-17 12:34 Europe/Paris — PR #33 : validation exacte du checkpoint HTTP et orientation vers recettes métier
+
+- RECONCILIATION : GitHub Patricked-code consulté ; dépôt visibility=private ; AGENTS.md, docs/15_AUTONOMOUS_AGENT_EXECUTION.md, journal courant et checkpoint historique docs/CONTINUITY_CHECKPOINT_2026-11-06.md relus. PR #33 toujours ouverte ; reviews=[] ; douze issues ouvertes (#3, #5–#9, #13–#17, #20). Les SHAs historiques du 06/11 ne sont pas réutilisés comme état courant.
+- PREUVE CI EXACT-HEAD : commit 7d448afc595e60a2210329077d360300b9be4ac0 ; CI #44066915674 completed/success (https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/44066915674) et Docker/PostgreSQL #44066915506 completed/success (https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/44066915506). Ces deux validations couvrent le test synthétique HTTP 503 dont le nettoyage du flux échoue et le checkpoint antérieur ; elles ne démontrent ni collecte officielle ni historique complet.
+- TRAVAIL CONCRET : réconciliation des preuves CI et actualisation du journal sur la branche existante PR #33. Aucun changement de code, source, migration, secret, main ou serveur ; tests locaux NOT_RUN. La PR n'est pas déclarée intégrable sans revue indépendante et gates vérifiés.
+- BLOCK_REASON : PR #33 Draft et reviews=[] ; conditions de fusion/protections non attestées. Issues #14–#17 : contrats institutionnels, licences, observations témoins et coordination des branches métier nécessaires ; aucun statut HISTORY_COMPLETE/DONE induit des smokes CI.
+- NEXT_ACTION : vérifier CI du nouveau HEAD documentaire ; solliciter revue indépendante de PR #33 puis, sans fusion implicite, reprendre un incrément métier à plus forte valeur dans les lots 0–13 après lecture des PR concurrentes (#26/#27 notamment) et claim. Priorité : qualification des adaptateurs #14 ou contrôles qualité #15 avec fixtures officielles autorisées, plutôt que tests HTTP additionnels. Ne pas toucher S1 sans gates.
+- ROLLBACK : revert ciblé de cette entrée documentaire sur branche Draft, sans effet production.
+
+---
+
+
 ## 2026-11-17 11:39 Europe/Paris — PR #33 : statut HTTP 503 conservé malgré échec du nettoyage du flux (issue #7, lots 4/11)
 
 - RECONCILIATION : dépôt privé confirmé par GitHub ; PR #33 ouverte Draft sur fix/http-retry-dispose-response-20261116. Documents AGENTS.md, docs/15_AUTONOMOUS_AGENT_EXECUTION.md et dernier worklog consultés ; revue PR #33 vide. Pas de modification de main ni des branches concurrentes.
