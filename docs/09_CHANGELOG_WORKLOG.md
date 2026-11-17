@@ -1,5 +1,17 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-17 11:39 Europe/Paris — PR #33 : statut HTTP 503 conservé malgré échec du nettoyage du flux (issue #7, lots 4/11)
+
+- RECONCILIATION : dépôt privé confirmé par GitHub ; PR #33 ouverte Draft sur fix/http-retry-dispose-response-20261116. Documents AGENTS.md, docs/15_AUTONOMOUS_AGENT_EXECUTION.md et dernier worklog consultés ; revue PR #33 vide. Pas de modification de main ni des branches concurrentes.
+- PREUVE CI EXACT-HEAD ANTERIEUR : ba43378c54bae71d5c4b10ec96958b97c6160851 : CI #44057373996 completed/success et Docker/PostgreSQL #44057374166 completed/success (GitHub Actions, vérifiés dans cette exécution). https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/44057373996 ; https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/44057374166.
+- TRAVAIL CONCRET : commit d3b4bcc15b1f6219bce21892b969e676c173867b : nouveau test synthétique dans test/fetcher-response-disposal.test.ts, réponse 503 dont l'annulation du flux échoue ; l'erreur HTTP 503 originale doit primer et la politique de zéro retry doit limiter à un seul appel. Aucun code de production changé : ce comportement est déjà implémenté, test de non-régression uniquement.
+- VALIDATION : tests locaux NOT_RUN ; CI du nouveau commit et du HEAD documentaire NOT_YET_ATTESTED ; aucune observation officielle, licence, HISTORY_COMPLETE ou recette S1 certifiée.
+- BLOCK_REASON : nouvelle CI à vérifier ; PR #33 Draft sans revue indépendante, protections et gates de fusion non attestés ; issue #17 exige toujours sources officielles autorisées, témoins datés et coordination des claims PR #26/#27.
+- NEXT_ACTION : vérifier CI/Docker exact-HEAD du test et du checkpoint, corriger tout échec ; faire réaliser une revue indépendante habilitée ; sélectionner ensuite un travail métier indépendant et réellement admissible dans les lots 0–13, sans multiplier les tests HTTP à faible valeur. Aucun merge ni S1 implicite.
+- ROLLBACK : revert ciblé du commit d3b4bcc sur la branche Draft ; aucun impact main ni production.
+
+---
+
 ## 2026-11-17 10:36 Europe/Paris — PR #33 : annulation pendant la lecture du corps HTTP 200 (issue #7, lots 4/11)
 
 - RECONCILIATION : dépôt privé vérifié par get_repo ; dix PR ouvertes (#22, #25–#33), PR #33 Draft. AGENTS.md, docs/15_AUTONOMOUS_AGENT_EXECUTION.md, dernier worklog et checkpoint du 06/11 relus ; documents maîtres du parcours d'arrivée consultés. Les PR concurrentes sont restées intactes.
