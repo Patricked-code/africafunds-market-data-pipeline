@@ -120,11 +120,15 @@ export async function fetchWithRetry(url: string, init: RequestInit = {}): Promi
         // Do not read or persist error bodies as market data.
         throw new HttpResponseError(response.status);
       }
+      const body = await readLimitedBody(response, env.HTTP_MAX_RESPONSE_BYTES);
+      // A caller can cancel while an otherwise successful body is being read.
+      // Never hand those bytes to the archive after the caller withdrew the request.
+      if (init.signal?.aborted) throw init.signal.reason ?? new DOMException('Aborted', 'AbortError');
       return {
         url: response.url,
         status: response.status,
         headers: Object.fromEntries(response.headers.entries()),
-        body: await readLimitedBody(response, env.HTTP_MAX_RESPONSE_BYTES),
+        body,
         fetchedAt: new Date().toISOString(),
       };
     } catch (error) {
