@@ -1,5 +1,18 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-17 06:32 Europe/Paris — PR #33 : CI rétablie et test nullable RequestInit.signal (issue #7, lots 4/11)
+
+- **RECONCILIATION** : PR #1 fusionnée ; PR #33 ouverte Draft sur `fix/http-retry-dispose-response-20261116`, HEAD initial `3509292bfa5eeb611e6797960f854a7e8145bfeb`, base `main` à `73256f48d81d38ce8ff6f51be9e024b25cf5dadb` selon métadonnées PR ; revue indépendante `[]`. Les PR concurrentes restent intactes.
+- **PREUVE CI EXACT-HEAD** : pour `3509292bfa5eeb611e6797960f854a7e8145bfeb`, GitHub Actions [CI #44018800693](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/44018800693) et [Docker/PostgreSQL #44018800667](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/44018800667) sont `completed/success`. Ces runs couvrent le correctif TS2322 antérieur ; ils ne couvrent pas le nouveau test.
+- **TRAVAIL CONCRET** : commit `06539bc58c5505cc685ea2b4793b5a64a9cf4c8c` ajoute dans `test/fetcher-response-disposal.test.ts` un test de non-régression : `RequestInit.signal: null`, réponse 503 suivie de 200, exactement deux appels réseau avec `HTTP_MAX_RETRIES=1`. Cible le chemin de backoff corrigé précédemment (`signal: init.signal ?? undefined`). Aucun code de production, catalogue de sources ou schéma modifié.
+- **VALIDATION DU NOUVEAU COMMIT** : tests locaux `NOT_RUN` ; CI et Docker/PostgreSQL du commit test et du futur HEAD documentaire `NOT_YET_ATTESTED`. Aucune exécution RED locale revendiquée, aucune donnée financière réelle testée.
+- **BLOCK_REASON** : nouveau test non encore validé par CI ; PR #33 toujours Draft, sans revue indépendante ; gates/protections de fusion non attestés. La recette #17 dépend encore de licences, observations officielles et coordination des PR #26/#27.
+- **NEXT_ACTION** : vérifier CI et Docker/PostgreSQL du HEAD documentaire issu de cette entrée ; diagnostiquer tout échec et corriger sur la même branche si admissible. Obtenir une revue indépendante et vérifier les gates avant toute fusion ; poursuivre ensuite un travail métier non concurrent des lots 0–13. Aucun merge, secret, déploiement S1 ou `HISTORY_COMPLETE` implicite.
+- **ROLLBACK** : revert ciblé du commit `06539bc` et du checkpoint documentaire sur la branche Draft, sans toucher à `main` ni aux données.
+
+---
+
+
 ## 2026-11-17 05:39 Europe/Paris — PR #33 : correction TS2322 du signal nullable, issue #7 (lot 4/11)
 
 - **RECONCILIATION** : PR #1 déjà fusionnée ; PR #33 Draft sur `fix/http-retry-dispose-response-20261116`, HEAD avant intervention `68370d39c7bd5b1af0f776c03e91af2d1ee37923` ; 10 PR ouvertes (#22, #25–#33) et 12 issues ouvertes selon recherche GitHub ; revue PR #33 vide. `main` précédemment constaté à `73256f48d81d38ce8ff6f51be9e024b25cf5dadb`, à revérifier avant toute fusion.
