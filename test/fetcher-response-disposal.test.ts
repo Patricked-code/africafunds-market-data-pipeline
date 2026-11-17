@@ -326,7 +326,7 @@ test('caller abort during successful response body consumption must not return a
         controller.enqueue(new Uint8Array([1, 2, 3]));
         controller.close();
       },
-    }), { status: 200 });
+    }, { highWaterMark: 0 }), { status: 200 });
   };
   try {
     await assert.rejects(fetchWithRetry('https://example.invalid/abort-during-body', {
