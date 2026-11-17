@@ -1,5 +1,18 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-17 19:35 Europe/Paris — PR #34 : invariant niveau strictement positif et CI (issue #17)
+
+- ADMISSION/RECONCILIATION : PR #1 fusionnée ; lecture de AGENTS.md, docs/15_AUTONOMOUS_AGENT_EXECUTION.md, checkpoint 2026-11-06, 14 documents maîtres, journal récent et src/calc/indices.ts. PR #34 Draft, HEAD initial ef2dd05bd77d825cba873892e10bc3783a60924b ; 11 PR ouvertes (#22 et #25–#34) ; 12 issues ouvertes (#3/#5–#9/#13–#17/#20). PR #34 reviews=[] ; aucune fusion autorisée. PR #26/#27 et autres branches concurrentes préservées.
+- CI PRECEDENTE ATTESTEE : HEAD ef2dd05bd77d825cba873892e10bc3783a60924b, GitHub Actions #44139496128 (CI) et #44139496172 (Docker/PostgreSQL), tous deux completed/success. Cela ne certifie aucune donnée financière réelle.
+- ANOMALIE REPRODUISIBLE PAR LECTURE : nextIndexLevel(Number.MIN_VALUE, -0.5) arrondit à 0 par sous-flux IEEE-754 malgré des entrées finies et un niveau antérieur strictement positif ; la valeur nulle ne doit pas être publiée comme indice. RED commit 9317fb50a82b7809a3f698f6901bd2003de52438, test/indices-finite-output.test.ts ; RED NOT_RUN (déduit du code). GREEN commit ad9a381496af3858dd5c74d6e539ba7a32f18908, src/calc/indices.ts : rejeter un résultat <= 0 après le contrôle de finitude. Aucun changement de formule ou de contrat public ; exemple 100, 0.01 conservé dans le test. État docs/06 mis à jour via a6cbd82f27ec14aa544f8378b67ac77dd3405949.
+- VALIDATION : tests locaux NOT_RUN. Pour le commit fonctionnel ad9a381496af3858dd5c74d6e539ba7a32f18908, GitHub Actions CI #44149498947 et Docker/PostgreSQL #44149498995 étaient in_progress au contrôle ; ne pas annoncer PASS. Nouveau HEAD documentaire à revérifier après cette écriture.
+- BLOCK_REASON : CI exact-HEAD encore en cours, PR #34 Draft sans revue indépendante, protections/gates de fusion non attestés ; aucune donnée témoin institutionnelle officielle et licenciée pour HISTORY_COMPLETE.
+- NEXT_ACTION : contrôler la conclusion des runs #44149498947/#44149498995 et du HEAD final ; corriger tout échec ; obtenir revue indépendante de l'invariant positif, des débordements et du choix fail-closed ; maintenir Draft et ne pas fusionner sans gates. En parallèle qualifier une observation officielle datée avec droits d'exploitation pour la recette issue #17, ou sélectionner un défaut indépendant non revendiqué des lots 0–13.
+- ROLLBACK : revert ciblé des commits 9317fb50 et ad9a3814 et des entrées documentaires sur branche PR #34 ; aucun push main, aucune modification S1, secret, catalogue des 44 sources, migration ou production.
+
+---
+
+
 ## 2026-11-17 18:39 Europe/Paris — PR #34 : validation CI exacte et revue des limites numériques (issue #17)
 
 - RECONCILIATION : PR #1 fusionnée ; AGENTS.md, docs/15_AUTONOMOUS_AGENT_EXECUTION.md, docs/CONTINUITY_CHECKPOINT_2026-11-06.md et présent journal relus sur GitHub. PR #34 ouverte Draft, HEAD exact 6dedaf982acfcee67ea45ed710d292c5135ff8f1, base SHA 73256f48d81d38ce8ff6f51be9e024b25cf5dadb ; 11 PR ouvertes au contrôle (dont #26/#27/#31/#33/#34). Ne pas réutiliser les SHA historiques comme état actuel.
