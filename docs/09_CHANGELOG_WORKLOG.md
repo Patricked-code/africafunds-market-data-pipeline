@@ -1,5 +1,17 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-17 17:30 Europe/Paris — Issue #17 : débordements moyenne/pondération (PR #34)
+
+- ADMISSION/RECONCILIATION : AGENTS.md, docs/15_AUTONOMOUS_AGENT_EXECUTION.md, checkpoint et worklog de la PR #34 relus ; PR #34 ouverte Draft, reviews=[] ; 11 PR ouvertes (#22, #25–#34). Les deux workflows du HEAD antérieur 564452c73b2a72221ab005ef29519f69be22eeb8 : CI #44116214467 et Docker/PostgreSQL #44116214592, completed/success. La CI ne prouve pas de données financières réelles.
+- RED COMMITTED : test/indices-finite-output.test.ts, commit 68ed04edddee57074d3bc42d4265fe73e0c6e843, couvre moyenne avec somme infinie, somme de poids infinie et numérateur pondéré infini, et préserve deux exemples ordinaires. RED inféré par lecture du code précédent ; aucun run RED local ni CI attesté.
+- GREEN COMMITTED : src/calc/indices.ts, commit c26831d4cd0f1ff8b56a2a1e7f68a41b5d776a2a ; refuse les totaux intermédiaires et résultats non finis dans meanReturn/weightedReturn, sans changer la signature, la sélection des composants valides ou la formule pour les cas ordinaires. Aucun secret, migration, catalogue source, serveur ou main modifié.
+- VALIDATION : tests locaux NOT_RUN ; aucune exécution GitHub Actions retournée lors du premier contrôle du SHA c26831d4. Ne pas déclarer GREEN validé avant preuve CI exacte. Cas de valeurs financières extrêmes pouvant être mathématiquement finies mais nécessitant des algorithmes numériques stabilisés : hors de ce correctif fail-closed, à examiner avec méthode financière approuvée.
+- BLOCK_REASON : CI du HEAD final non attestée ; PR #34 Draft et revue indépendante absente ; fusion interdite sans gates ; aucune donnée témoin officielle ni licence certifiée pour issue #17.
+- NEXT_ACTION : vérifier CI/Docker exact-HEAD de la PR #34, corriger toute régression, faire examiner indépendamment les choix de rejet overflow (notamment somme de grands nombres finie après normalisation) ; maintenir Draft jusqu'aux revues/gates. Reprendre une tâche métier non revendiquée dans les lots 0–13, sans toucher aux PR concurrentes.
+- ROLLBACK : revert ciblé des commits 68ed04e et c26831d et du présent checkpoint sur la branche PR #34 uniquement.
+
+---
+
 ## 2026-11-17 16:35 Europe/Paris — Issue #17 : indices et conversion FX, tests RED puis correction GREEN (PR #34)
 
 - RECONCILIATION : dépôt privé confirmé, main HEAD 73256f48d81d38ce8ff6f51be9e024b25cf5dadb (base PR #33 et nouvelle PR #34), PR #33 Draft HEAD 6b428474483d8086e26c995f970d88425c190a45, reviews=[] ; ses workflows exact-HEAD CI #44105454170 et Docker/PostgreSQL #44105454005 sont completed/success. Les PR concurrentes qualité, ingestion, obligations, audit et backfill ont été préservées. AGENTS.md, docs/15_AUTONOMOUS_AGENT_EXECUTION.md, checkpoint 06/11 et documents maîtres consultés.
