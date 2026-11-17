@@ -1,5 +1,18 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-17 20:33 Europe/Paris — PR #34 : capitalisation non positive, RED/GREEN (issue #17)
+
+- RECONCILIATION : lecture GitHub de AGENTS.md, docs/15_AUTONOMOUS_AGENT_EXECUTION.md, docs/09_CHANGELOG_WORKLOG.md et dernier checkpoint 2026-11-17 19:35 ; PR #34 Draft et reviews=[] ; PR concurrentes préservées. HEAD antérieur d6528e927978d83b07df6f09704f42c08a1ac089, CI #44149585498 et Docker/PostgreSQL #44149585503 completed/success, vérifiés via GitHub sur ce SHA exclusivement.
+- DEFAUT : capitaliseAnnualRate({previousLevel:100, annualRate:-2, elapsedDays:360}) produisait -100, et annualRate:-1 produisait 0 ; niveaux d'indice non positifs impropres à publication. Aucun changement de formule ou d'interface.
+- RED COMMITTED : test/indices-finite-output.test.ts commit 0080a6cf6ca281d5f51019a4295f0d5feb74b669 ; cas négatif, zéro et référence positive. RED déduit de la lecture du code initial, NOT_RUN localement.
+- GREEN COMMITTED : src/calc/indices.ts commit 48655952adaaf77bda30f1858f49a9d3d6e28330 ; garde de sortie result <= 0 dans capitaliseAnnualRate, même invariant que nextIndexLevel. GREEN local NOT_RUN, CI du HEAD exact à vérifier. Pas de données réelles ni licence certifiée.
+- BLOCK_REASON : validation CI des nouveaux commits non encore attestée, PR Draft sans revue indépendante, protections/gates de fusion non attestés ; recette historique institutionnelle issue #17 toujours bloquée par témoin/licence et coordination des PR #26/#27.
+- NEXT_ACTION : contrôler CI et Docker/PostgreSQL du HEAD exact de PR #34 et corriger si rouge ; revue indépendante du contrat d'indices strictement positifs, puis qualification d'une observation officielle datée et droits d'exploitation pour recette source→archive→normalisation→qualité→calcul→API ; si bloquée, sélectionner une tâche indépendante dans les lots 0–13. Ne pas fusionner, ne pas déployer S1, ne pas déclarer HISTORY_COMPLETE.
+- ROLLBACK : revert ciblé des commits 0080a6cf et 48655952 et de cette entrée sur branche PR #34 seulement ; main, sources historiques, secrets et S1 inchangés.
+
+---
+
+
 ## 2026-11-17 19:35 Europe/Paris — PR #34 : invariant niveau strictement positif et CI (issue #17)
 
 - ADMISSION/RECONCILIATION : PR #1 fusionnée ; lecture de AGENTS.md, docs/15_AUTONOMOUS_AGENT_EXECUTION.md, checkpoint 2026-11-06, 14 documents maîtres, journal récent et src/calc/indices.ts. PR #34 Draft, HEAD initial ef2dd05bd77d825cba873892e10bc3783a60924b ; 11 PR ouvertes (#22 et #25–#34) ; 12 issues ouvertes (#3/#5–#9/#13–#17/#20). PR #34 reviews=[] ; aucune fusion autorisée. PR #26/#27 et autres branches concurrentes préservées.
