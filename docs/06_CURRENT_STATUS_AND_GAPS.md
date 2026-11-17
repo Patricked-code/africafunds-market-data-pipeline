@@ -1,5 +1,7 @@
 # 06 — État réel et écarts
 
+> **2026-11-17 23:38 — PR #34, issue #17 (PARTIAL / Draft).** Correction additionnelle du rapport FX sous-normal arrondi à zéro : tests `9af6dc5d`/`bb84f2fa`, code `c070c8cb`. Le rendement -100% artificiel est rejeté (fail-closed). Tests locaux NOT_RUN ; CI du nouveau HEAD non attestée ; revue indépendante et recette officielle requises. Voir `docs/09_CHANGELOG_WORKLOG.md` pour preuves, BLOCK_REASON et NEXT_ACTION.
+
 > **2026-11-17 — PR #34, issue #17 (PARTIAL / Draft).** Le calcul `capitaliseAnnualRate` rejette désormais un niveau résultant nul ou négatif (test RED `0080a6cf`, code GREEN `48655952`) ; journal canonique dans `docs/09_CHANGELOG_WORKLOG.md`. CI du nouveau HEAD et revue indépendante non encore attestées ; tests locaux NOT_RUN. Aucune recette institutionnelle, licence, HISTORY_COMPLETE, fusion ou production S1 certifiée.
 
 ## 2026-11-17 — Issue #17 / PR #34 : niveau d'indice sous-fluant (branche Draft)
