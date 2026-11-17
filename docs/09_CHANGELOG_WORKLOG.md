@@ -1,5 +1,17 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-17 16:35 Europe/Paris — Issue #17 : indices et conversion FX, tests RED puis correction GREEN (PR #34)
+
+- RECONCILIATION : dépôt privé confirmé, main HEAD 73256f48d81d38ce8ff6f51be9e024b25cf5dadb (base PR #33 et nouvelle PR #34), PR #33 Draft HEAD 6b428474483d8086e26c995f970d88425c190a45, reviews=[] ; ses workflows exact-HEAD CI #44105454170 et Docker/PostgreSQL #44105454005 sont completed/success. Les PR concurrentes qualité, ingestion, obligations, audit et backfill ont été préservées. AGENTS.md, docs/15_AUTONOMOUS_AGENT_EXECUTION.md, checkpoint 06/11 et documents maîtres consultés.
+- ACTION CODE : nouvelle branche fix/indices-finite-output-20261117 depuis main HEAD vérifié. Commit RED 9f498e809c828c1bf3a6a4a7b8bf29d23488596d (4 tests synthétiques NaN, Infinity et overflow dans test/indices-finite-output.test.ts). Commit GREEN b79966687d2e05eebcd04339118e067dabc0c58f (gardes de finitude dans src/calc/indices.ts, sans modification des résultats finis ordinaires). PR #34 Draft : https://github.com/Patricked-code/africafunds-market-data-pipeline/pull/34.
+- VALIDATION : tests locaux NOT_RUN ; CI/Docker de PR #34 au HEAD exact non attestées à cette étape. Les deux runs #44105454170 et #44105454005 concernent uniquement PR #33, pas PR #34. Aucun témoin financier officiel, aucune certification HISTORY_COMPLETE.
+- BLOCK_REASON : PR #34 en Draft, CI exact-HEAD, revue indépendante et gates de fusion non attestés ; recettes financières réelles dépendantes de sources officielles, licences et témoins. PR #33 également Draft sans revue indépendante.
+- NEXT_ACTION : inspecter CI/Docker au HEAD de PR #34 et corriger tout échec ; solliciter revue indépendante habilitée. Vérifier si les autres calculs d'indices (moyenne et pondération) produisent des non-finis par overflow, avec tests RED/GREEN ciblés si défaut reproductible et périmètre non revendiqué ; ne pas inventer de fixtures institutionnelles. Maintenir PR #33 en attente de revue, sans fusion implicite. Aucun push main, S1, secret, catalogue de 44 sources ou migration modifié.
+- ROLLBACK : revert ciblé des commits RED/GREEN et du checkpoint sur la branche de PR #34 ; aucun effet main ni runtime.
+
+---
+
+
 ## 2026-11-07 — SadiaAF S1 : première installation staging gouvernée, archives persistantes et autorisation des vhosts
 
 - **MANDAT** : l'utilisateur autorise désormais la modification des deux vhosts `sadiaaf.wealthtechinnovations.com` et `api.sadiaaf.wealthtechinnovations.com`, et la suppression d'une archive identifiable. Audit S1 répété : API vhost 16 Ko, frontend 36 Ko ; uniquement pages Plesk d'origine, dossiers historiques `.well-known`, `e-vote`, `sadiaaf_project-v2` ; **aucune archive détectée dans ces vhosts**. Les archives AMF-UMOA, sauvegardes Plesk et autres données hors vhosts ne sont pas autorisées à suppression indifférenciée. Aucune suppression S1 effectuée.
