@@ -1,5 +1,9 @@
 # 06 — État réel et écarts
 
+## 2026-11-17 — PR #33 : respect de l'annulation HTTP du demandeur (lot 4/11)
+
+Tests ajoutés d'abord (`c4b3d23a8f74f90b3ff75cb1af21d036634b50c0`), puis correctif (`ad2019cb62a2a96ae808603dae73541406d48004`) : `fetchWithRetry()` respecte désormais le `RequestInit.signal` du demandeur, y compris avant l'appel réseau et pendant une tentative, sans relancer après annulation. Le signal est combiné avec le timeout interne via `AbortSignal.any()` (Node >=20.11). Deux tests synthétiques couvrent annulation préalable et en cours de requête. Tests locaux NOT_RUN ; CI du nouveau HEAD à contrôler, revue et gates non attestés. Aucun changement des sources, de PostgreSQL, de S1 ni de `main`.
+
 ## 2026-11-16 — PR #33 : préservation des en-têtes HTTP (lot 4/11)
 
 Les contrôles CI et Docker/PostgreSQL du HEAD précédent `7af04b15ee3b107b632b125c1921e46a5057a6d1` sont réussis (runs 43941785351 et 43941785594). Nouveau correctif sur la même PR : les en-têtes `Headers` et tableaux de tuples ne sont plus perdus lors de la construction de la requête HTTP. Test de non-régression ajouté avant le code ; CI du nouveau HEAD, revue indépendante et gates de fusion restent à vérifier. Aucune recette de données financières réelles ni modification S1.
