@@ -56,3 +56,10 @@ test('annual capitalisation rejects a non-positive computed index level', () => 
   assert.throws(() => capitaliseAnnualRate({ previousLevel: 100, annualRate: -1, elapsedDays: 360 }), /invalide|positif|nul/i);
   assert.equal(capitaliseAnnualRate({ previousLevel: 100, annualRate: 0.05, elapsedDays: 360 }), 105);
 });
+
+
+test('annual capitalisation rejects positive levels that underflow to zero while preserving zero-day identity', () => {
+  // Same strictly-positive publication invariant as nextIndexLevel at the IEEE-754 boundary.
+  assert.throws(() => capitaliseAnnualRate({ previousLevel: Number.MIN_VALUE, annualRate: -0.5, elapsedDays: 360 }), /invalide|positif|nul/i);
+  assert.equal(capitaliseAnnualRate({ previousLevel: 100, annualRate: 0.05, elapsedDays: 0 }), 100);
+});
