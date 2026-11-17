@@ -1,5 +1,18 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-17 07:36 Europe/Paris — PR #33 : timeout interne avec signal appelant, issue #7 (lots 4/11)
+
+- **RECONCILIATION** : PR #33 OPEN/DRAFT, branche `fix/http-retry-dispose-response-20261116`, HEAD avant intervention `f7d667d40034eaaa3f87cab300c342964b2bb65e`, base PR `main` SHA `73256f48d81d38ce8ff6f51be9e024b25cf5dadb`. PR #1 déjà fusionnée selon les checkpoints précédents. Recherche GitHub : 10 PR ouvertes, dont #22 et #25–#33 ; reviews #33 `[]`. Les autres branches et claims n'ont pas été modifiés.
+- **PREUVES CI EXACT-HEAD** : `f7d667d40034eaaa3f87cab300c342964b2bb65e` : [CI #44024885590](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/44024885590) et [Docker/PostgreSQL #44024885593](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/44024885593), tous deux `completed/success`. Cela valide le test `signal: null` précédent, pas le nouveau test.
+- **TRAVAIL CONCRET** : commit [`f8efbbe57f741b88fb4976aee09e9a76c6809eef`](https://github.com/Patricked-code/africafunds-market-data-pipeline/commit/f8efbbe57f741b88fb4976aee09e9a76c6809eef), test additif dans `test/fetcher-response-disposal.test.ts` : avec un signal appelant actif, le timeout interne doit toujours annuler l'unique tentative et ne pas annuler le signal de l'appelant. Réponse réseau synthétique uniquement, aucune source réelle interrogée. Pas de changement de code production, schéma, catalogue ou secret.
+- **VALIDATION** : tests locaux `NOT_RUN` ; CI et Docker/PostgreSQL du nouveau commit et du HEAD documentaire `NOT_YET_ATTESTED`. Pas de preuve RED locale, aucune recette financière ni publication.
+- **BLOCK_REASON** : CI du nouveau test non encore attestée, PR Draft sans revue indépendante, protections/gates de fusion non établis. Les témoins officiels/licences et la coordination des PR #26/#27 restent nécessaires à la recette #17.
+- **NEXT_ACTION** : contrôler les workflows du nouveau HEAD exact, inspecter les logs et corriger tout échec ; faire examiner la PR #33 par un réviseur indépendant habilité ; poursuivre ensuite un incrément métier non concurrent dans les lots 0–13, avec données officielles autorisées avant toute certification. Aucun merge ou S1 implicite.
+- **ROLLBACK** : revert ciblé du test `f8efbbe` et de cette entrée sur la branche Draft ; aucun changement de main ou production.
+
+---
+
+
 ## 2026-11-17 06:32 Europe/Paris — PR #33 : CI rétablie et test nullable RequestInit.signal (issue #7, lots 4/11)
 
 - **RECONCILIATION** : PR #1 fusionnée ; PR #33 ouverte Draft sur `fix/http-retry-dispose-response-20261116`, HEAD initial `3509292bfa5eeb611e6797960f854a7e8145bfeb`, base `main` à `73256f48d81d38ce8ff6f51be9e024b25cf5dadb` selon métadonnées PR ; revue indépendante `[]`. Les PR concurrentes restent intactes.
