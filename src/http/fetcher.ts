@@ -120,11 +120,12 @@ export async function fetchWithRetry(url: string, init: RequestInit = {}): Promi
     } catch (error) {
       lastError = error;
       // Caller cancellation is terminal; never retry a request it has withdrawn.
-      if (init.signal?.aborted) break;
+      if (init.signal?.aborted) throw init.signal.reason ?? new DOMException('Aborted', 'AbortError');
       const isTerminalClientError = error instanceof HttpResponseError
         && error.status >= 400 && error.status < 500 && error.status !== 429;
       if (isTerminalClientError || error instanceof HttpBodyTooLargeError || attempt >= env.HTTP_MAX_RETRIES) break;
-      await delay(500 * (2 ** attempt));
+      // An aborted caller must not remain blocked in exponential retry backoff.
+      await delay(500 * (2 ** attempt), undefined, { signal: init.signal });
     } finally {
       clearTimeout(timer);
     }
