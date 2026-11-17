@@ -258,3 +258,27 @@ test('internal HTTP timeout remains active when a caller supplies a non-aborted 
     env.HTTP_TIMEOUT_MS = originalTimeout;
   }
 });
+
+
+test('caller abort after a retryable HTTP response preserves its exact reason and prevents retry', async () => {
+  const originalFetch = globalThis.fetch;
+  const originalRetries = env.HTTP_MAX_RETRIES;
+  env.HTTP_MAX_RETRIES = 2;
+  const caller = new AbortController();
+  const reason = new DOMException('source ingestion cancelled', 'AbortError');
+  let calls = 0;
+  globalThis.fetch = async () => {
+    calls += 1;
+    caller.abort(reason);
+    return new Response(null, { status: 503 });
+  };
+  try {
+    await assert.rejects(fetchWithRetry('https://example.invalid/abort-after-503', {
+      signal: caller.signal,
+    }), (error: unknown) => error === reason);
+    assert.equal(calls, 1, 'caller cancellation must override a retryable status and prevent retry');
+  } finally {
+    globalThis.fetch = originalFetch;
+    env.HTTP_MAX_RETRIES = originalRetries;
+  }
+});
