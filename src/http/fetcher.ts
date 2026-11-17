@@ -97,6 +97,16 @@ export async function fetchWithRetry(url: string, init: RequestInit = {}): Promi
         redirect: 'follow',
         signal: init.signal ? AbortSignal.any([controller.signal, init.signal]) : controller.signal,
       });
+      // Some fetch implementations or mocks may resolve after caller cancellation.
+      // Never expose or archive a response that the caller has withdrawn.
+      if (init.signal?.aborted) {
+        try {
+          await response.body?.cancel();
+        } catch {
+          // Preserve the authoritative caller cancellation reason.
+        }
+        throw init.signal.reason ?? new DOMException('Aborted', 'AbortError');
+      }
       if (!response.ok) {
         // Release the response stream on terminal and retryable errors alike.
         // Otherwise repeated 429/5xx responses can retain HTTP connections.
