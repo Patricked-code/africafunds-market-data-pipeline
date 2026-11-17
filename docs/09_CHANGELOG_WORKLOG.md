@@ -1,5 +1,18 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-17 05:39 Europe/Paris — PR #33 : correction TS2322 du signal nullable, issue #7 (lot 4/11)
+
+- **RECONCILIATION** : PR #1 déjà fusionnée ; PR #33 Draft sur `fix/http-retry-dispose-response-20261116`, HEAD avant intervention `68370d39c7bd5b1af0f776c03e91af2d1ee37923` ; 10 PR ouvertes (#22, #25–#33) et 12 issues ouvertes selon recherche GitHub ; revue PR #33 vide. `main` précédemment constaté à `73256f48d81d38ce8ff6f51be9e024b25cf5dadb`, à revérifier avant toute fusion.
+- **PREUVE D'ÉCHEC** : pour le SHA `68370d39c7bd5b1af0f776c03e91af2d1ee37923`, [CI #44011411197](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/44011411197) et [Docker/PostgreSQL #44011411143](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/44011411143) sont `completed/failure`. Logs des jobs `133799059888` et `133799137379` : `src/http/fetcher.ts(128,54): TS2322` ; `RequestInit.signal` est `AbortSignal | null | undefined`, tandis que `node:timers/promises.setTimeout` exige `AbortSignal | undefined`. Docker échoue sur le même `npm run build`, et non sur une preuve de défaut PostgreSQL.
+- **CORRECTION CODE** : commit [`db9a58c498ac0b76418e0d6bc835d5a71e5fcaed`](https://github.com/Patricked-code/africafunds-market-data-pipeline/commit/db9a58c498ac0b76418e0d6bc835d5a71e5fcaed) ; normaliser uniquement l'option de backoff en `signal: init.signal ?? undefined`. Préserve les sémantiques d'annulation et l'interface existante ; aucune source, donnée ou secret modifié.
+- **VALIDATION** : les deux workflows précédents sont **FAILURE**, non PASS. Test local `NOT_RUN`. CI et Docker du commit correctif et du futur HEAD documentaire `NOT_YET_ATTESTED` ; aucune affirmation GREEN sans nouveaux runs.
+- **BLOCK_REASON** : validation CI exact-HEAD du correctif en attente, revue indépendante absente, PR Draft ; gates de fusion non attestés. Recette réelle #17 encore conditionnée aux licences, témoins officiels et coordination des PR #26/#27.
+- **NEXT_ACTION** : vérifier les runs CI et Docker/PostgreSQL du HEAD courant après ce checkpoint, inspecter toute erreur nouvelle, corriger sur cette branche sans modifier les PR concurrentes ; obtenir revue indépendante ; puis poursuivre un travail métier non concurrent parmi les lots 0–13.
+- **ROLLBACK** : revert ciblé du commit `db9a58c` sur la branche Draft uniquement, sans action sur main ni S1.
+
+---
+
+
 ## 2026-11-17 04:35 Europe/Paris — PR #33 : annulation pendant backoff HTTP (issue #7, lot 4/11)
 
 - **RECONCILIATION** : main `73256f48d81d38ce8ff6f51be9e024b25cf5dadb` ; PR #1 fusionnée ; PR #33 Draft, branche `fix/http-retry-dispose-response-20261116`, HEAD pré-intervention `5cce5488620d0d01c204967e997ead9989d44a91` ; dix PR ouvertes (#22, #25–#33), douze issues ouvertes (#3, #5–#9, #13–#17, #20), reviews #33 `[]`. Dépôt privé ; aucune intervention sur branches concurrentes.
