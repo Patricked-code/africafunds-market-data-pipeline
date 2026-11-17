@@ -1,5 +1,19 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-17 — PR #33 : correction du signal d'annulation du demandeur (issue #7, lot 4/11)
+
+- **Réconciliation** : PR #1 fusionnée, PR #33 toujours Draft sur `fix/http-retry-dispose-response-20261116`, HEAD initial vérifié `802a9a2190e8433377d7bbac8082f970b3e3639a` ; dépôt `private` ; revue PR #33 `[]`. PR concurrentes #22 et #25–#32 préservées, aucune modification des claims #26/#27.
+- **PREUVE CI EXACTE ANTÉRIEURE** : pour `802a9a2190e8433377d7bbac8082f970b3e3639a`, [CI #43996196752](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43996196752) et [Docker/PostgreSQL #43996196780](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43996196780) : `completed/success` selon GitHub. Ces runs **ne couvrent pas** les nouveaux changements.
+- **Défaut concret** : `fetchWithRetry` remplaçait `RequestInit.signal` par son timeout interne et ignorait ainsi l'annulation du demandeur, y compris avant la première tentative et pendant une requête.
+- **TESTS EN PREMIER** : `c4b3d23a8f74f90b3ff75cb1af21d036634b50c0`, deux tests synthétiques dans `test/fetcher-response-disposal.test.ts` pour annulation préalable (zéro fetch) et annulation en cours (une seule tentative).
+- **CORRECTION** : `ad2019cb62a2a96ae808603dae73541406d48004`, `src/http/fetcher.ts` : refus avant tentative si signal déjà annulé, combinaison `AbortSignal.any` avec timeout interne et sortie terminale du retry sur annulation du demandeur. Node >=20.11 déjà requis.
+- **ÉTAT** : `59ee1e3d24429443519dd110be4333bd111d40a3` met à jour `docs/06_CURRENT_STATUS_AND_GAPS.md`. Tests locaux `NOT_RUN` ; aucune exécution RED locale attestée ; CI des nouveaux commits `NOT_YET_ATTESTED`. Aucune donnée réelle, licence, recette #17, fusion ni S1.
+- **BLOCK_REASON** : CI exact-HEAD du correctif encore à vérifier ; revue indépendante absente ; protections/gates de fusion non attestés ; recette financière #17 toujours conditionnée aux témoins officiels/licences et coordination #26/#27.
+- **NEXT_ACTION** : contrôler CI et Docker/PostgreSQL au HEAD final, lire les logs et corriger tout échec ; demander une revue indépendante habilitée ; poursuivre une tâche métier non concurrente des lots 0–13, sans prétendre à HISTORY_COMPLETE ni déployer S1.
+- **ROLLBACK** : revert ciblé des commits de test et code sur la branche Draft après analyse, sans altérer `main`, les 44 sources, les données, les secrets ou S1.
+
+---
+
 ## 2026-11-17 — PR #33 : validation du test HTTP 429 sur HEAD documentaire (lot 4/11)
 
 - **GitHub vérifié** : PR #1 fusionnée ; PR #33 ouverte Draft sur `fix/http-retry-dispose-response-20261116`, HEAD `c77759b8027edff989c56d7e88eee115240e1942`, base SHA `73256f48d81d38ce8ff6f51be9e024b25cf5dadb`. Dépôt `private`. Aucun merge ni déploiement.
