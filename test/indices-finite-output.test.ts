@@ -41,3 +41,10 @@ test('weighted return rejects overflowing weight totals and weighted numerators'
   ]), /invalide|fini|finie/i);
   assert.equal(weightedReturn([{ value: 0.1, weight: 1 }, { value: 0.2, weight: 1 }]), 0.15000000000000002);
 });
+
+
+test('index level rejects positive finite inputs that underflow to zero', () => {
+  // The published index level must remain strictly positive, including at IEEE-754 boundaries.
+  assert.throws(() => nextIndexLevel(Number.MIN_VALUE, -0.5), /invalide|positif|nul/i);
+  assert.equal(nextIndexLevel(100, 0.01), 101);
+});
