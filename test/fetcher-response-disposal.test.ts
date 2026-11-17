@@ -196,9 +196,11 @@ test('caller abort during retry backoff stops promptly without another fetch', a
     return new Response(null, { status: 503 });
   };
   try {
+    const startedAt = Date.now();
     await assert.rejects(fetchWithRetry('https://example.invalid/backoff-cancel', {
       signal: controller.signal,
     }), (error: unknown) => error instanceof Error && error.name === 'AbortError');
+    assert.ok(Date.now() - startedAt < 400, 'caller abort must interrupt the 500ms retry backoff');
     assert.equal(calls, 1, 'abort during backoff must prevent the next attempt');
   } finally {
     env.HTTP_MAX_RETRIES = originalRetries;
