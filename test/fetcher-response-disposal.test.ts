@@ -182,3 +182,26 @@ test('in-flight caller abort propagates without retrying', async () => {
     globalThis.fetch = originalFetch;
   }
 });
+
+
+test('caller abort during retry backoff stops promptly without another fetch', async () => {
+  const originalFetch = globalThis.fetch;
+  const originalRetries = env.HTTP_MAX_RETRIES;
+  env.HTTP_MAX_RETRIES = 2;
+  const controller = new AbortController();
+  let calls = 0;
+  globalThis.fetch = async () => {
+    calls += 1;
+    queueMicrotask(() => controller.abort(new DOMException('cancelled during backoff', 'AbortError')));
+    return new Response(null, { status: 503 });
+  };
+  try {
+    await assert.rejects(fetchWithRetry('https://example.invalid/backoff-cancel', {
+      signal: controller.signal,
+    }), (error: unknown) => error instanceof Error && error.name === 'AbortError');
+    assert.equal(calls, 1, 'abort during backoff must prevent the next attempt');
+  } finally {
+    env.HTTP_MAX_RETRIES = originalRetries;
+    globalThis.fetch = originalFetch;
+  }
+});
