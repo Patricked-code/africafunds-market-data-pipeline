@@ -1,5 +1,17 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-17 18:39 Europe/Paris — PR #34 : validation CI exacte et revue des limites numériques (issue #17)
+
+- RECONCILIATION : PR #1 fusionnée ; AGENTS.md, docs/15_AUTONOMOUS_AGENT_EXECUTION.md, docs/CONTINUITY_CHECKPOINT_2026-11-06.md et présent journal relus sur GitHub. PR #34 ouverte Draft, HEAD exact 6dedaf982acfcee67ea45ed710d292c5135ff8f1, base SHA 73256f48d81d38ce8ff6f51be9e024b25cf5dadb ; 11 PR ouvertes au contrôle (dont #26/#27/#31/#33/#34). Ne pas réutiliser les SHA historiques comme état actuel.
+- VALIDATION ATTESTEE : pour ce HEAD exact, GitHub Actions runs 44126844606 et 44126844430 sont tous deux completed/success (https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/44126844606 et https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/44126844430). Les tests locaux restent NOT_RUN ; aucune collecte réelle, licence ou certification financière n'est démontrée par ces workflows.
+- REVUE CIBLEE : src/calc/indices.ts et test/indices-finite-output.test.ts relus. Les protections de finitude couvrent les sorties et les agrégats intermédiaires de meanReturn/weightedReturn. Cas limite à arbitrer méthodologiquement : une somme flottante intermédiaire peut déborder alors qu'une moyenne normalisée mathématique resterait finie ; la politique actuelle est fail-closed, pas un algorithme de sommation stabilisée. Aucun changement de méthode implicite effectué.
+- BLOCK_REASON : PR #34 toujours Draft ; revue indépendante et gates de fusion non attestés. La recette intégrée de l'issue #17 exige des témoins institutionnels officiels et des droits d'exploitation vérifiés. Les périmètres #14/#15/#16 sont déjà travaillés dans des PR distinctes ; éviter les collisions.
+- NEXT_ACTION : obtenir une revue indépendante du choix numérique et des tests sur PR #34 ; contrôler tout nouveau HEAD/CI avant intégration. En parallèle, qualifier dans l'issue #17 un cas financier officiel daté et licencié pour recette source→archive→normalisation→calcul→API ; si indisponible, chercher un défaut indépendant non revendiqué dans les lots 0–13 et développer tests/code sur branche dédiée. Ne jamais déclarer HISTORY_COMPLETE sans données et preuves.
+- ROLLBACK : ce checkpoint est documentaire sur branche Draft, revert ciblé possible ; aucun push main, merge, secret, source catalogue ni S1 modifié.
+
+---
+
+
 ## 2026-11-17 17:30 Europe/Paris — Issue #17 : débordements moyenne/pondération (PR #34)
 
 - ADMISSION/RECONCILIATION : AGENTS.md, docs/15_AUTONOMOUS_AGENT_EXECUTION.md, checkpoint et worklog de la PR #34 relus ; PR #34 ouverte Draft, reviews=[] ; 11 PR ouvertes (#22, #25–#34). Les deux workflows du HEAD antérieur 564452c73b2a72221ab005ef29519f69be22eeb8 : CI #44116214467 et Docker/PostgreSQL #44116214592, completed/success. La CI ne prouve pas de données financières réelles.
