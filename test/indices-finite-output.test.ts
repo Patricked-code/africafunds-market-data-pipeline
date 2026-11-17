@@ -70,3 +70,10 @@ test('annual capitalisation preserves the smallest positive index on a zero-day 
   assert.equal(capitaliseAnnualRate({ previousLevel: Number.MIN_VALUE, annualRate: -0.5, elapsedDays: 0 }), Number.MIN_VALUE);
   assert.throws(() => capitaliseAnnualRate({ previousLevel: Number.MIN_VALUE, annualRate: -0.5, elapsedDays: -1 }), /invalide/i);
 });
+
+
+test('FX conversion rejects an underflowed positive exchange-rate ratio', () => {
+  // A strictly positive economic FX ratio must not silently round to zero and publish -100%.
+  assert.throws(() => convertReturn({ localReturn: 0, fxToday: Number.MIN_VALUE, fxPrevious: 1 }), /invalide|fini|taux|rapport/i);
+  assert.equal(convertReturn({ localReturn: 0, fxToday: 1, fxPrevious: 1 }), 0);
+});
