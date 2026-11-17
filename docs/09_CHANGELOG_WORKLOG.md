@@ -1,5 +1,19 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-17 04:35 Europe/Paris — PR #33 : annulation pendant backoff HTTP (issue #7, lot 4/11)
+
+- **RECONCILIATION** : main `73256f48d81d38ce8ff6f51be9e024b25cf5dadb` ; PR #1 fusionnée ; PR #33 Draft, branche `fix/http-retry-dispose-response-20261116`, HEAD pré-intervention `5cce5488620d0d01c204967e997ead9989d44a91` ; dix PR ouvertes (#22, #25–#33), douze issues ouvertes (#3, #5–#9, #13–#17, #20), reviews #33 `[]`. Dépôt privé ; aucune intervention sur branches concurrentes.
+- **PREUVES CI HEAD ANTÉRIEUR** : [CI #44003707774](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/44003707774) et [Docker/PostgreSQL #44003707893](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/44003707893), tous deux `completed/success` pour `5cce5488620d0d01c204967e997ead9989d44a91`. Aucun PASS attribué aux nouveaux commits.
+- **DÉFAUT** : après une réponse HTTP retryable, le backoff `delay(500 * 2**attempt)` n'écoutait pas `RequestInit.signal`. Une annulation pendant ce délai pouvait attendre inutilement ; une annulation survenue après la réponse pouvait aussi laisser remonter le statut HTTP plutôt que la raison d'annulation.
+- **TESTS EN PREMIER** : `efee388285086637011d8f16b25da71f1e69a87c` puis `505bf648fe430cb39649e4aeebda71bacc0315f2` : test synthétique d'annulation pendant backoff et exigence d'interruption avant 400 ms (backoff nominal 500 ms). Aucune exécution RED locale attestée ; seuil temporel à surveiller en CI.
+- **CORRECTIF** : `86033a55f99e2943614f83e0f5a0afb410e129a4` : propager immédiatement la raison de l'annulation dans le catch et fournir le signal du demandeur à `node:timers/promises.setTimeout` pour interrompre l'attente. Aucun changement d'interface ni de catalogue de sources.
+- **TESTS** : locaux `NOT_RUN`, CI du HEAD modifié `NOT_YET_ATTESTED` ; aucune recette financière réelle, aucune fusion, aucun S1.
+- **BLOCK_REASON** : CI et revue indépendante du nouveau HEAD à attester ; PR Draft et protections/gates de fusion non établis ; témoins officiels/licences et coordination #26/#27 toujours nécessaires pour issue #17.
+- **NEXT_ACTION** : vérifier CI et Docker/PostgreSQL au HEAD exact, diagnostiquer et corriger tout échec ; si test temporel instable, le rendre déterministe sans diminuer l'exigence d'interruption ; solliciter revue indépendante et poursuivre un incrément métier non concurrent dans les lots 0–13. Aucune fusion implicite ni déploiement S1.
+- **ROLLBACK** : revert ciblé des commits test/code sur la branche Draft ; ne pas modifier main, secrets, archives, 44 sources ou production.
+
+---
+
 ## 2026-11-17 — PR #33 : correction du signal d'annulation du demandeur (issue #7, lot 4/11)
 
 - **Réconciliation** : PR #1 fusionnée, PR #33 toujours Draft sur `fix/http-retry-dispose-response-20261116`, HEAD initial vérifié `802a9a2190e8433377d7bbac8082f970b3e3639a` ; dépôt `private` ; revue PR #33 `[]`. PR concurrentes #22 et #25–#32 préservées, aucune modification des claims #26/#27.
