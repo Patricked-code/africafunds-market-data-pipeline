@@ -1,5 +1,17 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-17 14:31 Europe/Paris — PR #33 : CI exacte confirmée ; admission métier #14/#16/#17 réévaluée
+
+- RECONCILIATION : dépôt GitHub Patricked-code privé, branche de PR #33 conservée ; AGENTS.md, docs/15_AUTONOMOUS_AGENT_EXECUTION.md, checkpoint docs/CONTINUITY_CHECKPOINT_2026-11-06.md et dernier NEXT_ACTION lus. PR #33 reviews=[] ; PR concurrentes #26/#27 conservées. Le checkpoint historique 06/11 n'est pas une preuve d'état courant.
+- PREUVES CI EXACT-HEAD : commit 5c44b4ff01f00233646f655725f1a3fbb3a43351 : CI #44084053087 completed/success (https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/44084053087) et Docker/PostgreSQL #44084053088 completed/success (https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/44084053088), selon fetch_commit_workflow_runs. Ces runs ne couvrent aucun commit ultérieur et ne prouvent aucune collecte officielle.
+- TRAVAIL : lecture directe des issues #14, #16, #17 et réconciliation des exigences. #14 requiert contrats officiels et témoins autorisés pour 5 CBE + 1 GOSDMX ; #16 impose des sources/licences institutionnelles et conservation des 44 sources ; #17 interdit HISTORY_COMPLETE sans preuve intégrée. Aucune requête interdite, aucun accès à secret et aucune collision avec les branches métier revendiquées. Aucun code/test local ajouté : NOT_RUN.
+- BLOCK_REASON : PR #33 Draft sans revue indépendante ; protections/gates de fusion non attestés. Aucun contrat/licence et témoin officiel daté vérifié pour créer un mapping métier #14/#16/#17 sans invention ; claims #26/#27 non transférés. L'absence de ces preuves interdit de déclarer les adaptateurs ou l'historique DONE.
+- NEXT_ACTION : contrôler les CI du présent HEAD après commit ; solliciter une revue indépendante habilitée de PR #33 ; qualifier une source institutionnelle officielle et ses droits avec un échantillon daté exploitable, puis réserver un périmètre indépendant des PR #26/#27 et produire test RED/correctif GREEN/CI sur branche dédiée. À défaut, sélectionner un défaut de code prouvé et non revendiqué des lots 0–13. Aucun merge implicite ni S1.
+- ROLLBACK : revert ciblé de cette entrée documentaire sur branche Draft ; aucun effet sur main, sources ou production.
+
+---
+
+
 ## 2026-11-17 13:31 Europe/Paris — PR #33 : CI exact-HEAD verte ; qualification du prochain chantier métier
 
 - RECONCILIATION : GitHub Patricked-code, dépôt privé, PR #1 fusionnée, PR #33 ouverte Draft, HEAD exact `468ba527130f8e87848b962e0faf7a6d9ffde430`, revue indépendante `reviews=[]`. Règles AGENTS.md, contrat docs/15_AUTONOMOUS_AGENT_EXECUTION.md, checkpoint historique et dernier NEXT_ACTION relus.
