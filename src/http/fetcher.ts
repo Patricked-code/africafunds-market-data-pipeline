@@ -125,7 +125,7 @@ export async function fetchWithRetry(url: string, init: RequestInit = {}): Promi
         && error.status >= 400 && error.status < 500 && error.status !== 429;
       if (isTerminalClientError || error instanceof HttpBodyTooLargeError || attempt >= env.HTTP_MAX_RETRIES) break;
       // An aborted caller must not remain blocked in exponential retry backoff.
-      await delay(500 * (2 ** attempt), undefined, { signal: init.signal });
+      await delay(500 * (2 ** attempt), undefined, { signal: init.signal ?? undefined });
     } finally {
       clearTimeout(timer);
     }
