@@ -1,5 +1,17 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-17 21:31 Europe/Paris — PR #34 : preuve CI exacte et test frontière de capitalisation (issue #17)
+
+- RECONCILIATION : PR #1 fusionnée, PR #34 ouverte Draft, reviews=[] ; AGENTS.md, docs/15_AUTONOMOUS_AGENT_EXECUTION.md, journal courant et checkpoint historique du 06/11 relus sur la branche de PR #34 ; main et branche comparés par lecture du code existant. Dépôt GitHub private selon métadonnées du connecteur. PR concurrentes non modifiées.
+- PREUVE CI : HEAD antérieur exact `5e117482fbc1772e688fe987a33b3ca0fab4e146` ; workflow CI [#44160006664](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/44160006664) et Docker/PostgreSQL [#44160006611](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/44160006611) : completed/success, vérifiés par interrogation GitHub. Pas de certification de données officielles ni de production S1.
+- ACTION TEST : commit `3670b27989df8602eff6e1e1b2e5e38aaf6474ba`, ajout d'une régression dans `test/indices-finite-output.test.ts` : capitalisation de `Number.MIN_VALUE` à taux -0.5 / 360 jours doit rejeter un niveau nul par sous-flux ; durée zéro conserve exactement le niveau précédent. Ce test complète le garde de production existant, sans changement de formule. RED historique inféré ; test local NOT_RUN ; nouveau HEAD CI NOT_YET_VERIFIED.
+- BLOCK_REASON : CI du nouveau HEAD à contrôler ; PR Draft sans revue indépendante et gates de fusion non attestés ; recette intégrée #17 toujours sans observation officielle datée, licence et preuve de bout en bout. Pas de HISTORY_COMPLETE.
+- NEXT_ACTION : contrôler CI et Docker/PostgreSQL sur HEAD du commit de test puis HEAD documentaire ; corriger toute défaillance ; obtenir revue indépendante des invariants financiers et de la méthode fail-closed ; qualifier une source institutionnelle autorisée avec témoin daté pour la recette source→archive→normalisation→qualité→calcul→API. En cas de blocage, sélectionner une tâche indépendante non revendiquée dans les lots 0–13. Ne pas fusionner ni déployer S1.
+- ROLLBACK : revert ciblé du test `3670b279` et de cette entrée sur branche Draft ; aucun push main, secret, migration, catalogue historique ou serveur modifié.
+
+---
+
+
 ## 2026-11-17 20:33 Europe/Paris — PR #34 : capitalisation non positive, RED/GREEN (issue #17)
 
 - RECONCILIATION : lecture GitHub de AGENTS.md, docs/15_AUTONOMOUS_AGENT_EXECUTION.md, docs/09_CHANGELOG_WORKLOG.md et dernier checkpoint 2026-11-17 19:35 ; PR #34 Draft et reviews=[] ; PR concurrentes préservées. HEAD antérieur d6528e927978d83b07df6f09704f42c08a1ac089, CI #44149585498 et Docker/PostgreSQL #44149585503 completed/success, vérifiés via GitHub sur ce SHA exclusivement.
