@@ -69,7 +69,10 @@ export function convertReturn(input: {
   requireFinite(input.fxToday, 'Taux de change courant');
   requireFinite(input.fxPrevious, 'Taux de change précédent');
   if (input.fxToday <= 0 || input.fxPrevious <= 0) throw new Error('Taux de change invalide');
-  const result = (1 + input.localReturn) * (input.fxToday / input.fxPrevious) - 1;
+  const fxRatio = input.fxToday / input.fxPrevious;
+  requireFinite(fxRatio, 'Rapport de change');
+  if (fxRatio <= 0) throw new Error('Rapport de change invalide (non positif)');
+  const result = (1 + input.localReturn) * fxRatio - 1;
   requireFinite(result, 'Rendement converti');
   return result;
 }
