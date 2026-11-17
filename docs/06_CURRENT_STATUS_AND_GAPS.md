@@ -1,5 +1,11 @@
 # 06 — État réel et écarts
 
+## 2026-11-17 — Calculs indices / issue #17, PR #34 (validation en attente)
+
+- Branche `fix/indices-finite-output-20261117` : contrôles fail-closed des valeurs non finies en sortie des calculs d'indices, capitalisation, rendement réel et FX ; extension à `meanReturn` et `weightedReturn` pour les sommes et numérateurs intermédiaires susceptibles de déborder (`68ed04e` tests, `c26831d` correctif).
+- CI du HEAD fonctionnel et documentaire à confirmer ; tests locaux NOT_RUN ; PR Draft sans revue indépendante. Ne pas considérer ces calculs comme certifiés ni les historiques financiers comme complets.
+- NEXT_ACTION : contrôler CI du HEAD de PR #34, traiter toute régression et obtenir revue indépendante ; poursuivre la recette officielle de l'issue #17 avec droits et données témoins attestés.
+
 ## Audit S1 et sécurité de déploiement — 2026-11-07
 
 - **PREUVE SERVEUR READ-ONLY** : les domaines `sadiaaf.wealthtechinnovations.com` et `api.sadiaaf.wealthtechinnovations.com` existent et répondent tous deux **HTTP 500** à `curl -I` depuis S1 ; aucun dépôt Git racine dans leurs vhosts ; le seul conteneur Docker actif observé est le bridge MCP. Cela n'atteste pas l'absence d'autres bases/service hors Docker.
