@@ -1,5 +1,18 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-17 — PR #33 : couverture de non-régression HTTP 429 et preuve CI (lot 4/11)
+
+- **RÉCONCILIATION** : PR #33 ouverte, branche `fix/http-retry-dispose-response-20261116`; revue indépendante : aucune review retournée. PR concurrentes #22, #25–#32 laissées intactes. `AGENTS.md` et `docs/15_AUTONOMOUS_AGENT_EXECUTION.md` relus sur GitHub ; état historique à ne pas substituer aux contrôles courants.
+- **PREUVE DU SHA ANTÉRIEUR** : HEAD documentaire `7d25a7ddabfa5e6d05f23198ba51f8a966c456fe` ; [CI #43980687545](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43980687545) et [Docker/PostgreSQL #43980687484](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43980687484) : `completed/success`. Ces runs ne couvrent pas le test nouvellement ajouté.
+- **TRAVAIL CONCRET** : commit `8e60792709f5d6bfe5d617473beb175833515386`, ajout dans `test/fetcher-response-disposal.test.ts` d'un test HTTP 429 avec `ReadableStream.cancel()` rejeté, vérifiant deux tentatives avec `HTTP_MAX_RETRIES=1` et la conservation de `HttpResponseError(429)`. Aucun changement du fetcher de production ; aucune requête réelle vers une source.
+- **TESTS** : nouveau test `NOT_RUN` localement ; CI du commit `8e607927` à vérifier. Aucune exécution RED locale revendiquée.
+- **BLOCK_REASON** : CI du nouveau commit non attestée au moment de cette écriture ; PR Draft sans revue indépendante ; protections et gates de fusion non attestés ; issue #17 sans données témoins officielles/licences vérifiées et coordination des PR #26/#27 à préserver.
+- **NEXT_ACTION** : vérifier CI et Docker/PostgreSQL du HEAD actuel de PR #33 ; si échec, analyser logs et corriger sur la branche ; obtenir revue indépendante et protections avant toute fusion ; sélectionner ensuite un incrément métier admissible indépendant dans les lots existants. Ne jamais qualifier issue #17 DONE sans recette officielle complète.
+- **ROLLBACK** : revert ciblé du commit de test et du présent checkpoint ; aucune écriture `main`, S1, secret, migration ni modification des 44 sources.
+
+---
+
+
 ## 2026-11-17 — PR #33 : CI du test de lecture corrigé attestée (lot 4/11)
 
 - **Réconciliation GitHub** : PR #33 toujours ouverte Draft, HEAD de branche vérifié `8d358768d5731f6f27d0e0c9298a322f91252be5`, base `main`, sans revue indépendante attestée. Dépôt `private` au contrôle. Aucun droit de fusion implicite.
