@@ -48,3 +48,11 @@ test('index level rejects positive finite inputs that underflow to zero', () => 
   assert.throws(() => nextIndexLevel(Number.MIN_VALUE, -0.5), /invalide|positif|nul/i);
   assert.equal(nextIndexLevel(100, 0.01), 101);
 });
+
+
+test('annual capitalisation rejects a non-positive computed index level', () => {
+  // A finite annual rate below -100% must not produce a publishable negative index.
+  assert.throws(() => capitaliseAnnualRate({ previousLevel: 100, annualRate: -2, elapsedDays: 360 }), /invalide|positif|nul/i);
+  assert.throws(() => capitaliseAnnualRate({ previousLevel: 100, annualRate: -1, elapsedDays: 360 }), /invalide|positif|nul/i);
+  assert.equal(capitaliseAnnualRate({ previousLevel: 100, annualRate: 0.05, elapsedDays: 360 }), 105);
+});
