@@ -13,14 +13,23 @@ export function nextIndexLevel(previousLevel: number, dailyReturn: number): numb
 export function meanReturn(returns: number[]): number {
   const valid = returns.filter(Number.isFinite);
   if (!valid.length) throw new Error('Aucun rendement valide');
-  return valid.reduce((sum, value) => sum + value, 0) / valid.length;
+  const total = valid.reduce((sum, value) => sum + value, 0);
+  requireFinite(total, 'Somme des rendements');
+  const result = total / valid.length;
+  requireFinite(result, 'Rendement moyen');
+  return result;
 }
 
 export function weightedReturn(components: Array<{ value: number; weight: number }>): number {
   const valid = components.filter((item) => Number.isFinite(item.value) && Number.isFinite(item.weight) && item.weight > 0);
   const totalWeight = valid.reduce((sum, item) => sum + item.weight, 0);
   if (!totalWeight) throw new Error('Aucun poids valide');
-  return valid.reduce((sum, item) => sum + item.value * item.weight, 0) / totalWeight;
+  requireFinite(totalWeight, 'Somme des poids');
+  const numerator = valid.reduce((sum, item) => sum + item.value * item.weight, 0);
+  requireFinite(numerator, 'Somme pondérée');
+  const result = numerator / totalWeight;
+  requireFinite(result, 'Rendement pondéré');
+  return result;
 }
 
 export function capitaliseAnnualRate(input: {
