@@ -118,3 +118,24 @@ test('stream read failure releases the reader lock and preserves the original er
     globalThis.fetch = originalFetch;
   }
 });
+
+test('HTTP 429 retries even when response cancellation fails, preserving the final status', async () => {
+  const originalFetch = globalThis.fetch;
+  const originalRetries = env.HTTP_MAX_RETRIES;
+  env.HTTP_MAX_RETRIES = 1;
+  let calls = 0;
+  globalThis.fetch = async () => {
+    calls += 1;
+    return new Response(new ReadableStream<Uint8Array>({
+      cancel() { throw new Error('cancellation failed'); },
+    }), { status: 429 });
+  };
+  try {
+    await assert.rejects(fetchWithRetry('https://example.invalid/rate-limited'),
+      (error: unknown) => error instanceof HttpResponseError && error.status === 429);
+    assert.equal(calls, 2, 'retryable 429 must honor the configured retry limit');
+  } finally {
+    env.HTTP_MAX_RETRIES = originalRetries;
+    globalThis.fetch = originalFetch;
+  }
+});
