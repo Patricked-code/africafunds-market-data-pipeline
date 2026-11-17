@@ -1,5 +1,9 @@
 # 06 — État réel et écarts
 
+## 2026-11-17 — PR #33 : interruption du backoff HTTP par le demandeur
+
+Ajout d'un test de non-régression (`efee388`, `505bf64`) et correctif ciblé (`86033a5`) sur `fetchWithRetry` : annulation du demandeur propagée sans délai de backoff, sans nouvelles tentatives. Le test temporel (moins de 400 ms pour un backoff nominal de 500 ms) doit être validé en CI ; tests locaux `NOT_RUN`. La CI du HEAD antérieur `5cce548` est SUCCESS (#44003707774, #44003707893), **pas celle du nouveau correctif**. PR #33 Draft ; revue indépendante, gates de fusion et recette officielle #17 toujours ouverts. Référence détaillée : `docs/09_CHANGELOG_WORKLOG.md`.
+
 ## 2026-11-17 — PR #33 : respect de l'annulation HTTP du demandeur (lot 4/11)
 
 Tests ajoutés d'abord (`c4b3d23a8f74f90b3ff75cb1af21d036634b50c0`), puis correctif (`ad2019cb62a2a96ae808603dae73541406d48004`) : `fetchWithRetry()` respecte désormais le `RequestInit.signal` du demandeur, y compris avant l'appel réseau et pendant une tentative, sans relancer après annulation. Le signal est combiné avec le timeout interne via `AbortSignal.any()` (Node >=20.11). Deux tests synthétiques couvrent annulation préalable et en cours de requête. Tests locaux NOT_RUN ; CI du nouveau HEAD à contrôler, revue et gates non attestés. Aucun changement des sources, de PostgreSQL, de S1 ni de `main`.
