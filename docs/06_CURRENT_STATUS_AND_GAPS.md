@@ -1,5 +1,10 @@
 # 06 — État réel et écarts
 
+## 2026-11-17 — PR #33 : réponse HTTP 200 reçue après annulation du demandeur
+
+Test synthétique `a5a7172` et correctif `3b6ea64` : une réponse 200 résolue après annulation du demandeur est rejetée et son corps libéré avant toute lecture/publication ; la raison exacte d'annulation prime. CI précédente du HEAD `4224dca` réussie (#44040427887, #44040427972), CI du nouveau correctif non attestée. Tests locaux NOT_RUN, PR Draft sans revue indépendante. Aucun changement du catalogue, de PostgreSQL, de main ni de S1. Voir `docs/09_CHANGELOG_WORKLOG.md` pour preuves et NEXT_ACTION.
+
+
 ## 2026-11-17 — PR #33 : interruption du backoff HTTP par le demandeur
 
 Ajout d'un test de non-régression (`efee388`, `505bf64`) et correctif ciblé (`86033a5`) sur `fetchWithRetry` : annulation du demandeur propagée sans délai de backoff, sans nouvelles tentatives. Le test temporel (moins de 400 ms pour un backoff nominal de 500 ms) doit être validé en CI ; tests locaux `NOT_RUN`. La CI du HEAD antérieur `5cce548` est SUCCESS (#44003707774, #44003707893), **pas celle du nouveau correctif**. PR #33 Draft ; revue indépendante, gates de fusion et recette officielle #17 toujours ouverts. Référence détaillée : `docs/09_CHANGELOG_WORKLOG.md`.
