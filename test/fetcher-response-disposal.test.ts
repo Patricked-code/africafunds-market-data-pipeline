@@ -207,3 +207,23 @@ test('caller abort during retry backoff stops promptly without another fetch', a
     globalThis.fetch = originalFetch;
   }
 });
+
+
+test('nullable RequestInit.signal retains retry behavior without a caller abort signal', async () => {
+  const originalFetch = globalThis.fetch;
+  const originalRetries = env.HTTP_MAX_RETRIES;
+  env.HTTP_MAX_RETRIES = 1;
+  let calls = 0;
+  globalThis.fetch = async () => {
+    calls += 1;
+    return new Response(null, { status: calls === 1 ? 503 : 200 });
+  };
+  try {
+    const result = await fetchWithRetry('https://example.invalid/nullable-signal', { signal: null });
+    assert.equal(result.status, 200);
+    assert.equal(calls, 2, 'null signal must preserve retry after a transient 503');
+  } finally {
+    env.HTTP_MAX_RETRIES = originalRetries;
+    globalThis.fetch = originalFetch;
+  }
+});
