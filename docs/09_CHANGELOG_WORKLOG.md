@@ -1,5 +1,17 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-17 08:38 Europe/Paris — PR #33 : CI validée et test annulation après HTTP 503 (issue #7, lots 4/11)
+
+- RECONCILIATION : PR #1 closed/merged ; PR #33 open/draft sur fix/http-retry-dispose-response-20261116, HEAD initial f1e77d82b685b78ac69c54ed8ad39ba7555db03a. Douze issues ouvertes ; aucune review PR #33. Branches concurrentes et main préservées ; revérifier main et gates avant toute intégration.
+- PREUVES CI EXACT-HEAD : pour f1e77d82b685b78ac69c54ed8ad39ba7555db03a, workflows GitHub Actions #44032619740 et #44032619713 completed/success (https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/44032619740 et https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/44032619713). Ces runs valident le HEAD précédent et non le nouveau test.
+- TRAVAIL CONCRET : commit 200f0de7dd3ccfd6a1a2333ff28ae0db761759d0 (https://github.com/Patricked-code/africafunds-market-data-pipeline/commit/200f0de7dd3ccfd6a1a2333ff28ae0db761759d0) : test synthétique ajouté à test/fetcher-response-disposal.test.ts. Après une réponse HTTP 503, si l'appelant annule, la raison exacte d'annulation doit primer et aucune seconde tentative ne doit partir. Aucun code de production, source, schéma, secret ni serveur modifié.
+- VALIDATION : tests locaux NOT_RUN ; CI du commit test et du futur HEAD documentaire NOT_YET_ATTESTED ; aucune preuve RED locale ni recette financière officielle.
+- BLOCK_REASON : CI du nouveau test à vérifier, PR Draft sans revue indépendante, gates de fusion non attestés ; témoins officiels, licences et coordination PR #26/#27 requis pour issue #17.
+- NEXT_ACTION : vérifier les workflows du nouveau HEAD exact, corriger tout échec, obtenir revue indépendante et vérifier les gates avant toute fusion ; poursuivre ensuite un travail métier indépendant dans les lots 0–13. Ne pas déclarer HISTORY_COMPLETE ni déployer S1.
+- ROLLBACK : revert ciblé du test 200f0de et de ce checkpoint sur la branche Draft ; aucun impact sur main ni S1.
+
+---
+
 ## 2026-11-17 07:36 Europe/Paris — PR #33 : timeout interne avec signal appelant, issue #7 (lots 4/11)
 
 - **RECONCILIATION** : PR #33 OPEN/DRAFT, branche `fix/http-retry-dispose-response-20261116`, HEAD avant intervention `f7d667d40034eaaa3f87cab300c342964b2bb65e`, base PR `main` SHA `73256f48d81d38ce8ff6f51be9e024b25cf5dadb`. PR #1 déjà fusionnée selon les checkpoints précédents. Recherche GitHub : 10 PR ouvertes, dont #22 et #25–#33 ; reviews #33 `[]`. Les autres branches et claims n'ont pas été modifiés.
