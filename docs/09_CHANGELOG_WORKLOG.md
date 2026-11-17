@@ -1,5 +1,17 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-17 — PR #33 : validation du test HTTP 429 sur HEAD documentaire (lot 4/11)
+
+- **GitHub vérifié** : PR #1 fusionnée ; PR #33 ouverte Draft sur `fix/http-retry-dispose-response-20261116`, HEAD `c77759b8027edff989c56d7e88eee115240e1942`, base SHA `73256f48d81d38ce8ff6f51be9e024b25cf5dadb`. Dépôt `private`. Aucun merge ni déploiement.
+- **CI exacte** : pour HEAD `c77759b8027edff989c56d7e88eee115240e1942`, CI [#43988894956](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43988894956) et Docker/PostgreSQL [#43988894946](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43988894946) : `completed/success` selon GitHub. Les runs antérieurs du commit `8e60792709f5d6bfe5d617473beb175833515386` [#43988874606](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43988874606) et [#43988874633](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/43988874633) sont `completed/cancelled` : ne pas les qualifier SUCCESS.
+- **PÉRIMÈTRE** : test HTTP 429 déjà committé, sans changement fonctionnel dans cette reprise. Tests locaux `NOT_RUN`; CI valide le HEAD ci-dessus, pas le nouveau commit documentaire. Aucune donnée réelle, licence ou recette financière attestée.
+- **BLOCK_REASON** : PR Draft sans revue indépendante/gates de fusion attestés ; qualification des licences et témoins officiels, coordination #26/#27 et recette #17 encore ouvertes. Aucune preuve de runtime S1.
+- **NEXT_ACTION** : contrôler CI du nouveau HEAD ; obtenir une revue indépendante et confirmer protections de `main` avant toute fusion ; reprendre un incrément métier source→archive→normalisation→qualité→calcul→API après claim non concurrent et qualification d'un témoin officiel licite. Éviter les checkpoints documentaires sans progrès métier.
+- **ROLLBACK** : revert ciblé de ce seul checkpoint, sans modifier le test, les 44 sources, `main`, S1 ou les secrets.
+
+---
+
+
 ## 2026-11-17 — PR #33 : couverture de non-régression HTTP 429 et preuve CI (lot 4/11)
 
 - **RÉCONCILIATION** : PR #33 ouverte, branche `fix/http-retry-dispose-response-20261116`; revue indépendante : aucune review retournée. PR concurrentes #22, #25–#32 laissées intactes. `AGENTS.md` et `docs/15_AUTONOMOUS_AGENT_EXECUTION.md` relus sur GitHub ; état historique à ne pas substituer aux contrôles courants.
