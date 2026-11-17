@@ -1,5 +1,20 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-17 09:40 Europe/Paris — PR #33 : annulation après réponse HTTP 200 (issue #7, lots 4/11)
+
+- RECONCILIATION : PR #1 closed/merged ; PR #33 open/draft, HEAD de départ 4224dca356b1d26ccc136c062612f0e3f797fef3, base main 73256f48d81d38ce8ff6f51be9e024b25cf5dadb (métadonnées PR). Dépôt privé. Reviews PR #33 = []. Les PR concurrentes sont préservées.
+- PREUVES CI EXACT-HEAD ANTERIEUR : 4224dca356b1d26ccc136c062612f0e3f797fef3 : CI #44040427887 completed/success et Docker/PostgreSQL #44040427972 completed/success. https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/44040427887 ; https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/44040427972. Ne pas attribuer ces succès aux nouveaux commits.
+- DEFAUT CIBLE : une implémentation fetch pouvant résoudre une Response HTTP 200 après annulation du demandeur laissait le chemin succès poursuivre la lecture du corps et retourner des données. Le contrat impose le rejet et la libération du stream sans publication.
+- TEST D'ABORD : a5a71729924984811d1fc98616456ece8b9baab9 dans test/fetcher-response-disposal.test.ts ; réponse synthétique 200 retournée après abort, conservation de la raison exacte, un seul appel, stream annulé une fois. RED local NOT_RUN.
+- CORRECTIF : 3b6ea646eede38aff75c8850948e3a7d3e98a509 dans src/http/fetcher.ts ; après fetch, si signal demandeur aborted, annuler le corps avec échec d'annulation non masquant pas la raison puis rejeter. Pas de modification de catalogue, secrets, schéma, main ou S1.
+- VALIDATION : tests locaux NOT_RUN ; CI des nouveaux commits NOT_YET_ATTESTED. Aucun témoin financier officiel ni certification HISTORY_COMPLETE.
+- BLOCK_REASON : CI exact-HEAD nouveau correctif à vérifier ; PR Draft sans revue indépendante, gates de fusion non attestés ; issue #17 dépend toujours des licences, témoins datés et coordination des PR #26/#27.
+- NEXT_ACTION : vérifier CI/Docker du HEAD final, analyser et corriger tout échec ; obtenir revue indépendante et vérifier protections/gates ; reprendre une tâche métier indépendante des lots 0–13. Aucune fusion implicite ni S1.
+- ROLLBACK : revert ciblé des commits a5a7172 et 3b6ea64 sur branche Draft ; aucune action sur main ou production.
+
+---
+
+
 ## 2026-11-17 08:38 Europe/Paris — PR #33 : CI validée et test annulation après HTTP 503 (issue #7, lots 4/11)
 
 - RECONCILIATION : PR #1 closed/merged ; PR #33 open/draft sur fix/http-retry-dispose-response-20261116, HEAD initial f1e77d82b685b78ac69c54ed8ad39ba7555db03a. Douze issues ouvertes ; aucune review PR #33. Branches concurrentes et main préservées ; revérifier main et gates avant toute intégration.
