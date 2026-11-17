@@ -1,5 +1,20 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-17 10:36 Europe/Paris — PR #33 : annulation pendant la lecture du corps HTTP 200 (issue #7, lots 4/11)
+
+- RECONCILIATION : dépôt privé vérifié par get_repo ; dix PR ouvertes (#22, #25–#33), PR #33 Draft. AGENTS.md, docs/15_AUTONOMOUS_AGENT_EXECUTION.md, dernier worklog et checkpoint du 06/11 relus ; documents maîtres du parcours d'arrivée consultés. Les PR concurrentes sont restées intactes.
+- PREUVE CI EXACT-HEAD ANTERIEUR : 716295b5aee952951b97a57dbd9566f2b0762782 : CI #44048784765 completed/success et Docker/PostgreSQL #44048784958 completed/success, vérifiés via GitHub. https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/44048784765 ; https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/44048784958. Ces preuves ne couvrent pas les nouveaux commits.
+- DEFAUT CIBLE : un signal appelant peut être annulé pendant readLimitedBody après validation du statut HTTP 200 ; le code précédent pouvait retourner les octets lus et les rendre archivables malgré l'annulation.
+- TEST D'ABORD : 279f79605d23ae4696d926d445b4426c1455b8ec, puis 6397fd4814688dcb831462db238115fe401e2480 pour fixer highWaterMark=0 et déclencher l'annulation pendant reader.read(), pas avant la réponse. Test synthétique : raison exacte d'annulation, aucun retry. RED local NOT_RUN.
+- CORRECTIF : c7a016fa396c29176eb944855f142993ea89fd35 dans src/http/fetcher.ts ; contrôle du signal après lecture du corps et avant retour du FetchResult. Aucun changement du catalogue, schéma, secrets, main ou S1.
+- VALIDATION : tests locaux NOT_RUN ; CI/Docker du nouveau HEAD NOT_YET_ATTESTED. Aucune recette officielle, licence, collecte ou publication certifiée.
+- BLOCK_REASON : CI du nouveau HEAD et revue indépendante de PR #33 à vérifier ; protections et gates de fusion non attestés ; issue #17 dépend toujours des licences, témoins officiels et coordination des PR #26/#27.
+- NEXT_ACTION : vérifier CI/Docker du HEAD documentaire, analyser et corriger toute erreur ; demander une revue indépendante, vérifier gates ; puis poursuivre un incrément métier indépendant des lots 0–13. Ne pas fusionner ni déployer S1 sans autorisation.
+- ROLLBACK : revert ciblé des commits de test et correctif sur branche Draft ; aucun effet sur main ni production.
+
+---
+
+
 ## 2026-11-17 09:40 Europe/Paris — PR #33 : annulation après réponse HTTP 200 (issue #7, lots 4/11)
 
 - RECONCILIATION : PR #1 closed/merged ; PR #33 open/draft, HEAD de départ 4224dca356b1d26ccc136c062612f0e3f797fef3, base main 73256f48d81d38ce8ff6f51be9e024b25cf5dadb (métadonnées PR). Dépôt privé. Reviews PR #33 = []. Les PR concurrentes sont préservées.
