@@ -338,3 +338,25 @@ test('caller abort during successful response body consumption must not return a
     env.HTTP_MAX_RETRIES = originalRetries;
   }
 });
+
+
+test('HTTP 503 retains its status when response stream cancellation fails', async () => {
+  const originalFetch = globalThis.fetch;
+  const originalRetries = env.HTTP_MAX_RETRIES;
+  env.HTTP_MAX_RETRIES = 0;
+  let calls = 0;
+  globalThis.fetch = async () => {
+    calls += 1;
+    return new Response(new ReadableStream<Uint8Array>({
+      cancel() { throw new Error('stream cleanup failed'); },
+    }), { status: 503 });
+  };
+  try {
+    await assert.rejects(fetchWithRetry('https://example.invalid/unavailable-cleanup-failure'),
+      (error: unknown) => error instanceof HttpResponseError && error.status === 503);
+    assert.equal(calls, 1, 'terminal retry policy must not issue another request');
+  } finally {
+    globalThis.fetch = originalFetch;
+    env.HTTP_MAX_RETRIES = originalRetries;
+  }
+});
