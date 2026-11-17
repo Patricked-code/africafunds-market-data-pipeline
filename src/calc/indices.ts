@@ -47,6 +47,7 @@ export function capitaliseAnnualRate(input: {
   if (input.elapsedDays < 0) throw new Error('Nombre de jours invalide');
   const result = input.previousLevel * (1 + input.annualRate * input.elapsedDays / basis);
   requireFinite(result, 'Niveau capitalisé');
+  if (result <= 0) throw new Error('Niveau capitalisé invalide (non positif)');
   return result;
 }
 
