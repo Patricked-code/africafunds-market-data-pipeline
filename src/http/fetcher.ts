@@ -81,6 +81,8 @@ async function readLimitedBody(response: Response, maxBytes: number): Promise<Ui
 export async function fetchWithRetry(url: string, init: RequestInit = {}): Promise<FetchResult> {
   let lastError: unknown;
   for (let attempt = 0; attempt <= env.HTTP_MAX_RETRIES; attempt += 1) {
+    // Respect explicit caller cancellation, including before the first attempt.
+    if (init.signal?.aborted) throw init.signal.reason ?? new DOMException('Aborted', 'AbortError');
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), env.HTTP_TIMEOUT_MS);
     try {
@@ -93,7 +95,7 @@ export async function fetchWithRetry(url: string, init: RequestInit = {}): Promi
         ...init,
         headers,
         redirect: 'follow',
-        signal: controller.signal,
+        signal: init.signal ? AbortSignal.any([controller.signal, init.signal]) : controller.signal,
       });
       if (!response.ok) {
         // Release the response stream on terminal and retryable errors alike.
@@ -117,6 +119,8 @@ export async function fetchWithRetry(url: string, init: RequestInit = {}): Promi
       };
     } catch (error) {
       lastError = error;
+      // Caller cancellation is terminal; never retry a request it has withdrawn.
+      if (init.signal?.aborted) break;
       const isTerminalClientError = error instanceof HttpResponseError
         && error.status >= 400 && error.status < 500 && error.status !== 429;
       if (isTerminalClientError || error instanceof HttpBodyTooLargeError || attempt >= env.HTTP_MAX_RETRIES) break;
