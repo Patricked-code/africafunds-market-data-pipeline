@@ -7,6 +7,7 @@ export function nextIndexLevel(previousLevel: number, dailyReturn: number): numb
   if (!Number.isFinite(dailyReturn) || dailyReturn <= -1) throw new Error('Rendement journalier invalide');
   const result = previousLevel * (1 + dailyReturn);
   requireFinite(result, 'Niveau calculé');
+  if (result <= 0) throw new Error('Niveau calculé invalide (non positif)');
   return result;
 }
 
