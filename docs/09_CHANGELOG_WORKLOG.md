@@ -1,5 +1,17 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-17 15:38 Europe/Paris — PR #33 : CI exact-HEAD attestée, revue encore absente
+
+- RECONCILIATION : PR #1 closed/merged (merge commit d12a440b37972756105218335671002fe1dfd11a) ; PR #33 open/Draft, HEAD bb5882db86316af15b78320044fadd374fef3231 ; main reste base de comparaison, aucune écriture main. AGENTS.md, docs/15_AUTONOMOUS_AGENT_EXECUTION.md, worklog et checkpoint 2026-11-06 relus. Recherche des PR et issues ouvertes actualisée ; PR #26/#27 et leurs claims préservés.
+- PREUVES CI EXACT-HEAD : pour bb5882db86316af15b78320044fadd374fef3231, workflow CI #44093664860 completed/success (https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/44093664860) et workflow Docker/PostgreSQL #44093664854 completed/success (https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/44093664854). GitHub PR reviews=[] ; aucune revue indépendante attestée. Ces contrôles ne prouvent pas la recette financière officielle, la couverture historique ou S1.
+- ACTION : contrôles GitHub et qualification des périmètres #14/#15/#16/#17 ; aucun témoin officiel daté avec droit de conservation/redistribution établi dans cette intervention. Aucune modification de code/test, tests locaux NOT_RUN ; ne pas fabriquer de fixture officielle ni ajouter de test HTTP périphérique pour masquer l'absence de recette métier.
+- BLOCK_REASON : revue indépendante PR #33 absente et gates de fusion non attestés ; #14/#16/#17 requièrent contrat/licence/témoin officiel ; #26/#27 revendiquent ingestion et admission financière. Aucun HISTORY_COMPLETE ni DONE.
+- NEXT_ACTION : demander une revue indépendante habilitée PR #33 et vérifier protections/gates ; identifier une source officielle légalement exploitable avec fixture datée et licence explicite ; coordonner le claim GitHub avant d'implémenter mapping/parseur/recette intégrée dans les modules existants. Si cette qualification reste bloquée, sélectionner un défaut métier indépendant prouvé dans les lots 0–13, avec RED/GREEN et CI. Aucun merge, secret, modification des 44 sources ni déploiement S1.
+- ROLLBACK : revert ciblé de ce checkpoint documentaire sur branche Draft, aucun effet main/production.
+
+---
+
+
 ## 2026-11-17 14:31 Europe/Paris — PR #33 : CI exacte confirmée ; admission métier #14/#16/#17 réévaluée
 
 - RECONCILIATION : dépôt GitHub Patricked-code privé, branche de PR #33 conservée ; AGENTS.md, docs/15_AUTONOMOUS_AGENT_EXECUTION.md, checkpoint docs/CONTINUITY_CHECKPOINT_2026-11-06.md et dernier NEXT_ACTION lus. PR #33 reviews=[] ; PR concurrentes #26/#27 conservées. Le checkpoint historique 06/11 n'est pas une preuve d'état courant.
