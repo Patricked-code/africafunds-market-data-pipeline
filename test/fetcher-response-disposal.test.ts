@@ -139,3 +139,46 @@ test('HTTP 429 retries even when response cancellation fails, preserving the fin
     globalThis.fetch = originalFetch;
   }
 });
+
+
+test('caller-aborted requests do not start a fetch or retry', async () => {
+  const originalFetch = globalThis.fetch;
+  const controller = new AbortController();
+  controller.abort(new DOMException('caller cancelled', 'AbortError'));
+  let calls = 0;
+  globalThis.fetch = async () => {
+    calls += 1;
+    return new Response('unexpected', { status: 200 });
+  };
+  try {
+    await assert.rejects(fetchWithRetry('https://example.invalid/cancelled', {
+      signal: controller.signal,
+    }), (error: unknown) => error instanceof Error && error.name === 'AbortError');
+    assert.equal(calls, 0, 'a cancelled caller must not start or retry an HTTP request');
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test('in-flight caller abort propagates without retrying', async () => {
+  const originalFetch = globalThis.fetch;
+  const originalRetries = env.HTTP_MAX_RETRIES;
+  env.HTTP_MAX_RETRIES = 2;
+  const controller = new AbortController();
+  let calls = 0;
+  globalThis.fetch = async (_url, init) => {
+    calls += 1;
+    controller.abort(new DOMException('cancelled in flight', 'AbortError'));
+    if (init?.signal?.aborted) throw init.signal.reason;
+    return new Response('unexpected', { status: 200 });
+  };
+  try {
+    await assert.rejects(fetchWithRetry('https://example.invalid/inflight', {
+      signal: controller.signal,
+    }), (error: unknown) => error instanceof Error && error.name === 'AbortError');
+    assert.equal(calls, 1, 'caller abort must stop the retry loop');
+  } finally {
+    env.HTTP_MAX_RETRIES = originalRetries;
+    globalThis.fetch = originalFetch;
+  }
+});
