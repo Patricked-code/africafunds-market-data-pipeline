@@ -1,5 +1,12 @@
 # 06 — État réel et écarts
 
+## 2026-11-17 — Issue #17 / PR #34 : niveau d'indice sous-fluant (branche Draft)
+
+- Test synthétique ajouté au commit `9317fb50a82b7809a3f698f6901bd2003de52438` : `nextIndexLevel(Number.MIN_VALUE, -0.5)` ne doit pas publier un niveau nul par arrondi IEEE-754 ; cas ordinaire `100 * 1.01` préservé.
+- Correctif minimal au commit `ad9a381496af3858dd5c74d6e539ba7a32f18908` : après contrôle de finitude, refuser le niveau calculé non positif. Pas de changement de formule, signature, source, schéma, secret ou déploiement.
+- RED attendu par inspection du code antérieur, non exécuté. GREEN non encore attesté ; CI du HEAD exact à vérifier. Les données financières officielles, les licences et la recette intégrée demeurent non certifiées. PR Draft, revue indépendante nécessaire.
+
+
 ## 2026-11-17 — Calculs indices / issue #17, PR #34 (validation en attente)
 
 - Branche `fix/indices-finite-output-20261117` : contrôles fail-closed des valeurs non finies en sortie des calculs d'indices, capitalisation, rendement réel et FX ; extension à `meanReturn` et `weightedReturn` pour les sommes et numérateurs intermédiaires susceptibles de déborder (`68ed04e` tests, `c26831d` correctif).
