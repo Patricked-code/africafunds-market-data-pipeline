@@ -1,5 +1,17 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-18 06:32 Europe/Paris — PR #34 : CI HEAD précédent et test de non-régression de pondération
+
+- **RECONCILIATION** : PR #1 fusionnée ; PR #34 ouverte Draft, HEAD de départ `0c7ba97d487123d61a95795e3cf63f495ec8ad2e`, base `main` observée dans la PR `73256f48d81d38ce8ff6f51be9e024b25cf5dadb`. Recherche GitHub : 11 PR et 12 issues ouvertes ; revue indépendante PR #34 `reviews=[]`. Dépôt privé selon métadonnées GitHub. Documents AGENTS, 00–15, checkpoint historique, code et tests de la branche relus. Les autres PR ne sont pas modifiées.
+- **PREUVES CI exactes du HEAD précédent** `0c7ba97d487123d61a95795e3cf63f495ec8ad2e` : [CI #44238037039](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/44238037039) `completed/success` ; [Docker/PostgreSQL #44238037060](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/44238037060) `completed/success`. Ces workflows ne certifient pas les données officielles ni S1.
+- **ACTION CODE/TEST** : commit [`4b7b84403d6b823290f46c16b2f530bd31aa4e2e`](https://github.com/Patricked-code/africafunds-market-data-pipeline/commit/4b7b84403d6b823290f46c16b2f530bd31aa4e2e), ajout d'un test de non-régression dans `test/indices-finite-output.test.ts` : exclusion des observations NaN, poids nuls et négatifs, conservation d'une pondération valide et rejet lorsqu'aucun poids valide ne reste. Contrat actuel de `weightedReturn()` préservé ; aucune formule de production modifiée. Tests locaux **NOT_RUN** ; nouveau HEAD **CI NOT_YET_VERIFIED**.
+- **BLOCK_REASON** : nouveau test non encore attesté par CI ; PR Draft sans revue financière indépendante ; gates de fusion et protections non certifiés ; observations officielles, droits d'exploitation et recette intégrée de l'issue #17 incomplets.
+- **NEXT_ACTION** : contrôler les workflows CI/Docker du nouveau HEAD après ce checkpoint ; corriger tout échec. Obtenir une revue indépendante des invariants de calcul et du traitement des observations exclues. Reprendre ensuite une tâche non revendiquée des lots 0–13 ou la recette intégrée sur données officielles autorisées. Aucune fusion ni déploiement S1 sans gates.
+- **ROLLBACK** : revert du commit de test et du checkpoint sur branche Draft ; aucun changement main, S1, secrets, schéma, source historique ou donnée publiée.
+
+---
+
+
 ## 2026-11-18 05:31 Europe/Paris — PR #34 : validation exacte du HEAD et revue toujours en attente
 
 - **RECONCILIATION** : PR #1 merged ; PR #34 ouverte Draft, HEAD exact `69ebfd4b8eac0ebdf2738c1bcea55d44291be4c4`, base main `73256f48d81d38ce8ff6f51be9e024b25cf5dadb` (métadonnées PR) ; 11 PR et 12 issues ouvertes selon recherches GitHub. Revue PR #34 : `reviews=[]`. Lecture de `AGENTS.md`, `docs/15_AUTONOMOUS_AGENT_EXECUTION.md`, du journal courant, du checkpoint historique et de `src/calc/indices.ts` et `test/indices-finite-output.test.ts` sur la branche.
