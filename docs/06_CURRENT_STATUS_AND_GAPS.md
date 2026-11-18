@@ -1,5 +1,8 @@
 # 06 — État réel et écarts
 
+> **2026-11-18 03:34 — PR #34 / issue #17 (PARTIAL / Draft).** `realReturn()` rejette désormais un rendement nominal simple inférieur à -100 % (test `1de871c2`, code `fdf31336`), en conservant -100 % et les cas valides. CI du précédent HEAD `efe0daeb` : runs `44217492266` et `44217492252` SUCCESS ; tests locaux NOT_RUN et CI du nouveau HEAD non attestée. Revue indépendante de l'hypothèse sans levier, gates de fusion et recette officielle toujours requis. Détails, BLOCK_REASON et NEXT_ACTION dans `docs/09_CHANGELOG_WORKLOG.md`.
+
+
 > **2026-11-18 02:38 — PR #34 / issue #17 (PARTIAL / Draft).** `convertReturn()` refuse désormais un rendement local simple inférieur à -100 % (test `7a06f70e`, code `2af39713`) ; perte exactement -100 % et cas valides préservés. CI précédente sur `86d7b48d` : runs `44208834124` et `44208834111` SUCCESS. Tests locaux NOT_RUN ; nouveau HEAD non encore validé, revue indépendante et recette institutionnelle toujours manquantes. Journal canonique : `docs/09_CHANGELOG_WORKLOG.md`.
 
 
