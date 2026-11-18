@@ -102,3 +102,12 @@ test('FX conversion rejects a local simple return below -100% without altering a
   assert.equal(convertReturn({ localReturn: -1, fxToday: 2, fxPrevious: 1 }), -1);
   assert.equal(convertReturn({ localReturn: -0.5, fxToday: 2, fxPrevious: 1 }), 0);
 });
+
+
+test('real simple return rejects a nominal loss below -100% but preserves total loss', () => {
+  // A simple unlevered total return cannot lose more than the invested principal.
+  assert.throws(() => realReturn(-1.01, 0), /invalide|rendement/i);
+  assert.throws(() => realReturn(-2, 0.1), /invalide|rendement/i);
+  assert.equal(realReturn(-1, 0.1), -1);
+  assert.equal(realReturn(0.1, 0.1), 0);
+});
