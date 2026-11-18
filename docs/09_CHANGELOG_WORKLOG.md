@@ -1,5 +1,17 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-18 07:35 Europe/Paris — PR #34 : CI exacte et invariants de moyenne/pondération
+
+- **RECONCILIATION** : PR #1 merged ; PR #34 open/Draft, HEAD de départ `489e04535dd2879d015379031b33c9416945dca5`, base SHA exposé par la PR `73256f48d81d38ce8ff6f51be9e024b25cf5dadb`. Lecture de AGENTS.md, contrat 15, dernier worklog, checkpoint historique, code/tests et méthodologie financière. PR concurrentes non modifiées.
+- **CI ATTESTÉE sur HEAD précédent exact** `489e04535dd2879d015379031b33c9416945dca5` : [CI #44245041514](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/44245041514) et [Docker/PostgreSQL #44245041544](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/44245041544), toutes deux `completed/success` selon GitHub. Ces contrôles ne certifient ni observations officielles, ni licences, ni S1.
+- **ACTION TEST** : commit [`81924f1786a51f5adeab7962a362e56a41b9efd4`](https://github.com/Patricked-code/africafunds-market-data-pipeline/commit/81924f1786a51f5adeab7962a362e56a41b9efd4) ; tests de non-régression de `meanReturn()` et `weightedReturn()` : exclusions des observations invalides, conservation du dénominateur, absence de mutation des entrées, cas sans observations valides. Aucun changement de formule, de code de production ou de contrat existant. Tests locaux **NOT_RUN** ; CI du nouveau HEAD **NOT_YET_VERIFIED**.
+- **BLOCK_REASON** : nouvelle CI non attestée ; PR #34 toujours Draft et revue financière indépendante non prouvée ; protections/gates de fusion non certifiés ; recette intégrée issue #17 et licences/observations institutionnelles non attestées.
+- **NEXT_ACTION** : contrôler CI/Docker du nouveau HEAD après checkpoint, corriger tout échec ; obtenir revue indépendante des exclusions et de la méthode de pondération. Puis sélectionner une tâche admissible indépendante des PR concurrentes, prioritairement qualification d'une observation officielle et recette source→archive→normalisation→qualité→calcul→API, sans déclarer HISTORY_COMPLETE ni DONE.
+- **ROLLBACK** : revert ciblé du commit de test et de cette entrée sur branche Draft ; aucun push main, merge, secret, migration, changement des 44 sources ou déploiement S1.
+
+---
+
+
 ## 2026-11-18 06:32 Europe/Paris — PR #34 : CI HEAD précédent et test de non-régression de pondération
 
 - **RECONCILIATION** : PR #1 fusionnée ; PR #34 ouverte Draft, HEAD de départ `0c7ba97d487123d61a95795e3cf63f495ec8ad2e`, base `main` observée dans la PR `73256f48d81d38ce8ff6f51be9e024b25cf5dadb`. Recherche GitHub : 11 PR et 12 issues ouvertes ; revue indépendante PR #34 `reviews=[]`. Dépôt privé selon métadonnées GitHub. Documents AGENTS, 00–15, checkpoint historique, code et tests de la branche relus. Les autres PR ne sont pas modifiées.
