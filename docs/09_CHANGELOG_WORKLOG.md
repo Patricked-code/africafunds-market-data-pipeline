@@ -1,5 +1,17 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-18 10:38 Europe/Paris — PR #34 : CI exact-HEAD confirmée, arrêt des commits documentaires répétitifs
+
+- **RECONCILIATION** : PR #34 reste ouverte Draft, aucune revue enregistrée (`reviews=[]`) ; recherche GitHub : 11 PR ouvertes, 12 issues ouvertes. Lecture de `AGENTS.md`, `docs/15_AUTONOMOUS_AGENT_EXECUTION.md`, du journal récent et du checkpoint historique, des fonctions `src/calc/indices.ts` et de `test/indices-finite-output.test.ts`. PR #1 déjà fusionnée selon l'état antérieurement vérifié. Aucune branche concurrente modifiée.
+- **PREUVES CI** : commit exact `9affb5c7c5778165123e0fee73c06e61566574f1` : [CI #44268292095](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/44268292095) `completed/success` ; [Docker/PostgreSQL #44268291995](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/44268291995) `completed/success`. Les tests locaux restent `NOT_RUN`. Ces succès n'attestent ni licences, ni données témoins officielles, ni revue, ni déploiement.
+- **ACTION** : réconciliation CI et inspection des tests existants. Aucun nouveau défaut financier prouvé ne justifie une modification de formule ou un test redondant. Ce checkpoint marque explicitement l'arrêt de la boucle de commits de journal seuls sur PR #34 : ne pas créer un nouveau commit uniquement pour vérifier la CI du checkpoint précédent. Poursuivre une tâche fonctionnelle réellement admissible, avec claim et preuve, plutôt que déplacer le HEAD documentaire à chaque passage.
+- **BLOCK_REASON** : PR #34 Draft sans revue indépendante ; gates de fusion non attestés ; sources institutionnelles et droits/licences insuffisamment prouvés pour la recette intégrée #17. Aucun HISTORY_COMPLETE ou DONE justifié.
+- **NEXT_ACTION** : sortir de la boucle documentaire. Priorité à une revue indépendante de #34 et à un travail de code/test non revendiqué dans les lots 0–13 ; réconcilier les claims #26/#27 avant tout travail ingestion/qualité, qualifier un témoin officiel autorisé pour #13–#17, et développer un adaptateur/une recette seulement avec contrat réel. Ne pas re-committer le journal sans nouvelle preuve métier ou correction concrète. Pas de merge, S1 ni secret sans gates.
+- **ROLLBACK** : revert ciblé de cette seule entrée documentaire sur la branche Draft ; aucun changement de main, source registry, schéma, secret ou runtime.
+
+---
+
+
 ## 2026-11-18 09:34 Europe/Paris — PR #34 : validation exacte des deux workflows, revue et recette métier toujours ouvertes
 
 - **RECONCILIATION GITHUB** : PR #1 closed/merged ; PR #34 open/Draft, HEAD observé `7b15a41ba3d12d48374d8bac500d5c0a72315e21`, base exposée `73256f48d81d38ce8ff6f51be9e024b25cf5dadb`, `reviews=[]`. Recherche : 11 PR ouvertes et 12 issues ouvertes. Lecture des 16 documents d'arrivée (AGENTS, mémoire, conception, architecture, gouvernance, méthodes, lots, recette, roadmap, état, handoff, décisions, gates, journal et contrat autonome), du checkpoint du 06/11 et des fonctions/tests financiers ; PR concurrentes préservées.
