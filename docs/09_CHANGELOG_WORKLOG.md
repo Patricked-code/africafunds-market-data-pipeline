@@ -1,5 +1,18 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-18 — Lot 4 / #14 : tests isolés du parseur CSV documentaire
+
+- **SOURCE** : branche `test/parser-csv-document-regression-20261118` créée depuis `main` après lecture d'AGENTS.md, du contrat d'exécution et de la continuité ; PR #1 fusionnée selon contrôle GitHub antérieur, 11 PR ouvertes au contrôle de cette intervention. Ne pas utiliser les anciens SHA comme HEAD courant.
+- **ACTION CODE** : `test/csv-document-parser-regression.test.ts` ajouté (commit `72dfb130e12a3f08731cc18a4a8af0bb7b001d04`) : quatre tests synthétiques sans réseau pour BOM, CSV quoted/multiligne/escaped quotes, détection point-virgule, cellules vides TSV et lignes blanches. Aucun adaptateur CBE/BCT ni source réelle modifié ; aucune licence présumée.
+- **NON-COLLISION** : fichier de test neuf ; aucun changement aux fichiers des PR #26/#27/#33/#34 ni aux 44 endpoints. Le parseur existant reste inchangé.
+- **VALIDATION** : tests locaux NOT_RUN ; CI du nouveau HEAD à observer. Les tests sont des invariants structurels, non une recette d'adaptateur institutionnel.
+- **BLOCK_REASON** : six adaptateurs dynamiques (#14) restent non certifiés faute de contrats/fixtures institutionnels autorisés ; revue indépendante et gates de fusion non attestés ; CI du commit neuf non encore vérifiée.
+- **NEXT_ACTION** : ouvrir PR Draft, contrôler les workflows du HEAD exact et corriger tout test rouge ; obtenir revue ; poursuivre l'adaptateur officiel autorisé ou une autre tâche indépendante, sans fusion ni déploiement S1.
+- **ROLLBACK** : revert de la PR de tests uniquement ; aucune écriture S1, DB ou catalogue.
+
+---
+
+
 ## 2026-11-07 — SadiaAF S1 : première installation staging gouvernée, archives persistantes et autorisation des vhosts
 
 - **MANDAT** : l'utilisateur autorise désormais la modification des deux vhosts `sadiaaf.wealthtechinnovations.com` et `api.sadiaaf.wealthtechinnovations.com`, et la suppression d'une archive identifiable. Audit S1 répété : API vhost 16 Ko, frontend 36 Ko ; uniquement pages Plesk d'origine, dossiers historiques `.well-known`, `e-vote`, `sadiaaf_project-v2` ; **aucune archive détectée dans ces vhosts**. Les archives AMF-UMOA, sauvegardes Plesk et autres données hors vhosts ne sont pas autorisées à suppression indifférenciée. Aucune suppression S1 effectuée.
