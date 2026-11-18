@@ -1,5 +1,20 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-18 02:38 Europe/Paris — PR #34 / issue #17 : rejeter un rendement simple FX inférieur à -100 %
+
+- **Réconciliation** : PR #1 fusionnée ; PR #34 Draft, branche `fix/indices-finite-output-20261117`, HEAD initial `86d7b48d7e70ae070b3e292b73b94887dd2754e0` ; 11 PR et 12 issues ouvertes ; revue PR #34 `reviews=[]`. `AGENTS.md`, `docs/15_AUTONOMOUS_AGENT_EXECUTION.md`, journal courant et checkpoint historique relus. Aucun périmètre concurrent modifié.
+- **CI HEAD précédent** : [CI #44208834124](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/44208834124) et [Docker/PostgreSQL #44208834111](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/44208834111) `completed/success` sur `86d7b48d7e70ae070b3e292b73b94887dd2754e0`. Ne prouvent ni recette de données officielles ni déploiement S1.
+- **Défaut** : `convertReturn` acceptait `localReturn < -1`, produisant un rendement de perte supérieure à 100 % sur une position simple sans levier. La conversion de rendement simple doit refuser ces entrées ; une perte exactement égale à -100 % reste admissible.
+- **RED committé** : `7a06f70e358529af5ba9f4f86fb7190b6ec1a292` ajoute un test de refus `-1.01` et `-2`, avec contrôles de non-régression `-1` et `-0.5`.
+- **GREEN committé** : `2af39713b0883b5dc5290588ec539eb1fda92961` ajoute un garde local minimal dans `src/calc/indices.ts`, sans changer la signature, les formules des cas valides, la source registry, la base ou l'API.
+- **Tests locaux** : NOT_RUN ; les termes RED/GREEN décrivent les commits TDD, non des résultats de test observés. **CI des nouveaux commits** : à vérifier sur HEAD exact après ce checkpoint.
+- **BLOCK_REASON** : nouveaux tests/CI non attestés, PR Draft sans revue indépendante ni gates de fusion validés ; recette source→archive→normalisation→qualité→calcul→API sur données officielles/licences non certifiée.
+- **NEXT_ACTION** : vérifier les workflows GitHub CI et Docker/PostgreSQL du HEAD de cette entrée, corriger les échecs ; obtenir une revue indépendante des invariants financiers ; poursuivre la recette de l'issue #17 avec données témoins officielles autorisées ou une tâche libre des lots 0–13. Ne pas fusionner ni déployer S1 sans gates.
+- **Rollback** : revert des commits `2af39713` et `7a06f70e` sur branche PR, sans intervention serveur.
+
+---
+
+
 ## 2026-11-18 01:33 Europe/Paris — PR #34 / issue #17 : facteur de conversion FX sous-fluant et preuve CI précédente
 
 - RECONCILIATION : PR #1 merged ; PR #34 Draft HEAD de départ `87cd783766c3cec572e05b146d8b56f09354c5b0`, reviews=[] ; 11 PR ouvertes et 12 issues ouvertes trouvées par GitHub. AGENTS.md, docs/15_AUTONOMOUS_AGENT_EXECUTION.md, dernier worklog et checkpoint du 06/11 relus. PR concurrentes non modifiées.
