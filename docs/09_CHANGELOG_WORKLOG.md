@@ -1,5 +1,18 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-18 — PR #35 : préambule CSV constitué de lignes d'espaces
+
+- **RÉCONCILIATION** : branche Draft #35 ; les workflows du HEAD antérieur `cbeffa7c40cf01dfc39120fce0ae62ad9128804c` sont [CI #44393136955](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/44393136955) et [Docker/PostgreSQL #44393137032](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/44393137032), tous deux `completed/success`. Revue indépendante de #35 : aucune lors de cette lecture.
+- **TEST** : commit `e92a1462863d8718d590b349eff118ead0add75e`, cas synthétique d'un préambule de lignes ne contenant que des espaces/tabulations avant un en-tête point-virgule. Le parseur ignore déjà ces lignes, mais l'autodétection s'arrêtait prématurément. Test RED committé, exécution RED isolée `NOT_RUN`.
+- **CORRECTION** : commit `e1a6e4f041f3d0992e8705464134e16e92707e8f`, ignore également ces lignes pour le choix du séparateur ; conserve la lecture des enregistrements et le séparateur explicite. Aucun endpoint, secret, migration, main ou S1 modifié.
+- **VALIDATION** : tests locaux `NOT_RUN` ; workflows du nouveau HEAD `NOT_YET_VERIFIED`, aucune réussite inférée de la CI précédente. Les six adaptateurs institutionnels, licences et données historiques ne sont pas certifiés.
+- **BLOCK_REASON** : CI exact-HEAD et revue indépendante en attente ; échantillons/contrats officiels #14 non attestés ; gates de fusion non établis.
+- **NEXT_ACTION** : vérifier CI sur le nouveau HEAD de #35, corriger toute régression, obtenir revue indépendante ; poursuivre une tâche indépendante admissible #14/#17 après réconciliation des PR et des licences. Aucun merge ni déploiement S1.
+- **ROLLBACK** : revert ciblé des deux commits de code/test et de ce checkpoint sur la branche Draft.
+
+---
+
+
 ## 2026-11-18 — PR #35 : lignes blanches initiales et reprise de CI
 
 - **CI attestée HEAD antérieur** : `2b771288e8fbd7b1a236a3211d96c550a50034c5` : runs [44383152425](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/44383152425) et [44383152376](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/44383152376), tous deux `completed/success`. Preuve enregistrée également en commentaire PR #35 [6990935022](https://github.com/Patricked-code/africafunds-market-data-pipeline/pull/35#issuecomment-6990935022).
