@@ -60,3 +60,12 @@ test('Delimited: semicolon autodetection supports a multiline quoted header', ()
     ['Bill\n91d', '2026-01-02', '5.25'],
   ]);
 });
+
+// Blank preamble lines must not bias delimiter detection toward the comma fallback.
+test('Delimited: leading blank lines do not hide a semicolon header', () => {
+  const rows = parseDelimited('\n\r\ndate;rate;unit\n2026-01-02;5.25;percent\n');
+  assert.deepEqual(rows, [
+    ['date', 'rate', 'unit'],
+    ['2026-01-02', '5.25', 'percent'],
+  ]);
+});
