@@ -100,3 +100,7 @@ Commencer Phase 1 et Phase 2 sur une branche fonctionnelle : identité/RBAC/audi
 - **Backfill** : PR #12 contient des corrections P0, dernière CI du HEAD `ab45f3ffe175f69e45ba3f06ffe3b033185c6e3e` run 42313428780 SUCCESS vérifié, mais des fenêtres réelles et la reprise des RUNNING expirés restent incomplètes ; issue #5 non DONE.
 - **Normalisation/recette** : issues #15/#17 ouvertes ; PostgreSQL et méthodes financières existants, chaîne raw→canonical→calc→publish non attestée pour 11 marchés.
 - **Protection de main** : dernière vérification `protected=false` ; aucun merge/déploiement autorisé par ce checkpoint. Vérifier de nouveau à chaque reprise.
+
+## 2026-11-18 — Lot 4, PR #35 (en attente de validation)
+
+Le parseur CSV existant reçoit un test supplémentaire et un correctif de sélection de séparateur lorsque les en-têtes cités contiennent des séparateurs concurrents. Les tests locaux sont NOT_RUN ; la CI et la revue du HEAD final restent à attester. Les six adaptateurs institutionnels, leurs licences et les historiques réels ne sont pas certifiés par cette correction. Voir `docs/09_CHANGELOG_WORKLOG.md` et PR #35.
