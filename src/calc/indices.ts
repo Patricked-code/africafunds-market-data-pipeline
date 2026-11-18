@@ -53,6 +53,7 @@ export function capitaliseAnnualRate(input: {
 
 export function realReturn(nominalReturn: number, inflationReturn: number): number {
   requireFinite(nominalReturn, 'Rendement nominal');
+  if (nominalReturn < -1) throw new Error('Rendement nominal invalide (inférieur à -100 %)');
   requireFinite(inflationReturn, 'Inflation');
   if (inflationReturn <= -1) throw new Error('Inflation invalide');
   const result = (1 + nominalReturn) / (1 + inflationReturn) - 1;
