@@ -1,5 +1,17 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-18 08:33 Europe/Paris — PR #34 : CI exacte du HEAD précédent, revue indépendante toujours bloquante
+
+- **RECONCILIATION** : dépôt privé selon GitHub ; PR #1 closed/merged ; 11 PR ouvertes et 12 issues ouvertes ; PR #34 open/Draft, branche `fix/indices-finite-output-20261117`, aucune revue enregistrée (`reviews=[]`). Lecture de `AGENTS.md`, `docs/15_AUTONOMOUS_AGENT_EXECUTION.md`, dernier worklog, checkpoint historique, `docs/04_FINANCIAL_METHODOLOGIES.md`, `src/calc/indices.ts` et `test/indices-finite-output.test.ts`. Aucun changement des PR concurrentes.
+- **CI ATTESTÉE pour SHA exact** `3caa38be706c8a673057603cc8d08e8a70bfffab` : [CI #44252557748](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/44252557748) et [Docker/PostgreSQL #44252557714](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/44252557714), tous deux `completed/success` selon GitHub. Tests locaux NOT_RUN ; ces runs ne certifient pas les données réelles, licences, revue métier ni S1.
+- **ACTION** : examen statique du code et des tests de calculs financiers. Aucun défaut supplémentaire suffisamment qualifié pour changer les formules sans revue méthodologique ; éviter des tests redondants et une modification non justifiée. Le travail concret de ce passage est la réconciliation CI et la mise à jour de la continuité canonique. Aucun nouveau test ou correctif de production.
+- **BLOCK_REASON** : revue indépendante toujours absente, PR #34 Draft, gates de fusion non attestés ; absence de données témoins officielles et de licence prouvée pour la recette complète issue #17. La CI du nouveau commit documentaire devra être vérifiée séparément.
+- **NEXT_ACTION** : contrôler CI/Docker sur le SHA de ce checkpoint ; obtenir une revue indépendante de la méthodologie et des gardes IEEE-754, corriger les observations justifiées. Reprendre ensuite un défaut indépendant non revendiqué des lots 0–13 ou la qualification de données témoins officielles dans les issues #13–#17, sans modifier les PR concurrentes ni déclarer HISTORY_COMPLETE.
+- **ROLLBACK** : revert de cette entrée sur la branche Draft ; aucune modification de main, secrets, source registry, migration ou S1.
+
+---
+
+
 ## 2026-11-18 07:35 Europe/Paris — PR #34 : CI exacte et invariants de moyenne/pondération
 
 - **RECONCILIATION** : PR #1 merged ; PR #34 open/Draft, HEAD de départ `489e04535dd2879d015379031b33c9416945dca5`, base SHA exposé par la PR `73256f48d81d38ce8ff6f51be9e024b25cf5dadb`. Lecture de AGENTS.md, contrat 15, dernier worklog, checkpoint historique, code/tests et méthodologie financière. PR concurrentes non modifiées.
