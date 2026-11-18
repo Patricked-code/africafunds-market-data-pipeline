@@ -1,5 +1,18 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-18 — PR #35 : correction de détection du séparateur CSV avec champs cités
+
+- **PREUVE CI ANTÉRIEURE** : workflow GitHub Actions #44348351156 `completed/success` sur le HEAD précédent `b581a2bf3e5a6834d19824fffb7a41052709b2f9` ; cette preuve ne couvre pas les commits ci-dessous.
+- **TEST RED (code committé, exécution RED non attestée)** : `89c2ba480521882d2fd7a81b6a98530c122d6cec` ajoute une fixture CSV avec plusieurs points-virgules dans un en-tête cité, cas qui fausse le comptage naïf des séparateurs.
+- **CORRECTIF GREEN (code committé, CI à vérifier)** : `bc153752039849a1594a59776b043fe7254569f9` compte uniquement les séparateurs hors guillemets, respecte les doubles guillemets échappés, préserve la priorité existante à égalité et le séparateur explicite. Fichiers : `src/parsers/csv.ts`, `test/csv-document-parser-regression.test.ts`.
+- **PORTÉE** : lot 4 / issue #14, branche de PR #35 uniquement ; aucun endpoint, adaptateur institutionnel, source officielle, base, secret, main ou S1 modifié.
+- **VALIDATION** : tests locaux NOT_RUN ; aucune CI ni revue indépendante attestée sur le nouveau HEAD au moment de cette entrée. Aucun contrat officiel ni historique certifié.
+- **BLOCK_REASON** : CI et revue du nouveau HEAD en attente ; droits et échantillons institutionnels des six adaptateurs non attestés ; protections de fusion non établies.
+- **NEXT_ACTION** : vérifier CI GitHub sur le dernier SHA exact de PR #35, corriger tout échec et demander revue indépendante ; poursuivre une tâche indépendante admissible sans fusion ni déploiement S1.
+- **ROLLBACK** : revert ciblé des commits de PR #35 ; aucun effet serveur ou données historiques.
+
+---
+
 ## 2026-11-18 — Lot 4 / #14 : tests isolés du parseur CSV documentaire
 
 - **SOURCE** : branche `test/parser-csv-document-regression-20261118` créée depuis `main` après lecture d'AGENTS.md, du contrat d'exécution et de la continuité ; PR #1 fusionnée selon contrôle GitHub antérieur, 11 PR ouvertes au contrôle de cette intervention. Ne pas utiliser les anciens SHA comme HEAD courant.
