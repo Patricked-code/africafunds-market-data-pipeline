@@ -1,5 +1,18 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-18 01:33 Europe/Paris — PR #34 / issue #17 : facteur de conversion FX sous-fluant et preuve CI précédente
+
+- RECONCILIATION : PR #1 merged ; PR #34 Draft HEAD de départ `87cd783766c3cec572e05b146d8b56f09354c5b0`, reviews=[] ; 11 PR ouvertes et 12 issues ouvertes trouvées par GitHub. AGENTS.md, docs/15_AUTONOMOUS_AGENT_EXECUTION.md, dernier worklog et checkpoint du 06/11 relus. PR concurrentes non modifiées.
+- PREUVES CI exact-HEAD antérieur : [CI #44201021212](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/44201021212) et [Docker/PostgreSQL #44201021422](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/44201021422), tous deux completed/success pour `87cd783766c3cec572e05b146d8b56f09354c5b0`. Ce n'est ni une recette financière réelle ni une preuve S1.
+- TEST : commit `03cd7c070f4a207ad7db9c5d31db2ae7531419ce` ; scénario synthétique `localReturn=-0.5, fxToday=Number.MIN_VALUE, fxPrevious=1` : quotient FX positif, produit brut arrondi à zéro, rendement artificiel -100% ; préserver le vrai cas `localReturn=-1`. RED déduit par lecture du code antérieur, NOT_RUN localement.
+- CODE : commit `fd3164db032ed3c0041cebf32844363fa3531595` ; vérification de finitude et de stricte positivité du facteur brut lorsque le rendement local est supérieur à -100%, avant soustraction de 1. Aucun changement de signature, source, migration, secret, formule nominale, main ou S1. GREEN CI du nouveau HEAD NOT_YET_VERIFIED.
+- BLOCK_REASON : CI du nouveau HEAD à vérifier ; PR #34 Draft, revue indépendante absente, gates de fusion non attestés ; données officielles/licences/recette intégrée #17 toujours non certifiées. La méthode numérique fail-closed nécessite une revue indépendante.
+- NEXT_ACTION : vérifier CI et Docker/PostgreSQL sur le HEAD documentaire final, corriger si rouge ; obtenir revue indépendante et contrôles de fusion ; qualifier témoin officiel/licence pour recette source→archive→normalisation→qualité→calcul→API. Si bloqué, reprendre une tâche libre et indépendante des lots 0–13. Aucun merge ni S1.
+- ROLLBACK : revert ciblé des deux commits code/test et du checkpoint sur la branche Draft.
+
+---
+
+
 ## 2026-11-18 00:36 Europe/Paris — PR #34 : CI du HEAD précédent et couverture du quotient FX (issue #17)
 
 - RECONCILIATION : PR #1 merged ; PR #34 ouverte Draft, reviews=[] ; 11 PR et 12 issues ouvertes recensées ; dépôt privé selon get_repo. AGENTS.md, docs/15_AUTONOMOUS_AGENT_EXECUTION.md, worklog et checkpoint historique du 06/11 relus ; comparaison du code de calcul sur main et branche PR #34. Les autres PR et claims restent intacts.
