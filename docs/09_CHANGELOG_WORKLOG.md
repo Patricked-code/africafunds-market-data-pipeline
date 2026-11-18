@@ -1,5 +1,17 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-18 — PR #35 : CI précédente verte et correction en-tête CSV multiligne
+
+- **PREUVE CI** : HEAD précédent `a77e3fea580c74144902fe9a747d6951ef0c2558` : [CI #44371715719](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/44371715719) `completed/success` ; [Docker/PostgreSQL #44371715771](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/44371715771) `completed/success`. Ces runs ne valident pas les commits suivants.
+- **NOUVEAU TEST** : `8c76da5cf8684f460a9dd3596c731c29231df2f4` couvre un en-tête cité multiligne suivi de séparateurs `;` : la détection sur la première ligne physique choisissait `,` à tort. Test RED committé, exécution isolée NOT_RUN.
+- **CORRECTION** : `f525fabb645b1115d9a3aa9832bd0b7d6a3e5b52` compte les séparateurs non cités jusqu'à la fin du premier enregistrement logique, respecte guillemets échappés et sauts de ligne cités. Aucune source réelle ou endpoint modifié.
+- **VALIDATION** : tests locaux NOT_RUN ; CI exact-HEAD du correctif en attente ; revue indépendante non attestée. Pas de merge ni de déploiement S1.
+- **BLOCK_REASON** : CI et revue du nouveau HEAD à vérifier ; contrats/licences et observations officielles des six adaptateurs encore non certifiés.
+- **NEXT_ACTION** : vérifier les runs du HEAD actuel de PR #35 ; corriger tout échec, consigner preuves dans la PR sans boucle de commits documentaires ; demander revue puis reprendre l'issue #14 sur des données autorisées.
+- **ROLLBACK** : revert ciblé des deux commits sur branche Draft.
+
+---
+
 ## 2026-11-18 — PR #35 : diagnostic CI rouge et correctif TypeScript ciblé
 
 - **HEAD diagnostiqué** : `b67f83468e1df6846c543f0aa4de3a5eec9b6f2a` ; GitHub Actions [CI #44360170604](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/44360170604) et [Docker/PostgreSQL #44360170661](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/44360170661) : `completed/failure`.
