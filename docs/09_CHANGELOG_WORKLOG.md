@@ -1,5 +1,17 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-18 04:38 Europe/Paris — PR #34 / issue #17 : CI exacte confirmée et revue financière à obtenir
+
+- **RECONCILIATION** : PR #1 closed (mémoire sur main), PR #34 Draft, branche `fix/indices-finite-output-20261117`, HEAD de départ `a437aeaebf684dc0b4a55ea2462fc70edaac8cb1` ; 11 PR ouvertes, revue PR #34 `reviews=[]`, dépôt `visibility=private` selon get_repo. Lecture de `AGENTS.md`, `docs/15_AUTONOMOUS_AGENT_EXECUTION.md`, du journal actuel, du checkpoint `docs/CONTINUITY_CHECKPOINT_2026-11-06.md`, du code et des tests de la PR. Les autres PR restent intactes.
+- **PREUVES CI pour HEAD exact** `a437aeaebf684dc0b4a55ea2462fc70edaac8cb1` : [CI #44224387842](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/44224387842) `completed/success` et [Docker/PostgreSQL #44224387851](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/44224387851) `completed/success` selon GitHub. Ne prouvent ni données réelles, ni méthodologie financière approuvée, ni S1.
+- **ACTION** : contrôle des invariants numériques du code `src/calc/indices.ts` et des scénarios `test/indices-finite-output.test.ts`. Pas de modification de formule sans revue méthodologique indépendante ; tests locaux NOT_RUN. Demande de revue ciblée sur la PR #34 ; aucune revue approuvée à ce stade.
+- **BLOCK_REASON** : PR #34 toujours Draft sans revue indépendante ; méthodologie des rendements simples sans levier et comportement fail-closed aux frontières IEEE-754 non approuvés ; gates de fusion non attestés ; données officielles/licences et recette intégrée issue #17 absentes.
+- **NEXT_ACTION** : obtenir revue indépendante des formules et invariants de la PR #34, traiter ses remarques avec tests, vérifier CI sur tout nouveau HEAD ; parallèlement qualifier une observation officielle autorisée pour recette source→archive→normalisation→qualité→calcul→API ou reprendre un travail indépendant non revendiqué des lots 0–13. Aucun merge ni déploiement S1.
+- **ROLLBACK** : revert ciblé de cette entrée documentaire sur branche Draft ; aucune modification de main, S1, secrets, SQL ou 44 sources.
+
+---
+
+
 ## 2026-11-18 03:34 Europe/Paris — PR #34 / issue #17 : rendement réel simple inférieur à -100 %
 
 - **Réconciliation** : PR #1 merged, PR #34 ouverte Draft sur `fix/indices-finite-output-20261117` ; 11 PR ouvertes et 12 issues ouvertes retournées par GitHub. Lecture de `AGENTS.md`, `docs/15_AUTONOMOUS_AGENT_EXECUTION.md`, du worklog courant, du checkpoint `docs/CONTINUITY_CHECKPOINT_2026-11-06.md` et du code/tests de branche. Les autres PR et claims restent intacts.
