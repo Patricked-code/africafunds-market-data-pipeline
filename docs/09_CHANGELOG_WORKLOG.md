@@ -1,5 +1,17 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-18 09:34 Europe/Paris — PR #34 : validation exacte des deux workflows, revue et recette métier toujours ouvertes
+
+- **RECONCILIATION GITHUB** : PR #1 closed/merged ; PR #34 open/Draft, HEAD observé `7b15a41ba3d12d48374d8bac500d5c0a72315e21`, base exposée `73256f48d81d38ce8ff6f51be9e024b25cf5dadb`, `reviews=[]`. Recherche : 11 PR ouvertes et 12 issues ouvertes. Lecture des 16 documents d'arrivée (AGENTS, mémoire, conception, architecture, gouvernance, méthodes, lots, recette, roadmap, état, handoff, décisions, gates, journal et contrat autonome), du checkpoint du 06/11 et des fonctions/tests financiers ; PR concurrentes préservées.
+- **PREUVES CI EXACT-HEAD** : commit `7b15a41ba3d12d48374d8bac500d5c0a72315e21` : [CI #44259974019](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/44259974019) `completed/success` ; [Docker/PostgreSQL #44259974073](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/44259974073) `completed/success`, selon GitHub. Ces résultats ne démontrent ni une revue indépendante, ni une collecte réelle, ni les licences, ni la production S1.
+- **ACTION ET CONTRÔLE** : vérification du code de `src/calc/indices.ts` et de `test/indices-finite-output.test.ts` : les gardes existants couvrent les scénarios financiers synthétiques déjà ajoutés ; aucune anomalie supplémentaire reproductible et méthodologiquement admissible identifiée. Pas de changement de formule ni de test redondant. Tests locaux NOT_RUN. La revue financière indépendante demeure indispensable avant modification de conventions de rendement.
+- **BLOCK_REASON** : revue indépendante absente et PR Draft ; protections/gates de fusion non attestés ; droits/licences et observations institutionnelles datées manquants pour attester la recette source → archive → normalisation → qualité → calcul → API (#13–#17). Aucune preuve HISTORY_COMPLETE. Le nouveau HEAD documentaire créé par cette entrée demandera une validation CI distincte.
+- **NEXT_ACTION** : contrôler les deux workflows du nouveau HEAD ; si échec, corriger. Obtenir une revue indépendante des formules et de la politique d'exclusion des observations invalides. Prioriser ensuite une correction fonctionnelle démontrée et non revendiquée des lots 0–13 ou la qualification d'un échantillon officiel autorisé pour la recette #17 ; coordonner les claims #26/#27 avant toute intervention sur ingestion/qualité. Ne pas multiplier les commits purement documentaires sans progrès métier ; ne pas fusionner ni déployer S1.
+- **ROLLBACK** : revert ciblé de cette entrée sur la branche Draft ; aucun changement main, source registry, migration, secret, vhost ou runtime.
+
+---
+
+
 ## 2026-11-18 08:33 Europe/Paris — PR #34 : CI exacte du HEAD précédent, revue indépendante toujours bloquante
 
 - **RECONCILIATION** : dépôt privé selon GitHub ; PR #1 closed/merged ; 11 PR ouvertes et 12 issues ouvertes ; PR #34 open/Draft, branche `fix/indices-finite-output-20261117`, aucune revue enregistrée (`reviews=[]`). Lecture de `AGENTS.md`, `docs/15_AUTONOMOUS_AGENT_EXECUTION.md`, dernier worklog, checkpoint historique, `docs/04_FINANCIAL_METHODOLOGIES.md`, `src/calc/indices.ts` et `test/indices-finite-output.test.ts`. Aucun changement des PR concurrentes.
