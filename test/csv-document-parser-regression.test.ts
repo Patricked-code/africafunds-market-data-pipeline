@@ -69,3 +69,13 @@ test('Delimited: leading blank lines do not hide a semicolon header', () => {
     ['2026-01-02', '5.25', 'percent'],
   ]);
 });
+
+// Whitespace-only preamble lines are discarded by the parser and must not
+// prevent detection of the delimiter in the first meaningful header record.
+test('Delimited: whitespace-only preamble lines do not hide a semicolon header', () => {
+  const rows = parseDelimited('  \r\n\t\n date;rate;unit\n2026-01-02;5.25;percent\n');
+  assert.deepEqual(rows, [
+    ['date', 'rate', 'unit'],
+    ['2026-01-02', '5.25', 'percent'],
+  ]);
+});
