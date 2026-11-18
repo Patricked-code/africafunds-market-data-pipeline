@@ -93,3 +93,12 @@ test('FX conversion rejects an underflowed compounded gross return, but preserve
   // A genuine -100% local loss is still valid, independently of a positive FX rate.
   assert.equal(convertReturn({ localReturn: -1, fxToday: 1, fxPrevious: 1 }), -1);
 });
+
+
+test('FX conversion rejects a local simple return below -100% without altering a total loss', () => {
+  // A simple financial return cannot lose more than the entire invested principal.
+  assert.throws(() => convertReturn({ localReturn: -1.01, fxToday: 1, fxPrevious: 1 }), /invalide|rendement/i);
+  assert.throws(() => convertReturn({ localReturn: -2, fxToday: 2, fxPrevious: 1 }), /invalide|rendement/i);
+  assert.equal(convertReturn({ localReturn: -1, fxToday: 2, fxPrevious: 1 }), -1);
+  assert.equal(convertReturn({ localReturn: -0.5, fxToday: 2, fxPrevious: 1 }), 0);
+});
