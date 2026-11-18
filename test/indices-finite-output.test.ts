@@ -84,3 +84,12 @@ test('FX conversion rejects an overflowing exchange-rate ratio without changing 
   assert.throws(() => convertReturn({ localReturn: 0, fxToday: Number.MAX_VALUE, fxPrevious: Number.MIN_VALUE }), /invalide|fini|rapport/i);
   assert.equal(convertReturn({ localReturn: 0.1, fxToday: 2, fxPrevious: 2 }), 0.10000000000000009);
 });
+
+
+test('FX conversion rejects an underflowed compounded gross return, but preserves a genuine total loss', () => {
+  // The FX quotient remains strictly positive, yet (1 + localReturn) * quotient rounds to zero.
+  // It must not be published as a synthetic -100% return.
+  assert.throws(() => convertReturn({ localReturn: -0.5, fxToday: Number.MIN_VALUE, fxPrevious: 1 }), /invalide|positif|nul|rapport/i);
+  // A genuine -100% local loss is still valid, independently of a positive FX rate.
+  assert.equal(convertReturn({ localReturn: -1, fxToday: 1, fxPrevious: 1 }), -1);
+});
