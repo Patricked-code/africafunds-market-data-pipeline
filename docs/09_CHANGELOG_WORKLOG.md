@@ -1,5 +1,18 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-18 — PR #35 : diagnostic CI rouge et correctif TypeScript ciblé
+
+- **HEAD diagnostiqué** : `b67f83468e1df6846c543f0aa4de3a5eec9b6f2a` ; GitHub Actions [CI #44360170604](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/44360170604) et [Docker/PostgreSQL #44360170661](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/44360170661) : `completed/failure`.
+- **CAUSE PROUVÉE** : `src/parsers/csv.ts` lignes 13–14, `TS2345` : `firstLine[i]` peut être `undefined` sous les règles TypeScript ; `Map.has/get/set` attendent `string`. Le build Docker échoue pour la même raison, avant recette runtime ; ne pas attribuer cet échec à PostgreSQL.
+- **CORRECTION CODE** : commit [522148ea](https://github.com/Patricked-code/africafunds-market-data-pipeline/commit/522148ea07c343440368be22ad8fc35525d0a68d) ; garde `char !== undefined` avant `counts.has/get/set`, sans changement de logique CSV pour caractères valides.
+- **VALIDATION** : tests locaux NOT_RUN ; CI du commit correctif et du présent checkpoint non attestée au moment de rédaction. Revue indépendante manquante. Aucun endpoint officiel, migration, secret, main ni S1 modifié.
+- **BLOCK_REASON** : CI exact-HEAD du correctif et revue indépendante en attente ; données/licences des six adaptateurs institutionnels non certifiées.
+- **NEXT_ACTION** : vérifier les workflows du HEAD actuel de PR #35, diagnostiquer toute autre erreur, obtenir revue et continuer le lot 4/#14 sans merge ni déploiement. Si vert, ne pas créer de checkpoint documentaire en boucle : actualiser la PR ou l'issue avec le lien CI exact.
+- **ROLLBACK** : revert ciblé du correctif et du checkpoint sur branche Draft.
+
+---
+
+
 ## 2026-11-18 — PR #35 : correction de détection du séparateur CSV avec champs cités
 
 - **PREUVE CI ANTÉRIEURE** : workflow GitHub Actions #44348351156 `completed/success` sur le HEAD précédent `b581a2bf3e5a6834d19824fffb7a41052709b2f9` ; cette preuve ne couvre pas les commits ci-dessous.
