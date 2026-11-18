@@ -1,5 +1,16 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-18 05:31 Europe/Paris — PR #34 : validation exacte du HEAD et revue toujours en attente
+
+- **RECONCILIATION** : PR #1 merged ; PR #34 ouverte Draft, HEAD exact `69ebfd4b8eac0ebdf2738c1bcea55d44291be4c4`, base main `73256f48d81d38ce8ff6f51be9e024b25cf5dadb` (métadonnées PR) ; 11 PR et 12 issues ouvertes selon recherches GitHub. Revue PR #34 : `reviews=[]`. Lecture de `AGENTS.md`, `docs/15_AUTONOMOUS_AGENT_EXECUTION.md`, du journal courant, du checkpoint historique et de `src/calc/indices.ts` et `test/indices-finite-output.test.ts` sur la branche.
+- **CI ATTESTÉE sur SHA exact** `69ebfd4b8eac0ebdf2738c1bcea55d44291be4c4` : [CI #44231895378](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/44231895378) `completed/success` ; [Docker/PostgreSQL #44231895438](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/44231895438) `completed/success`. Résultats de workflows, non preuve de données officielles, de validation méthodologique, de runtime autonome ou de S1.
+- **ACTION** : revue statique des invariants de calcul et des tests de frontière existants. Aucune anomalie supplémentaire suffisamment qualifiée pour justifier une modification de formule sans arbitrage métier ; aucun test local exécuté. Les PR concurrentes restent intactes. La demande de revue précédente n'est pas une approbation.
+- **BLOCK_REASON** : revue financière indépendante non enregistrée ; PR Draft, gates/protections de fusion non attestés ; recettes de données institutionnelles/licences et chaîne intégrée issue #17 non certifiées. Le présent commit documentaire aura un SHA nouveau, sans CI attribuable par anticipation.
+- **NEXT_ACTION** : contrôler CI/Docker sur le HEAD documentaire issu de ce checkpoint ; obtenir une revue indépendante des formules et des limites IEEE-754, traiter les remarques. En parallèle, reprendre une tâche indépendante non revendiquée dans les lots 0–13, prioritairement la qualification de données témoins officielles pour la recette source→archive→normalisation→qualité→calcul→API ; aucune fusion ou S1 sans gates.
+- **ROLLBACK** : revert de ce seul checkpoint sur branche Draft ; aucune modification de code, de données, de main, de secrets ou de production.
+
+---
+
 ## 2026-11-18 04:38 Europe/Paris — PR #34 / issue #17 : CI exacte confirmée et revue financière à obtenir
 
 - **RECONCILIATION** : PR #1 closed (mémoire sur main), PR #34 Draft, branche `fix/indices-finite-output-20261117`, HEAD de départ `a437aeaebf684dc0b4a55ea2462fc70edaac8cb1` ; 11 PR ouvertes, revue PR #34 `reviews=[]`, dépôt `visibility=private` selon get_repo. Lecture de `AGENTS.md`, `docs/15_AUTONOMOUS_AGENT_EXECUTION.md`, du journal actuel, du checkpoint `docs/CONTINUITY_CHECKPOINT_2026-11-06.md`, du code et des tests de la PR. Les autres PR restent intactes.
