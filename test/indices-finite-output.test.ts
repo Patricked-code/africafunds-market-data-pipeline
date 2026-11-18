@@ -126,3 +126,27 @@ test('weighted return excludes invalid and non-positive weights without changing
     { value: Number.POSITIVE_INFINITY, weight: 1 },
   ]), /poids valide/i);
 });
+
+
+test('mean return excludes non-finite observations without mutating the input', () => {
+  // Invalid observations must not affect the denominator or overwrite the raw input.
+  const observations = [0.1, Number.NaN, 0.3, Number.POSITIVE_INFINITY];
+  const snapshot = observations.slice();
+  assert.equal(meanReturn(observations), 0.2);
+  assert.deepEqual(observations, snapshot);
+  assert.throws(() => meanReturn([Number.NaN, Number.NEGATIVE_INFINITY]), /Aucun rendement valide/i);
+});
+
+test('weighted return excludes invalid weights and preserves the source components', () => {
+  // Zero/negative/non-finite weights and invalid values must not enter either sum.
+  const components = [
+    { value: 0.1, weight: 1 },
+    { value: 0.3, weight: 3 },
+    { value: Number.NaN, weight: 20 },
+    { value: 10, weight: Number.POSITIVE_INFINITY },
+    { value: 5, weight: -1 },
+  ];
+  const snapshot = components.map((item) => ({ ...item }));
+  assert.equal(weightedReturn(components), 0.24999999999999997);
+  assert.deepEqual(components, snapshot);
+});
