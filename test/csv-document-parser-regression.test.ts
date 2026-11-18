@@ -51,3 +51,12 @@ test('Delimited: autodetection ignores semicolons inside a quoted CSV header', (
     ['2026-01-02', 'bond;a;b;c', '5.25'],
   ]);
 });
+
+// The header record, not its first physical line, determines the delimiter.
+test('Delimited: semicolon autodetection supports a multiline quoted header', () => {
+  const rows = parseDelimited('"metric\nlabel";date;rate\n"Bill\n91d";2026-01-02;5.25\n');
+  assert.deepEqual(rows, [
+    ['metric\nlabel', 'date', 'rate'],
+    ['Bill\n91d', '2026-01-02', '5.25'],
+  ]);
+});
