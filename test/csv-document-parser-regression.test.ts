@@ -41,3 +41,13 @@ test('Delimited: blank physical lines are ignored without inventing observations
     ['2026-01-02', '0'],
   ]);
 });
+
+// A quoted field may contain more semicolons than the number of CSV separators.
+// Delimiter selection must count only separators outside quoted fields.
+test('Delimited: autodetection ignores semicolons inside a quoted CSV header', () => {
+  const rows = parseDelimited('date,"metric;a;b;c",rate\n2026-01-02,"bond;a;b;c",5.25\n');
+  assert.deepEqual(rows, [
+    ['date', 'metric;a;b;c', 'rate'],
+    ['2026-01-02', 'bond;a;b;c', '5.25'],
+  ]);
+});
