@@ -1,5 +1,19 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-18 03:34 Europe/Paris — PR #34 / issue #17 : rendement réel simple inférieur à -100 %
+
+- **Réconciliation** : PR #1 merged, PR #34 ouverte Draft sur `fix/indices-finite-output-20261117` ; 11 PR ouvertes et 12 issues ouvertes retournées par GitHub. Lecture de `AGENTS.md`, `docs/15_AUTONOMOUS_AGENT_EXECUTION.md`, du worklog courant, du checkpoint `docs/CONTINUITY_CHECKPOINT_2026-11-06.md` et du code/tests de branche. Les autres PR et claims restent intacts.
+- **CI vérifiée sur HEAD précédent exact** `efe0daebfd1506c32f3e7e6e607b12eb6f213522` : [CI #44217492266](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/44217492266) et [Docker/PostgreSQL #44217492252](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/44217492252), tous deux `completed/success`. Cela n'atteste aucune donnée réelle, licence, historique complet ou S1.
+- **Défaut** : `realReturn(-1.01, 0)` pouvait retourner une perte réelle inférieure à -100 %, incohérente avec le contrat de rendement simple sans levier désormais appliqué à `convertReturn`. Une perte nominale exactement -100 % reste permise.
+- **Test committé** : `1de871c29fe022ff9b082b824dd38490b53d60db`, rejette -1.01 et -2, conserve -1 et le cas 10 % nominal / 10 % inflation. RED déduit par inspection de la version antérieure, non exécuté localement.
+- **Correctif committé** : `fdf31336a2b75564c0d65e616121920789be53f2`, garde minimal dans `realReturn` après contrôle de finitude, sans modifier signature, calcul valide, source registry, SQL, API ou serveur. Tests locaux `NOT_RUN` ; CI des nouveaux commits `NOT_YET_VERIFIED`.
+- **BLOCK_REASON** : CI des nouveaux commits et revue indépendante non attestées, PR Draft et gates de fusion non validés. L'hypothèse de rendement simple sans levier doit être examinée par revue métier ; recettes officielles source→archive→normalisation→qualité→calcul→API toujours non certifiées.
+- **NEXT_ACTION** : contrôler CI et Docker/PostgreSQL du nouveau HEAD exact, corriger tout échec ; obtenir revue indépendante des invariants de rendements simples et vérifier les protections/gates. Ensuite qualifier une observation institutionnelle autorisée pour recette intégrée issue #17, ou poursuivre un périmètre indépendant non revendiqué des lots 0–13. Aucune fusion ni déploiement S1 implicite.
+- **Rollback** : revert ciblé des commits `fdf31336` et `1de871c2` sur branche Draft, sans toucher main ou S1.
+
+---
+
+
 ## 2026-11-18 02:38 Europe/Paris — PR #34 / issue #17 : rejeter un rendement simple FX inférieur à -100 %
 
 - **Réconciliation** : PR #1 fusionnée ; PR #34 Draft, branche `fix/indices-finite-output-20261117`, HEAD initial `86d7b48d7e70ae070b3e292b73b94887dd2754e0` ; 11 PR et 12 issues ouvertes ; revue PR #34 `reviews=[]`. `AGENTS.md`, `docs/15_AUTONOMOUS_AGENT_EXECUTION.md`, journal courant et checkpoint historique relus. Aucun périmètre concurrent modifié.
