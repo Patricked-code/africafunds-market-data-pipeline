@@ -7,9 +7,12 @@ export function parseDelimited(text: string, delimiter?: string): string[][] {
   let recordStarted = false;
   for (let i = 0; i < normalized.length; i += 1) {
     const char = normalized[i];
-    // Ignore empty physical lines before the first header record.
-    if (!recordStarted && (char === '\n' || char === '\r')) continue;
-    if (!inQuotes && (char === '\n' || char === '\r')) break;
+    // Ignore empty or whitespace-only physical lines before the header.
+    // The parser itself discards these rows, so autodetection must agree.
+    if (!inQuotes && (char === '\n' || char === '\r')) {
+      if (!recordStarted || normalized.slice(0, i).trim() === '') continue;
+      break;
+    }
     recordStarted = true;
     if (char === '"') {
       if (inQuotes && normalized[i + 1] === '"') i += 1;
