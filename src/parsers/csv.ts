@@ -10,7 +10,7 @@ export function parseDelimited(text: string, delimiter?: string): string[][] {
     if (char === '"') {
       if (inQuotes && firstLine[i + 1] === '"') i += 1;
       else inQuotes = !inQuotes;
-    } else if (!inQuotes && counts.has(char)) {
+    } else if (char !== undefined && !inQuotes && counts.has(char)) {
       counts.set(char, (counts.get(char) ?? 0) + 1);
     }
   }
