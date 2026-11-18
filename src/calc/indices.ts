@@ -66,6 +66,7 @@ export function convertReturn(input: {
   fxPrevious: number;
 }): number {
   requireFinite(input.localReturn, 'Rendement local');
+  if (input.localReturn < -1) throw new Error('Rendement local invalide (inférieur à -100 %)');
   requireFinite(input.fxToday, 'Taux de change courant');
   requireFinite(input.fxPrevious, 'Taux de change précédent');
   if (input.fxToday <= 0 || input.fxPrevious <= 0) throw new Error('Taux de change invalide');
