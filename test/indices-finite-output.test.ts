@@ -111,3 +111,18 @@ test('real simple return rejects a nominal loss below -100% but preserves total 
   assert.equal(realReturn(-1, 0.1), -1);
   assert.equal(realReturn(0.1, 0.1), 0);
 });
+
+
+test('weighted return excludes invalid and non-positive weights without changing valid observations', () => {
+  // A bad observation must not contaminate the financial average or its denominator.
+  assert.equal(weightedReturn([
+    { value: 0.1, weight: 1 },
+    { value: Number.NaN, weight: 100 },
+    { value: 5, weight: 0 },
+    { value: -2, weight: -1 },
+  ]), 0.1);
+  assert.throws(() => weightedReturn([
+    { value: 0.1, weight: 0 },
+    { value: Number.POSITIVE_INFINITY, weight: 1 },
+  ]), /poids valide/i);
+});
