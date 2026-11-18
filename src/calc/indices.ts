@@ -72,7 +72,12 @@ export function convertReturn(input: {
   const fxRatio = input.fxToday / input.fxPrevious;
   requireFinite(fxRatio, 'Rapport de change');
   if (fxRatio <= 0) throw new Error('Rapport de change invalide (non positif)');
-  const result = (1 + input.localReturn) * fxRatio - 1;
+  const grossReturn = (1 + input.localReturn) * fxRatio;
+  requireFinite(grossReturn, 'Facteur de rendement converti');
+  if (input.localReturn > -1 && grossReturn <= 0) {
+    throw new Error('Facteur de rendement converti invalide (non positif)');
+  }
+  const result = grossReturn - 1;
   requireFinite(result, 'Rendement converti');
   return result;
 }
