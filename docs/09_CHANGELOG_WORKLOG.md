@@ -1,5 +1,17 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-18 — PR #35 : lignes blanches initiales et reprise de CI
+
+- **CI attestée HEAD antérieur** : `2b771288e8fbd7b1a236a3211d96c550a50034c5` : runs [44383152425](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/44383152425) et [44383152376](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/44383152376), tous deux `completed/success`. Preuve enregistrée également en commentaire PR #35 [6990935022](https://github.com/Patricked-code/africafunds-market-data-pipeline/pull/35#issuecomment-6990935022).
+- **TEST ADDITIF** : commit `00a111f22d2f895775b877f0e841646cea63d130` : en-tête point-virgule précédé de lignes vides `LF/CRLF`, sans réseau. Avant correction, l'autodétection quittait la boucle au premier saut de ligne et retenait la virgule. Test RED committé mais exécution isolée `NOT_RUN`.
+- **CORRECTION MINIMALE** : commit `3c739b1b47aeaf59e53031305aeefe25ccb8c712` : ignorer les sauts de ligne précédant le premier enregistrement logique pour l'autodétection, sans changer la lecture des lignes ni les URLs institutionnelles.
+- **VALIDATION** : tests locaux `NOT_RUN` ; CI des nouveaux commits `NOT_YET_VERIFIED`, ne pas extrapoler la CI précédente. Aucune recette de données réelles, revue indépendante, fusion ou exécution S1.
+- **BLOCK_REASON** : nouvelle CI et revue indépendante non attestées ; contrats, licences et échantillons officiels des six adaptateurs #14 toujours à qualifier.
+- **NEXT_ACTION** : vérifier CI exact-HEAD après ce checkpoint, corriger tout échec, consigner preuves dans la PR sans nouveau commit documentaire isolé ; demander revue indépendante, puis reprendre une tâche admissible #14 ou autre lot sans collision.
+- **ROLLBACK** : revert des commits de test/correctif et du présent checkpoint sur la seule branche Draft.
+
+---
+
 ## 2026-11-18 — PR #35 : CI précédente verte et correction en-tête CSV multiligne
 
 - **PREUVE CI** : HEAD précédent `a77e3fea580c74144902fe9a747d6951ef0c2558` : [CI #44371715719](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/44371715719) `completed/success` ; [Docker/PostgreSQL #44371715771](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/44371715771) `completed/success`. Ces runs ne valident pas les commits suivants.
