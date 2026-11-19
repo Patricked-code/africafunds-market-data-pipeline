@@ -35,6 +35,7 @@ export function parseDelimited(text: string, delimiter?: string): string[][] {
   let quoted = false;
   let explicitQuotedCell = false;
   let closedQuotedCell = false;
+  let cellWasQuoted = false;
 
   for (let i = 0; i < normalized.length; i += 1) {
     const char = normalized[i];
@@ -53,31 +54,39 @@ export function parseDelimited(text: string, delimiter?: string): string[][] {
       if (!quoted && cell.trim().length > 0) {
         throw new Error('Invalid quote inside unquoted delimited field');
       }
+      if (!quoted) {
+        // Leading whitespace outside quotes is not part of the quoted value.
+        cell = '';
+        cellWasQuoted = true;
+      }
       explicitQuotedCell = true;
       quoted = !quoted;
       closedQuotedCell = !quoted;
     } else if (char === sep && !quoted) {
-      row.push(cell.trim());
+      row.push(cellWasQuoted ? cell : cell.trim());
       cell = '';
+      cellWasQuoted = false;
       closedQuotedCell = false;
     } else if ((char === '\n' || char === '\r') && !quoted) {
       if (char === '\r' && next === '\n') i += 1;
-      row.push(cell.trim());
+      row.push(cellWasQuoted ? cell : cell.trim());
       if (row.some(Boolean) || row.length > 1 || explicitQuotedCell) rows.push(row);
       row = [];
       cell = '';
       explicitQuotedCell = false;
+      cellWasQuoted = false;
       closedQuotedCell = false;
     } else {
       if (closedQuotedCell && char !== undefined && !/\s/.test(char)) {
         throw new Error('Invalid characters after closing quote in delimited field');
       }
-      cell += char;
+      // Whitespace after a closing quote is formatting, not source content.
+      if (!closedQuotedCell) cell += char;
     }
   }
   if (quoted) throw new Error('Unterminated quoted field in delimited document');
   if (cell.length || row.length || explicitQuotedCell) {
-    row.push(cell.trim());
+    row.push(cellWasQuoted ? cell : cell.trim());
     if (row.some(Boolean) || row.length > 1 || explicitQuotedCell) rows.push(row);
   }
   return rows;
