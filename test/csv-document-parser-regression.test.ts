@@ -155,3 +155,11 @@ test('Delimited: fully empty explicit financial records are preserved', () => {
   ]);
   assert.deepEqual(rowsToObjects(rows)[0], { date: '', rate: '', unit: '' });
 });
+
+// An explicitly quoted empty single-column record is a real record, not a blank line.
+// Preserve its position for downstream source-quality and provenance checks.
+test('Delimited: quoted empty single-column record is preserved', () => {
+  const rows = parseDelimited('rate\n""\n\n5.25\n""');
+  assert.deepEqual(rows, [['rate'], [''], ['5.25'], ['']]);
+  assert.deepEqual(rowsToObjects(rows), [{ rate: '' }, { rate: '5.25' }, { rate: '' }]);
+});
