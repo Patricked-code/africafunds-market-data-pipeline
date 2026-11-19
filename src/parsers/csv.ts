@@ -43,6 +43,11 @@ export function parseDelimited(text: string, delimiter?: string): string[][] {
       cell += '"';
       i += 1;
     } else if (char === '"') {
+      // A closed quoted field cannot be reopened, even after whitespace.
+      // Otherwise distinct source fragments can be silently concatenated.
+      if (closedQuotedCell) {
+        throw new Error('Invalid quote after closing quoted delimited field');
+      }
       // Quotes cannot begin inside an already populated unquoted value.
       // Reject rather than silently stripping a character from financial data.
       if (!quoted && cell.trim().length > 0) {
