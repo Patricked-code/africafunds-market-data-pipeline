@@ -33,6 +33,7 @@ export function parseDelimited(text: string, delimiter?: string): string[][] {
   let row: string[] = [];
   let cell = '';
   let quoted = false;
+  let explicitQuotedCell = false;
 
   for (let i = 0; i < normalized.length; i += 1) {
     const char = normalized[i];
@@ -41,6 +42,7 @@ export function parseDelimited(text: string, delimiter?: string): string[][] {
       cell += '"';
       i += 1;
     } else if (char === '"') {
+      explicitQuotedCell = true;
       quoted = !quoted;
     } else if (char === sep && !quoted) {
       row.push(cell.trim());
@@ -48,9 +50,10 @@ export function parseDelimited(text: string, delimiter?: string): string[][] {
     } else if ((char === '\n' || char === '\r') && !quoted) {
       if (char === '\r' && next === '\n') i += 1;
       row.push(cell.trim());
-      if (row.some(Boolean) || row.length > 1) rows.push(row);
+      if (row.some(Boolean) || row.length > 1 || explicitQuotedCell) rows.push(row);
       row = [];
       cell = '';
+      explicitQuotedCell = false;
     } else {
       cell += char;
     }
