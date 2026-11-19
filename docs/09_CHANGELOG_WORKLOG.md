@@ -1,5 +1,20 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-19 — PR #35 / issue #14 : interdiction de rouvrir un champ CSV cité fermé
+
+- **RECONCILIATION** : PR #1 fusionnée ; branche PR #35 Draft, HEAD initial exact `347b918ae7ad57c5e41b27ac5d3c6a9d2294d9a6` ; lecture AGENTS.md, docs/15, dernier journal, checkpoint du 06/11 et discussions PR #35 ; autres PR/claims non modifiés. Dépôt GitHub privé lors de ce contrôle.
+- **PREUVE CI PRECEDENTE** : sur SHA `347b918ae7ad57c5e41b27ac5d3c6a9d2294d9a6`, workflow CI [#44556082359](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/44556082359) et Docker/PostgreSQL [#44556082411](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/44556082411) : completed/success. Ils ne prouvent PAS les nouveaux commits.
+- **RISQUE STATIQUE** : après un guillemet fermant et un espace, un autre guillemet pouvait rouvrir le champ et concaténer des fragments distincts (ex. `"5.25" "6.25"`) ; risque de valeur financière altérée.
+- **TEST** : commit `c4981faa58aa16bcf5bc76290855bb023450e4e6` : assertions synthétiques fin de ligne et EOF. Test RED isolé NOT_RUN.
+- **CORRECTIF** : commit `a9a5516d64012e068d049eee27f5a1ddebbebe19` : rejet fail-closed de toute réouverture de guillemet lorsque `closedQuotedCell` est vrai ; interfaces inchangées. Tests locaux NOT_RUN.
+- **VALIDATION** : CI exact-HEAD des nouveaux commits NOT_YET_ATTESTED ; revue indépendante absente (seulement COMMENTED par l'auteur). Les formats institutionnels, licences et données témoins restent non certifiés.
+- **BLOCK_REASON** : nouveau HEAD non validé par CI/revue ; six adaptateurs CBE/GOSDMX #14 et recette réelle #17 incomplets ; protections/gates de fusion et S1 non satisfaits.
+- **NEXT_ACTION** : vérifier les workflows du HEAD final après journal, corriger toute régression, obtenir revue indépendante ; qualifier les formats et licences des six adaptateurs et reprendre la recette #17 après vérification des claims. Ne pas fusionner, pousser main, modifier les 44 sources ni déployer S1.
+- **ROLLBACK** : revert ciblé de `a9a5516` et `c4981fa` sur la branche Draft après revue, sans effet sur main/S1.
+
+---
+
+
 ## 2026-11-19 — PR #35 / issue #14 : caractères après fermeture d'un champ CSV cité
 
 - **RECONCILIATION** : règles AGENTS.md, contrat docs/15, dernier journal et checkpoint GitHub #7012302853 relus ; PR #35 Draft et revue indépendante toujours absente. Branche existante `test/parser-csv-document-regression-20261118`, aucune PR concurrente modifiée. Les SHAs anciens ne sont pas des états courants.
