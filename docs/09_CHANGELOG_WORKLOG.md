@@ -1,5 +1,20 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-19 — PR #35 / issue #14 : conservation des enregistrements entièrement vides mais délimités
+
+- **RECONCILIATION** : PR #35 Draft, HEAD initial `8aa159379bf917271021a9d8813c6b86aba1b7f6`, base `main` observée `73256f48d81d38ce8ff6f51be9e024b25cf5dadb`. Documents AGENTS, contrat autonome, journal et checkpoint 2026-11-06 relus. PR concurrentes non modifiées.
+- **PREUVES CI du HEAD initial** : [CI #44498205925](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/44498205925) et [Docker/PostgreSQL #44498205910](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/44498205910), tous deux `completed/success`. Ces runs **ne valident pas** les changements ci-dessous.
+- **DÉFAUT STATIQUE** : `parseDelimited` supprimait les enregistrements `;;` ou `,,` contenant uniquement des cellules explicitement vides, car `row.some(Boolean)` était faux. Une ligne physique réellement vide doit rester ignorée, mais un enregistrement avec séparateurs explicites doit être conservé pour ne pas perdre une observation.
+- **TEST TDD (committé avant correction ; RED isolé NOT_RUN)** : `3ee0e9b26430d996e8bb0be070719d2abd6db6e1`, fixture avec enregistrements vides délimités au milieu et en fin de document, et ligne blanche ignorée.
+- **CORRECTION** : `4c34d4ea6f06ea395c972fa8b4de7152e1982f6d`, conservation lorsque `row.some(Boolean) || row.length > 1`, pour fins de ligne et EOF. Pas de changement de signature, source, migration, secret ni S1.
+- **VALIDATION** : tests locaux `NOT_RUN`, CI du HEAD après commits `NOT_YET_ATTESTED`, revue indépendante absente ; aucun format institutionnel, licence ou historique certifié.
+- **BLOCK_REASON** : CI exact-HEAD à confirmer et revue indépendante requise ; droits et données témoins CBE/GOSDMX #14, chaîne de recette #17 et protections/gates de fusion non certifiés.
+- **NEXT_ACTION** : contrôler les deux workflows du nouveau HEAD ; corriger tout échec, obtenir revue indépendante ; qualifier le contrat métier des lignes entièrement vides sur fixtures institutionnelles autorisées et poursuivre #14/#17 après réconciliation des claims. Ne pas fusionner ni déployer.
+- **ROLLBACK** : revert ciblé des deux commits fonctionnels et du checkpoint sur la branche Draft ; aucun impact production.
+
+---
+
+
 ## 2026-11-19 — PR #35 / #14 : CI du correctif de collision validée et test CRLF additionnel
 
 - **RECONCILIATION** : dépôt privé ; PR #1 fusionnée ; PR #35 reste Draft sur `test/parser-csv-document-regression-20261118` ; consulter GitHub avant toute nouvelle écriture. Documents AGENTS, contrat agents, checkpoint 2026-11-06 et autorités de conception relus ; les SHAs historiques ne sont pas des HEAD actuels.
