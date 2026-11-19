@@ -163,3 +163,9 @@ test('Delimited: quoted empty single-column record is preserved', () => {
   assert.deepEqual(rows, [['rate'], [''], ['5.25'], ['']]);
   assert.deepEqual(rowsToObjects(rows), [{ rate: '' }, { rate: '5.25' }, { rate: '' }]);
 });
+
+// A stray quote embedded in an unquoted financial field must not silently
+// disappear or turn the remainder of the record into quoted data.
+test('Delimited: quote inside unquoted financial field is rejected', () => {
+  assert.throws(() => parseDelimited('date,rate\n2026-01-02,5".25\n'), /quote|malformed|invalid/i);
+});
