@@ -142,3 +142,16 @@ test('Delimited: CRLF quoted descriptions preserve signed rates and empty final 
     { date: '2026-01-02', description: 'Bill\r\n91d', rate: '-0.25', unit: '' },
   ]);
 });
+
+// A delimiter-bearing record with all empty values is not a blank physical line.
+// Dropping it silently loses a source observation and its row position.
+test('Delimited: fully empty explicit financial records are preserved', () => {
+  const rows = parseDelimited('date;rate;unit\n;;\n\n2026-01-02;5.25;percent\n;;');
+  assert.deepEqual(rows, [
+    ['date', 'rate', 'unit'],
+    ['', '', ''],
+    ['2026-01-02', '5.25', 'percent'],
+    ['', '', ''],
+  ]);
+  assert.deepEqual(rowsToObjects(rows)[0], { date: '', rate: '', unit: '' });
+});
