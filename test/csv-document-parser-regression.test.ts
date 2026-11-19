@@ -88,3 +88,13 @@ test('Delimited: tab-heavy blank preamble cannot override a semicolon header', (
     ['2026-01-02', '5.25', 'percent'],
   ]);
 });
+
+// Large discarded preambles must not affect the actual financial header.
+// This also exercises linear preamble scanning without timing-dependent assertions.
+test('Delimited: long whitespace preamble preserves semicolon header detection', () => {
+  const preamble = (' \t\t\r\n').repeat(12000);
+  assert.deepEqual(parseDelimited(preamble + 'date;rate;unit\n2026-01-02;5.25;percent\n'), [
+    ['date', 'rate', 'unit'],
+    ['2026-01-02', '5.25', 'percent'],
+  ]);
+});
