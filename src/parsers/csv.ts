@@ -42,6 +42,11 @@ export function parseDelimited(text: string, delimiter?: string): string[][] {
       cell += '"';
       i += 1;
     } else if (char === '"') {
+      // Quotes cannot begin inside an already populated unquoted value.
+      // Reject rather than silently stripping a character from financial data.
+      if (!quoted && cell.trim().length > 0) {
+        throw new Error('Invalid quote inside unquoted delimited field');
+      }
       explicitQuotedCell = true;
       quoted = !quoted;
     } else if (char === sep && !quoted) {
