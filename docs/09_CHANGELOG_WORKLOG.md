@@ -1,5 +1,18 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-19 — PR #35 / issue #14 : validation CI et compatibilité des champs CSV cités
+
+- **RECONCILIATION** : GitHub dépôt privé ; PR #1 MERGED ; PR #35 OPEN/DRAFT, HEAD initial exact `9b823560eeecc33c07612deb85f9bced026db764`, base `main` observée `73256f48d81d38ce8ff6f51be9e024b25cf5dadb`. AGENTS.md, docs/15, journal, checkpoint historique et discussions/revue PR #35 relus ; PR concurrentes laissées intactes.
+- **PREUVES CI EXACT-HEAD PRECEDENT** : [Docker/PostgreSQL #44568723312](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/44568723312) et [CI #44568723791](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/44568723791) = completed/success pour `9b823560eeecc33c07612deb85f9bced026db764` ; ne valident pas les commits suivants.
+- **TEST ADDITIF** : commit `e79e5c90d6d4b34a56a27f0e99deb17bebd4978e` ; vérifie que les espaces et tabulations après un guillemet fermant restent acceptés avant séparateur ou EOF, tout en conservant taux positif et négatif. Ce test documente la limite de compatibilité des contrôles fail-closed introduits précédemment. Aucun code de production, source institutionnelle, schéma ou contrat API modifié.
+- **VALIDATION NOUVEAU TEST** : tests locaux NOT_RUN ; CI exact-HEAD du commit de test et du présent journal NOT_YET_ATTESTED au moment de l'écriture. Aucune approbation indépendante (revue COMMENTED de l'auteur seulement). Aucune donnée témoin/licence officielle certifiée.
+- **BLOCK_REASON** : revue indépendante et gates de fusion absents ; contrats/licences et six adaptateurs CBE/GOSDMX #14 non certifiés ; recettes réelles #17 et gates S1 incomplets.
+- **NEXT_ACTION** : contrôler les workflows exact-HEAD de la PR #35 après ce journal, lire et corriger tout échec ; obtenir revue indépendante des règles CSV et de la compatibilité des fichiers officiels ; poursuivre #14/#17 ou autre lot indépendant après réconciliation des claims. Aucun merge, push main, secret, S1, HISTORY_COMPLETE ou DONE.
+- **ROLLBACK** : revert ciblé du commit de test `e79e5c9` et de cette entrée sur la branche Draft ; aucun effet sur main/production.
+
+---
+
+
 ## 2026-11-19 — PR #35 / issue #14 : interdiction de rouvrir un champ CSV cité fermé
 
 - **RECONCILIATION** : PR #1 fusionnée ; branche PR #35 Draft, HEAD initial exact `347b918ae7ad57c5e41b27ac5d3c6a9d2294d9a6` ; lecture AGENTS.md, docs/15, dernier journal, checkpoint du 06/11 et discussions PR #35 ; autres PR/claims non modifiés. Dépôt GitHub privé lors de ce contrôle.
