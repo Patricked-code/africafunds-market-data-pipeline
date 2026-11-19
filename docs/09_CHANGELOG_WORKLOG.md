@@ -1,5 +1,18 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-19 — Lot 4 / #14 : intégrité CSV, guillemets et en-têtes dupliqués (PR #35)
+
+- **RECONCILIATION** : main HEAD `73256f48d81d38ce8ff6f51be9e024b25cf5dadb` ; PR #1 fusionnée ; PR #35 Draft au HEAD initial `29c9856259ac74d459cea10dc818fc559a1f6867`. CI [#44445712618](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/44445712618) et Docker/PostgreSQL [#44445712519](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/44445712519) SUCCESS **uniquement sur le HEAD initial**. Revue GitHub COMMENTED de l'auteur, aucune APPROVE indépendante.
+- **RISQUE CONSTATÉ PAR LECTURE** : champ cité non refermé accepté en fin de fichier ; colonnes homonymes écrasées silencieusement par `Object.fromEntries` ; aucune observation institutionnelle réelle alléguée.
+- **TESTS AJOUTÉS** : commit `23da9571ca14faf2537e31064ed59257be15c7da`, deux tests synthétiques exigeant une erreur explicite. RED isolé NOT_RUN.
+- **CORRECTIF** : commit `37c29d54fcbf06a7a812e34ed5f0af819755e452`, refus des champs cités non refermés et des noms de colonnes dupliqués (y compris les noms de repli), sans changer le séparateur, les données brutes, les 44 sources ou les schémas.
+- **VALIDATION** : tests locaux NOT_RUN ; CI du HEAD après correction/documentation NOT_YET_ATTESTED. Les succès antérieurs ne valident pas ces modifications. Revue indépendante, contrats/licences et observations témoins officielles non attestés.
+- **BLOCK_REASON** : CI exact-HEAD et revue indépendante à obtenir ; impact des fichiers CSV institutionnels malformés à qualifier avec échantillons autorisés ; six adaptateurs et recette financière #17 incomplets.
+- **NEXT_ACTION** : vérifier CI et smoke Docker du nouveau HEAD, corriger tout échec ; faire examiner la politique fail-closed sur en-têtes dupliqués et guillemets, obtenir revue indépendante ; poursuivre #14/#17 sur sources autorisées, sans collision ni merge ni S1.
+- **ROLLBACK** : revert ciblé des deux commits fonctionnels et de ce checkpoint sur la branche Draft.
+
+---
+
 ## 2026-11-19 — Lot 4 / issue #14 : préambules CSV volumineux (PR #35)
 
 - **RECONCILIATION** : PR #1 fusionnée ; PR #35 Draft, HEAD initial `427601702772b06bc2ad8b88eafe747e4dabf6f8`, reviews=[] ; CI [#44429751554](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/44429751554) et Docker/PostgreSQL [#44429751631](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/44429751631) SUCCESS uniquement sur ce HEAD initial. Aucun SHA historique substitué à un HEAD actuel.
