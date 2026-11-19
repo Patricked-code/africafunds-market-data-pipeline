@@ -4,13 +4,15 @@ export function parseDelimited(text: string, delimiter?: string): string[][] {
   // Only unquoted delimiters contribute to autodetection.
   const counts = new Map<string, number>([[',', 0], [';', 0], ['\t', 0]]);
   let inQuotes = false;
-  let recordStarted = false;
+  // Track whether the first meaningful header has begun without repeatedly
+  // slicing the entire preamble (quadratic on large whitespace-only inputs).
+  let headerStarted = false;
   for (let i = 0; i < normalized.length; i += 1) {
     const char = normalized[i];
     // Ignore empty or whitespace-only physical lines before the header.
     // The parser itself discards these rows, so autodetection must agree.
     if (!inQuotes && (char === '\n' || char === '\r')) {
-      if (!recordStarted || normalized.slice(0, i).trim() === '') {
+      if (!headerStarted) {
         // Discard separator counts from whitespace-only preamble lines.
         // Tabs in those ignored rows are not header delimiters.
         for (const candidate of counts.keys()) counts.set(candidate, 0);
@@ -18,7 +20,7 @@ export function parseDelimited(text: string, delimiter?: string): string[][] {
       }
       break;
     }
-    recordStarted = true;
+    if (char !== undefined && !/\s/.test(char)) headerStarted = true;
     if (char === '"') {
       if (inQuotes && normalized[i + 1] === '"') i += 1;
       else inQuotes = !inQuotes;
