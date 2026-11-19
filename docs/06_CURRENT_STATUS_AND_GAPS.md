@@ -108,3 +108,10 @@ Le parseur CSV existant reçoit un test supplémentaire et un correctif de séle
 ## 2026-11-19 — PR #35 / CSV preamble regression
 
 Test synthétique supplémentaire sur les tabulations de préambule ignoré (`adecee37`), correction ciblée du score des séparateurs (`3e461c0`) sur branche Draft. Les deux workflows du SHA antérieur `aa536744` ont réussi (#44413241529, #44413241513) ; **nouveau HEAD non encore certifié**, tests locaux NOT_RUN, revue indépendante absente. Aucun adaptateur officiel ni historique réel certifié. `NEXT_ACTION` et `BLOCK_REASON` détaillés dans `docs/09_CHANGELOG_WORKLOG.md`.
+
+## 2026-11-19 — CSV document integrity follow-up (PR #35)
+
+- Deux tests synthétiques ajoutés pour les champs cités non refermés et les en-têtes dupliqués ; parseur modifié pour rejeter explicitement ces deux cas (commits `23da9571`, `37c29d54`). Aucun test local exécuté ; CI du HEAD final non encore attestée.
+- Politique fail-closed à revoir indépendamment pour compatibilité des documents institutionnels ; aucune source réelle, licence, collecte ou historique complet certifié. PR Draft, aucun merge/S1.
+- **BLOCK_REASON** : CI exacte, revue indépendante et échantillons/licences officiels manquants.
+- **NEXT_ACTION** : vérifier les workflows du nouveau HEAD, traiter les régressions, obtenir revue indépendante, puis poursuivre #14/#17 sur données autorisées.
