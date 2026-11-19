@@ -1,5 +1,18 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-20 00:32 Europe/Paris — PR #35 : CI documentaire vérifiée et test CR cité ajouté
+
+- **RECONCILIATION** : PR #1, #12 et #18 fusionnées ; PR #35 OPEN/DRAFT sur `test/parser-csv-document-regression-20261118`, lecture de AGENTS.md, docs/15, journal, dernier checkpoint PR #35 (#7024137874), code CSV et tests, issues #3/#5/#13–#17 et revue. Base main et HEAD doivent être revérifiés avant toute intégration ; aucune fusion autorisée.
+- **PREUVE CI** : commit précédent `375c96c59c63d1d68cc8f7bde4bb6442d3edf587`, workflow CI [#44630113383](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/44630113383) et Docker/PostgreSQL [#44630113382](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/44630113382) tous deux `completed/success`. Ne prouvent pas le commit de test suivant.
+- **TEST ADDITIF** : commit `b1551a029ccae2e000b5c4fcf97560e613fd0754`, `test/csv-document-parser-regression.test.ts` : enregistrement séparé par CR seul, CR interne à une valeur documentaire citée, taux négatif et mapping exact. Cas synthétique uniquement, pas de certification institutionnelle. Tests locaux NOT_RUN, RED isolé NOT_RUN ; CI de ce nouveau HEAD NOT_YET_ATTESTED.
+- **REVUE** : uniquement COMMENTED par auteur sur PR #35 ; pas d'APPROVED indépendante attestée. Les contrats/licences/fixtures CBE/GOSDMX #14 et recettes réelles #17 restent non certifiés.
+- **BLOCK_REASON** : CI exact-HEAD du nouveau test, revue indépendante et gates de fusion ; sources officielles/licences/fixtures des six adaptateurs et chaîne historique financière réelle non attestées. Aucune preuve de runner hébergé permanent ou de déploiement S1.
+- **NEXT_ACTION** : contrôler les workflows du HEAD après mise à jour du journal ; corriger toute régression ; obtenir revue tierce de PR #35 ; qualifier un fichier témoin officiel autorisé et reprendre un adaptateur #14 ou une tâche indépendante #5/#15 après claim et réconciliation des PR concurrentes. Aucun merge/main/S1/secret/changement des 44 endpoints/HISTORY_COMPLETE.
+- **ROLLBACK** : revert ciblé du test `b1551a0` et de l'entrée documentaire sur la branche Draft, sans effet sur production.
+
+---
+
+
 ## 2026-11-19 23:35 Europe/Paris — PR #35 : CI exact-HEAD attestée, revue et qualification officielles toujours ouvertes
 
 - **RECONCILIATION** : dépôt privé, branche `test/parser-csv-document-regression-20261118`, PR #35 OPEN/DRAFT, HEAD de départ `aad9b2bb2e446a37f080757aab5641421896fcc1`, base `main` indiquée par GitHub `73256f48d81d38ce8ff6f51be9e024b25cf5dadb`. Lecture de `AGENTS.md`, `docs/15_AUTONOMOUS_AGENT_EXECUTION.md`, du présent journal, du checkpoint historique, des issues et PR concurrentes et de la revue PR #35. Le descriptif de la PR contient des SHA historiques : ne pas les réutiliser comme état courant.
