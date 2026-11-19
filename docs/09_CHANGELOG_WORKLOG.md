@@ -1,5 +1,20 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-19 — PR #35 / issue #14 : conservation des espaces à l'intérieur des cellules citées
+
+- **RECONCILIATION** : dépôt privé, PR #1 fusionnée, PR #35 OPEN/DRAFT, branche `test/parser-csv-document-regression-20261118`. Documents AGENTS.md, docs/15, journal et checkpoint historique relus ; PR/issues concurrentes inspectées, aucune autre branche modifiée. HEAD de reprise `e82972f370319c9da00785f9d24faeb0cf25b0cd`.
+- **CI EXACT-HEAD AVANT MODIFICATION** : [Docker/PostgreSQL #44599925135](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/44599925135) et [CI #44599925144](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/44599925144), tous deux completed/success pour `e82972f370319c9da00785f9d24faeb0cf25b0cd`. Ces preuves ne couvrent PAS les commits suivants.
+- **DEFAUT** : `parseDelimited` appliquait `.trim()` à toute cellule, y compris une valeur explicitement citée, supprimant silencieusement les espaces significatifs d'une observation ou d'un identifiant documentaire.
+- **TEST AJOUTE** : `85cde587abd9a1d5d58ab657acb77ab939d02b02`, fixture synthétique avec espaces internes en début/fin de cellule citée, cellule citée ne contenant qu'un espace, taux signé et EOF. RED isolé NOT_RUN.
+- **CORRECTIF** : `cca62ad8e1f761075f1d9a21389542e08e6adafb`, suivi `cellWasQuoted` ; conservation du contenu cité, exclusion des espaces de présentation après guillemet fermant ; valeurs non citées restent normalisées par trim. Pas de modification des 44 sources, schéma, secrets, main ou S1.
+- **VALIDATION** : tests locaux NOT_RUN ; CI des nouveaux commits NOT_YET_ATTESTED. Le changement sémantique des espaces cités nécessite revue indépendante et confrontation à des fichiers institutionnels autorisés ; ne pas déclarer DONE.
+- **BLOCK_REASON** : CI exact-HEAD et revue indépendante à obtenir ; contrats/licences et données témoins des six adaptateurs CBE/GOSDMX non certifiés ; recette financière réelle #17 incomplète ; gates de fusion/S1 non satisfaits.
+- **NEXT_ACTION** : vérifier les workflows exact-HEAD après le présent commit documentaire, inspecter logs et corriger toute régression ; faire revoir la préservation des espaces cités, puis reprendre les adaptateurs #14 et la recette #17 avec sources officielles autorisées et claims vérifiés. Aucun merge, push main, déploiement S1 ni HISTORY_COMPLETE.
+- **ROLLBACK** : revert ciblé des deux commits code/test et du présent journal sur la branche Draft ; aucune opération de production.
+
+---
+
+
 ## 2026-11-19 — PR #35 : CI précédente attestée et régression de séparateur CSV avec tabulations citées
 
 - **RECONCILIATION** : PR #1 fusionnée ; PR #35 OPEN/DRAFT, branche `test/parser-csv-document-regression-20261118`, HEAD initial `5620e24a09869610aefd2edddc33487494127d07`, base main `73256f48d81d38ce8ff6f51be9e024b25cf5dadb` ; issues ouvertes et PR concurrentes consultées, aucune branche concurrente modifiée. AGENTS.md, docs/15, dernier journal, checkpoint historique et revue COMMENTED de l'auteur relus.
