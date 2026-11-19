@@ -1,5 +1,18 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-19 — PR #35 / issue #14 : correction CI de l'enregistrement vide cité à EOF
+
+- **RECONCILIATION** : branche Draft existante `test/parser-csv-document-regression-20261118` ; reprise du NEXT_ACTION précédent. Aucun travail sur main, S1 ou branche concurrente.
+- **PREUVE CI** : [CI #44516833996](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/44516833996) `completed/failure`, job `validate` #135534917205 : 44 tests, 43 PASS et 1 FAIL, `Delimited: quoted empty single-column record is preserved`. [Docker/PostgreSQL #44516834592](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/44516834592) `completed/success` sur le HEAD précédent `24ecf9765db5ca304f95d45d57646e0d395f4f3a`. Les logs du job prouvent le test rouge ; les messages PostgreSQL pendant l'initialisation ne sont pas le défaut de ce job.
+- **CAUSE** : le chemin fin-de-ligne testait `explicitQuotedCell` mais le chemin EOF, pourtant muni de ce drapeau pour entrer dans la finalisation, ne le testait pas avant `rows.push(row)` : la dernière observation `""` était perdue.
+- **CORRECTION** : commit [2fce1d0](https://github.com/Patricked-code/africafunds-market-data-pipeline/commit/2fce1d0ea3b929847d5f46af5735d74429539013) : inclure `explicitQuotedCell` dans la condition de conservation à EOF, en symétrie avec la fin de ligne. Test RED attesté en CI avant correction ; test GREEN local `NOT_RUN`.
+- **VALIDATION** : CI du HEAD après correction/documentation `NOT_YET_ATTESTED` ; revue indépendante et gates de fusion non attestés ; pas de données institutionnelles ni de recette #17 certifiées.
+- **BLOCK_REASON** : nouveau HEAD en attente de CI et revue indépendante ; contrats/licences/fixtures des six adaptateurs CBE/GOSDMX #14 et recette financière #17 encore incomplets.
+- **NEXT_ACTION** : vérifier les deux workflows du nouveau HEAD exact ; si rouge, lire logs et corriger ; demander revue indépendante et poursuivre #14/#17 ou tâche indépendante non revendiquée après réconciliation des claims. Ne pas fusionner ni déployer S1.
+- **ROLLBACK** : revert ciblé de `2fce1d0` et de cette entrée sur la branche Draft ; aucune donnée, main ni production touchée.
+
+---
+
 ## 2026-11-19 — PR #35 / issue #14 : observation CSV vide explicitement citée sur une colonne
 
 - **RECONCILIATION** : PR #1 fusionnée ; PR #35 Draft sur `test/parser-csv-document-regression-20261118`, sans revue indépendante APPROVED. Branche concurrente non modifiée. AGENTS, contrat autonome, checkpoint et autorités documentaires relus.
