@@ -128,3 +128,17 @@ test('Delimited: generated fallback header cannot collide with explicit header',
   const rows = parseDelimited('column_2,\n5.25,6.25\n');
   assert.throws(() => rowsToObjects(rows), /duplicate|header/i);
 });
+
+
+// Preserve source line endings inside quoted documentary fields, while retaining
+// signed rates and an explicit empty last column without numeric coercion.
+test('Delimited: CRLF quoted descriptions preserve signed rates and empty final cells', () => {
+  const rows = parseDelimited('date;description;rate;unit\r\n2026-01-02;"Bill\r\n91d";-0.25;\r\n');
+  assert.deepEqual(rows, [
+    ['date', 'description', 'rate', 'unit'],
+    ['2026-01-02', 'Bill\r\n91d', '-0.25', ''],
+  ]);
+  assert.deepEqual(rowsToObjects(rows), [
+    { date: '2026-01-02', description: 'Bill\r\n91d', rate: '-0.25', unit: '' },
+  ]);
+});
