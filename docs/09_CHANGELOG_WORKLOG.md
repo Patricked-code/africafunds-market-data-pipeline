@@ -1,5 +1,18 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-19 — Lot 4 / issue #14 : préambules CSV volumineux (PR #35)
+
+- **RECONCILIATION** : PR #1 fusionnée ; PR #35 Draft, HEAD initial `427601702772b06bc2ad8b88eafe747e4dabf6f8`, reviews=[] ; CI [#44429751554](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/44429751554) et Docker/PostgreSQL [#44429751631](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/44429751631) SUCCESS uniquement sur ce HEAD initial. Aucun SHA historique substitué à un HEAD actuel.
+- **DEFAUT STATIQUE** : la détection de séparateur dans `src/parsers/csv.ts` répétait `normalized.slice(0,i).trim()` à chaque ligne de préambule, entraînant un coût potentiellement quadratique avec de nombreux espaces/tabulations. Aucun incident runtime allégué.
+- **TEST AJOUTE** : commit `b038918c90e34f5ffbcc79f80154ad2522b07abe`, fixture synthétique avec 12 000 lignes de préambule suivies d'un en-tête point-virgule. Le test est une régression de correction ; aucune exécution RED isolée n'est attestée.
+- **CORRECTIF** : commit `f18b5d2a261250c95a65f462153d9f187053aa0f`, état booléen `headerStarted` à la place du découpage répété ; préserve la remise à zéro des séparateurs de lignes ignorées et le traitement des guillemets. Aucun endpoint, secret, migration, main ou S1 modifié.
+- **VALIDATION** : tests locaux NOT_RUN ; CI et Docker/PostgreSQL des nouveaux commits NOT_YET_ATTESTED ; revue indépendante absente au contrôle initial. Aucune donnée institutionnelle ou historique complet certifié.
+- **BLOCK_REASON** : CI/revue du HEAD post-correctif non attestées ; droits, contrats et échantillons officiels des six adaptateurs et recette #17 toujours non certifiés.
+- **NEXT_ACTION** : vérifier le SHA final de PR #35 et ses deux workflows, corriger toute erreur, obtenir une revue indépendante ; poursuivre #14/#17 sur sources autorisées et sans collision avec les autres PR. Ne pas fusionner, déployer S1 ni déclarer DONE/HISTORY_COMPLETE.
+- **ROLLBACK** : revert ciblé des deux commits fonctionnels sur branche Draft ; aucun effet sur production ou données historiques.
+
+---
+
 ## 2026-11-19 — PR #35 / issue #14 : tabs dans le préambule CSV ignoré
 
 - **RECONCILIATION** : PR #1 fusionnée ; PR #35 Draft HEAD précédent `aa53674403f5e243696a4f032975f6508434f1d9`. Workflows sur ce SHA : [CI #44413241529](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/44413241529) et [Docker/PostgreSQL #44413241513](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/44413241513), `completed/success`. Aucune revue indépendante observée. Dépôt privé lors de la lecture GitHub.
