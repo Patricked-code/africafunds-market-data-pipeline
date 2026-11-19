@@ -183,3 +183,16 @@ test('Delimited: quoted field cannot reopen after closing quote', () => {
   assert.throws(() => parseDelimited('date,rate\n2026-01-02,"5.25" "6.25"\n'), /quote|malformed|invalid/i);
   assert.throws(() => parseDelimited('date,rate\n2026-01-02,"5.25" "6.25"'), /quote|malformed|invalid/i);
 });
+
+
+// Whitespace after a closing quote is permitted before a delimiter or EOF.
+// This guards the compatibility boundary of the fail-closed quote checks:
+// reject additional content, but do not reject a correctly closed financial field.
+test('Delimited: whitespace after a closing quote preserves valid financial cells', () => {
+  const rows = parseDelimited('date;rate;unit\n2026-01-02;"5.25" \t;percent\n2026-01-03;"-0.25" \t;percent\n');
+  assert.deepEqual(rowsToObjects(rows), [
+    { date: '2026-01-02', rate: '5.25', unit: 'percent' },
+    { date: '2026-01-03', rate: '-0.25', unit: 'percent' },
+  ]);
+  assert.deepEqual(parseDelimited('rate\n"5.25" \t'), [['rate'], ['5.25']]);
+});
