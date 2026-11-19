@@ -1,5 +1,18 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-19 — PR #35 : CI précédente attestée et régression de séparateur CSV avec tabulations citées
+
+- **RECONCILIATION** : PR #1 fusionnée ; PR #35 OPEN/DRAFT, branche `test/parser-csv-document-regression-20261118`, HEAD initial `5620e24a09869610aefd2edddc33487494127d07`, base main `73256f48d81d38ce8ff6f51be9e024b25cf5dadb` ; issues ouvertes et PR concurrentes consultées, aucune branche concurrente modifiée. AGENTS.md, docs/15, dernier journal, checkpoint historique et revue COMMENTED de l'auteur relus.
+- **PREUVES EXACT-HEAD PRECEDENT** : [Docker/PostgreSQL #44588874363](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/44588874363) et [CI #44588874531](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/44588874531) = completed/success pour `5620e24a09869610aefd2edddc33487494127d07`. Ces workflows ne valident pas le nouveau test.
+- **TEST FONCTIONNEL ADDITIF** : commit `5b2b7e5e44487d7d6b99e5ab5b631e43a27cdd42`, fichier `test/csv-document-parser-regression.test.ts` : en-tête CSV avec tabulations internes citées, vrais séparateurs point-virgule, CRLF et taux négatif ; vérification de la détection du séparateur et du mapping des colonnes. Aucun changement de production, schéma, sources officielles ou API. Tests locaux NOT_RUN, RED isolé NOT_RUN ; la CI du nouveau HEAD doit être contrôlée.
+- **REVUE** : seule revue observée COMMENTED par Patricked-code ; aucune approbation indépendante ni preuve de contrat institutionnel CBE/GOSDMX.
+- **BLOCK_REASON** : CI exact-HEAD après test non encore attestée ; revue indépendante et gates de fusion manquants ; six adaptateurs #14 sans licences/fixtures officielles certifiées ; recette financière réelle #17 incomplète.
+- **NEXT_ACTION** : vérifier les workflows du nouveau HEAD après le présent journal ; corriger tout échec ; obtenir revue indépendante, qualifier les six contrats et observations officielles ; poursuivre les lots 0–13 après claim GitHub vérifié. Aucun merge, push main, S1, secret, modification des 44 sources, HISTORY_COMPLETE ou DONE.
+- **ROLLBACK** : revert ciblé du commit de test et de l'entrée documentaire sur la branche Draft ; aucun impact production.
+
+---
+
+
 ## 2026-11-19 — PR #35 : validation CI exact-HEAD et reprise de la revue indépendante
 
 - **RECONCILIATION** : PR #35 OPEN/DRAFT, HEAD `967344f8c897f29df6f508a071e6aa2bcab79a45`, base `main` SHA `73256f48d81d38ce8ff6f51be9e024b25cf5dadb`. Douze PR ouvertes (#22, #25–#34, #35), issues #5/#13–#17 et autres tâches examinées ; aucun claim concurrent modifié. Le descriptif de la PR #35 conserve un ancien HEAD historique, non utilisé comme preuve courante.
