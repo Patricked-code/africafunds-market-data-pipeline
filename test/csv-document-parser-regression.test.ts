@@ -231,3 +231,12 @@ test('Delimited: quoted whitespace and escaped quotes remain exact source values
     { date: '2026-01-02', instrument: '  Bill "91;d"  ', rate: '-0.25' },
   ]);
 });
+
+// A quoted field can contain a carriage return without ending the record.
+// Preserve the source byte-level line break and signed financial observation.
+test('Delimited: lone CR inside quoted documentary field is not a record boundary', () => {
+  const rows = parseDelimited('date;instrument;rate\r2026-01-02;"Bill\r91d";-0.25\r');
+  assert.deepEqual(rowsToObjects(rows), [
+    { date: '2026-01-02', instrument: 'Bill\r91d', rate: '-0.25' },
+  ]);
+});
