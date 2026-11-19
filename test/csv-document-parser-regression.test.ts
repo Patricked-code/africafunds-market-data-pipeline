@@ -125,6 +125,6 @@ test('Delimited: explicit trailing empty cells preserve row width', () => {
 
 // Fallback header names must participate in the same uniqueness constraint.
 test('Delimited: generated fallback header cannot collide with explicit header', () => {
-  const rows = parseDelimited('column_1,\n5.25,6.25\n');
+  const rows = parseDelimited('column_2,\n5.25,6.25\n');
   assert.throws(() => rowsToObjects(rows), /duplicate|header/i);
 });
