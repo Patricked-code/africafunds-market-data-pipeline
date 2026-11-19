@@ -1,5 +1,18 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-19 — Lot 4 / #14 : correction du test de collision d'en-têtes (PR #35)
+
+- **RECONCILIATION** : PR #35 ouverte Draft sur `test/parser-csv-document-regression-20261118`; dépôt privé ; PR #1 fusionnée. HEAD antérieur `437eb8391044debfc86ccb7e3a4b4ede638980b7` (à revérifier avant toute action ultérieure). Les issues #3/#5/#13–#17 restent des dépendances ouvertes, aucune fusion autorisée.
+- **PREUVE CI ROUGE** : GitHub Actions [CI #44481049964](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/44481049964) `completed/failure` : job `validate`, étape `Unit tests`, 40 tests réussis / 1 échec. Test `Delimited: generated fallback header cannot collide with explicit header` : `Missing expected exception`. Le run affiche un SHA de merge synthétique `736bb57c1ee07604e096af340c510687578a7625` ; ne pas le confondre avec le HEAD de branche. Autre run #44481049963 `completed/success` ; succès d'un workflow distinct, pas validation globale.
+- **CAUSE ET CORRECTION** : fixture incorrecte `column_1,\n5.25,6.25\n` : l'en-tête explicite `column_1` ne peut pas entrer en collision avec le nom de repli de la deuxième colonne `column_2`. Remplacement minimal par `column_2,\n5.25,6.25\n`, afin de tester réellement la collision. Commit [0d2168bb](https://github.com/Patricked-code/africafunds-market-data-pipeline/commit/0d2168bb8cb7896ca5b085afeb0962265326d0f4). Aucun code de production ni source officielle modifié.
+- **VALIDATION** : test RED précédent attesté par CI, test corrigé localement `NOT_RUN` ; CI du nouveau HEAD après ce journal `NOT_YET_ATTESTED`. Revue indépendante non attestée.
+- **BLOCK_REASON** : nouvelle CI et revue indépendante requises ; droits, contrats et fixtures institutionnels des six adaptateurs #14, recette réelle #17 et gates S1 non certifiés.
+- **NEXT_ACTION** : contrôler les workflows du nouveau HEAD de PR #35, corriger tout échec ; obtenir une revue indépendante, poursuivre #14/#17 sur données officielles autorisées ou une tâche indépendante non revendiquée. Aucun merge, push main ni S1.
+- **ROLLBACK** : revert du seul commit de fixture et du présent checkpoint sur branche Draft ; aucune production touchée.
+
+---
+
+
 ## 2026-11-19 — Lot 4 / #14 : CI du HEAD précédent et invariants CSV additifs (PR #35)
 
 - **RECONCILIATION** : PR #1 fusionnée ; PR #35 Draft, HEAD initial `c59300b8d81406bec6e1026d7796376edf092cd0`, base main observée `73256f48d81d38ce8ff6f51be9e024b25cf5dadb`. Douze PR ouvertes observées, notamment #35 et des PR indépendantes sur #5/#13/#14/#15/#16/#17 ; pas de fusion ni modification de leurs branches.
