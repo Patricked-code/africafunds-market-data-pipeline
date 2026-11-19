@@ -1,5 +1,12 @@
 # 06 — État réel et écarts
 
+## Lot 4 — Intégrité des lignes CSV (PR #35, 2026-11-19)
+
+- **PARTIAL / BRANCH ONLY** : tests synthétiques et correction de `rowsToObjects` pour refuser les lignes dont le nombre de champs diffère des en-têtes ; commits `fd20fec88d2ac6ab4b38675cd55640e4cfc7fa98` et `63f6e4aca8edf83c60eb12bf02602af5569b107c`. Tests locaux `NOT_RUN`, CI du nouveau HEAD `NOT_YET_ATTESTED` ; revue indépendante et fixtures institutionnelles manquantes. Ne pas déclarer DONE ni appliquer sur S1.
+- **NEXT_ACTION** : CI exact-HEAD et revue PR #35 ; qualifier les six adaptateurs #14 et recettes #17 sans changer les 44 sources historiques.
+
+---
+
 ## Audit S1 et sécurité de déploiement — 2026-11-07
 
 - **PREUVE SERVEUR READ-ONLY** : les domaines `sadiaaf.wealthtechinnovations.com` et `api.sadiaaf.wealthtechinnovations.com` existent et répondent tous deux **HTTP 500** à `curl -I` depuis S1 ; aucun dépôt Git racine dans leurs vhosts ; le seul conteneur Docker actif observé est le bridge MCP. Cela n'atteste pas l'absence d'autres bases/service hors Docker.
