@@ -104,3 +104,7 @@ Commencer Phase 1 et Phase 2 sur une branche fonctionnelle : identité/RBAC/audi
 ## 2026-11-18 — Lot 4, PR #35 (en attente de validation)
 
 Le parseur CSV existant reçoit un test supplémentaire et un correctif de sélection de séparateur lorsque les en-têtes cités contiennent des séparateurs concurrents. Les tests locaux sont NOT_RUN ; la CI et la revue du HEAD final restent à attester. Les six adaptateurs institutionnels, leurs licences et les historiques réels ne sont pas certifiés par cette correction. Voir `docs/09_CHANGELOG_WORKLOG.md` et PR #35.
+
+## 2026-11-19 — PR #35 / CSV preamble regression
+
+Test synthétique supplémentaire sur les tabulations de préambule ignoré (`adecee37`), correction ciblée du score des séparateurs (`3e461c0`) sur branche Draft. Les deux workflows du SHA antérieur `aa536744` ont réussi (#44413241529, #44413241513) ; **nouveau HEAD non encore certifié**, tests locaux NOT_RUN, revue indépendante absente. Aucun adaptateur officiel ni historique réel certifié. `NEXT_ACTION` et `BLOCK_REASON` détaillés dans `docs/09_CHANGELOG_WORKLOG.md`.
