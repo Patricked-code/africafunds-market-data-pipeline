@@ -169,3 +169,10 @@ test('Delimited: quoted empty single-column record is preserved', () => {
 test('Delimited: quote inside unquoted financial field is rejected', () => {
   assert.throws(() => parseDelimited('date,rate\n2026-01-02,5".25\n'), /quote|malformed|invalid/i);
 });
+
+// After a quoted financial field closes, trailing non-whitespace text is invalid.
+// Otherwise the parser silently concatenates a malformed source value.
+test('Delimited: trailing characters after a closing quote are rejected', () => {
+  assert.throws(() => parseDelimited('date,rate\n2026-01-02,"5.25"junk\n'), /quote|malformed|invalid/i);
+  assert.throws(() => parseDelimited('date,rate\n2026-01-02,"5.25"junk'), /quote|malformed|invalid/i);
+});
