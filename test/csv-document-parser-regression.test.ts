@@ -79,3 +79,12 @@ test('Delimited: whitespace-only preamble lines do not hide a semicolon header',
     ['2026-01-02', '5.25', 'percent'],
   ]);
 });
+
+// Tabs in discarded preamble lines must not compete with the real header separator.
+test('Delimited: tab-heavy blank preamble cannot override a semicolon header', () => {
+  const rows = parseDelimited('\t\t\t\t\r\n\t\t\t\n date;rate;unit\n2026-01-02;5.25;percent\n');
+  assert.deepEqual(rows, [
+    ['date', 'rate', 'unit'],
+    ['2026-01-02', '5.25', 'percent'],
+  ]);
+});
