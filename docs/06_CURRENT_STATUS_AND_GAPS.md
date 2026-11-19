@@ -1,5 +1,12 @@
 # 06 — État réel et écarts
 
+## Lot 4 — Fermeture stricte des champs CSV cités (PR #35, 2026-11-19)
+
+- **PARTIAL / BRANCH ONLY** : test synthétique et correctif fail-closed contre les caractères non blancs après la fermeture d'un champ cité, commits `53a21b27` et `3fc9958b` (correctifs intermédiaires `2fd0302c`, `57000a5e`). CI antérieure du HEAD `caa7eb35` : #44546013097 et #44546013065 SUCCESS ; CI des nouveaux commits non attestée à l'écriture. Tests locaux NOT_RUN ; revue indépendante et données institutionnelles manquantes.
+- **NEXT_ACTION** : vérifier CI exact-HEAD, revue tierce, puis qualification #14/#17 sans modifier les 44 sources et sans fusion/S1.
+
+---
+
 ## Lot 4 — Intégrité des lignes CSV (PR #35, 2026-11-19)
 
 - **PARTIAL / BRANCH ONLY** : tests synthétiques et correction de `rowsToObjects` pour refuser les lignes dont le nombre de champs diffère des en-têtes ; commits `fd20fec88d2ac6ab4b38675cd55640e4cfc7fa98` et `63f6e4aca8edf83c60eb12bf02602af5569b107c`. Tests locaux `NOT_RUN`, CI du nouveau HEAD `NOT_YET_ATTESTED` ; revue indépendante et fixtures institutionnelles manquantes. Ne pas déclarer DONE ni appliquer sur S1.
