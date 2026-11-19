@@ -1,5 +1,20 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-19 — PR #35 / issue #14 : observation CSV vide explicitement citée sur une colonne
+
+- **RECONCILIATION** : PR #1 fusionnée ; PR #35 Draft sur `test/parser-csv-document-regression-20261118`, sans revue indépendante APPROVED. Branche concurrente non modifiée. AGENTS, contrat autonome, checkpoint et autorités documentaires relus.
+- **PREUVE CI du HEAD précédent** : [CI #44507028317](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/44507028317) et [Docker/PostgreSQL #44507028294](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/44507028294) : `completed/success` pour `df97d4fc601d67b48d8f1bf57a6c8f18eefbad8f` uniquement.
+- **RISQUE STATIQUE** : la ligne `""` sur un CSV à une colonne était perdue, car `row.some(Boolean)` était faux et `row.length === 1`. La même perte se produisait pour le dernier enregistrement à EOF ; les lignes physiques vides doivent toujours être ignorées.
+- **TEST SYNTHETIQUE** : commit `c19d3a90fc7ea7ca93967d47362d1420c19506f6`, vérification des observations vides citées, d'une ligne physique blanche ignorée, d'une valeur intermédiaire et de EOF. RED isolé NOT_RUN.
+- **CORRECTION** : commits `905b60dac2a4d002d9904b2881523e8959e641b5` et `a1e2b1ae90cc1e96cf45a394f2dcef6ce0852350`, suivi local de `explicitQuotedCell` pour conserver le record au saut de ligne et à EOF ; aucune signature publique ni schéma modifié.
+- **VALIDATION** : tests locaux NOT_RUN ; CI des nouveaux commits NOT_YET_ATTESTED ; formats et licences institutionnels non certifiés.
+- **BLOCK_REASON** : revue indépendante et gates de fusion non attestés ; contrats CBE/GOSDMX, données témoins et recette financière #17 manquants.
+- **NEXT_ACTION** : vérifier les deux workflows du nouveau HEAD exact, corriger tout échec, obtenir revue indépendante ; qualifier données officielles et poursuivre #14/#17 ou tâche indépendante sans claim concurrent. Aucun merge ni déploiement S1.
+- **ROLLBACK** : revert ciblé des commits de test, correction et journal sur la branche Draft ; aucun effet sur main ni production.
+
+---
+
+
 ## 2026-11-19 — PR #35 / issue #14 : conservation des enregistrements entièrement vides mais délimités
 
 - **RECONCILIATION** : PR #35 Draft, HEAD initial `8aa159379bf917271021a9d8813c6b86aba1b7f6`, base `main` observée `73256f48d81d38ce8ff6f51be9e024b25cf5dadb`. Documents AGENTS, contrat autonome, journal et checkpoint 2026-11-06 relus. PR concurrentes non modifiées.
