@@ -98,3 +98,13 @@ test('Delimited: long whitespace preamble preserves semicolon header detection',
     ['2026-01-02', '5.25', 'percent'],
   ]);
 });
+
+// Fail closed on malformed institutional documents instead of silently publishing partial rows.
+test('Delimited: unterminated quoted field is rejected', () => {
+  assert.throws(() => parseDelimited('date,rate\n2026-01-02,"5.25\n'), /unterminated|unclosed|quote/i);
+});
+
+test('Delimited: duplicate header names cannot silently overwrite financial values', () => {
+  const rows = parseDelimited('date,rate,rate\n2026-01-02,5.25,6.25\n');
+  assert.throws(() => rowsToObjects(rows), /duplicate|header/i);
+});
