@@ -1,5 +1,18 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-19 — PR #35 / #14 : CI du correctif de collision validée et test CRLF additionnel
+
+- **RECONCILIATION** : dépôt privé ; PR #1 fusionnée ; PR #35 reste Draft sur `test/parser-csv-document-regression-20261118` ; consulter GitHub avant toute nouvelle écriture. Documents AGENTS, contrat agents, checkpoint 2026-11-06 et autorités de conception relus ; les SHAs historiques ne sont pas des HEAD actuels.
+- **PREUVES CI** : sur le HEAD exact `3076ea065a7688d3aaf4b42586c4bad2daeb43f6`, [CI #44488554092](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/44488554092) et [Docker/PostgreSQL #44488554032](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/44488554032) : `completed/success`. Ces preuves valident la correction de fixture précédente, **pas** le nouveau test.
+- **TRAVAIL CONCRET** : commit `1e7fbf4f2fbe6ac504d2a9612c2eb581564997ea` : test synthétique du maintien des retours CRLF dans une description citée, d'un taux signé négatif conservé comme chaîne et d'une cellule terminale explicitement vide. Aucun code de production, source officielle, schéma, secret ou serveur modifié.
+- **VALIDATION** : test ajouté mais exécution locale `NOT_RUN` ; CI du HEAD après ce checkpoint `NOT_YET_ATTESTED`. Revue indépendante de PR #35 non attestée (revue existante `COMMENTED` par l'auteur). Pas de recette officielle ou historique complet.
+- **BLOCK_REASON** : nouveau HEAD en attente de CI et revue indépendante ; contrats/licences/fixtures CBE et GOSDMX #14 non certifiés ; chaîne financière #17 et gates S1 incomplets. Aucune fusion autorisée.
+- **NEXT_ACTION** : vérifier les deux workflows du HEAD exact post-checkpoint ; corriger si rouge, obtenir revue indépendante ; reprendre les adaptateurs officiels ou une tâche indépendante admissible après vérification des claims concurrents. Ne pas fusionner, déployer S1 ni déclarer HISTORY_COMPLETE.
+- **ROLLBACK** : revert ciblé du commit de test et du checkpoint sur branche Draft ; aucune donnée ou production touchée.
+
+---
+
+
 ## 2026-11-19 — Lot 4 / #14 : correction du test de collision d'en-têtes (PR #35)
 
 - **RECONCILIATION** : PR #35 ouverte Draft sur `test/parser-csv-document-regression-20261118`; dépôt privé ; PR #1 fusionnée. HEAD antérieur `437eb8391044debfc86ccb7e3a4b4ede638980b7` (à revérifier avant toute action ultérieure). Les issues #3/#5/#13–#17 restent des dépendances ouvertes, aucune fusion autorisée.
