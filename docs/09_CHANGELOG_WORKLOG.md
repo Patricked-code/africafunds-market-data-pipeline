@@ -1,5 +1,17 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-19 23:35 Europe/Paris — PR #35 : CI exact-HEAD attestée, revue et qualification officielles toujours ouvertes
+
+- **RECONCILIATION** : dépôt privé, branche `test/parser-csv-document-regression-20261118`, PR #35 OPEN/DRAFT, HEAD de départ `aad9b2bb2e446a37f080757aab5641421896fcc1`, base `main` indiquée par GitHub `73256f48d81d38ce8ff6f51be9e024b25cf5dadb`. Lecture de `AGENTS.md`, `docs/15_AUTONOMOUS_AGENT_EXECUTION.md`, du présent journal, du checkpoint historique, des issues et PR concurrentes et de la revue PR #35. Le descriptif de la PR contient des SHA historiques : ne pas les réutiliser comme état courant.
+- **PREUVES CI EXACT-HEAD** : [Docker/PostgreSQL #44621006522](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/44621006522) et [CI #44621006544](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/44621006544), tous deux `completed/success` pour `aad9b2bb2e446a37f080757aab5641421896fcc1`. Ces résultats ne prouvent ni licence institutionnelle, ni ingestion réelle, ni recette #17, ni S1. Tests locaux NOT_RUN.
+- **CONTROLE CODE** : `src/parsers/csv.ts` contient déjà les protections contre guillemets non refermés, en-têtes dupliqués, largeur de ligne incohérente, caractères parasites et réouverture de champs cités. Ne pas dupliquer ces corrections. Le test combiné `657d391a` est couvert par les deux runs ci-dessus.
+- **REVUE** : une revue `COMMENTED` par l'auteur Patricked-code, aucune `APPROVED` indépendante attestée ; PR reste Draft. Aucune fusion demandée.
+- **BLOCK_REASON** : revue indépendante/gates manquants ; contrats, licences, paramètres et fichiers témoins officiels des cinq adaptateurs CBE et de GOSDMX (#14) non certifiés ; chaîne source→archive→qualité→calcul→API et couverture historique #17 non prouvées ; aucun droit de déploiement S1 accordé.
+- **NEXT_ACTION** : contrôler les workflows du commit documentaire suivant sans leur attribuer les preuves du SHA précédent ; obtenir revue indépendante du parseur ; qualifier légalement un endpoint institutionnel avec contrat et témoin daté, puis développer l'adaptateur existant sur une branche non possédée par une autre exécution. En parallèle, reprendre une tâche #13/#15/#17 indépendante uniquement après contrôle des claims GitHub. Ne pas déclarer DONE/HISTORY_COMPLETE.
+- **ROLLBACK** : revert ciblé de cette seule entrée documentaire sur la branche Draft ; aucun changement de code métier, main, source, secret, schéma ou runtime S1.
+
+---
+
 ## 2026-11-19 — PR #35 / issue #14 : preuve CI des espaces cites et regression combinee
 
 - **RECONCILIATION** : depot prive, PR #1 fusionnee ; PR #35 OPEN/DRAFT, base main observee `73256f48d81d38ce8ff6f51be9e024b25cf5dadb`, HEAD initial `ef3568b1a5a48b87fc0bc57d6da4b048b9e80d29`. AGENTS.md, docs/15, worklog, checkpoint historique, revues et PR/issues ouvertes relus. Aucune branche concurrente modifiee.
