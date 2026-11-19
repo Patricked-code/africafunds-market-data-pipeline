@@ -64,7 +64,7 @@ export function parseDelimited(text: string, delimiter?: string): string[][] {
       explicitQuotedCell = false;
       closedQuotedCell = false;
     } else {
-      if (closedQuotedCell && char !== undefined && !/\\s/.test(char)) {
+      if (closedQuotedCell && char !== undefined && !/\s/.test(char)) {
         throw new Error('Invalid characters after closing quote in delimited field');
       }
       cell += char;
