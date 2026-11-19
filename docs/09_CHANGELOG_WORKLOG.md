@@ -1,5 +1,18 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-19 — PR #35 / issue #14 : preuve CI des espaces cites et regression combinee
+
+- **RECONCILIATION** : depot prive, PR #1 fusionnee ; PR #35 OPEN/DRAFT, base main observee `73256f48d81d38ce8ff6f51be9e024b25cf5dadb`, HEAD initial `ef3568b1a5a48b87fc0bc57d6da4b048b9e80d29`. AGENTS.md, docs/15, worklog, checkpoint historique, revues et PR/issues ouvertes relus. Aucune branche concurrente modifiee.
+- **PREUVE CI EXACT-HEAD PRECEDENT** : [Docker/PostgreSQL #44609866361](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/44609866361) et [CI #44609866396](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/44609866396), tous deux completed/success pour `ef3568b1a5a48b87fc0bc57d6da4b048b9e80d29`. Ne valident pas le nouveau commit.
+- **TEST ADDITIF** : `657d391a74996edeae4a94b011137a3f5e4a0aba`, fixture synthetique dans `test/csv-document-parser-regression.test.ts` couvrant simultanement espaces significatifs cites, guillemets doubles echappes, point-virgule dans la valeur, taux negatif et mapping de colonnes. Aucun changement de production, source, schema ou secret. Tests locaux NOT_RUN, CI du nouveau HEAD NOT_YET_ATTESTED.
+- **REVUE** : revue COMMENTED de l'auteur seulement ; aucune APPROVED independante. Aucune certification des contrats/licences/fichiers temoins institutionnels.
+- **BLOCK_REASON** : CI exact-HEAD apres ce test et revue independante non attestees ; six adaptateurs CBE/GOSDMX #14 sans contrats/licences/fixtures officiels certifies ; recette financiere reelle #17 et gates S1 incomplets.
+- **NEXT_ACTION** : verifier workflows exact-HEAD du commit de journal, corriger toute regression ; obtenir revue independante de la compatibilite CSV et des conventions officielles ; poursuivre #14/#17 ou une tache independante apres verification des claims. Aucun merge, push main, deploiement S1, secret, modification des 44 endpoints ou HISTORY_COMPLETE.
+- **ROLLBACK** : revert cible du commit de test et du journal sur la branche Draft ; aucun impact production.
+
+---
+
+
 ## 2026-11-19 — PR #35 / issue #14 : conservation des espaces à l'intérieur des cellules citées
 
 - **RECONCILIATION** : dépôt privé, PR #1 fusionnée, PR #35 OPEN/DRAFT, branche `test/parser-csv-document-regression-20261118`. Documents AGENTS.md, docs/15, journal et checkpoint historique relus ; PR/issues concurrentes inspectées, aucune autre branche modifiée. HEAD de reprise `e82972f370319c9da00785f9d24faeb0cf25b0cd`.
