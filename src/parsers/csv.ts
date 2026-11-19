@@ -10,7 +10,12 @@ export function parseDelimited(text: string, delimiter?: string): string[][] {
     // Ignore empty or whitespace-only physical lines before the header.
     // The parser itself discards these rows, so autodetection must agree.
     if (!inQuotes && (char === '\n' || char === '\r')) {
-      if (!recordStarted || normalized.slice(0, i).trim() === '') continue;
+      if (!recordStarted || normalized.slice(0, i).trim() === '') {
+        // Discard separator counts from whitespace-only preamble lines.
+        // Tabs in those ignored rows are not header delimiters.
+        for (const candidate of counts.keys()) counts.set(candidate, 0);
+        continue;
+      }
       break;
     }
     recordStarted = true;
