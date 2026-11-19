@@ -1,5 +1,12 @@
 # 06 — État réel et écarts
 
+## Lot 4 — Réouverture invalide d'un champ cité CSV (PR #35, 2026-11-19)
+
+- **PARTIAL / BRANCH ONLY** : test synthétique `c4981fa` et correctif fail-closed `a9a5516` empêchent la réouverture d'un champ après son guillemet fermant, même séparé par des espaces. CI précédente du HEAD `347b918a` : runs #44556082359 et #44556082411 SUCCESS ; CI du nouveau code non attestée au checkpoint. Tests locaux NOT_RUN, revue indépendante et validation des formats institutionnels manquantes.
+- **NEXT_ACTION** : vérifier CI exact-HEAD et revue PR #35 ; qualifier sources/licences et données témoins #14/#17 avant toute fusion, S1 ou statut DONE.
+
+---
+
 ## Lot 4 — Fermeture stricte des champs CSV cités (PR #35, 2026-11-19)
 
 - **PARTIAL / BRANCH ONLY** : test synthétique et correctif fail-closed contre les caractères non blancs après la fermeture d'un champ cité, commits `53a21b27` et `3fc9958b` (correctifs intermédiaires `2fd0302c`, `57000a5e`). CI antérieure du HEAD `caa7eb35` : #44546013097 et #44546013065 SUCCESS ; CI des nouveaux commits non attestée à l'écriture. Tests locaux NOT_RUN ; revue indépendante et données institutionnelles manquantes.
