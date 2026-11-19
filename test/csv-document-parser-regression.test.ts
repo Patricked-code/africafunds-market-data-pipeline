@@ -221,3 +221,13 @@ test('Delimited: quoted leading and trailing whitespace is preserved', () => {
     { date: '2026-01-03', label: ' ', rate: '-0.25' },
   ]);
 });
+
+
+// Quoted spaces must survive even when the same field contains escaped quotes
+// and a delimiter. This protects documentary instrument identifiers verbatim.
+test('Delimited: quoted whitespace and escaped quotes remain exact source values', () => {
+  const rows = parseDelimited('date;instrument;rate\n2026-01-02;"  Bill ""91;d""  ";-0.25\n');
+  assert.deepEqual(rowsToObjects(rows), [
+    { date: '2026-01-02', instrument: '  Bill "91;d"  ', rate: '-0.25' },
+  ]);
+});
