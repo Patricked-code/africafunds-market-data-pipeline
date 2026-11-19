@@ -1,5 +1,16 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-19 — PR #35 / issue #14 : validation GREEN CI de la correction EOF (reconciliation)
+
+- **SOURCE DE VÉRITÉ** : GitHub, branche Draft `test/parser-csv-document-regression-20261118`, correctif `2fce1d0ea3b929847d5f46af5735d74429539013`, journal précédent `5d9ceb0bb775f73cd99bb5a90e0202ab27ecdaa4`. Relecture AGENTS.md, contrat autonome, journal et dernier checkpoint PR #35.
+- **PREUVES EXACT-HEAD** : [CI #44524874085](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/44524874085) (run 571) et [Docker/PostgreSQL #44524874099](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/44524874099) (run 441) : tous deux `completed/success` pour `5d9ceb0bb775f73cd99bb5a90e0202ab27ecdaa4`. Ce verdict concerne le correctif EOF précédent, **pas** le présent commit de journal.
+- **CONTRÔLE** : test `Delimited: quoted empty single-column record is preserved` présent ; la CI précédente était rouge (43/44), le HEAD corrigé a deux workflows verts. Tests locaux NOT_RUN. Revue PR #35 : uniquement `COMMENTED` par Patricked-code ; aucune approbation indépendante.
+- **BLOCK_REASON** : revue indépendante et gates de fusion manquants ; qualification des contrats/licences/fixtures des six adaptateurs #14 et recette financière officielle #17 non attestées. Aucune preuve de staging/S1 ni de `HISTORY_COMPLETE`.
+- **NEXT_ACTION** : obtenir une revue indépendante sur le HEAD de code validé et traiter ses observations ; vérifier les nouveaux workflows de tout commit ultérieur ; poursuivre les travaux institutionnels #14 et #17 sur branches non revendiquées, en préservant les 44 sources historiques. Ne pas fusionner, pousser sur main ou déployer S1.
+- **ROLLBACK** : revert ciblé de cette entrée documentaire uniquement ; ne toucher ni au code validé, ni aux données, ni à S1.
+
+---
+
 ## 2026-11-19 — PR #35 / issue #14 : correction CI de l'enregistrement vide cité à EOF
 
 - **RECONCILIATION** : branche Draft existante `test/parser-csv-document-regression-20261118` ; reprise du NEXT_ACTION précédent. Aucun travail sur main, S1 ou branche concurrente.
