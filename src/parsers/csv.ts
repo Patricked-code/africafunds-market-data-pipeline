@@ -55,6 +55,7 @@ export function parseDelimited(text: string, delimiter?: string): string[][] {
       cell += char;
     }
   }
+  if (quoted) throw new Error('Unterminated quoted field in delimited document');
   if (cell.length || row.length) {
     row.push(cell.trim());
     if (row.some(Boolean)) rows.push(row);
@@ -64,5 +65,9 @@ export function parseDelimited(text: string, delimiter?: string): string[][] {
 
 export function rowsToObjects(rows: string[][]): Array<Record<string, string>> {
   const headers = rows[0] ?? [];
+  const names = headers.map((header, i) => header || `column_${i + 1}`);
+  if (new Set(names).size !== names.length) {
+    throw new Error('Duplicate header in delimited document');
+  }
   return rows.slice(1).map((row) => Object.fromEntries(headers.map((header, i) => [header || `column_${i + 1}`, row[i] ?? ''])));
 }
