@@ -54,6 +54,7 @@ export function parseDelimited(text: string, delimiter?: string): string[][] {
     } else if (char === sep && !quoted) {
       row.push(cell.trim());
       cell = '';
+      closedQuotedCell = false;
     } else if ((char === '\n' || char === '\r') && !quoted) {
       if (char === '\r' && next === '\n') i += 1;
       row.push(cell.trim());
