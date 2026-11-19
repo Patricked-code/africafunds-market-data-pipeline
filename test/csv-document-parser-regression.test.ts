@@ -108,3 +108,9 @@ test('Delimited: duplicate header names cannot silently overwrite financial valu
   const rows = parseDelimited('date,rate,rate\n2026-01-02,5.25,6.25\n');
   assert.throws(() => rowsToObjects(rows), /duplicate|header/i);
 });
+
+// A short or over-wide row must not silently shift or discard financial columns.
+test('Delimited: row width mismatch is rejected before object mapping', () => {
+  assert.throws(() => rowsToObjects(parseDelimited('date,rate\n2026-01-02,5.25,unexpected\n')), /column|width|field/i);
+  assert.throws(() => rowsToObjects(parseDelimited('date,rate\n2026-01-02\n')), /column|width|field/i);
+});
