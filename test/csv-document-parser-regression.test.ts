@@ -211,3 +211,13 @@ test('Delimited: quoted tabs in header cannot override semicolon autodetection',
     rate: '-0.25',
   }]);
 });
+
+// Spaces inside quotes are source data, not formatting. Trimming a quoted
+// identifier or documentary observation silently changes its provenance.
+test('Delimited: quoted leading and trailing whitespace is preserved', () => {
+  const rows = parseDelimited('date;label;rate\n2026-01-02;"  Bill 91d  ";" 5.25 "\n2026-01-03;" ";"-0.25"');
+  assert.deepEqual(rowsToObjects(rows), [
+    { date: '2026-01-02', label: '  Bill 91d  ', rate: ' 5.25 ' },
+    { date: '2026-01-03', label: ' ', rate: '-0.25' },
+  ]);
+});
