@@ -1,5 +1,17 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-19 — PR #35 : validation CI exact-HEAD et reprise de la revue indépendante
+
+- **RECONCILIATION** : PR #35 OPEN/DRAFT, HEAD `967344f8c897f29df6f508a071e6aa2bcab79a45`, base `main` SHA `73256f48d81d38ce8ff6f51be9e024b25cf5dadb`. Douze PR ouvertes (#22, #25–#34, #35), issues #5/#13–#17 et autres tâches examinées ; aucun claim concurrent modifié. Le descriptif de la PR #35 conserve un ancien HEAD historique, non utilisé comme preuve courante.
+- **PREUVES EXACT-HEAD** : [CI #44578550988](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/44578550988) et [Docker/PostgreSQL #44578550787](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/44578550787) = `completed/success` pour `967344f8c897f29df6f508a071e6aa2bcab79a45`. Les tests locaux restent `NOT_RUN`. Ce verdict ne valide ni la conformité de formats institutionnels ni le futur commit documentaire.
+- **REVUE** : seule revue trouvée = `COMMENTED` par l'auteur ; aucune `APPROVED` indépendante. Le code courant contient déjà les gardes pour champs cités non refermés, en-têtes dupliqués et largeur de ligne ; ne pas rouvrir ces défauts à partir d'un ancien commentaire sans inspection du HEAD.
+- **BLOCK_REASON** : revue indépendante et gates de fusion non satisfaits ; six adaptateurs CBE/GOSDMX sans contrats/licences/fixtures officielles certifiés ; recette de données réelles #17 incomplète ; aucune preuve de collecte complète ou de déploiement S1.
+- **NEXT_ACTION** : contrôler la CI du présent commit documentaire, solliciter une revue indépendante des règles de parsing CSV et de la compatibilité institutionnelle ; si revue/CI bloquées, sélectionner un travail fonctionnel indépendant après claim GitHub vérifié (issues #13–#17, #5) ; ne pas déclarer DONE/HISTORY_COMPLETE, ne pas fusionner ni déployer S1.
+- **ROLLBACK** : revert ciblé du présent commit documentaire sur la branche Draft ; aucune action sur main, S1, secrets ou les 44 endpoints.
+
+---
+
+
 ## 2026-11-19 — PR #35 / issue #14 : validation CI et compatibilité des champs CSV cités
 
 - **RECONCILIATION** : GitHub dépôt privé ; PR #1 MERGED ; PR #35 OPEN/DRAFT, HEAD initial exact `9b823560eeecc33c07612deb85f9bced026db764`, base `main` observée `73256f48d81d38ce8ff6f51be9e024b25cf5dadb`. AGENTS.md, docs/15, journal, checkpoint historique et discussions/revue PR #35 relus ; PR concurrentes laissées intactes.
