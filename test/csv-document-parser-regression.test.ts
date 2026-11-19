@@ -196,3 +196,18 @@ test('Delimited: whitespace after a closing quote preserves valid financial cell
   ]);
   assert.deepEqual(parseDelimited('rate\n"5.25" \t'), [['rate'], ['5.25']]);
 });
+
+// A quoted institutional header may contain many tab characters while the
+// actual file uses semicolons. Counting quoted tabs would shift every column.
+test('Delimited: quoted tabs in header cannot override semicolon autodetection', () => {
+  const rows = parseDelimited('date;"metric\tname\tunit\tseries";rate\r\n2026-01-02;"bill\t91d";-0.25\r\n');
+  assert.deepEqual(rows, [
+    ['date', 'metric\tname\tunit\tseries', 'rate'],
+    ['2026-01-02', 'bill\t91d', '-0.25'],
+  ]);
+  assert.deepEqual(rowsToObjects(rows), [{
+    date: '2026-01-02',
+    'metric\tname\tunit\tseries': 'bill\t91d',
+    rate: '-0.25',
+  }]);
+});
