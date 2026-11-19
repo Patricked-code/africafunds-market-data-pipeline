@@ -1,5 +1,18 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-19 — PR #35 / issue #14 : tabs dans le préambule CSV ignoré
+
+- **RECONCILIATION** : PR #1 fusionnée ; PR #35 Draft HEAD précédent `aa53674403f5e243696a4f032975f6508434f1d9`. Workflows sur ce SHA : [CI #44413241529](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/44413241529) et [Docker/PostgreSQL #44413241513](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/44413241513), `completed/success`. Aucune revue indépendante observée. Dépôt privé lors de la lecture GitHub.
+- **TEST RED COMMITTÉ, NON EXÉCUTÉ ISOLÉMENT** : `adecee37c8c54d8e42de2e2662c5fd4500922c61` : lignes de préambule composées de plusieurs tabulations, puis en-tête `;`. Ces tabulations étaient comptées comme séparateurs malgré le rejet de ces lignes par le parseur.
+- **CORRECTION CODE** : `3e461c0fa8bd4535c37f20b20ed783fe3dad738f` : remise à zéro des scores des séparateurs pour les lignes physiques initiales intégralement blanches, sans modifier les séparateurs des enregistrements utiles. Le séparateur explicite, les champs cités et les 44 sources restent inchangés.
+- **VALIDATION** : tests locaux `NOT_RUN` ; CI du HEAD après correctif/documentation `NOT_YET_VERIFIED`. Les deux succès antérieurs ne valident pas ces commits. Aucune recette institutionnelle ni donnée réelle attestée.
+- **BLOCK_REASON** : CI du nouveau HEAD et revue indépendante à établir ; six adaptateurs CBE/BCT, droits d'accès, échantillons officiels et recette #17 encore non certifiés ; gates de fusion et S1 non satisfaits.
+- **NEXT_ACTION** : vérifier CI du HEAD exact de PR #35, corriger tout échec ; obtenir revue indépendante, puis reprendre une tâche non revendiquée des lots 0–13, en priorité #14/#17 avec échantillons officiels autorisés. Ne pas fusionner, pousser sur main ni déployer S1.
+- **ROLLBACK** : revert ciblé des commits test/correctif et de ce checkpoint sur la branche Draft.
+
+---
+
+
 ## 2026-11-18 — PR #35 : préambule CSV constitué de lignes d'espaces
 
 - **RÉCONCILIATION** : branche Draft #35 ; les workflows du HEAD antérieur `cbeffa7c40cf01dfc39120fce0ae62ad9128804c` sont [CI #44393136955](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/44393136955) et [Docker/PostgreSQL #44393137032](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/44393137032), tous deux `completed/success`. Revue indépendante de #35 : aucune lors de cette lecture.
