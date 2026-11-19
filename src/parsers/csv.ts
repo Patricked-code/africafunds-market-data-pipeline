@@ -48,7 +48,7 @@ export function parseDelimited(text: string, delimiter?: string): string[][] {
     } else if ((char === '\n' || char === '\r') && !quoted) {
       if (char === '\r' && next === '\n') i += 1;
       row.push(cell.trim());
-      if (row.some(Boolean)) rows.push(row);
+      if (row.some(Boolean) || row.length > 1) rows.push(row);
       row = [];
       cell = '';
     } else {
@@ -58,7 +58,7 @@ export function parseDelimited(text: string, delimiter?: string): string[][] {
   if (quoted) throw new Error('Unterminated quoted field in delimited document');
   if (cell.length || row.length) {
     row.push(cell.trim());
-    if (row.some(Boolean)) rows.push(row);
+    if (row.some(Boolean) || row.length > 1) rows.push(row);
   }
   return rows;
 }
