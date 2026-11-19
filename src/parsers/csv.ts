@@ -34,6 +34,7 @@ export function parseDelimited(text: string, delimiter?: string): string[][] {
   let cell = '';
   let quoted = false;
   let explicitQuotedCell = false;
+  let closedQuotedCell = false;
 
   for (let i = 0; i < normalized.length; i += 1) {
     const char = normalized[i];
@@ -49,6 +50,7 @@ export function parseDelimited(text: string, delimiter?: string): string[][] {
       }
       explicitQuotedCell = true;
       quoted = !quoted;
+      closedQuotedCell = !quoted;
     } else if (char === sep && !quoted) {
       row.push(cell.trim());
       cell = '';
@@ -59,7 +61,11 @@ export function parseDelimited(text: string, delimiter?: string): string[][] {
       row = [];
       cell = '';
       explicitQuotedCell = false;
+      closedQuotedCell = false;
     } else {
+      if (closedQuotedCell && char !== undefined && !/\\s/.test(char)) {
+        throw new Error('Invalid characters after closing quote in delimited field');
+      }
       cell += char;
     }
   }
