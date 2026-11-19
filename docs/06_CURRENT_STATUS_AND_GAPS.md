@@ -122,3 +122,10 @@ Test synthétique supplémentaire sur les tabulations de préambule ignoré (`ad
 - Politique fail-closed à revoir indépendamment pour compatibilité des documents institutionnels ; aucune source réelle, licence, collecte ou historique complet certifié. PR Draft, aucun merge/S1.
 - **BLOCK_REASON** : CI exacte, revue indépendante et échantillons/licences officiels manquants.
 - **NEXT_ACTION** : vérifier les workflows du nouveau HEAD, traiter les régressions, obtenir revue indépendante, puis poursuivre #14/#17 sur données autorisées.
+
+## 2026-11-19 — PR #35 : ligne CSV explicitement vide et citée (une colonne)
+
+- Test synthétique `c19d3a9` et correction `905b60d` / `a1e2b1a` sur branche Draft : conservation de `""` comme observation vide explicite, y compris à EOF ; lignes physiques blanches ignorées. Aucun document institutionnel réel certifié.
+- CI et smoke du HEAD précédent `df97d4f` SUCCESS (runs #44507028317 / #44507028294), **ne valident pas les nouveaux commits**. Tests locaux NOT_RUN ; revue indépendante et gates de fusion manquants.
+- **BLOCK_REASON** : CI exact-HEAD et revue à obtenir ; licences, fixtures officielles CBE/GOSDMX et recette #17 incomplètes.
+- **NEXT_ACTION** : vérifier les nouveaux runs, corriger si nécessaire, poursuivre la qualification institutionnelle et la recette sans merge ni S1. Journal canonique : `docs/09_CHANGELOG_WORKLOG.md`.
