@@ -1,5 +1,17 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-19 — Lot 4 / #14 : CI du HEAD précédent et invariants CSV additifs (PR #35)
+
+- **RECONCILIATION** : PR #1 fusionnée ; PR #35 Draft, HEAD initial `c59300b8d81406bec6e1026d7796376edf092cd0`, base main observée `73256f48d81d38ce8ff6f51be9e024b25cf5dadb`. Douze PR ouvertes observées, notamment #35 et des PR indépendantes sur #5/#13/#14/#15/#16/#17 ; pas de fusion ni modification de leurs branches.
+- **PREUVES CI exact-HEAD initial** : [CI #44473112404](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/44473112404) et [Docker/PostgreSQL #44473112479](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/44473112479), tous deux `completed/success` sur `c59300b`. Ces résultats ne valident PAS les commits ultérieurs.
+- **TRAVAIL CONCRET** : commit `cd151fc48ffbbe2941c5b4dc81b8b46ad288a87b`, deux tests synthétiques additionnels : cellules finales explicitement vides préservées ; collision entre nom d'en-tête explicite et nom de repli généré refusée. Aucun endpoint ni code de production modifié ; les tests sont ajoutés mais pas exécutés localement.
+- **VALIDATION** : tests locaux `NOT_RUN` ; CI du nouveau HEAD après documentation `NOT_YET_ATTESTED` ; revue indépendante non attestée. Les résultats antérieurs ne prouvent pas l'exécution des deux nouveaux tests.
+- **BLOCK_REASON** : revue indépendante et gates de fusion absents ; contrats/licences/échantillons des six adaptateurs #14 non certifiés ; recette institutionnelle #17 incomplète ; aucun droit de déploiement S1.
+- **NEXT_ACTION** : vérifier le nouveau HEAD et ses deux workflows, corriger tout échec ; obtenir revue indépendante de #35, qualifier les fixtures officielles autorisées pour #14 et poursuivre une tâche indépendante non revendiquée des lots 0–13. Ne pas fusionner, modifier main ou déployer S1.
+- **ROLLBACK** : revert des commits additifs de test et de documentation sur la branche Draft, sans impact production.
+
+---
+
 ## 2026-11-19 — Lot 4 / #14 : refus des lignes CSV de largeur incohérente (PR #35)
 
 - **RECONCILIATION** : branche existante PR #35, dernier HEAD observé avant cette intervention `4d0bd3ade9d36da75035d5268ff592bf3fe4a780`. Deux runs GitHub Actions sur ce SHA : [CI #44466531595](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/44466531595) et [Docker/PostgreSQL #44466531582](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/44466531582), `completed/success`. Ils ne valident pas les commits suivants. Revue indépendante non attestée.
