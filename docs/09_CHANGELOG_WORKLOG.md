@@ -1,5 +1,19 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-19 — PR #35 / issue #14 : caractères après fermeture d'un champ CSV cité
+
+- **RECONCILIATION** : règles AGENTS.md, contrat docs/15, dernier journal et checkpoint GitHub #7012302853 relus ; PR #35 Draft et revue indépendante toujours absente. Branche existante `test/parser-csv-document-regression-20261118`, aucune PR concurrente modifiée. Les SHAs anciens ne sont pas des états courants.
+- **PREUVE CI PRECEDENTE** : sur `caa7eb35f4f2c7db39faf07b95d3d14ff2d42caf`, [CI #44546013097](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/44546013097) et [Docker/PostgreSQL #44546013065](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/44546013065) = `completed/success`. Ces résultats ne valident PAS les nouveaux commits.
+- **RISQUE** : `parseDelimited` concaténait silencieusement du texte après la fermeture d'un champ cité (ex. `"5.25"junk`), altérant la donnée financière source. Inspection statique, aucun document institutionnel réel.
+- **TEST** : commit `53a21b272a815a943cede90911ceb20b14feda03` : deux assertions synthétiques (fin de ligne et EOF), RED isolé NOT_RUN.
+- **CORRECTION** : commits `2fd0302c06041c2087922ca82bf9fda20095a375`, `57000a5e67888efc5cba1e459deadb853d963b50`, `3fc9958b0b9391c497640c608c573e13d1f26415` : drapeau de fermeture de champ cité, rejet de caractères non blancs après guillemet final, remise à zéro entre cellules/lignes et regex d'espacement corrigée. Signature publique inchangée ; aucune source, migration, secret ou S1 modifié.
+- **VALIDATION** : tests locaux NOT_RUN, CI exact-HEAD après nouveaux commits NOT_YET_ATTESTED ; revue indépendante et compatibilité avec les formats institutionnels non attestées.
+- **BLOCK_REASON** : CI des nouveaux commits et revue tierce absentes ; contrats/licences/fixtures CBE/GOSDMX #14 et recette officielle #17 non certifiés ; gates de fusion/S1 non satisfaits.
+- **NEXT_ACTION** : vérifier les workflows du nouveau HEAD exact, corriger si échec ; faire revoir les règles de fermeture des champs cités et les données témoins officielles autorisées ; poursuivre les adaptateurs et la recette #14/#17 ou une tâche indépendante sans claim concurrent. Aucun merge, push main ni S1.
+- **ROLLBACK** : revert ciblé des commits de test/correction sur la branche Draft après revue ; aucun effet production.
+
+---
+
 ## 2026-11-19 — PR #35 / issue #14 : rejet d'un guillemet parasite dans une valeur CSV non citée
 
 - **RECONCILIATION** : branche Draft existante `test/parser-csv-document-regression-20261118`, PR #35 HEAD avant modification `e2f8cee3dcbf4efef61277cc96802543a8eb7036` ; AGENTS.md, contrat autonome, journal, issue #14 et revues relus. Aucune approbation indépendante (revue COMMENTED par l'auteur seulement). PR concurrentes laissées intactes.
