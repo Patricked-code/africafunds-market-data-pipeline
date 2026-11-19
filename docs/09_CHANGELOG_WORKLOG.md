@@ -1,5 +1,20 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-19 — PR #35 / issue #14 : rejet d'un guillemet parasite dans une valeur CSV non citée
+
+- **RECONCILIATION** : branche Draft existante `test/parser-csv-document-regression-20261118`, PR #35 HEAD avant modification `e2f8cee3dcbf4efef61277cc96802543a8eb7036` ; AGENTS.md, contrat autonome, journal, issue #14 et revues relus. Aucune approbation indépendante (revue COMMENTED par l'auteur seulement). PR concurrentes laissées intactes.
+- **PREUVE CI PRECEDENTE** : [CI #44534889379](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/44534889379) et [Docker/PostgreSQL #44534889391](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/44534889391), `completed/success` sur `e2f8cee3dcbf4efef61277cc96802543a8eb7036` uniquement ; ne valident pas le nouveau code.
+- **RISQUE** : une valeur numérique non citée contenant un guillemet parasite, par exemple `5".25`, était transformée silencieusement par le parseur en `5.25` au lieu d'être rejetée. Aucune donnée institutionnelle réelle utilisée.
+- **TEST** : commit `b801c1a189b05ac5b6644e4a68855e163cea82ff`, fixture synthétique rejetant un guillemet inséré dans un taux non cité. Test RED isolé `NOT_RUN` ; ne pas prétendre à une exécution locale.
+- **CORRECTIF** : commit `98801cadfcff19c850e5e70e908726a6ff3c1cd0`, garde minimale dans `src/parsers/csv.ts` avant ouverture de guillemets lorsque la cellule non citée contient déjà une valeur. Aucun changement des 44 sources, migrations, secrets, main ou S1.
+- **VALIDATION** : nouvelle CI exact-HEAD `NOT_YET_ATTESTED` au moment de l'écriture ; revue indépendante et données témoins officielles manquantes. Les règles de guillemets après fermeture et les conventions de fichiers réels nécessitent une revue séparée.
+- **BLOCK_REASON** : CI du HEAD documentaire final non encore attestée ; revue indépendante et gates de fusion absents ; contrats/licences/fixtures des six adaptateurs #14 et recette officielle #17 incomplets.
+- **NEXT_ACTION** : inspecter les workflows du nouveau HEAD, lire les logs et corriger tout échec ; faire revoir le rejet des guillemets par un tiers et confronter aux formats institutionnels autorisés ; poursuivre #14/#17 après réconciliation des claims. Aucun merge, S1, HISTORY_COMPLETE ni DONE.
+- **ROLLBACK** : revert ciblé des commits `98801cad` et `b801c1a` sur la branche Draft après revue ; aucune action sur main ou production.
+
+---
+
+
 ## 2026-11-19 — PR #35 / issue #14 : validation GREEN CI de la correction EOF (reconciliation)
 
 - **SOURCE DE VÉRITÉ** : GitHub, branche Draft `test/parser-csv-document-regression-20261118`, correctif `2fce1d0ea3b929847d5f46af5735d74429539013`, journal précédent `5d9ceb0bb775f73cd99bb5a90e0202ab27ecdaa4`. Relecture AGENTS.md, contrat autonome, journal et dernier checkpoint PR #35.
