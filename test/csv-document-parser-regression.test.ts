@@ -176,3 +176,10 @@ test('Delimited: trailing characters after a closing quote are rejected', () => 
   assert.throws(() => parseDelimited('date,rate\n2026-01-02,"5.25"junk\n'), /quote|malformed|invalid/i);
   assert.throws(() => parseDelimited('date,rate\n2026-01-02,"5.25"junk'), /quote|malformed|invalid/i);
 });
+
+// A second quote after a closed quoted field must not reopen quoting and
+// concatenate distinct source fragments into a fabricated financial value.
+test('Delimited: quoted field cannot reopen after closing quote', () => {
+  assert.throws(() => parseDelimited('date,rate\n2026-01-02,"5.25" "6.25"\n'), /quote|malformed|invalid/i);
+  assert.throws(() => parseDelimited('date,rate\n2026-01-02,"5.25" "6.25"'), /quote|malformed|invalid/i);
+});
