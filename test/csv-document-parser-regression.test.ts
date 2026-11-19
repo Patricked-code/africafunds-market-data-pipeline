@@ -114,3 +114,17 @@ test('Delimited: row width mismatch is rejected before object mapping', () => {
   assert.throws(() => rowsToObjects(parseDelimited('date,rate\n2026-01-02,5.25,unexpected\n')), /column|width|field/i);
   assert.throws(() => rowsToObjects(parseDelimited('date,rate\n2026-01-02\n')), /column|width|field/i);
 });
+
+// Preserve explicit empty final cells while rejecting absent cells.
+// This distinguishes an intentionally blank financial observation from a truncated record.
+test('Delimited: explicit trailing empty cells preserve row width', () => {
+  const rows = parseDelimited('date;rate;unit\n2026-01-02;;\n');
+  assert.deepEqual(rows, [['date', 'rate', 'unit'], ['2026-01-02', '', '']]);
+  assert.deepEqual(rowsToObjects(rows), [{ date: '2026-01-02', rate: '', unit: '' }]);
+});
+
+// Fallback header names must participate in the same uniqueness constraint.
+test('Delimited: generated fallback header cannot collide with explicit header', () => {
+  const rows = parseDelimited('column_1,\n5.25,6.25\n');
+  assert.throws(() => rowsToObjects(rows), /duplicate|header/i);
+});
