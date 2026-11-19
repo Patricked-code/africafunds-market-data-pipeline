@@ -69,5 +69,10 @@ export function rowsToObjects(rows: string[][]): Array<Record<string, string>> {
   if (new Set(names).size !== names.length) {
     throw new Error('Duplicate header in delimited document');
   }
-  return rows.slice(1).map((row) => Object.fromEntries(headers.map((header, i) => [header || `column_${i + 1}`, row[i] ?? ''])));
+  return rows.slice(1).map((row, index) => {
+    if (row.length !== names.length) {
+      throw new Error(`Delimited document row ${index + 2} has ${row.length} fields; expected ${names.length}`);
+    }
+    return Object.fromEntries(names.map((name, i) => [name, row[i] ?? '']));
+  });
 }
