@@ -1,5 +1,16 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-20 05:35 Europe/Paris — PR #35 : CI exact-HEAD attestée, bascule vers qualification métier (#14)
+
+- **RECONCILIATION** : PR #1 fusionnée ; PR #35 OPEN/DRAFT, HEAD initial `a534dd6f3f25e1be90a6ff4a620a50dbad711f75`, base main observée `73256f48d81d38ce8ff6f51be9e024b25cf5dadb`. Recherche des PR/ issues ouvertes effectuée : nombreuses branches propriétaires concurrentes (#26–#34) ; aucune écriture dans ces branches. `AGENTS.md`, `docs/15_AUTONOMOUS_AGENT_EXECUTION.md`, présent journal et dernier checkpoint PR consultés.
+- **CI EXACT-HEAD** : [Docker/PostgreSQL #44668578667](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/44668578667) et [CI #44668578695](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/44668578695) sont `completed/success` pour le SHA `a534dd6f3f25e1be90a6ff4a620a50dbad711f75` selon GitHub Actions. Ce succès ne couvre pas le présent commit documentaire et ne certifie ni source réelle ni production.
+- **ACTION** : vérification de la CI et des dépendances #13–#17 ; aucune nouvelle fixture CSV synthétique ajoutée sans défaut démontré. Priorité maintenue sur un contrat officiel/licence et une observation témoin datée pour un des six adaptateurs #14 ; ne pas déclarer un adaptateur opérationnel sur la seule présence d'URL. Tests locaux NOT_RUN.
+- **BLOCK_REASON** : PR #35 Draft, approbation indépendante et gates non attestés ; absence de preuve suffisante de droits, protocole et fixture datée CBE/GOSDMX ; recette source→archive→canonical→quality→calcul→API #17 non attestée ; claims des autres PR à respecter.
+- **NEXT_ACTION** : obtenir revue indépendante sur PR #35 ; qualifier source officielle, droits, contrat de format, témoin daté pour #14 avant code d'adaptateur ; sinon examiner un défaut non revendiqué de #5/#15 et créer branche dédiée avec test RED/GREEN. Vérifier CI du commit documentaire présent avant toute conclusion ; ne pas fusionner ni déployer S1.
+- **ROLLBACK** : revert ciblé de cette entrée sur la branche Draft ; aucun changement de main, secret, S1, 44 endpoints ou données brutes.
+
+---
+
 ## 2026-11-20 04:33 Europe/Paris — PR #35 : validation CI exact HEAD et revue des gates (lot 4 / #14)
 
 - **RÉCONCILIATION** : PR #1 fusionnée ; PR #35 OPEN/DRAFT, branche `test/parser-csv-document-regression-20261118`, HEAD `190946cc5df25e41a2b4b3941c6b3239ac4c2a6e`, base main `73256f48d81d38ce8ff6f51be9e024b25cf5dadb` au contrôle. Dépôt GitHub privé (get_repo). La recherche des PR et issues ouvertes confirme des chantiers concurrents : ne pas modifier leurs branches.
