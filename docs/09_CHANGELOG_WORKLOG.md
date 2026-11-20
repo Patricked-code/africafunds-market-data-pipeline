@@ -1,5 +1,18 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-20 02:31 Europe/Paris — Validation CI PR #35 et passage au gate de revue
+
+- **RECONCILIATION GITHUB** : dépôt privé, PR #1 fusionnée, PR #35 OPEN/DRAFT, branche `test/parser-csv-document-regression-20261118`, HEAD exact avant écriture `1903b512e6c136b99fbd1b181b7eaeebe7eb7c4f`, base main `73256f48d81d38ce8ff6f51be9e024b25cf5dadb`. PR ouvertes et issues ouvertes recherchées, issue #14 et dernière revue relues ; dernier checkpoint #7026453208 pris comme point de reprise, sans réutiliser les SHA historiques.
+- **CI EXACT-HEAD** : GitHub Actions retourne CI [#44646796831](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/44646796831) et Docker/PostgreSQL [#44646796839](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/44646796839), tous deux `completed/success` pour `1903b512e6c136b99fbd1b181b7eaeebe7eb7c4f`. Tests locaux `NOT_RUN`. Les preuves ne sont pas transférables au commit documentaire suivant.
+- **REVUE** : une seule revue `COMMENTED` de l'auteur Patricked-code (sur ancien HEAD), aucune `APPROVED` indépendante ; PR demeure Draft. Les observations historiques de cette revue (quotes non refermées / en-têtes dupliqués) sont déjà corrigées dans le code courant, ne pas dupliquer.
+- **ACTION** : inspection du code et des tests CSV courants ; aucune modification fonctionnelle sans nouveau défaut prouvé, afin de ne pas multiplier les fixtures synthétiques. Mise à jour de la continuité GitHub uniquement. Aucun claim concurrent ni source officielle modifiés.
+- **BLOCK_REASON** : revue indépendante et gates de fusion manquants ; six contrats/licences/fixtures institutionnels CBE/GOSDMX non qualifiés (#14), aucune recette financière réelle source→archive→qualité→calcul→API (#17), pas d'autorisation S1.
+- **NEXT_ACTION** : obtenir une revue indépendante habilitée de la PR #35 sur le HEAD exact ; qualifier légalement une source officielle et une fixture datée pour un des six adaptateurs #14 ; implémenter alors le premier adaptateur borné et ses tests dans les composants existants après contrôle des claims. À défaut, reprendre un défaut fonctionnel indépendant de #5/#15 après inspection des PR propriétaires. Vérifier la CI du commit documentaire présent sans déclarer son succès à l'avance. Pas de merge/main/S1/secret/HISTORY_COMPLETE.
+- **ROLLBACK** : revert ciblé de cette entrée documentaire sur la branche Draft ; aucune modification de production.
+
+---
+
+
 ## 2026-11-20 01:32 Europe/Paris — Contrôle CI exact-HEAD et reprise gouvernée PR #35
 
 - **RECONCILIATION** : branche PR #35 `test/parser-csv-document-regression-20261118`, dernier HEAD fonctionnel/documentaire observé `2f3516813287a5fd367ee893bb3960dfc5a108ba` ; PR #1 documentaire précédemment fusionnée, dépôt GitHub privé (get_repo courant). Dernier checkpoint [#7025230682](https://github.com/Patricked-code/africafunds-market-data-pipeline/pull/35#issuecomment-7025230682) relu. Le statut exact de main et l'ensemble des revues/gates doivent être revérifiés avant toute fusion.
