@@ -1,5 +1,16 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-20 11:36 Europe/Paris — CI exact-SHA confirmée, blocages métier maintenus (aucun code spéculatif)
+
+- **RECONCILIATION** : branche PR #35 `test/parser-csv-document-regression-20261118`, dépôt privé, PR #35 OPEN/DRAFT ; lecture AGENTS.md, docs/15, journal et checkpoint #7036117232, matrice de l'audit #42314547906, parseur CSV/tests, documentation maître et recherche GitHub des 12 PR et 12 issues ouvertes. PR #26/#27/#33 et autres branches concurrentes préservées. Aucun SHA historique présumé actuel.
+- **PREUVES CI** : SHA exact `77f343e278529dbf7be3157db75e5ede47f6533d` : [CI #44712472416](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/44712472416) et [Docker/PostgreSQL #44712472633](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/44712472633), chacun `completed/success` selon GitHub. Tests locaux NOT_RUN. Aucun résultat d'export officiel, d'historique réel ou de runtime S1 inféré.
+- **ANALYSE** : revue PR #35 = uniquement COMMENTED par auteur, aucune APPROVED indépendante. Les protections CSV déjà présentes et leurs fixtures synthétiques ont été vérifiées ; pas de nouveau défaut suffisamment établi pour modifier le parseur. Matrice source historique : 22 NOT_PROBED, 7 HEAD 403, 1 HEAD 404, 14 HEAD 200 non certifiés ; CBE 5 restreints, GOSDMX 200 contenu non qualifié. Pas de bypass ni de licence supposée.
+- **BLOCK_REASON** : revue indépendante et gates PR #35 absents ; aucun contrat officiel/licence/observation datée GOSDMX ou CBE vérifié ; recette financière #17 réelle absente ; PR concurrentes sur ingestion, qualité, HTTP et backfill empêchent une appropriation implicite. Aucune tâche de code autonome admissible établie dans cette intervention ; aucun nouveau test ou code métier.
+- **NEXT_ACTION** : vérifier la CI du commit documentaire issu de cette entrée ; obtenir revue indépendante PR #35 ; qualifier via voie officielle autorisée un format et un témoin GOSDMX, puis réaliser l'adaptateur avec tests. Sinon examiner un défaut précis indépendant des PR ouvertes, enregistrer un claim GitHub explicite, TDD RED/GREEN et CI. Éviter les commits docs-only récurrents sans progrès métier ; aucun merge/main/S1/secret/HISTORY_COMPLETE.
+- **ROLLBACK** : revert ciblé de cette entrée sur branche Draft ; aucune donnée brute, source historique ou runtime modifié.
+
+---
+
 ## 2026-11-20 10:37 Europe/Paris — Réconciliation CI exacte et clarification des dépendances, sans correctif spéculatif
 
 - **RECONCILIATION** : dépôt GitHub privé ; PR #1 MERGED ; PR #35 OPEN/DRAFT, HEAD avant écriture `3cf75163ea791f677b38aa166241233e9dbf069c`, base SHA de la PR `73256f48d81d38ce8ff6f51be9e024b25cf5dadb`. Lecture AGENTS, contrat docs/15, journal, checkpoint #7034563876, parseur/tests, documents maîtres et PR/issues courantes. PR #26 (ingestion fail-closed) et #27 (qualité) toujours Draft ; aucune appropriation de leurs fichiers.
