@@ -1,5 +1,16 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-20 12:30 Europe/Paris — CI exacte PR #35 et contrôle de l'absence de correctif spéculatif
+
+- **RECONCILIATION** : PR #1 MERGED ; PR #35 OPEN/DRAFT, HEAD exact avant écriture `82eb5d1847e31295d651fbe95f1bfb0b9729d6f1`, base PR `73256f48d81d38ce8ff6f51be9e024b25cf5dadb`. AGENTS.md, docs/15, worklog, checkpoint #7037380499, parseur CSV et tests relus. Recherche des PR/issues ouvertes et revue #35 (seule COMMENTED par auteur, aucune APPROVED indépendante). Aucune branche concurrente touchée.
+- **PREUVES CI** : sur SHA exact `82eb5d1847e31295d651fbe95f1bfb0b9729d6f1`, [Docker/PostgreSQL #44720759304](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/44720759304) et [CI #44720759352](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/44720759352) : `completed/success` selon GitHub. Tests locaux NOT_RUN ; aucun export institutionnel ni runtime S1 certifié.
+- **TRAVAIL** : vérification du code CSV actuel et des fixtures ; les garde-fous précédemment signalés (quotes non refermées, en-têtes dupliqués, séparateurs invalides) sont déjà implémentés. Aucun nouveau défaut démontré : pas de test ou patch spéculatif, pas de commit métier redondant. Les PR #26/#27 et les autres branches propriétaires sont préservées.
+- **BLOCK_REASON** : absence de revue indépendante/gates de fusion ; cinq CBE historiquement restreints, GOSDMX sans contrat/licence/fixture datée attestés ; recette réelle source→archive→normalisation→qualité→calcul→API #17 absente. Aucune voie sûre démontrée aujourd'hui pour coder l'adaptateur institutionnel sans inventer un contrat.
+- **NEXT_ACTION** : vérifier CI de ce nouveau HEAD documentaire, solliciter une revue indépendante PR #35 ; obtenir via canal officiel les droits, schéma et observation datée GOSDMX, puis TDD adaptateur dans le socle existant. À défaut, isoler un défaut reproductible hors périmètre des PR concurrentes, enregistrer claim GitHub, développer et tester. Ne pas fusionner, toucher main/S1/secrets, contourner robots/403 ou déclarer HISTORY_COMPLETE.
+- **ROLLBACK** : revert ciblé de cette entrée documentaire sur la branche Draft ; aucun effet sur données ou production.
+
+---
+
 ## 2026-11-20 11:36 Europe/Paris — CI exact-SHA confirmée, blocages métier maintenus (aucun code spéculatif)
 
 - **RECONCILIATION** : branche PR #35 `test/parser-csv-document-regression-20261118`, dépôt privé, PR #35 OPEN/DRAFT ; lecture AGENTS.md, docs/15, journal et checkpoint #7036117232, matrice de l'audit #42314547906, parseur CSV/tests, documentation maître et recherche GitHub des 12 PR et 12 issues ouvertes. PR #26/#27/#33 et autres branches concurrentes préservées. Aucun SHA historique présumé actuel.
