@@ -1,5 +1,17 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-20 06:35 Europe/Paris — PR #35 : CI exacte confirmée et qualification des six sources confrontée à l'audit canonique
+
+- **RECONCILIATION** : PR #35 OPEN/DRAFT, HEAD avant écriture `ea7dcee39474d25ae16e1a777a6d6be65b5f229d`, base main observée `73256f48d81d38ce8ff6f51be9e024b25cf5dadb`. AGENTS.md, docs/15, worklog, checkpoint PR et PR/issues ouvertes consultés. Aucune écriture sur les branches concurrentes ; PR #35 toujours sans approbation indépendante (seule revue COMMENTED de l'auteur).
+- **CI EXACT SHA** : [CI #44675478041](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/44675478041) et [Docker/PostgreSQL #44675477860](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/44675477860) : `completed/success` pour `ea7dcee39474d25ae16e1a777a6d6be65b5f229d`. Ne couvrent pas le présent commit documentaire. Tests locaux NOT_RUN.
+- **QUALIFICATION #13/#14** : relecture de `docs/SOURCE_AUDIT_RUN_42314547906.md` (run #42314547906, SHA `da1e669531ba7533df412b4f2d889374a66128e7`). Cinq endpoints CBE `egy-cbe-conia`, `egy-cbe-conia-index`, `egy-cbe-interbank`, `egy-cbe-tbills`, `egy-cbe-tbonds` sont tous `RESTRICTED / HEAD 403` dans cet audit historique ; `tun-bct-gosdmx` est seulement `HTTP_OK_UNVERIFIED_CONTENT / HEAD 200`. Aucun de ces six statuts ne prouve un contrat SDMX, un format, une licence de réutilisation, une fixture datée ou un historique opérationnel. Les 22 NOT_PROBED restent non certifiés ; aucun contournement robots/403, aucune modification des 44 endpoints.
+- **ACTION** : vérification des deux workflows et rapprochement précis des six adaptateurs avec l'audit existant, sans créer de second registre, de fausse fixture ni de nouveau test CSV redondant. Aucun code métier modifié pendant ce contrôle.
+- **BLOCK_REASON** : PR #35 Draft sans revue indépendante ; cinq sources CBE historiquement HEAD 403 sans voie d'accès officielle certifiée ; GOSDMX seulement HEAD 200 sans contrat de contenu ni observation témoin datée ; #17 non attestée source→archive→canonical→quality→calcul→API. CI du présent commit documentaire à revérifier.
+- **NEXT_ACTION** : contrôler la CI du nouveau SHA, obtenir une revue indépendante de PR #35 ; prioriser `tun-bct-gosdmx` pour identifier un export/SDMX officiel autorisé, droits et fixture datée avant adaptation ; pour les cinq CBE demander/documenter la voie officielle sans bypass. Si aucun accès légal/fixture, choisir un défaut indépendant #5/#15 après contrôle des claims et des PR propriétaires. Ne pas fusionner, déployer S1, modifier les secrets ni déclarer DONE/HISTORY_COMPLETE.
+- **ROLLBACK** : revert ciblé de cette entrée sur la branche Draft ; aucun changement main, serveur ou sources historiques.
+
+---
+
 ## 2026-11-20 05:35 Europe/Paris — PR #35 : CI exact-HEAD attestée, bascule vers qualification métier (#14)
 
 - **RECONCILIATION** : PR #1 fusionnée ; PR #35 OPEN/DRAFT, HEAD initial `a534dd6f3f25e1be90a6ff4a620a50dbad711f75`, base main observée `73256f48d81d38ce8ff6f51be9e024b25cf5dadb`. Recherche des PR/ issues ouvertes effectuée : nombreuses branches propriétaires concurrentes (#26–#34) ; aucune écriture dans ces branches. `AGENTS.md`, `docs/15_AUTONOMOUS_AGENT_EXECUTION.md`, présent journal et dernier checkpoint PR consultés.
