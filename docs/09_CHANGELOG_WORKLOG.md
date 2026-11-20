@@ -1,5 +1,17 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-20 07:35 Europe/Paris — PR #35 : CI exact-HEAD attestée, contrôle de non-duplication et gate #14
+
+- **RECONCILIATION** : PR #1 MERGED ; PR #35 OPEN/DRAFT, HEAD avant écriture `a404d6bd7dd53639d0c67021b100fc2799b3151b`, base main `73256f48d81d38ce8ff6f51be9e024b25cf5dadb`. AGENTS.md, docs/15, journal, checkpoint #7031456404, code `src/parsers/csv.ts`, tests et PR/issues ouvertes consultés. Aucune écriture sur les branches concurrentes.
+- **CI EXACT-HEAD** : [CI #44682073285](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/44682073285) et [Docker/PostgreSQL #44682073278](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/44682073278) : `completed/success` pour `a404d6bd7dd53639d0c67021b100fc2799b3151b` selon GitHub Actions. Tests locaux NOT_RUN. Ces runs ne certifient aucun export institutionnel ni le runtime S1.
+- **CONTROLE CODE** : les validations du séparateur explicite, des guillemets fermés, des en-têtes dupliqués, de la largeur des lignes et les tests synthétiques correspondants sont déjà dans la branche ; aucune duplication de correctif CSV. Audit source #42314547906 : cinq CBE `HEAD 403/RESTRICTED`, GOSDMX `HEAD 200/HTTP_OK_UNVERIFIED_CONTENT`. Ne pas interpréter HEAD 200 comme un export SDMX validé.
+- **ACTION** : vérification positive de la CI exacte et inspection de compatibilité du parseur ; maintien du gate légal/formats avant développement des adaptateurs. Aucun code métier modifié, aucune donnée réelle téléchargée, aucune nouvelle fixture inventée.
+- **BLOCK_REASON** : PR Draft sans revue indépendante ; absence de contrat officiel/licence et d'observation témoin datée pour GOSDMX/CBE ; #17 non démontrée source→archive→canonical→quality→calcul→API. La CI du présent commit documentaire reste à contrôler.
+- **NEXT_ACTION** : vérifier la CI du nouveau HEAD ; obtenir revue indépendante PR #35 ; qualifier par canal officiel les droits, le contrat SDMX/export et une observation datée GOSDMX ; sinon sélectionner une anomalie démontrable et non revendiquée des issues #5/#15 avec claim GitHub, test RED/GREEN et PR dédiée. Aucun merge, S1, secret, bypass 403/robots, modification des 44 endpoints ni HISTORY_COMPLETE.
+- **ROLLBACK** : revert ciblé de cette entrée documentaire ; aucun effet main/serveur/données.
+
+---
+
 ## 2026-11-20 06:35 Europe/Paris — PR #35 : CI exacte confirmée et qualification des six sources confrontée à l'audit canonique
 
 - **RECONCILIATION** : PR #35 OPEN/DRAFT, HEAD avant écriture `ea7dcee39474d25ae16e1a777a6d6be65b5f229d`, base main observée `73256f48d81d38ce8ff6f51be9e024b25cf5dadb`. AGENTS.md, docs/15, worklog, checkpoint PR et PR/issues ouvertes consultés. Aucune écriture sur les branches concurrentes ; PR #35 toujours sans approbation indépendante (seule revue COMMENTED de l'auteur).
