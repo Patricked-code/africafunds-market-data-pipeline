@@ -1,5 +1,16 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-20 08:35 Europe/Paris — PR #35 : CI exacte du checkpoint 07:35 vérifiée, priorité au travail métier
+
+- **RECONCILIATION** : PR #1 MERGED ; PR #35 OPEN/DRAFT sur `test/parser-csv-document-regression-20261118`, HEAD avant écriture `5990d55f7826fc38248aeaac1aa1a70edc1e6021`, base main `73256f48d81d38ce8ff6f51be9e024b25cf5dadb` (métadonnées PR). Dépôt privé au contrôle. AGENTS.md, docs/15, présent journal, checkpoint #7032417299 et parseur CSV consultés ; PR ouvertes examinées. Aucune branche concurrente modifiée.
+- **PREUVES CI EXACT SHA** : [CI #44688985451](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/44688985451) et [Docker/PostgreSQL #44688985541](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/44688985541) : `completed/success` pour `5990d55f7826fc38248aeaac1aa1a70edc1e6021`. Tests locaux NOT_RUN. Aucun test sur export officiel, licence, historique réel ou S1 attesté.
+- **ACTION** : validation des deux workflows exacts et vérification du code existant. Pas de modification CSV supplémentaire sans défaut nouveau démontré ; pas de fixture institutionnelle inventée. Le périmètre métier #14/#17 reste prioritaire. Cette intervention ne comporte pas de nouveau code métier.
+- **BLOCK_REASON** : revue indépendante PR #35 absente ; cinq CBE historiquement HEAD 403 et GOSDMX HEAD 200 sans contenu certifié ; licences, contrats de format, observation témoin datée et recette financière de bout en bout #17 non attestés. CI du présent commit documentaire non encore vérifiée.
+- **NEXT_ACTION** : vérifier CI du nouveau HEAD et revue PR #35 ; qualifier par canal officiel GOSDMX (format, droits, exemple daté) sans bypass ; si indisponible, choisir un défaut indépendant #5/#15, vérifier claim et créer branche/tests RED-GREEN. Ne pas répéter des commits documentaires sans progression fonctionnelle. Aucun merge, push main, S1, secret, altération des 44 sources ni HISTORY_COMPLETE.
+- **ROLLBACK** : revert ciblé du seul ajout au worklog sur branche Draft.
+
+---
+
 ## 2026-11-20 07:35 Europe/Paris — PR #35 : CI exact-HEAD attestée, contrôle de non-duplication et gate #14
 
 - **RECONCILIATION** : PR #1 MERGED ; PR #35 OPEN/DRAFT, HEAD avant écriture `a404d6bd7dd53639d0c67021b100fc2799b3151b`, base main `73256f48d81d38ce8ff6f51be9e024b25cf5dadb`. AGENTS.md, docs/15, journal, checkpoint #7031456404, code `src/parsers/csv.ts`, tests et PR/issues ouvertes consultés. Aucune écriture sur les branches concurrentes.
