@@ -1,5 +1,20 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-20 03:38 Europe/Paris — Lot 4/#14 : séparateur explicite invalide, test et correction fail-closed
+
+- **RECONCILIATION** : PR #35 OPEN/DRAFT, branche `test/parser-csv-document-regression-20261118`, HEAD initial `63380d2e0d6b3d6172bdb1dc013a9a88166c54ff` ; documents AGENTS.md, docs/15, journal, checkpoint de PR #35, parseur et tests relus. Les PR et issues ouvertes ont été recherchées. Aucune modification des branches concurrentes.
+- **CI EXACT-HEAD PRECEDENT** : [CI #44654244372](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/44654244372) et [Docker/PostgreSQL #44654244338](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/44654244338), tous deux `completed/success` pour `63380d2e0d6b3d6172bdb1dc013a9a88166c54ff`. Ces preuves ne couvrent PAS les nouveaux commits.
+- **DEFAUT** : un séparateur explicite vide, multicaractère, guillemet ou saut de ligne pouvait être accepté silencieusement ; la valeur était alors susceptible d'être interprétée comme une colonne unique, altérant le mapping financier.
+- **TEST TDD** : commit `2caf30ce6d63ef5b05095d392dbc7f694f376503`, assertions pour cinq séparateurs invalides et compatibilité d'un séparateur personnalisé valide `|`. RED isolé NOT_RUN ; pas de preuve d'exécution locale.
+- **CORRECTION** : commit `643e813b2f067b2e2a7924eb8a513a10b406dcf8`, validation fail-closed à l'entrée de `parseDelimited` sans modifier l'autodétection ni les 44 sources historiques.
+- **VALIDATION** : CI du nouveau HEAD NOT_YET_ATTESTED ; tests locaux NOT_RUN ; aucune revue indépendante APPROVED attestée. Pas de données témoins institutionnelles, aucune recette historique ou S1 certifiée.
+- **BLOCK_REASON** : CI du nouveau HEAD et revue indépendante à confirmer ; contrats/licences et données témoins des six adaptateurs CBE/GOSDMX #14 non certifiés ; chaîne financière réelle #17 et gates de fusion/S1 non satisfaits.
+- **NEXT_ACTION** : vérifier CI exact-HEAD après ce journal, corriger toute régression ; obtenir revue indépendante du parseur ; qualifier contrat officiel + fichier témoin daté pour un adaptateur #14 ou reprendre un défaut indépendant #5/#15 après vérification des claims. Ne pas fusionner ni déployer S1, ne pas déclarer DONE/HISTORY_COMPLETE.
+- **ROLLBACK** : revert ciblé des commits de test et correction sur cette branche Draft après analyse ; aucun push main, secret, migration ou runtime modifié.
+
+---
+
+
 ## 2026-11-20 02:31 Europe/Paris — Validation CI PR #35 et passage au gate de revue
 
 - **RECONCILIATION GITHUB** : dépôt privé, PR #1 fusionnée, PR #35 OPEN/DRAFT, branche `test/parser-csv-document-regression-20261118`, HEAD exact avant écriture `1903b512e6c136b99fbd1b181b7eaeebe7eb7c4f`, base main `73256f48d81d38ce8ff6f51be9e024b25cf5dadb`. PR ouvertes et issues ouvertes recherchées, issue #14 et dernière revue relues ; dernier checkpoint #7026453208 pris comme point de reprise, sans réutiliser les SHA historiques.
