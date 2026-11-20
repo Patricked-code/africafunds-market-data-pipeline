@@ -1,5 +1,17 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-20 10:37 Europe/Paris — Réconciliation CI exacte et clarification des dépendances, sans correctif spéculatif
+
+- **RECONCILIATION** : dépôt GitHub privé ; PR #1 MERGED ; PR #35 OPEN/DRAFT, HEAD avant écriture `3cf75163ea791f677b38aa166241233e9dbf069c`, base SHA de la PR `73256f48d81d38ce8ff6f51be9e024b25cf5dadb`. Lecture AGENTS, contrat docs/15, journal, checkpoint #7034563876, parseur/tests, documents maîtres et PR/issues courantes. PR #26 (ingestion fail-closed) et #27 (qualité) toujours Draft ; aucune appropriation de leurs fichiers.
+- **PREUVES CI** : sur HEAD `3cf75163ea791f677b38aa166241233e9dbf069c`, GitHub Actions [CI #44703950067](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/44703950067) et [Docker/PostgreSQL #44703950158](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/44703950158) : `completed/success`. Tests locaux `NOT_RUN`. La CI du présent commit documentaire reste à vérifier.
+- **CONSTATS** : revue PR #35 : une seule `COMMENTED` de l'auteur, aucune `APPROVED` indépendante. #14 : PR #26 couvre déjà le blocage précoce des adaptateurs manuels non implémentés, sans les rendre opérationnels ; #15 : PR #27 contient une admission typée partielle, sans intégration DB ni observations officielles. Ne pas dupliquer ces corrections. Les licences, contrats SDMX/CBE et témoins datés restent non prouvés. Aucune donnée réelle, test local, fusion ou déploiement effectué.
+- **BLOCK_REASON** : revue indépendante et gates PR #35 manquants ; sources institutionnelles #14 sans droits/contrat/témoin démontrés ; #17 sans recette source→archive→normalisation→qualité→calcul→API ; zones #5/#15 occupées par des PR concurrentes et sans claim exclusif attesté.
+- **NEXT_ACTION** : contrôler CI du nouveau HEAD ; obtenir revue indépendante sur PR #35 ; rechercher un contrat officiel GOSDMX et observation témoin autorisée avant tout adaptateur. Si non disponible, inspecter un défaut fonctionnel distinct non revendiqué, réserver explicitement son périmètre dans GitHub, puis test RED, correctif GREEN et CI, sans commits docs-only répétitifs.
+- **ROLLBACK** : revert de la présente entrée sur branche Draft ; aucun changement métier, sources, `main`, secrets ou S1.
+
+---
+
+
 ## 2026-11-20 09:35 Europe/Paris — PR #35 : CI exacte attestée, pas de duplication de code sans défaut prouvé
 
 - **RECONCILIATION** : dépôt privé selon GitHub ; PR #35 ouverte en Draft, branche `test/parser-csv-document-regression-20261118`. Relecture `AGENTS.md`, `docs/15_AUTONOMOUS_AGENT_EXECUTION.md`, présent journal, checkpoint PR #7033430524, `src/parsers/csv.ts`, tests CSV, PR/issues ouvertes. PR concurrentes laissées intactes ; SHA `main` et protections non revalidés exhaustivement dans ce contrôle, aucune fusion envisagée.
