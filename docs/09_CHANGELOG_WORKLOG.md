@@ -1,5 +1,16 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-20 09:35 Europe/Paris — PR #35 : CI exacte attestée, pas de duplication de code sans défaut prouvé
+
+- **RECONCILIATION** : dépôt privé selon GitHub ; PR #35 ouverte en Draft, branche `test/parser-csv-document-regression-20261118`. Relecture `AGENTS.md`, `docs/15_AUTONOMOUS_AGENT_EXECUTION.md`, présent journal, checkpoint PR #7033430524, `src/parsers/csv.ts`, tests CSV, PR/issues ouvertes. PR concurrentes laissées intactes ; SHA `main` et protections non revalidés exhaustivement dans ce contrôle, aucune fusion envisagée.
+- **CI EXACT SHA** : SHA `7003423e84a6fd2064eb7d3f0acb3820bbeee5c9` : [CI #44696050415](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/44696050415) et [Docker/PostgreSQL #44696050335](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/44696050335), tous deux `completed/success` selon `fetch_commit_workflow_runs`. Tests locaux NOT_RUN. Ce résultat ne certifie ni données réelles ni staging S1.
+- **ACTION** : examen de la chaîne parseur/tests et des dépendances #14/#15 ; les défauts CSV déjà corrigés sont couverts. Aucun défaut supplémentaire prouvé ni fixture officielle légalement qualifiée pour justifier un nouveau correctif. Aucune branche concurrente, source, secret, schéma ou serveur modifié. Pas de nouveau code/test pendant cette intervention ; éviter une nouvelle série de commits documentaires sans progression métier.
+- **BLOCK_REASON** : PR #35 Draft, seule revue COMMENTED par auteur, approbation indépendante absente ; GOSDMX non certifié sur contenu/format/licence/témoin daté et cinq CBE historiquement 403 ; #17 sans preuve de recette réelle. Les claims concurrents des lots #5/#15 empêchent une modification sans réservation préalable.
+- **NEXT_ACTION** : demander une revue indépendante sur le code CSV validé ; obtenir une preuve officielle de format/licence et une observation datée GOSDMX pour démarrer l'adaptateur existant, sans bypass ; sinon isoler et réserver un défaut précis non revendiqué de #5/#15, puis TDD et PR dédiée. Contrôler CI du présent SHA documentaire ; aucune fusion, main, S1, secret ou HISTORY_COMPLETE.
+- **ROLLBACK** : revert ciblé de cette entrée documentaire ; aucun changement des 44 endpoints ou données brutes.
+
+---
+
 ## 2026-11-20 08:35 Europe/Paris — PR #35 : CI exacte du checkpoint 07:35 vérifiée, priorité au travail métier
 
 - **RECONCILIATION** : PR #1 MERGED ; PR #35 OPEN/DRAFT sur `test/parser-csv-document-regression-20261118`, HEAD avant écriture `5990d55f7826fc38248aeaac1aa1a70edc1e6021`, base main `73256f48d81d38ce8ff6f51be9e024b25cf5dadb` (métadonnées PR). Dépôt privé au contrôle. AGENTS.md, docs/15, présent journal, checkpoint #7032417299 et parseur CSV consultés ; PR ouvertes examinées. Aucune branche concurrente modifiée.
