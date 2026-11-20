@@ -1,5 +1,17 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-20 01:32 Europe/Paris — Contrôle CI exact-HEAD et reprise gouvernée PR #35
+
+- **RECONCILIATION** : branche PR #35 `test/parser-csv-document-regression-20261118`, dernier HEAD fonctionnel/documentaire observé `2f3516813287a5fd367ee893bb3960dfc5a108ba` ; PR #1 documentaire précédemment fusionnée, dépôt GitHub privé (get_repo courant). Dernier checkpoint [#7025230682](https://github.com/Patricked-code/africafunds-market-data-pipeline/pull/35#issuecomment-7025230682) relu. Le statut exact de main et l'ensemble des revues/gates doivent être revérifiés avant toute fusion.
+- **PREUVE CI DU SHA 2f351681** : fetch_commit_workflow_runs retourne deux runs GitHub Actions `44638645007` et `44638644761`, tous deux `completed/success` pour ce SHA. Preuve limitée à ce commit, non transférable au commit documentaire créé ensuite. Tests locaux `NOT_RUN`.
+- **LECTURE CODE** : `src/parsers/csv.ts` et `test/csv-document-parser-regression.test.ts` relus. Le test du CR isolé `b1551a0` est présent. Aucun correctif CSV supplémentaire non justifié n'est créé ; le chantier prioritaire est la qualification officielle des adaptateurs #14 et la recette #17, pas la multiplication de fixtures synthétiques.
+- **BLOCK_REASON** : PR #35 Draft et revue indépendante non attestée dans cette reprise ; contrats/licences, protocoles et fichiers témoins CBE/GOSDMX #14 manquants ; recette source→archive→canonical→quality→API #17 non attestée ; aucune preuve de S1 prêt à déployer.
+- **NEXT_ACTION** : vérifier CI du nouveau HEAD documentaire ; demander une revue indépendante et qualifier légalement une source institutionnelle (contrat, accès, fixture datée), puis implémenter l'adaptateur admissible et ses tests sur branche/PR après vérification du claim ; à défaut reprendre une tâche indépendante #5/#15. Ne pas fusionner ni déployer S1 sans gates.
+- **ROLLBACK** : revert ciblé de ce commit documentaire sur la branche ; aucune modification de données, `main`, S1, secrets ou des 44 sources.
+
+---
+
+
 ## 2026-11-20 00:32 Europe/Paris — PR #35 : CI documentaire vérifiée et test CR cité ajouté
 
 - **RECONCILIATION** : PR #1, #12 et #18 fusionnées ; PR #35 OPEN/DRAFT sur `test/parser-csv-document-regression-20261118`, lecture de AGENTS.md, docs/15, journal, dernier checkpoint PR #35 (#7024137874), code CSV et tests, issues #3/#5/#13–#17 et revue. Base main et HEAD doivent être revérifiés avant toute intégration ; aucune fusion autorisée.
