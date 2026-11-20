@@ -1,5 +1,17 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-20 04:33 Europe/Paris — PR #35 : validation CI exact HEAD et revue des gates (lot 4 / #14)
+
+- **RÉCONCILIATION** : PR #1 fusionnée ; PR #35 OPEN/DRAFT, branche `test/parser-csv-document-regression-20261118`, HEAD `190946cc5df25e41a2b4b3941c6b3239ac4c2a6e`, base main `73256f48d81d38ce8ff6f51be9e024b25cf5dadb` au contrôle. Dépôt GitHub privé (get_repo). La recherche des PR et issues ouvertes confirme des chantiers concurrents : ne pas modifier leurs branches.
+- **PREUVES CI EXACT SHA** : [CI #44662379920](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/44662379920) et [Docker/PostgreSQL #44662379917](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/44662379917), chacun `completed/success` pour `190946cc5df25e41a2b4b3941c6b3239ac4c2a6e` (fetch_commit_workflow_runs). Cela valide le correctif de séparateur explicite sur ce SHA ; aucune donnée institutionnelle réelle ni S1 attestés.
+- **REVUE** : une revue `COMMENTED` de l'auteur, aucune `APPROVED` indépendante. Contrôle du parseur et des tests CSV : les gardes existantes contre séparateurs invalides, guillemets non refermés et en-têtes dupliqués sont présentes ; pas de duplication de correctifs. Aucun nouveau test local exécuté.
+- **BLOCK_REASON** : revue indépendante/gates de fusion manquants ; contrats/licences et fixtures datées CBE/GOSDMX #14 non certifiés ; recette réelle source→archive→normalisation→qualité→calcul→API #17 absente. Aucun merge ou S1 autorisé.
+- **NEXT_ACTION** : vérifier la CI du nouveau HEAD documentaire issu de cette entrée, solliciter une revue indépendante de la PR #35, puis qualifier une source officielle autorisée et son fichier témoin pour adapter les composants existants. Si bloqué, reprendre une tâche indépendante #5/#15 après vérification des claims. Ne pas produire de tests CSV redondants.
+- **ROLLBACK** : revert ciblé de cette seule entrée documentaire sur la branche PR ; aucun changement de main, serveur, secrets ou catalogue de 44 endpoints.
+
+---
+
+
 ## 2026-11-20 03:38 Europe/Paris — Lot 4/#14 : séparateur explicite invalide, test et correction fail-closed
 
 - **RECONCILIATION** : PR #35 OPEN/DRAFT, branche `test/parser-csv-document-regression-20261118`, HEAD initial `63380d2e0d6b3d6172bdb1dc013a9a88166c54ff` ; documents AGENTS.md, docs/15, journal, checkpoint de PR #35, parseur et tests relus. Les PR et issues ouvertes ont été recherchées. Aucune modification des branches concurrentes.
