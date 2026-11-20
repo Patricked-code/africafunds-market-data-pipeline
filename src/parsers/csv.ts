@@ -1,4 +1,9 @@
 export function parseDelimited(text: string, delimiter?: string): string[][] {
+  // Invalid caller-supplied separators must not silently collapse source columns.
+  // Preserve support for legitimate custom single-character separators.
+  if (delimiter !== undefined && (delimiter.length !== 1 || delimiter === '"' || delimiter === '\r' || delimiter === '\n')) {
+    throw new Error('Invalid delimited document separator');
+  }
   const normalized = text.replace(/^\uFEFF/, '');
   // Inspect the complete first logical record, including multiline quoted headers.
   // Only unquoted delimiters contribute to autodetection.
