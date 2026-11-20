@@ -240,3 +240,14 @@ test('Delimited: lone CR inside quoted documentary field is not a record boundar
     { date: '2026-01-02', instrument: 'Bill\r91d', rate: '-0.25' },
   ]);
 });
+
+// An invalid explicit delimiter must fail closed rather than merge financial
+// columns silently into one value. Valid custom one-character separators remain supported.
+test('Delimited: invalid explicit delimiters are rejected without losing columns', () => {
+  for (const invalid of ['', ';;', '\n', '\r', '"']) {
+    assert.throws(() => parseDelimited('date;rate\n2026-01-02;5.25\n', invalid), /delimiter|separator|invalid/i);
+  }
+  assert.deepEqual(parseDelimited('date|rate\n2026-01-02|5.25\n', '|'), [
+    ['date', 'rate'], ['2026-01-02', '5.25'],
+  ]);
+});
