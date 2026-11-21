@@ -1,5 +1,16 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-22 — Issue #13 / PR #25 : preuve CI détaillée du HEAD exact et reprise documentaire
+
+- **RECONCILIATION** : PR #1 fusionnée ; instructions `AGENTS.md`, `docs/15_AUTONOMOUS_AGENT_EXECUTION.md`, journal et checkpoint historique relus sur `main` ; PR #25 OPEN/Draft au HEAD `8e1a22fe4d5100f5fea15ec024f063b06486c265`, PR #22 OPEN/Draft et laissée intacte ; recherche des PR et issues ouvertes effectuée. Le présent commit documentaire fera évoluer le HEAD : la preuve CI ci-dessous couvre exclusivement le HEAD de code précédent.
+- **PREUVE GITHUB ACTIONS** : [run #102 / 42536032601](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/42536032601) `completed/success` associé au SHA exact `8e1a22fe4d5100f5fea15ec024f063b06486c265` ; job `validate` #128900422548 `completed/success`. Étapes attestées SUCCESS : checkout de la révision PR, installation des dépendances, typecheck, tests unitaires, test offline de cohérence des 44 sources, garde S1 et préflight, validation Compose, build, migrations PostgreSQL et réapplication, seed du registre, tests intégration PostgreSQL, claim backfill et garde de fenêtres. Cette CI ne valide pas les données réelles des sources ni les tests de la PR #22 divergente.
+- **REVUE** : liste GitHub des reviews de PR #25 vide au contrôle ; PR demeure Draft. Tests locaux de cette intervention **NOT_RUN**. Aucune collecte réseau, aucun secret, aucune fusion, aucun déploiement S1.
+- **BLOCK_REASON** : revue indépendante/gates non attestés ; qualifications officielles, droits/licences et échantillons des 22 `NOT_PROBED`, 7 `RESTRICTED`, 1 `NOT_FOUND` non établis ; les 14 `HTTP_OK_UNVERIFIED_CONTENT` ne prouvent pas la qualité des données. CI du nouveau HEAD documentaire à recontrôler après commit.
+- **NEXT_ACTION** : vérifier le run/checks du HEAD documentaire résultant ; obtenir revue indépendante ; qualifier protocole et échantillons officiels autorisés pour issue #13, puis les 6 adaptateurs de #14 sans bypass ; préserver les 44 sources historiques et la PR #22. Aucune certification `HISTORY_COMPLETE` ni `DONE`.
+- **ROLLBACK** : revert ciblé du présent commit documentaire, sans modification des sources ou des données.
+
+---
+
 ## 2026-11-09 — Issue #13 / PR #25 : CI #100 sur HEAD antérieur, cohérence fichier/code marché
 
 - **RECONCILIATION** : AGENTS.md et docs/15 relus ; worklog et NEXT_ACTION de PR #25 relus ; issue #13 OPEN ; PR #25 et PR #22 indépendantes ; HEAD initial PR #25 `0652aae2779082a01052fb91927d9fca0dbacf1e` confirmé identique à la branche avant écriture. Aucun merge ni S1.
