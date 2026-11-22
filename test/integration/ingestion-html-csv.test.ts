@@ -1,0 +1,105 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { createHash, randomUUID } from 'node:crypto';
+import { mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+
+// Integration test: actual ingestion code and isolated PostgreSQL; no outbound HTTP.
+test('HTML index -> CSV child -> SHA archive -> PostgreSQL -> SUCCESS; failed child -> FAILED', async () => {
+  assert.ok(process.env.DATABASE_URL, 'DATABASE_URL must be an isolated integration database');
+  const root = await mkdtemp(join(tmpdir(), 'sadia-ingest-'));
+  const registryPath = join(root, 'registry.json');
+  const endpointCode = 'ci-html-csv-' + randomUUID();
+  const indexUrl = 'https://fixtures.invalid/' + endpointCode + '/';
+  const childUrl = indexUrl + 'rates.csv';
+  const html = '<html><body><a href="rates.csv">Historical rates</a></body></html>';
+  const csv = 'date;rate\n2026-01-02;4.25\n2026-01-03;4.50\n';
+  const originalFetch = globalThis.fetch;
+  const previousRegistry = process.env.SOURCE_REGISTRY_PATH;
+  const previousArchive = process.env.RAW_ARCHIVE_DIR;
+  const previousRetries = process.env.HTTP_MAX_RETRIES;
+  process.env.SOURCE_REGISTRY_PATH = registryPath;
+  process.env.RAW_ARCHIVE_DIR = join(root, 'archive');
+  process.env.HTTP_MAX_RETRIES = '0';
+  let pool: typeof import('../src/db/pool.js').pool | undefined;
+  try {
+    await writeFile(registryPath, JSON.stringify({
+      version: 'ci', generatedAt: '2026-11-22', defaultPolicies: {},
+      markets: [{
+        code: 'MAR', name: 'Synthetic CI', currency: 'MAD', allShareIndex: null,
+        institutions: {},
+        endpoints: [{ id: endpointCode, label: 'Synthetic HTML CSV', url: indexUrl,
+          dataFamily: 'MONEY_MARKET_RATE', collector: 'HTML_LINK_INDEX',
+          frequency: 'DAILY', enabled: true }],
+      }],
+    }));
+    const db = await import('../src/db/pool.js');
+    pool = db.pool;
+    const { runIngestion } = await import('../src/jobs/ingest.js');
+    let failChild = false;
+    globalThis.fetch = async (input) => {
+      const url = String(input);
+      if (url !== indexUrl && url !== childUrl) throw new Error('Unexpected outbound URL: ' + url);
+      const response = url === childUrl && failChild
+        ? new Response('unavailable', { status: 404 })
+        : new Response(url === indexUrl ? html : csv, {
+            status: 200,
+            headers: { 'content-type': url === indexUrl ? 'text/html' : 'text/csv' },
+          });
+      Object.defineProperty(response, 'url', { value: url });
+      return response;
+    };
+    await runIngestion({ endpointCode, failOnEndpointError: true });
+    const runs = await pool.query<{ status: string; summary: { rows: number; success: number } }>(
+      "SELECT status, summary FROM ops.ingestion_runs WHERE scope->>'endpointCode'=$1 ORDER BY started_at DESC",
+      [endpointCode],
+    );
+    assert.equal(runs.rows[0]?.status, 'SUCCESS');
+    assert.equal(runs.rows[0]?.summary.rows, 2);
+    assert.equal(runs.rows[0]?.summary.success, 1);
+    const artifacts = await pool.query<{ raw_artifact_id: string; sha256: string; archive_path: string; parent_artifact_id: string | null }>(
+      'SELECT raw_artifact_id, sha256, archive_path, parent_artifact_id FROM source.raw_artifacts WHERE endpoint_code=$1',
+      [endpointCode],
+    );
+    assert.equal(artifacts.rowCount, 2);
+    const child = artifacts.rows.find((row) => row.parent_artifact_id !== null);
+    assert.ok(child);
+    assert.equal(child.sha256.trim(), createHash('sha256').update(csv).digest('hex'));
+    assert.equal((await readFile(join(process.env.RAW_ARCHIVE_DIR!, child.archive_path))).toString(), csv);
+    const persisted = await pool.query<{ count: string }>(
+      'SELECT count(*)::text AS count FROM market.raw_records WHERE endpoint_code=$1', [endpointCode],
+    );
+    assert.equal(persisted.rows[0]?.count, '2');
+
+    failChild = true;
+    await assert.rejects(runIngestion({ endpointCode, failOnEndpointError: true }));
+    const failed = await pool.query<{ status: string; summary: { failed: number } }>(
+      "SELECT status, summary FROM ops.ingestion_runs WHERE scope->>'endpointCode'=$1 ORDER BY started_at DESC",
+      [endpointCode],
+    );
+    assert.equal(failed.rows[0]?.status, 'FAILED');
+    assert.equal(failed.rows[0]?.summary.failed, 1);
+  } finally {
+    globalThis.fetch = originalFetch;
+    if (pool) {
+      // Only synthetic records with a unique endpoint code, in the isolated CI database.
+      await pool.query("DELETE FROM ops.ingestion_runs WHERE scope->>'endpointCode'=$1", [endpointCode]);
+      await pool.query(
+        'DELETE FROM quality.assessments WHERE object_type=$1 AND object_id IN (SELECT raw_artifact_id FROM source.raw_artifacts WHERE endpoint_code=$2)',
+        ['RAW_ARTIFACT', endpointCode],
+      );
+      await pool.query('DELETE FROM market.raw_records WHERE endpoint_code=$1', [endpointCode]);
+      await pool.query('DELETE FROM source.raw_artifacts WHERE endpoint_code=$1 AND parent_artifact_id IS NOT NULL', [endpointCode]);
+      await pool.query('DELETE FROM source.raw_artifacts WHERE endpoint_code=$1', [endpointCode]);
+      await pool.query('DELETE FROM source.source_endpoints WHERE endpoint_code=$1', [endpointCode]);
+    }
+    if (previousRegistry === undefined) delete process.env.SOURCE_REGISTRY_PATH;
+    else process.env.SOURCE_REGISTRY_PATH = previousRegistry;
+    if (previousArchive === undefined) delete process.env.RAW_ARCHIVE_DIR;
+    else process.env.RAW_ARCHIVE_DIR = previousArchive;
+    if (previousRetries === undefined) delete process.env.HTTP_MAX_RETRIES;
+    else process.env.HTTP_MAX_RETRIES = previousRetries;
+    await rm(root, { recursive: true, force: true });
+  }
+});
