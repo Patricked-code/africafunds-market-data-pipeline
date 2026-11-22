@@ -145,6 +145,22 @@ test('HTML index -> CSV child -> SHA archive -> PostgreSQL -> SUCCESS; failed ch
     assert.equal(mixed.rows[0]?.summary.success, 1);
     assert.equal(mixed.rows[0]?.summary.failed, 1);
     assert.equal(mixed.rows[0]?.error_message, null);
+    // A rejected sibling endpoint must not create successful raw data or artifacts.
+    const rejectedArtifacts = await pool.query<{ count: string }>(
+      'SELECT count(*)::text AS count FROM source.raw_artifacts WHERE endpoint_code=$1',
+      [failingEndpointCode],
+    );
+    assert.equal(rejectedArtifacts.rows[0]?.count, '0');
+    const rejectedRows = await pool.query<{ count: string }>(
+      'SELECT count(*)::text AS count FROM market.raw_records WHERE endpoint_code=$1',
+      [failingEndpointCode],
+    );
+    assert.equal(rejectedRows.rows[0]?.count, '0');
+    const survivingRows = await pool.query<{ count: string }>(
+      'SELECT count(*)::text AS count FROM market.raw_records WHERE endpoint_code=$1',
+      [endpointCode],
+    );
+    assert.equal(survivingRows.rows[0]?.count, '2');
   } finally {
     globalThis.fetch = originalFetch;
     if (pool) {
