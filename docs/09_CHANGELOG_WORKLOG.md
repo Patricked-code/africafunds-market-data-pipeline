@@ -1,5 +1,18 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-22 — PR #36 : strict-mode sans double finalisation (lots 4/11)
+
+- **RECONCILIATION** : PR #1 MERGED, PR #36 OPEN/DRAFT ; base main `73256f48d81d38ce8ff6f51be9e024b25cf5dadb`, HEAD initial `83f1712d163143465d762427cbafb84b794905d9` ; dépôt privé au contrôle GitHub. AGENTS.md, documents maîtres 00–15, checkpoint 2026-11-06 et dernier NEXT_ACTION relus ; PR/issues ouvertes recherchées ; revues #36 = []. Aucune branche concurrente modifiée.
+- **TEST_EVIDENCE HEAD précédent** : [CI #638 / run 45044625482](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45044625482) et [Docker #505 / run 45044625520](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45044625520) = completed/success, exclusivement sur `83f1712d163143465d762427cbafb84b794905d9`.
+- **RED (non exécuté isolément)** : commit `183164c42230741557eff0d9532d5629bb1420f7` ajoute une assertion de non-réécriture de `error_message` pour un run FAILED après signalement strict `failOnEndpointError`. Le code précédent finalisait une première fois puis réentrait dans catch pour finaliser une seconde fois.
+- **GREEN (non encore validé)** : commit `493023b71f624cdaabe2b743cd61aa0ca6ffef5f` déplace la finalisation normale après le catch des erreurs opérationnelles dans `src/jobs/ingest.ts`. Une erreur opérationnelle garde sa finalisation FAILED ; une erreur de signalement strict n'écrase plus un PARTIAL/FAILED déjà enregistré. Aucun changement de schéma, source, secret, API, main ou S1.
+- **TEST_EVIDENCE nouveau code** : NOT_YET_ATTESTED ; attendre les workflows CI et Docker sur le nouveau HEAD. Tests locaux NOT_RUN. La recette reste synthétique et ne certifie pas la collecte officielle.
+- **BLOCK_REASON** : CI exact-HEAD et revue indépendante #36 manquantes pour ces deux nouveaux commits ; qualification officielle #13/#14 et recette métier #17 incomplètes.
+- **NEXT_ACTION** : vérifier les workflows CI/Docker exact-HEAD, lire les logs et corriger toute régression ; ajouter si nécessaire une recette multi-endpoints SUCCESS/PARTIAL/FAILED pour certifier la conservation de PARTIAL, puis solliciter revue indépendante avant fusion. Poursuivre #13/#14/#15 sur tâches libres uniquement après claim/réconciliation ; aucun merge ni S1.
+- **ROLLBACK** : revert ciblé des deux commits code/test et de cette entrée sur la branche Draft ; aucune donnée réelle ni production modifiée.
+
+---
+
 ## 2026-11-22 — PR #36 : historique FAILED conservé après reprise (lots 4/11)
 
 - **RECONCILIATION** : PR #1 réellement MERGED ; PR #36 OPEN/DRAFT, HEAD de départ `5c2f28df44f0adc5dd16ecbdcc9af5be047d9f42`, base `73256f48d81d38ce8ff6f51be9e024b25cf5dadb`. AGENTS.md, docs/15_AUTONOMOUS_AGENT_EXECUTION.md, worklog et checkpoint 2026-11-06 relus ; recherche des 13 PR ouvertes et 12 issues ouvertes ; aucune branche concurrente modifiée.
