@@ -1,5 +1,18 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-22 — PR #36 : retry après échec enfant et non-duplication (lots 4/11)
+
+- **RECONCILIATION** : PR #1 fusionnée ; PR #36 ouverte Draft ; HEAD vérifié avant modification `acff39845ee4bffd01062da39ad27cf7249c399d` ; AGENTS.md, docs/15_AUTONOMOUS_AGENT_EXECUTION.md, worklog et checkpoint du 06/11 relus ; PR/issues ouvertes recherchées ; aucune branche concurrente modifiée.
+- **TEST_EVIDENCE — GREEN sur HEAD précédent** : [CI #634 / run 45033460962](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45033460962) et [Docker #501 / run 45033460973](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45033460973) sont `completed/success` pour `acff39845ee4bffd01062da39ad27cf7249c399d`. Ces résultats ne certifient pas le nouveau commit.
+- **CODE/TEST** : commit `e336d6b7a93e1769fc9c3206824a9e8f0f530757` étend `test/integration/ingestion-html-csv.test.ts` : après SUCCESS puis FAILED sur HTTP 404, un troisième passage rétabli doit revenir à SUCCESS sans dupliquer les deux observations ni les deux archives brutes. Même moteur `runIngestion`, fixture synthétique et PostgreSQL isolé ; aucun nouveau schéma, source ou orchestrateur.
+- **TEST_EVIDENCE du nouveau code** : `NOT_YET_ATTESTED` ; contrôler les nouveaux workflows CI/Docker et corriger toute régression.
+- **BLOCK_REASON** : CI exact HEAD du nouveau test et revue indépendante non attestées ; contrats/licences et données officielles #13/#14 non qualifiés ; pas de preuve HISTORY_COMPLETE ni déploiement S1.
+- **NEXT_ACTION** : vérifier CI/Docker du HEAD après ce journal, notamment le troisième passage et les compteurs ; en cas d'échec, lire les logs et corriger la PR #36. Obtenir revue indépendante avant fusion ; poursuivre les sources officielles #13/#14 et normalisation #15 sans toucher aux PR occupées. Aucun déploiement S1.
+- **ROLLBACK** : revert ciblé du commit de test et de cette entrée sur branche Draft ; aucune modification de main ou production.
+
+---
+
+
 ## 2026-11-22 — PR #36 : recette intégrée GREEN et préservation des données après échec enfant (lots 4/11)
 
 - **RECONCILIATION** : PR #1 fusionnée ; PR #36 ouverte Draft, HEAD initial exact `dff333f5a3339f2943b1094a84d53d77d3fc3b20` ; AGENTS.md, documents maîtres dans l'ordre prescrit, docs/15_AUTONOMOUS_AGENT_EXECUTION.md, checkpoint 2026-11-06 et dernier NEXT_ACTION consultés ; PR concurrentes préservées.
