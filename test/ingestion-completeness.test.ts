@@ -35,3 +35,13 @@ test('invalid counters never certify an ingestion as complete', () => {
     assert.throws(() => assertUsableIngestion({ rows: 3, failedChildren }), /Ingestion incomplete/);
   }
 });
+
+
+test('unsafe integer counters cannot certify a successful ingestion', () => {
+  for (const rows of [Number.MAX_SAFE_INTEGER + 1, Number.MIN_SAFE_INTEGER - 1]) {
+    assert.throws(() => assertUsableIngestion({ rows, failedChildren: 0 }), /Ingestion incomplete/);
+  }
+  for (const failedChildren of [Number.MAX_SAFE_INTEGER + 1, Number.MIN_SAFE_INTEGER - 1]) {
+    assert.throws(() => assertUsableIngestion({ rows: 1, failedChildren }), /Ingestion incomplete/);
+  }
+});
