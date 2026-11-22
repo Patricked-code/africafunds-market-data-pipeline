@@ -1,5 +1,17 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-22 — PR #36 : refus des sélections vides de sources (lot 4/11)
+
+- **RECONCILIATION** : PR #1 fusionnée ; PR #36 OPEN/DRAFT sur `fix/ingestion-false-success-20261122`, HEAD de départ `55f9f0967723d8e5df9e5abb020829cd1cff825b` ; lecture AGENTS.md, docs/15_AUTONOMOUS_AGENT_EXECUTION.md, worklog et checkpoint 2026-11-06 ; recherche des PR/issues ouvertes. Les autres branches restent intactes.
+- **PREUVE CI antérieure** : les workflows GitHub Actions [45003884242](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45003884242) et [45003884201](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45003884201) sont `completed/success` pour le HEAD de départ `55f9f096`. Aucun résultat de ce type n'est attribué aux commits nouveaux.
+- **CODE** : commits `6bbfba67f6d82ee44149aaade3776b2b29b122cf` et `9dd83a09dc220c1e2a632344bf6b278d9e205552` : garde `assertEndpointsSelected` et appel avant `startRun`. Un filtre qui ne correspond à aucune source ne produit plus de faux `SUCCESS` ni de run vide. Contrat explicite : échec avant création du run, pas de statut `FAILED` persistant pour cette absence de sélection.
+- **TESTS** : commit `2530cc0fd5d30c257ff00633f2bbdd6dd623edaa` ajoute la couverture des comptes 0, négatifs, fractionnaires, NaN, infinis, hors entiers sûrs, et des comptes valides. **NOT_RUN** au moment de l'écriture ; la CI du nouveau HEAD reste à contrôler. Le test HTTP→HTML→CSV enfant→DB n'est pas encore livré.
+- **BLOCK_REASON** : CI exact-HEAD et revue indépendante non attestées ; absence de recette HTTP/CSV intégrée ; contrats/licences et échantillons officiels CBE/GOSDMX toujours non vérifiés. Aucun S1, aucun merge, aucun HISTORY_COMPLETE.
+- **NEXT_ACTION** : contrôler CI et Docker du nouveau HEAD ; corriger toute régression ; poursuivre un test d'intégration déterministe du parcours HTTP/index HTML/CSV enfant et de ses échecs, avec fixtures synthétiques et isolation de DB ; obtenir revue indépendante ; continuer issues #13/#14 sans toucher aux PR concurrentes.
+- **ROLLBACK** : revert ciblé des trois commits fonctionnels/tests et de cette entrée sur la branche Draft ; aucune donnée, migration, archive, secret ou production modifiés.
+
+---
+
 ## 2026-11-22 — PR #36 : vérification des gates CI du HEAD 129aba7a (reprise 09:39 Europe/Paris)
 
 - **RÉCONCILIATION** : PR #1 réellement MERGED ; PR #36 OPEN/DRAFT, HEAD exact `129aba7abb4957859fde63e2fcafb4fb891a1a0e` ; recherche GitHub actuelle des PR/issues ouvertes ; lecture AGENTS.md, docs/15_AUTONOMOUS_AGENT_EXECUTION.md, journal de branche et checkpoint historique 2026-11-06. Les autres branches, notamment #22, demeurent non modifiées.
