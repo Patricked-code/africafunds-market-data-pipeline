@@ -1,5 +1,19 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-22 — PR #36 : vérification des gates CI du HEAD 129aba7a (reprise 09:39 Europe/Paris)
+
+- **RÉCONCILIATION** : PR #1 réellement MERGED ; PR #36 OPEN/DRAFT, HEAD exact `129aba7abb4957859fde63e2fcafb4fb891a1a0e` ; recherche GitHub actuelle des PR/issues ouvertes ; lecture AGENTS.md, docs/15_AUTONOMOUS_AGENT_EXECUTION.md, journal de branche et checkpoint historique 2026-11-06. Les autres branches, notamment #22, demeurent non modifiées.
+- **TEST_EVIDENCE — CI exact-HEAD** : [run 44998766549](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/44998766549), CI #621, `completed/success`, job `validate` #137135444994 `completed/success`. Étapes explicitement `success` : checkout exact PR revision, TypeScript, unit tests, build, PostgreSQL migrations/reapply, registry seed, integration tests, backfill claim/window gates, S1 read-only checks.
+- **TEST_EVIDENCE — Docker exact-HEAD** : [run 44998766503](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/44998766503), Docker #488, `completed/success`, job #137135500574 `completed/success`, stack Docker isolée et persistance PostgreSQL sur runner CI. Aucun runtime S1 ni collecte réelle certifié.
+- **REVUE** : `list_pull_request_reviews(#36)` retourne zéro revue ; la PR reste Draft. La validation de l'ancien HEAD ne doit pas être transposée à un commit ultérieur.
+- **ANALYSE CODE** : les tests de `test/ingestion-completeness.test.ts` valident la garde pure, mais pas le chemin réel `ingestEndpoint` avec faux HTTP/archives/DB. `src/jobs/ingest.ts` traite les index HTML et les enfants ; la qualification métier d'un index sans observations et la propagation des échecs demandent encore des fixtures et tests d'intégration. Aucun contrat institutionnel CBE/GOSDMX inféré.
+- **BLOCK_REASON** : revue indépendante non attestée ; test d'intégration HTTP→index HTML→CSV enfant→persistance→statut manquant ; contrats/licences/échantillons officiels des six adaptateurs #14 non vérifiés. Pas de merge, HISTORY_COMPLETE ou S1.
+- **NEXT_ACTION** : compléter un test d'intégration déterministe et isolé du parcours HTML/CSV et des échecs enfants (fixtures non officielles synthétiques, aucun réseau externe) sur la PR #36 après relecture de l'architecture des tests existants ; corriger toute régression, vérifier CI exact nouveau HEAD et obtenir revue indépendante. En parallèle poursuivre qualifications #13/#14 sans toucher aux PR concurrentes. Éviter les commits documentaires répétitifs pour le seul polling CI.
+- **ROLLBACK** : revert ciblé de cette entrée sur la branche #36 ; aucun code, donnée, schéma, secret ou serveur modifié pendant cette reprise.
+
+---
+
+
 ## 2026-11-22 — PR #36 : CI exact-HEAD confirmée et test de dépassement des entiers sûrs
 
 - **RÉCONCILIATION** : PR #1 fermée/fusionnée selon l'état GitHub antérieurement attesté ; PR #36 OPEN/DRAFT, branche `fix/ingestion-false-success-20261122`. Relecture AGENTS.md, protocole autonome, journal de branche, checkpoint historique et recherches des issues/PR ouvertes. Le checkpoint 2026-11-06 n'est pas un état courant.
