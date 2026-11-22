@@ -1,5 +1,18 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-22 — PR #36 : recette intégrée GREEN et préservation des données après échec enfant (lots 4/11)
+
+- **RECONCILIATION** : PR #1 fusionnée ; PR #36 ouverte Draft, HEAD initial exact `dff333f5a3339f2943b1094a84d53d77d3fc3b20` ; AGENTS.md, documents maîtres dans l'ordre prescrit, docs/15_AUTONOMOUS_AGENT_EXECUTION.md, checkpoint 2026-11-06 et dernier NEXT_ACTION consultés ; PR concurrentes préservées.
+- **TEST_EVIDENCE — GREEN exact HEAD précédent** : [CI #632 / run 45028281579](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45028281579), job 137226001846, `completed/success`, typecheck, build, migrations, tests unitaires et intégration PostgreSQL ; les logs contiennent explicitement `ok 3 - HTML index -> CSV child -> SHA archive -> PostgreSQL -> SUCCESS; failed child -> FAILED`. [Docker #499 / run 45028281596](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45028281596), job 137226063028, `completed/success`. Ces preuves ne valent pas pour le commit nouveau.
+- **CODE/TEST** : commit `60a664d88a98220f8791e545a5ce7412f74375dc` ajoute à `test/integration/ingestion-html-csv.test.ts` des assertions de non-perte et non-duplication : après l'échec HTTP 404 du CSV enfant lors d'un second passage, les deux observations déjà persistées et les deux artefacts SHA identifiés restent présents. Le code existant déduplique les artefacts par `(endpoint_code, sha256)` ; aucune modification du moteur, des schémas ou des sources.
+- **TEST_EVIDENCE du nouveau code** : `NOT_RUN` au moment de ce checkpoint ; attendre CI et Docker sur le HEAD créé par la présente mise à jour.
+- **BLOCK_REASON** : nouvelle CI exact HEAD et revue indépendante non attestées ; contrats/licences et observations officielles #13/#14 non qualifiés ; historique complet et publication financière #17 non certifiés.
+- **NEXT_ACTION** : contrôler CI et Docker sur le nouveau HEAD et les assertions de non-duplication ; si rouge, lire les logs et corriger sur #36. Obtenir revue indépendante ; poursuivre #13/#14 avec droits officiels, sans modifier #22 ni les autres PR ; ne pas fusionner ni déployer S1.
+- **ROLLBACK** : revert ciblé du commit de test et de cette entrée sur la PR Draft ; aucun impact sur main, secrets ou production.
+
+---
+
+
 ## 2026-11-22 — PR #36 : correction TypeScript après CI rouge (lot 4/11)
 
 - **RECONCILIATION** : AGENTS.md, docs/15_AUTONOMOUS_AGENT_EXECUTION.md et dernier NEXT_ACTION relus ; PR et issues ouvertes recherchées. Branche #36 conservée, aucune modification de main ni de branche concurrente.
