@@ -1,5 +1,17 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-22 — PR #36 : contrat HTML → CSV enfant testé avec fixtures synthétiques (lot 4/11)
+
+- **RECONCILIATION** : lecture de `AGENTS.md`, `docs/15_AUTONOMOUS_AGENT_EXECUTION.md`, `docs/09_CHANGELOG_WORKLOG.md` et du checkpoint historique 2026-11-06 ; recherche des 13 PR et 12 issues ouvertes. PR #36 toujours Draft, aucune revue indépendante retournée. PR #22 et autres branches concurrentes non modifiées.
+- **TEST_EVIDENCE antérieure, exact HEAD** : commit `4b00492c07797107fe2950bc49f07834815bc61a` ; CI [45008109698](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45008109698) et Docker isolé [45008109652](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45008109652), tous deux `completed/success`. Ne pas attribuer ces résultats au nouveau code.
+- **TRAVAIL CONCRET** : commit `bd0f407e7293181a93a2b06cdd64f1371c28d313` ; ajout `test/ingestion-html-csv-contract.test.ts` (3 tests) : index HTML sans table → lien CSV relatif → observations parsées → garde de complétude ; échec d'un enfant malgré CSV valide ; CSV sans observations. Fixtures exclusivement synthétiques `fixtures.invalid`, sans réseau.
+- **LIMITES** : tests `NOT_RUN` au moment de l'écriture ; ce test contractuel n'exécute pas `fetchWithRetry`, l'archive SHA-256, PostgreSQL ni `runIngestion`. Il ne remplace pas la recette intégrée HTTP → DB → statut final et ne certifie aucun endpoint officiel, licence ou historique.
+- **BLOCK_REASON** : CI exact-HEAD du nouveau test et revue indépendante non attestées ; intégration HTTP/archives/DB/statut manquante ; contrats/échantillons officiels des six adaptateurs #14 non qualifiés.
+- **NEXT_ACTION** : contrôler les workflows CI/Docker du HEAD de cette branche après le présent commit ; corriger tout échec ; construire une recette isolée HTTP/index/CSV/DB/statut en réutilisant les tests d'intégration existants et sans réseau externe ; obtenir revue indépendante ; poursuivre #13/#14 sans toucher aux branches concurrentes.
+- **ROLLBACK** : revert ciblé du commit de test et de cette entrée sur la branche Draft, sans toucher `main`, données, secrets ou S1.
+
+---
+
 ## 2026-11-22 — PR #36 : refus des sélections vides de sources (lot 4/11)
 
 - **RECONCILIATION** : PR #1 fusionnée ; PR #36 OPEN/DRAFT sur `fix/ingestion-false-success-20261122`, HEAD de départ `55f9f0967723d8e5df9e5abb020829cd1cff825b` ; lecture AGENTS.md, docs/15_AUTONOMOUS_AGENT_EXECUTION.md, worklog et checkpoint 2026-11-06 ; recherche des PR/issues ouvertes. Les autres branches restent intactes.
