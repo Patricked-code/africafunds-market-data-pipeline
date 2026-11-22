@@ -1,5 +1,17 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-22 — PR #36 : preuve CI et contrôle d'historique PARTIAL réitéré (lots 4/11)
+
+- **RECONCILIATION** : AGENTS.md, docs/15_AUTONOMOUS_AGENT_EXECUTION.md, journal et checkpoint docs/CONTINUITY_CHECKPOINT_2026-11-06.md consultés ; PR #36 OPEN/Draft, revues = [] ; recherche des PR/issues ouvertes ; branche initiale exactement b2fa95bcd01bbf132279a4d726117d027282c330 (comparaison GitHub identical). Aucune branche concurrente modifiée.
+- **TEST_EVIDENCE** : commit initial b2fa95bcd01bbf132279a4d726117d027282c330 ; [CI run 45072540364](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45072540364) completed/success, job 137362527783 (typecheck, tests unitaires, migrations, intégration PostgreSQL, backfill) ; [Docker run 45072540400](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45072540400) completed/success, job 137362585727. Ces preuves ne certifient pas le nouveau commit.
+- **CODE/TEST** : commit 00b82a6eaca31bdda85ea407c18c679309f44899 : assertions additives dans test/integration/ingestion-html-csv.test.ts. Après deux exécutions mixtes, vérifier deux lignes PARTIAL correspondant aux deux ingestion_run_id capturés, exactement deux archives saines conservées et zéro archive du sibling HTTP 404. Requête limitée aux UUID des runs synthétiques ; aucun endpoint officiel appelé.
+- **TEST_EVIDENCE nouveau code** : NOT_RUN localement ; CI exact-HEAD NOT_YET_ATTESTED, à contrôler après le commit documentaire.
+- **BLOCK_REASON** : revue indépendante #36 absente ; validation exact-HEAD des nouvelles assertions en attente ; contrats/licences #13/#14, normalisation #15 et recettes réelles #17 non certifiés.
+- **NEXT_ACTION** : vérifier CI et Docker exact-HEAD après cette entrée ; corriger tout échec. Puis demander une revue indépendante de #36, sans fusion implicite ; sélectionner une tâche indépendante des lots 0–13 après vérification des claims. Ne pas déployer S1 ni déclarer HISTORY_COMPLETE.
+- **ROLLBACK** : revert ciblé du commit 00b82a6e et de cette entrée sur la branche Draft ; aucune migration, secret, donnée réelle ni production touchés.
+
+---
+
 ## 2026-11-22 — PR #36 : réexécution PARTIAL sans doublon (lots 4/11)
 
 - **RECONCILIATION** : PR #1 MERGED ; PR #36 OPEN/DRAFT, base main `73256f48d81d38ce8ff6f51be9e024b25cf5dadb`, HEAD de départ `0fdae0a7bc8d9f485c0ce18917acedb7bb63ee41`. AGENTS.md, docs/15_AUTONOMOUS_AGENT_EXECUTION.md, présent journal et checkpoint historique 2026-11-06 relus ; 13 PR et 12 issues ouvertes recherchées ; reviews #36 = []. Aucun travail sur les branches concurrentes.
