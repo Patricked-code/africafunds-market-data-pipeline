@@ -110,6 +110,15 @@ test('HTML index -> CSV child -> SHA archive -> PostgreSQL -> SUCCESS; failed ch
       [endpointCode],
     );
     assert.equal(artifactsAfterRecovery.rows[0]?.count, '2');
+    // Recovery must not rewrite the failed attempt into a false SUCCESS.
+    const history = await pool.query<{ status: string; count: string }>(
+      "SELECT status, count(*)::text AS count FROM ops.ingestion_runs WHERE scope->>'endpointCode'=$1 GROUP BY status",
+      [endpointCode],
+    );
+    const counts = new Map(history.rows.map(({ status, count }) => [status, Number(count)]));
+    assert.equal(counts.get('SUCCESS'), 2);
+    assert.equal(counts.get('FAILED'), 1);
+    assert.equal(history.rows.reduce((total, row) => total + Number(row.count), 0), 3);
   } finally {
     globalThis.fetch = originalFetch;
     if (pool) {
