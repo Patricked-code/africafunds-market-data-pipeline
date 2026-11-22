@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { assertUsableIngestion } from '../src/jobs/ingestionCompleteness.js';
+import { assertEndpointsSelected, assertUsableIngestion } from '../src/jobs/ingestionCompleteness.js';
 
 test('financial observations without child errors are complete', () => {
   assert.doesNotThrow(() => assertUsableIngestion({ rows: 3, failedChildren: 0 }));
@@ -44,4 +44,12 @@ test('unsafe integer counters cannot certify a successful ingestion', () => {
   for (const failedChildren of [Number.MAX_SAFE_INTEGER + 1, Number.MIN_SAFE_INTEGER - 1]) {
     assert.throws(() => assertUsableIngestion({ rows: 1, failedChildren }), /Ingestion incomplete/);
   }
+});
+
+test('empty endpoint filters never record a successful ingestion run', () => {
+  for (const count of [0, -1, 0.5, NaN, Infinity, Number.MAX_SAFE_INTEGER + 1]) {
+    assert.throws(() => assertEndpointsSelected(count), /no selected endpoints/);
+  }
+  assert.doesNotThrow(() => assertEndpointsSelected(1));
+  assert.doesNotThrow(() => assertEndpointsSelected(44));
 });
