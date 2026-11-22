@@ -1,5 +1,11 @@
 # 06 — État réel et écarts
 
+## 2026-11-22 — Lot 4/11 : classification des faux succès d'ingestion
+
+- Branche dédiée `fix/ingestion-false-success-20261122` depuis main `73256f48d81d38ce8ff6f51be9e024b25cf5dadb` : correctif proposé dans `src/jobs/ingest.ts`, garde pure et tests associés. Les archives SHA-256 sont conservées ; les réponses non parsables et les liens enfants échoués ne sont plus silencieusement classés comme succès.
+- **Statut** : code écrit sur branche ; tests et CI non encore attestés, revue requise. La qualification des formats PDF/JSON/SDMX, des sources et des historiques reste ouverte. Vérifier les index HTML sans données avant toute fusion.
+
+
 ## Audit S1 et sécurité de déploiement — 2026-11-07
 
 - **PREUVE SERVEUR READ-ONLY** : les domaines `sadiaaf.wealthtechinnovations.com` et `api.sadiaaf.wealthtechinnovations.com` existent et répondent tous deux **HTTP 500** à `curl -I` depuis S1 ; aucun dépôt Git racine dans leurs vhosts ; le seul conteneur Docker actif observé est le bridge MCP. Cela n'atteste pas l'absence d'autres bases/service hors Docker.
