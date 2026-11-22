@@ -1,5 +1,18 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-22 — PR #36 : historique FAILED conservé après reprise (lots 4/11)
+
+- **RECONCILIATION** : PR #1 réellement MERGED ; PR #36 OPEN/DRAFT, HEAD de départ `5c2f28df44f0adc5dd16ecbdcc9af5be047d9f42`, base `73256f48d81d38ce8ff6f51be9e024b25cf5dadb`. AGENTS.md, docs/15_AUTONOMOUS_AGENT_EXECUTION.md, worklog et checkpoint 2026-11-06 relus ; recherche des 13 PR ouvertes et 12 issues ouvertes ; aucune branche concurrente modifiée.
+- **TEST_EVIDENCE exact HEAD précédent** : [CI run 45039498157](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45039498157) et [Docker run 45039498171](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45039498171) retournent `completed/success` pour le commit `5c2f28df44f0adc5dd16ecbdcc9af5be047d9f42`. La recherche des revues #36 retourne zéro revue. Les succès ne sont PAS transposés aux nouveaux commits.
+- **CODE/TEST** : commit `f6e1824e5e2526d1ef88534ac113260df08d8cbf` renforce `test/integration/ingestion-html-csv.test.ts` : après SUCCESS → FAILED (HTTP 404 enfant) → SUCCESS, le journal `ops.ingestion_runs` doit conserver exactement deux runs SUCCESS et un run FAILED, sans réécriture silencieuse du run échoué. Les assertions précédentes de non-duplication des observations et archives sont conservées. Fixture synthétique et PostgreSQL isolé, sans réseau externe ni changement de schéma.
+- **TEST_EVIDENCE nouveau code** : `NOT_YET_ATTESTED` ; contrôler CI/Docker du HEAD après ce journal, corriger tout échec avant toute revue/fusion.
+- **BLOCK_REASON** : nouveau test non encore validé sur son HEAD exact ; aucune revue indépendante #36 ; qualification officielle des sources #13 et adaptateurs #14 incomplète ; aucun HISTORY_COMPLETE ni déploiement S1 attesté.
+- **NEXT_ACTION** : vérifier CI/Docker exact HEAD de #36 et la conservation des statuts historiques ; corriger les erreurs éventuelles. Obtenir revue indépendante avant fusion. Poursuivre les qualifications #13/#14 et #15 sur branches libres uniquement après réconciliation/claim, sans toucher aux PR concurrentes ; ne pas fusionner ni déployer S1.
+- **ROLLBACK** : revert ciblé du commit de test et de cette entrée sur la branche Draft ; aucune donnée réelle, secret, main ou serveur modifié.
+
+---
+
+
 ## 2026-11-22 — PR #36 : retry après échec enfant et non-duplication (lots 4/11)
 
 - **RECONCILIATION** : PR #1 fusionnée ; PR #36 ouverte Draft ; HEAD vérifié avant modification `acff39845ee4bffd01062da39ad27cf7249c399d` ; AGENTS.md, docs/15_AUTONOMOUS_AGENT_EXECUTION.md, worklog et checkpoint du 06/11 relus ; PR/issues ouvertes recherchées ; aucune branche concurrente modifiée.
