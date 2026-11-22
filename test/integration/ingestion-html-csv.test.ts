@@ -161,6 +161,33 @@ test('HTML index -> CSV child -> SHA archive -> PostgreSQL -> SUCCESS; failed ch
       [endpointCode],
     );
     assert.equal(survivingRows.rows[0]?.count, '2');
+    // A repeated mixed run must not turn the failed sibling into a false success
+    // or duplicate observations already committed by the healthy sibling.
+    await assert.rejects(runIngestion({ market: 'MAR', failOnEndpointError: true }));
+    const repeatedMixed = await pool.query<{
+      ingestion_run_id: string;
+      status: string;
+      summary: { endpoints: number; success: number; failed: number };
+    }>(
+      "SELECT ingestion_run_id, status, summary FROM ops.ingestion_runs WHERE scope->>'market'='MAR' ORDER BY started_at DESC LIMIT 1",
+    );
+    assert.equal(repeatedMixed.rows[0]?.status, 'PARTIAL');
+    assert.equal(repeatedMixed.rows[0]?.summary.endpoints, 2);
+    assert.equal(repeatedMixed.rows[0]?.summary.success, 1);
+    assert.equal(repeatedMixed.rows[0]?.summary.failed, 1);
+    const repeatedRows = await pool.query<{ count: string }>(
+      'SELECT count(*)::text AS count FROM market.raw_records WHERE endpoint_code=$1',
+      [endpointCode],
+    );
+    assert.equal(repeatedRows.rows[0]?.count, '2');
+    const repeatedRejectedRows = await pool.query<{ count: string }>(
+      'SELECT count(*)::text AS count FROM market.raw_records WHERE endpoint_code=$1',
+      [failingEndpointCode],
+    );
+    assert.equal(repeatedRejectedRows.rows[0]?.count, '0');
+    if (repeatedMixed.rows[0]?.ingestion_run_id) {
+      await pool.query('DELETE FROM ops.ingestion_runs WHERE ingestion_run_id=$1', [repeatedMixed.rows[0].ingestion_run_id]);
+    }
   } finally {
     globalThis.fetch = originalFetch;
     if (pool) {
