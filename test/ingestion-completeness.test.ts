@@ -26,3 +26,12 @@ test('an HTML link index with zero parent rows succeeds when child files yield o
 test('an HTML link index with no usable child observations is not a successful ingestion', () => {
   assert.throws(() => assertUsableIngestion({ rows: 0, failedChildren: 0 }), /rows=0/);
 });
+
+test('invalid counters never certify an ingestion as complete', () => {
+  for (const rows of [-1, NaN, Infinity, 1.5]) {
+    assert.throws(() => assertUsableIngestion({ rows, failedChildren: 0 }), /Ingestion incomplete/);
+  }
+  for (const failedChildren of [-1, NaN, Infinity, 0.5]) {
+    assert.throws(() => assertUsableIngestion({ rows: 3, failedChildren }), /Ingestion incomplete/);
+  }
+});
