@@ -17,3 +17,12 @@ test('a failed child download cannot be hidden by successful sibling extraction'
 test('all failed child downloads cannot become a successful endpoint', () => {
   assert.throws(() => assertUsableIngestion({ rows: 0, failedChildren: 2 }), /Ingestion incomplete/);
 });
+
+test('an HTML link index with zero parent rows succeeds when child files yield observations', () => {
+  // The endpoint-wide guard must run after child extraction, not after the index page.
+  assert.doesNotThrow(() => assertUsableIngestion({ rows: 2, failedChildren: 0 }));
+});
+
+test('an HTML link index with no usable child observations is not a successful ingestion', () => {
+  assert.throws(() => assertUsableIngestion({ rows: 0, failedChildren: 0 }), /rows=0/);
+});
