@@ -25,6 +25,7 @@ test('HTML index -> CSV child -> SHA archive -> PostgreSQL -> SUCCESS; failed ch
   process.env.RAW_ARCHIVE_DIR = join(root, 'archive');
   process.env.HTTP_MAX_RETRIES = '0';
   let pool: typeof import('../../src/db/pool.js').pool | undefined;
+  let mixedRunId: string | undefined;
   try {
     await writeFile(registryPath, JSON.stringify({
       version: 'ci', generatedAt: '2026-11-22', defaultPolicies: {},
@@ -131,12 +132,14 @@ test('HTML index -> CSV child -> SHA archive -> PostgreSQL -> SUCCESS; failed ch
     // Mixed endpoint outcomes must remain PARTIAL even when strict mode rejects.
     await assert.rejects(runIngestion({ market: 'MAR', failOnEndpointError: true }));
     const mixed = await pool.query<{
+      ingestion_run_id: string;
       status: string;
       summary: { endpoints: number; success: number; failed: number };
       error_message: string | null;
     }>(
-      "SELECT status, summary, error_message FROM ops.ingestion_runs WHERE scope->>'market'='MAR' ORDER BY started_at DESC LIMIT 1",
+      "SELECT ingestion_run_id, status, summary, error_message FROM ops.ingestion_runs WHERE scope->>'market'='MAR' ORDER BY started_at DESC LIMIT 1",
     );
+    mixedRunId = mixed.rows[0]?.ingestion_run_id;
     assert.equal(mixed.rows[0]?.status, 'PARTIAL');
     assert.equal(mixed.rows[0]?.summary.endpoints, 2);
     assert.equal(mixed.rows[0]?.summary.success, 1);
@@ -147,7 +150,7 @@ test('HTML index -> CSV child -> SHA archive -> PostgreSQL -> SUCCESS; failed ch
     if (pool) {
       // Only synthetic records with a unique endpoint code, in the isolated CI database.
       await pool.query("DELETE FROM ops.ingestion_runs WHERE scope->>'endpointCode'=$1", [endpointCode]);
-      await pool.query("DELETE FROM ops.ingestion_runs WHERE scope->>'market'='MAR' AND scope->>'endpointCode' IS NULL");
+      if (mixedRunId) await pool.query('DELETE FROM ops.ingestion_runs WHERE ingestion_run_id=$1', [mixedRunId]);
       await pool.query(
         'DELETE FROM quality.assessments WHERE object_type=$1 AND object_id IN (SELECT raw_artifact_id FROM source.raw_artifacts WHERE endpoint_code=$2)',
         ['RAW_ARTIFACT', endpointCode],
