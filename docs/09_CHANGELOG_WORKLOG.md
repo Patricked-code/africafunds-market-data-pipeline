@@ -1,5 +1,17 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-23 — PR #36 : comportement PARTIAL non strict après répétitions (lots 4/11)
+
+- **RECONCILIATION** : AGENTS.md, docs/15_AUTONOMOUS_AGENT_EXECUTION.md, docs/09_CHANGELOG_WORKLOG.md et checkpoint docs/CONTINUITY_CHECKPOINT_2026-11-06.md relus ; 13 PR ouvertes dont #36 Draft, 12 issues ouvertes retrouvées. Branches concurrentes non modifiées ; aucune fusion ni S1.
+- **TEST_EVIDENCE HEAD précédent** : commit `778155a07e9e2b54be823c0419818f197aae6163` ; [CI run 45078954063](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45078954063) et [Docker run 45078954056](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45078954056) : completed/success, exact-HEAD précédent uniquement. Reviews #36 : aucune.
+- **CODE/TEST** : commit `d275612b4b9b706ba1a2a12a0e5fbbf8cc9c0724` étend `test/integration/ingestion-html-csv.test.ts` avec un troisième run multi-endpoints sans `failOnEndpointError` : promesse résolue, statut PostgreSQL `PARTIAL`, compteurs 2/1/1, `error_message=NULL` et absence de duplication des deux observations du sibling sain. Nettoyage borné au nouvel UUID de run. Fixtures synthétiques uniquement.
+- **TEST_EVIDENCE nouveau HEAD** : tests locaux NOT_RUN ; CI/Docker exact-HEAD NOT_YET_ATTESTED après ce commit documentaire. Ne pas transférer les succès précédents.
+- **BLOCK_REASON** : validation CI exact-HEAD du test non strict et revue indépendante #36 absentes ; qualifications officielles #13/#14, historiques #5 et recette réelle #17 non terminées. Aucune autorisation de fusion ou de déploiement S1.
+- **NEXT_ACTION** : vérifier CI/Docker sur le nouveau HEAD et corriger toute régression ; demander revue indépendante #36, sans fusion implicite. Puis traiter une tâche indépendante des lots 0–13 après vérification des claims et contrats officiels, sans toucher aux PR concurrentes.
+- **ROLLBACK** : revert ciblé du commit `d275612b` et de cette entrée documentaire sur la branche Draft ; aucun schéma, source officielle, secret, main ou S1 modifié.
+
+---
+
 ## 2026-11-22 — PR #36 : preuve CI et contrôle d'historique PARTIAL réitéré (lots 4/11)
 
 - **RECONCILIATION** : AGENTS.md, docs/15_AUTONOMOUS_AGENT_EXECUTION.md, journal et checkpoint docs/CONTINUITY_CHECKPOINT_2026-11-06.md consultés ; PR #36 OPEN/Draft, revues = [] ; recherche des PR/issues ouvertes ; branche initiale exactement b2fa95bcd01bbf132279a4d726117d027282c330 (comparaison GitHub identical). Aucune branche concurrente modifiée.
