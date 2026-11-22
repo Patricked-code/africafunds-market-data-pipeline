@@ -13,6 +13,8 @@ test('HTML index -> CSV child -> SHA archive -> PostgreSQL -> SUCCESS; failed ch
   const endpointCode = 'ci-html-csv-' + randomUUID();
   const indexUrl = 'https://fixtures.invalid/' + endpointCode + '/';
   const childUrl = indexUrl + 'rates.csv';
+  const failingEndpointCode = 'ci-html-csv-failing-' + randomUUID();
+  const failingIndexUrl = 'https://fixtures.invalid/' + failingEndpointCode + '/';
   const html = '<html><body><a href="rates.csv">Historical rates</a></body></html>';
   const csv = 'date;rate\n2026-01-02;4.25\n2026-01-03;4.50\n';
   const originalFetch = globalThis.fetch;
@@ -31,7 +33,10 @@ test('HTML index -> CSV child -> SHA archive -> PostgreSQL -> SUCCESS; failed ch
         institutions: {},
         endpoints: [{ id: endpointCode, label: 'Synthetic HTML CSV', url: indexUrl,
           dataFamily: 'MONEY_MARKET_RATE', collector: 'HTML_LINK_INDEX',
-          frequency: 'DAILY', enabled: true }],
+          frequency: 'DAILY', enabled: true },
+          { id: failingEndpointCode, label: 'Synthetic failing endpoint', url: failingIndexUrl,
+            dataFamily: 'MONEY_MARKET_RATE', collector: 'HTML_LINK_INDEX',
+            frequency: 'DAILY', enabled: true }],
       }],
     }));
     const db = await import('../../src/db/pool.js');
@@ -40,6 +45,7 @@ test('HTML index -> CSV child -> SHA archive -> PostgreSQL -> SUCCESS; failed ch
     let failChild = false;
     globalThis.fetch = async (input) => {
       const url = String(input);
+      if (url === failingIndexUrl) return new Response('unavailable', { status: 404 });
       if (url !== indexUrl && url !== childUrl) throw new Error('Unexpected outbound URL: ' + url);
       const response = url === childUrl && failChild
         ? new Response('unavailable', { status: 404 })
@@ -121,11 +127,27 @@ test('HTML index -> CSV child -> SHA archive -> PostgreSQL -> SUCCESS; failed ch
     assert.equal(counts.get('SUCCESS'), 2);
     assert.equal(counts.get('FAILED'), 1);
     assert.equal(history.rows.reduce((total, row) => total + Number(row.count), 0), 3);
+
+    // Mixed endpoint outcomes must remain PARTIAL even when strict mode rejects.
+    await assert.rejects(runIngestion({ market: 'MAR', failOnEndpointError: true }));
+    const mixed = await pool.query<{
+      status: string;
+      summary: { endpoints: number; success: number; failed: number };
+      error_message: string | null;
+    }>(
+      "SELECT status, summary, error_message FROM ops.ingestion_runs WHERE scope->>'market'='MAR' ORDER BY started_at DESC LIMIT 1",
+    );
+    assert.equal(mixed.rows[0]?.status, 'PARTIAL');
+    assert.equal(mixed.rows[0]?.summary.endpoints, 2);
+    assert.equal(mixed.rows[0]?.summary.success, 1);
+    assert.equal(mixed.rows[0]?.summary.failed, 1);
+    assert.equal(mixed.rows[0]?.error_message, null);
   } finally {
     globalThis.fetch = originalFetch;
     if (pool) {
       // Only synthetic records with a unique endpoint code, in the isolated CI database.
       await pool.query("DELETE FROM ops.ingestion_runs WHERE scope->>'endpointCode'=$1", [endpointCode]);
+      await pool.query("DELETE FROM ops.ingestion_runs WHERE scope->>'market'='MAR' AND scope->>'endpointCode' IS NULL");
       await pool.query(
         'DELETE FROM quality.assessments WHERE object_type=$1 AND object_id IN (SELECT raw_artifact_id FROM source.raw_artifacts WHERE endpoint_code=$2)',
         ['RAW_ARTIFACT', endpointCode],
@@ -134,6 +156,7 @@ test('HTML index -> CSV child -> SHA archive -> PostgreSQL -> SUCCESS; failed ch
       await pool.query('DELETE FROM source.raw_artifacts WHERE endpoint_code=$1 AND parent_artifact_id IS NOT NULL', [endpointCode]);
       await pool.query('DELETE FROM source.raw_artifacts WHERE endpoint_code=$1', [endpointCode]);
       await pool.query('DELETE FROM source.source_endpoints WHERE endpoint_code=$1', [endpointCode]);
+      await pool.query('DELETE FROM source.source_endpoints WHERE endpoint_code=$1', [failingEndpointCode]);
     }
     if (previousRegistry === undefined) delete process.env.SOURCE_REGISTRY_PATH;
     else process.env.SOURCE_REGISTRY_PATH = previousRegistry;
