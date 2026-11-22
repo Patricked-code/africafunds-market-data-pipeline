@@ -1,5 +1,16 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-22 — PR #36 : CI exacte et couverture des index HTML (reprise gouvernée)
+
+- **PREUVES GITHUB** : sur HEAD initial de la PR #36 `103787e77b626bd0591538846f5820c81e8991ff`, workflow CI #614, run [44985642241](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/44985642241), job `validate` #137095482572 **completed/success** (TypeScript, tests unitaires, build, migrations PostgreSQL et réapplication, tests intégration, claims et fenêtres backfill). Workflow Docker isolé #481, run [44985642266](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/44985642266), job #137095482412 **completed/success** (boot et persistance PostgreSQL sur runner éphémère). Ces résultats ne valent **que pour ce SHA**, sans preuve de collecte officielle ou S1.
+- **TRAVAIL CODE/TEST ADDITIF** : commit `17ae2a83c9fd06d86056825ccdc4eb576df5d878` ajoute deux cas de non-régression à `test/ingestion-completeness.test.ts` : index HTML sans table locale mais fichiers enfants avec observations, et index sans observation enfant. Aucun changement de contrat d'ingestion, aucune écriture sur les branches concurrentes.
+- **LIMITES** : ces deux tests contrôlent la garde agrégée, pas le téléchargement réel ni la classification détaillée de chaque source ; CI sur le HEAD après ajout **non encore attestée**. La politique de classification `FAILED` versus `PARTIAL` pour les index légitimes et les documents sans observation demeure à arbitrer. Aucune revue indépendante attestée.
+- **BLOCK_REASON** : revue indépendante absente ; qualification institutionnelle des formats et des licences #14 non achevée ; CI exact-HEAD du nouveau test et des modifications documentaires à vérifier.
+- **NEXT_ACTION** : vérifier les runs `pull_request` et jobs du nouveau HEAD ; compléter si nécessaire les tests d'intégration index HTML/CSV avec fixtures autorisées et la distinction de statut sans faux SUCCESS ; obtenir revue indépendante, puis continuer les six adaptateurs officiels #14 et les qualifications #13. Préserver PR #22 et les autres branches occupées ; aucune fusion ni S1 sans gates.
+- **ROLLBACK** : revert ciblé des commits de cette branche, sans modification de schéma, données ni archives.
+
+---
+
 ## 2026-11-22 — Lot 4/11 : garde anti-faux SUCCESS ingestion (PR indépendante)
 
 - **BASE REVÉRIFIÉE** : main `73256f48d81d38ce8ff6f51be9e024b25cf5dadb` ; branche `fix/ingestion-false-success-20261122` dédiée, sans toucher aux PR #22, #25, #26 ou #35.
