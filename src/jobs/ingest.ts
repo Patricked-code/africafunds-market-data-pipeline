@@ -1,5 +1,6 @@
 import { Buffer } from 'node:buffer';
 import { assertIngestionSucceeded } from './ingestionOutcome.js';
+import { assertUsableIngestion } from './ingestionCompleteness.js';
 import { fetchWithRetry } from '../http/fetcher.js';
 import { archiveRaw } from '../archive/rawStore.js';
 import { discoverLinks, parseHtmlTables } from '../parsers/html.js';
@@ -90,7 +91,7 @@ async function parseAndPersist(endpoint: SourceEndpoint, artifactId: string, bod
     return sheets.reduce((sum, sheet) => sum + sheet.rows.length, 0);
   }
   await persistRows(endpoint, artifactId, null, []);
-  return 0;
+  throw new Error(`Unsupported ingestion content type: ${type}`);
 }
 
 async function ingestEndpoint(endpoint: SourceEndpoint, mode: 'ingest' | 'discover'): Promise<{ artifacts: number; rows: number; links: number }> {
@@ -100,6 +101,7 @@ async function ingestEndpoint(endpoint: SourceEndpoint, mode: 'ingest' | 'discov
   let rows = await parseAndPersist(endpoint, pageArtifactId, page.body, contentType(page.headers));
   let artifacts = 1;
   let linksCount = 0;
+  let failedChildren = 0;
 
   const shouldDiscover = endpoint.collector.includes('LINK_INDEX') || endpoint.collector === 'HTML_TABLE_CSV' || mode === 'discover';
   if (shouldDiscover && contentType(page.headers).includes('html')) {
@@ -114,10 +116,12 @@ async function ingestEndpoint(endpoint: SourceEndpoint, mode: 'ingest' | 'discov
         artifacts += 1;
         rows += await parseAndPersist(endpoint, childId, child.body, contentType(child.headers));
       } catch (error) {
+        failedChildren += 1;
         logger.warn({ endpoint: endpoint.id, url: link.url, error }, 'Téléchargement lié impossible');
       }
     }
   }
+  assertUsableIngestion({ rows, failedChildren });
   return { artifacts, rows, links: linksCount };
 }
 
