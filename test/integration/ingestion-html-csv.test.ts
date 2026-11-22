@@ -52,7 +52,7 @@ test('HTML index -> CSV child -> SHA archive -> PostgreSQL -> SUCCESS; failed ch
     };
     await runIngestion({ endpointCode, failOnEndpointError: true });
     const runs = await pool.query<{ status: string; summary: { rows: number; success: number } }>(
-      "SELECT status, summary FROM ops.ingestion_runs WHERE scope->>'endpointCode'=$1 ORDER BY started_at DESC",
+      "SELECT status, summary, error_message FROM ops.ingestion_runs WHERE scope->>'endpointCode'=$1 ORDER BY started_at DESC",
       [endpointCode],
     );
     assert.equal(runs.rows[0]?.status, 'SUCCESS');
@@ -74,12 +74,14 @@ test('HTML index -> CSV child -> SHA archive -> PostgreSQL -> SUCCESS; failed ch
 
     failChild = true;
     await assert.rejects(runIngestion({ endpointCode, failOnEndpointError: true }));
-    const failed = await pool.query<{ status: string; summary: { failed: number } }>(
+    const failed = await pool.query<{ status: string; summary: { failed: number }; error_message: string | null }>(
       "SELECT status, summary FROM ops.ingestion_runs WHERE scope->>'endpointCode'=$1 ORDER BY started_at DESC",
       [endpointCode],
     );
     assert.equal(failed.rows[0]?.status, 'FAILED');
     assert.equal(failed.rows[0]?.summary.failed, 1);
+    // An expected strict-mode rejection must not finalize an already FAILED run twice.
+    assert.equal(failed.rows[0]?.error_message, null);
     // A rejected child must not erase or duplicate previously committed observations.
     const retained = await pool.query<{ count: string }>(
       'SELECT count(*)::text AS count FROM market.raw_records WHERE endpoint_code=$1',
