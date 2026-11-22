@@ -4,3 +4,10 @@ export function assertUsableIngestion(result: { rows: number; failedChildren: nu
     throw new Error(`Ingestion incomplete: rows=${result.rows}, failedChildren=${result.failedChildren}`);
   }
 }
+
+/** An empty registry selection is not evidence of a successful collection. */
+export function assertEndpointsSelected(count: number): void {
+  if (!Number.isSafeInteger(count) || count <= 0) {
+    throw new Error(`Ingestion has no selected endpoints: count=${count}`);
+  }
+}
