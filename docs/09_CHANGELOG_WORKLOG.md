@@ -1,5 +1,18 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-22 — Lot 4/11 : garde anti-faux SUCCESS ingestion (PR indépendante)
+
+- **BASE REVÉRIFIÉE** : main `73256f48d81d38ce8ff6f51be9e024b25cf5dadb` ; branche `fix/ingestion-false-success-20261122` dédiée, sans toucher aux PR #22, #25, #26 ou #35.
+- **CONSTAT CODE** : `src/jobs/ingest.ts` incrémentait le compteur d'endpoint réussi même si `parseAndPersist()` produisait zéro observation, et absorbait les échecs de liens enfants. Un archivage brut seul ne certifie pas une ingestion exploitable.
+- **PATCH** : garde pure `src/jobs/ingestionCompleteness.ts`, rejet de contenu non interprété après conservation de l'archive et de l'assessment, décompte des échecs enfants, refus de SUCCESS en l'absence de lignes ou si un enfant échoue ; quatre tests unitaires `test/ingestion-completeness.test.ts`. Aucun adaptateur PDF/JSON/SDMX inventé ; aucune modification de source/licence.
+- **LIMITES** : tests écrits, non exécutés localement ; CI exact-HEAD et revue indépendante à vérifier. Les cas d'index HTML sans observations et les réponses autorisées sans données doivent être qualifiés métier avant merge ; le contrat `PARTIAL`/échec reste à préciser selon la politique de run. Aucune collecte réelle, aucun S1, aucune certification des 44 sources.
+- **BLOCK_REASON** : absence de validation CI, revue indépendante et échantillons officiels des six adaptateurs ; PR #22 sous travail concurrent.
+- **NEXT_ACTION** : ouvrir PR Draft sur main, vérifier CI exact-HEAD et corriger les tests, demander revue ; traiter les faux SUCCESS et compatibilité des index HTML, puis poursuivre issue #14 avec formats et droits officiels. Pas de merge sans gates.
+- **ROLLBACK** : revert des commits ciblés de cette branche ; archives brutes et schéma PostgreSQL inchangés.
+
+---
+
+
 ## 2026-11-07 — SadiaAF S1 : première installation staging gouvernée, archives persistantes et autorisation des vhosts
 
 - **MANDAT** : l'utilisateur autorise désormais la modification des deux vhosts `sadiaaf.wealthtechinnovations.com` et `api.sadiaaf.wealthtechinnovations.com`, et la suppression d'une archive identifiable. Audit S1 répété : API vhost 16 Ko, frontend 36 Ko ; uniquement pages Plesk d'origine, dossiers historiques `.well-known`, `e-vote`, `sadiaaf_project-v2` ; **aucune archive détectée dans ces vhosts**. Les archives AMF-UMOA, sauvegardes Plesk et autres données hors vhosts ne sont pas autorisées à suppression indifférenciée. Aucune suppression S1 effectuée.
