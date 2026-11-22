@@ -1,5 +1,16 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-22 — Issue #13 / PR #25 : CI du checkpoint documentaire précédent attestée
+
+- **RÉCONCILIATION** : PR #1 MERGED ; PR #25 OPEN/Draft, PR #22 OPEN/Draft conservée ; 12 PR et 12 issues ouvertes retrouvées ; lecture des règles, du journal de branche, du protocole et du checkpoint historique. Le présent ajout documentaire ne modifie aucun endpoint, adaptateur ni donnée.
+- **PREUVE EXACT-HEAD** : commit précédent `cce051ae9878e5000e9456e088a1765e9b889f42` ; [GitHub Actions run 44962998218](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/44962998218) `completed/success`, job `validate` #137025718174 `completed/success`. Les étapes attestées incluent tests unitaires, contrôle offline des 44 sources, typecheck, build, migrations et réapplication PostgreSQL, seed, tests intégration, claim backfill et garde des fenêtres. **Ce résultat porte uniquement sur le commit précédent, pas sur le nouveau HEAD produit par cette entrée.**
+- **LIMITES** : tests locaux NOT_RUN ; revue indépendante et accès institutionnels non attestés ; 22 NOT_PROBED, 7 RESTRICTED, 1 NOT_FOUND et 14 HTTP_OK_UNVERIFIED_CONTENT non qualifiés ; aucun historique réel certifié. Aucun merge, push main, secret ou S1.
+- **BLOCK_REASON** : revue/gates et qualification officielle des sources manquantes ; CI du nouveau HEAD documentaire à vérifier.
+- **NEXT_ACTION** : vérifier les checks du nouveau HEAD, faire revoir PR #25 indépendamment ; continuer issue #13 par protocoles/licences/échantillons officiels autorisés, issue #14 sur branche distincte si contrats vérifiés ; ne pas toucher PR #22 occupée ; aucune certification DONE/HISTORY_COMPLETE.
+- **ROLLBACK** : revert ciblé du seul commit documentaire.
+
+---
+
 ## 2026-11-22 — Issue #13 / PR #25 : preuve CI détaillée du HEAD exact et reprise documentaire
 
 - **RECONCILIATION** : PR #1 fusionnée ; instructions `AGENTS.md`, `docs/15_AUTONOMOUS_AGENT_EXECUTION.md`, journal et checkpoint historique relus sur `main` ; PR #25 OPEN/Draft au HEAD `8e1a22fe4d5100f5fea15ec024f063b06486c265`, PR #22 OPEN/Draft et laissée intacte ; recherche des PR et issues ouvertes effectuée. Le présent commit documentaire fera évoluer le HEAD : la preuve CI ci-dessous couvre exclusivement le HEAD de code précédent.
