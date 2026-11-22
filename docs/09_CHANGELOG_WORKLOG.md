@@ -1,5 +1,18 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-22 — PR #36 : recette intégrée synthétique HTTP → archive → PostgreSQL (lot 4/11)
+
+- **RECONCILIATION** : PR #1 merged ; PR #36 open/draft ; lecture AGENTS.md, docs/15_AUTONOMOUS_AGENT_EXECUTION.md, checkpoint 2026-11-06 et worklog de branche ; recherche des PR/issues ouvertes. Aucun SHA historique réutilisé comme preuve actuelle.
+- **PREUVE CI antérieure** : commit documentaire `0312bba67301156daa55674dde08946d6888d1c7` : GitHub Actions runs [45018302589](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45018302589) et [45018302597](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45018302597), tous deux `completed/success`. Ces résultats ne couvrent PAS le nouveau test.
+- **CODE/TEST livré** : commit `4b4b59ca7d3a6d3556cd7bab261c2047864d775d` ; nouveau `test/integration/ingestion-html-csv.test.ts` ; exercice du vrai `runIngestion`, du fetch simulé strictement limité à deux URL `fixtures.invalid`, de l'index HTML, du CSV enfant, de l'archivage SHA-256 et du contenu de fichier, de `market.raw_records`, du statut `SUCCESS` et du statut `FAILED` pour enfant HTTP 404. Fixture et endpoint uniques ; nettoyage ciblé de la base isolée et des fichiers temporaires.
+- **TEST_EVIDENCE** : `NOT_RUN` pour le nouveau test au moment du commit ; CI/Docker exact-HEAD à contrôler. Aucune source officielle interrogée, aucune preuve de collecte historique ou de production.
+- **BLOCK_REASON** : réussite CI du nouveau HEAD non encore attestée ; revue indépendante manquante ; contrats/licences/échantillons officiels CBE/GOSDMX et qualifications #13 encore incomplets. Le test nécessite `DATABASE_URL` pointant vers la base de CI isolée et migrations/seed préalables.
+- **NEXT_ACTION** : contrôler CI et Docker exact-HEAD de #36 ; corriger toute erreur TypeScript ou d'intégration ; obtenir une revue indépendante avant fusion. Puis reprendre les qualifications officielles #13/#14 et les lots 0–13 sans intervenir sur les branches concurrentes (#22 notamment).
+- **ROLLBACK** : revert ciblé du nouveau fichier de test et de cette entrée sur la PR Draft ; aucune migration, donnée de production, secret ou serveur S1 modifié.
+
+---
+
+
 ## 2026-11-22 — PR #36 : CI et Docker du contrat HTML/CSV confirmés (lot 4/11)
 
 - **RECONCILIATION** : PR #1 `closed/merged` ; PR #36 `open/draft`, HEAD vérifié `09af8e4bce436a3a124f37c3f2d5eadcadbc359d`. Lecture de `AGENTS.md`, `docs/15_AUTONOMOUS_AGENT_EXECUTION.md`, du checkpoint `docs/CONTINUITY_CHECKPOINT_2026-11-06.md` et du présent journal ; recherche des issues ouvertes. Les SHA du 06/11 restent historiques.
