@@ -185,6 +185,22 @@ test('HTML index -> CSV child -> SHA archive -> PostgreSQL -> SUCCESS; failed ch
       [failingEndpointCode],
     );
     assert.equal(repeatedRejectedRows.rows[0]?.count, '0');
+    // Both mixed attempts must remain auditable as PARTIAL, without new raw archives.
+    const partialHistory = await pool.query<{ count: string }>(
+      "SELECT count(*)::text AS count FROM ops.ingestion_runs WHERE scope->>'market'='MAR' AND status='PARTIAL' AND ingestion_run_id = ANY($1::uuid[])",
+      [[mixedRunId, repeatedMixed.rows[0]?.ingestion_run_id].filter(Boolean)],
+    );
+    assert.equal(partialHistory.rows[0]?.count, '2');
+    const repeatedArtifacts = await pool.query<{ count: string }>(
+      'SELECT count(*)::text AS count FROM source.raw_artifacts WHERE endpoint_code=$1',
+      [endpointCode],
+    );
+    assert.equal(repeatedArtifacts.rows[0]?.count, '2');
+    const repeatedRejectedArtifacts = await pool.query<{ count: string }>(
+      'SELECT count(*)::text AS count FROM source.raw_artifacts WHERE endpoint_code=$1',
+      [failingEndpointCode],
+    );
+    assert.equal(repeatedRejectedArtifacts.rows[0]?.count, '0');
     if (repeatedMixed.rows[0]?.ingestion_run_id) {
       await pool.query('DELETE FROM ops.ingestion_runs WHERE ingestion_run_id=$1', [repeatedMixed.rows[0].ingestion_run_id]);
     }
