@@ -1,5 +1,16 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-22 — PR #36 : correction TypeScript après CI rouge (lot 4/11)
+
+- **RECONCILIATION** : AGENTS.md, docs/15_AUTONOMOUS_AGENT_EXECUTION.md et dernier NEXT_ACTION relus ; PR et issues ouvertes recherchées. Branche #36 conservée, aucune modification de main ni de branche concurrente.
+- **TEST_EVIDENCE — FAILURE** : CI [45022944788](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45022944788), job 137209671703, échec TypeScript TS2307 lignes 25/37/39 du test d'intégration (imports relatifs incorrects), suivi de TS7006 ligne 66. Docker [45022944772](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45022944772), job 137209682285, échec de build sur les mêmes erreurs ; aucun PASS attribué à ces runs. Le log CI indique un checkout de c6af4683e2f4f274e0fd7cb255878e8fd6226f49 ; revérifier le HEAD pour chaque validation ultérieure.
+- **CODE** : commit [07aa15775703e7d15e351d35a6f4d476b9cc7c69](https://github.com/Patricked-code/africafunds-market-data-pipeline/commit/07aa15775703e7d15e351d35a6f4d476b9cc7c69) corrige les imports du fichier imbriqué test/integration/ingestion-html-csv.test.ts de ../src/ vers ../../src/. Le TS7006 est vraisemblablement une conséquence du module non résolu ; son élimination reste à prouver par CI, sans prétendre à un succès.
+- **BLOCK_REASON** : CI et Docker du nouveau HEAD non encore attestés ; possible erreur de schéma/runtime du test intégral à diagnostiquer ; revue indépendante absente ; contrats et échantillons officiels #13/#14 toujours à qualifier.
+- **NEXT_ACTION** : contrôler CI/Docker exact HEAD de #36, lire les logs en cas d'échec, corriger les erreurs de type, fixtures, schéma et runtime de la recette intégrée ; ensuite obtenir une revue indépendante avant toute fusion et poursuivre #13/#14. Aucune exécution S1 ni certification de données réelles.
+- **ROLLBACK** : revert ciblé du commit de correction des imports et de cette entrée sur la PR Draft ; aucune modification de production, migration, secret ou main.
+
+---
+
 ## 2026-11-22 — PR #36 : recette intégrée synthétique HTTP → archive → PostgreSQL (lot 4/11)
 
 - **RECONCILIATION** : PR #1 merged ; PR #36 open/draft ; lecture AGENTS.md, docs/15_AUTONOMOUS_AGENT_EXECUTION.md, checkpoint 2026-11-06 et worklog de branche ; recherche des PR/issues ouvertes. Aucun SHA historique réutilisé comme preuve actuelle.
