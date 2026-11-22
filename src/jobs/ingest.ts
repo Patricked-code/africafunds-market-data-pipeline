@@ -1,6 +1,6 @@
 import { Buffer } from 'node:buffer';
 import { assertIngestionSucceeded } from './ingestionOutcome.js';
-import { assertUsableIngestion } from './ingestionCompleteness.js';
+import { assertEndpointsSelected, assertUsableIngestion } from './ingestionCompleteness.js';
 import { fetchWithRetry } from '../http/fetcher.js';
 import { archiveRaw } from '../archive/rawStore.js';
 import { discoverLinks, parseHtmlTables } from '../parsers/html.js';
@@ -132,6 +132,7 @@ export async function runIngestion(input: { market?: string; family?: string; en
     ...(input.family !== undefined ? { family: input.family } : {}),
   }))
     .filter((endpoint) => !input.endpointCode || endpoint.id === input.endpointCode);
+  assertEndpointsSelected(endpoints.length);
   const runId = await startRun({ jobType: mode.toUpperCase(), scope: input });
   const summary = { endpoints: endpoints.length, success: 0, failed: 0, artifacts: 0, rows: 0, links: 0 };
   try {
