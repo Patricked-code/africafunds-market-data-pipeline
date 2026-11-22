@@ -1,5 +1,16 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-22 — Issue #13 / PR #25 : validation CI du HEAD 87d39b9 attestée
+
+- **RÉCONCILIATION** : PR #1 MERGED ; PR #25 OPEN/Draft au SHA exact `87d39b9aee56c2b56554808481329843b02d04e6`, PR #22 OPEN/Draft non modifiée ; lecture des règles, du journal de branche, du contrat agent et du checkpoint historique. Ce changement est documentaire uniquement.
+- **PREUVE EXACT-HEAD** : [GitHub Actions run 44967048176](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/44967048176), workflow CI #612, `completed/success` sur le HEAD précédent `87d39b9aee56c2b56554808481329843b02d04e6`. Job `validate` #137038314143 `completed/success` ; étapes success : types, tests unitaires, intégrité hors réseau des 44 sources, sécurité S1, validation Compose, build, migrations PostgreSQL et réapplication, seed, tests intégration, claim backfill et garde de fenêtres. La réussite ne s'étend PAS au nouveau HEAD documentaire ni à la PR #22.
+- **REVUE ET LIMITES** : `reviews=[]` pour #25 ; tests locaux NOT_RUN ; ni licence/source réelle, ni données témoins, ni déploiement S1 attestés. Les 22 NOT_PROBED, 7 RESTRICTED, 1 NOT_FOUND et 14 HTTP_OK_UNVERIFIED_CONTENT restent des qualifications historiques, non une certification de couverture.
+- **BLOCK_REASON** : revue indépendante et gates de fusion absents ; qualifications officielles et échantillons autorisés non établis. Aucune nouvelle correction fonctionnelle indépendante revendiquée.
+- **NEXT_ACTION** : obtenir revue indépendante sur #25 ; qualifier protocoles/licences/échantillons de l'issue #13 et adaptateurs #14 sans contourner robots ni toucher aux 44 sources ; reprendre les autres lots indépendants. Vérifier les checks du HEAD documentaire résultant sans créer un commit supplémentaire pour le seul suivi de ce contrôle.
+- **ROLLBACK** : revert ciblé du présent ajout documentaire ; aucun changement du code métier, de main ou de S1.
+
+---
+
 ## 2026-11-22 — Issue #13 / PR #25 : CI du checkpoint documentaire précédent attestée
 
 - **RÉCONCILIATION** : PR #1 MERGED ; PR #25 OPEN/Draft, PR #22 OPEN/Draft conservée ; 12 PR et 12 issues ouvertes retrouvées ; lecture des règles, du journal de branche, du protocole et du checkpoint historique. Le présent ajout documentaire ne modifie aucun endpoint, adaptateur ni donnée.
