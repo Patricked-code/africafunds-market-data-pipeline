@@ -91,6 +91,25 @@ test('HTML index -> CSV child -> SHA archive -> PostgreSQL -> SUCCESS; failed ch
       [endpointCode],
     );
     assert.equal(retainedArtifacts.rows[0]?.count, '2');
+    // A subsequent healthy retry must recover without duplicating raw data or archives.
+    failChild = false;
+    await runIngestion({ endpointCode, failOnEndpointError: true });
+    const recovered = await pool.query<{ status: string; summary: { rows: number; success: number } }>(
+      "SELECT status, summary FROM ops.ingestion_runs WHERE scope->>'endpointCode'=$1 ORDER BY started_at DESC",
+      [endpointCode],
+    );
+    assert.equal(recovered.rows[0]?.status, 'SUCCESS');
+    assert.equal(recovered.rows[0]?.summary.rows, 2);
+    const afterRecovery = await pool.query<{ count: string }>(
+      'SELECT count(*)::text AS count FROM market.raw_records WHERE endpoint_code=$1',
+      [endpointCode],
+    );
+    assert.equal(afterRecovery.rows[0]?.count, '2');
+    const artifactsAfterRecovery = await pool.query<{ count: string }>(
+      'SELECT count(*)::text AS count FROM source.raw_artifacts WHERE endpoint_code=$1',
+      [endpointCode],
+    );
+    assert.equal(artifactsAfterRecovery.rows[0]?.count, '2');
   } finally {
     globalThis.fetch = originalFetch;
     if (pool) {
