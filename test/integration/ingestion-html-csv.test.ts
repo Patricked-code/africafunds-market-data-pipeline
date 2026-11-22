@@ -22,7 +22,7 @@ test('HTML index -> CSV child -> SHA archive -> PostgreSQL -> SUCCESS; failed ch
   process.env.SOURCE_REGISTRY_PATH = registryPath;
   process.env.RAW_ARCHIVE_DIR = join(root, 'archive');
   process.env.HTTP_MAX_RETRIES = '0';
-  let pool: typeof import('../src/db/pool.js').pool | undefined;
+  let pool: typeof import('../../src/db/pool.js').pool | undefined;
   try {
     await writeFile(registryPath, JSON.stringify({
       version: 'ci', generatedAt: '2026-11-22', defaultPolicies: {},
@@ -34,9 +34,9 @@ test('HTML index -> CSV child -> SHA archive -> PostgreSQL -> SUCCESS; failed ch
           frequency: 'DAILY', enabled: true }],
       }],
     }));
-    const db = await import('../src/db/pool.js');
+    const db = await import('../../src/db/pool.js');
     pool = db.pool;
-    const { runIngestion } = await import('../src/jobs/ingest.js');
+    const { runIngestion } = await import('../../src/jobs/ingest.js');
     let failChild = false;
     globalThis.fetch = async (input) => {
       const url = String(input);
