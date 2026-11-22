@@ -1,5 +1,16 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-22 — PR #36 : durcissement des compteurs de complétude
+
+- **RÉCONCILIATION** : PR #1 fusionnée ; PR #36 toujours Draft. Les runs GitHub Actions du HEAD précédent `2c4de4c3496328f90ec14776442f230a20e9f786` sont `completed/success` : Docker [44990092461](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/44990092461), job `137109088171` ; CI [44990092470](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/44990092470), job `137109041529`. Aucune transposition de ces résultats aux nouveaux commits.
+- **CODE** : commit `ef248379b6932f9f1b116656be4eb2bbb6c7a526` refuse les compteurs de lignes/échecs négatifs, fractionnaires, infinis, NaN ou non sûrs. Commit `00f54de17c072c252b2806e4654b94e0ae593551` ajoute la couverture de régression correspondante. La garde reste pure et le contrat public inchangé ; aucun accès source ni S1.
+- **TEST_EVIDENCE** : nouveaux tests écrits, **NOT_RUN** au moment de ce checkpoint ; attendre les runs CI du nouveau HEAD. La revue indépendante est absente.
+- **BLOCK_REASON** : CI exact-HEAD des nouveaux commits non attestée ; revue indépendante manquante ; qualification officielle des index documentaires et des six adaptateurs #14 non achevée.
+- **NEXT_ACTION** : vérifier les workflows CI et Docker exact-HEAD du commit de journal, examiner les erreurs et corriger si nécessaire ; poursuivre les tests d'intégration des index HTML/CSV et l'arbitrage de statut sans faux SUCCESS ; obtenir revue indépendante et maintenir PR #36 Draft jusqu'aux gates. Poursuivre #13/#14 indépendamment des branches concurrentes.
+- **ROLLBACK** : revert ciblé des commits `ef248379`, `00f54de1` et du présent checkpoint sur branche PR #36, sans changement de données ni schéma.
+
+---
+
 ## 2026-11-22 — PR #36 : CI exacte et couverture des index HTML (reprise gouvernée)
 
 - **PREUVES GITHUB** : sur HEAD initial de la PR #36 `103787e77b626bd0591538846f5820c81e8991ff`, workflow CI #614, run [44985642241](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/44985642241), job `validate` #137095482572 **completed/success** (TypeScript, tests unitaires, build, migrations PostgreSQL et réapplication, tests intégration, claims et fenêtres backfill). Workflow Docker isolé #481, run [44985642266](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/44985642266), job #137095482412 **completed/success** (boot et persistance PostgreSQL sur runner éphémère). Ces résultats ne valent **que pour ce SHA**, sans preuve de collecte officielle ou S1.
