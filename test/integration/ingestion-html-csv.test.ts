@@ -80,6 +80,17 @@ test('HTML index -> CSV child -> SHA archive -> PostgreSQL -> SUCCESS; failed ch
     );
     assert.equal(failed.rows[0]?.status, 'FAILED');
     assert.equal(failed.rows[0]?.summary.failed, 1);
+    // A rejected child must not erase or duplicate previously committed observations.
+    const retained = await pool.query<{ count: string }>(
+      'SELECT count(*)::text AS count FROM market.raw_records WHERE endpoint_code=$1',
+      [endpointCode],
+    );
+    assert.equal(retained.rows[0]?.count, '2');
+    const retainedArtifacts = await pool.query<{ count: string }>(
+      'SELECT count(*)::text AS count FROM source.raw_artifacts WHERE endpoint_code=$1',
+      [endpointCode],
+    );
+    assert.equal(retainedArtifacts.rows[0]?.count, '2');
   } finally {
     globalThis.fetch = originalFetch;
     if (pool) {
