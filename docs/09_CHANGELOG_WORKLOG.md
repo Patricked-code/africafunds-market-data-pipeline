@@ -1,5 +1,19 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-22 — PR #36 : correction du test strict-mode après CI rouge (lots 4/11)
+
+- RECONCILIATION : PR #36 ouverte Draft ; PR #1 précédemment fusionnée ; AGENTS.md, docs/15_AUTONOMOUS_AGENT_EXECUTION.md et worklog relus ; PR/issues ouvertes recherchées. Aucune branche concurrente modifiée.
+- TEST_EVIDENCE : [CI #641 / run 45050783101](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45050783101) completed/failure, job 137295221369 : typecheck, tests unitaires, build et migrations réussis ; intégration PostgreSQL échouée à la ligne 84 (undefined versus null). [Docker #508 / run 45050783078](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45050783078) completed/success sur HEAD antérieur 80149af068c0a0751359ac8feeb9b3321ba5890d.
+- ROOT_CAUSE : assertion sur failed.rows[0].error_message mais requête SQL SELECT status, summary sans error_message ; la propriété était undefined. Ceci est une erreur de test, pas une preuve de double finalisation.
+- CODE/TEST : commit 9059646e1387d1670eed172770051b2c24265d49 ajoute error_message à la projection SQL du test. Aucun changement de code métier, schéma, secret, source, main ou S1.
+- TEST_EVIDENCE nouveau code : NOT_YET_ATTESTED ; tests locaux NOT_RUN ; contrôler les workflows exact-HEAD après ce checkpoint.
+- BLOCK_REASON : CI du correctif et revue indépendante non attestées ; qualification #13/#14 et recette métier #17 incomplètes.
+- NEXT_ACTION : vérifier CI et Docker du nouveau HEAD ; corriger si échec ; ajouter ensuite une recette multi-endpoints démontrant PARTIAL conservé en mode strict ; demander revue indépendante avant toute fusion. Continuer les lots libres après réconciliation, sans toucher aux PR concurrentes ni S1.
+- ROLLBACK : revert ciblé du commit de test et de cette entrée sur la branche Draft.
+
+---
+
+
 ## 2026-11-22 — PR #36 : strict-mode sans double finalisation (lots 4/11)
 
 - **RECONCILIATION** : PR #1 MERGED, PR #36 OPEN/DRAFT ; base main `73256f48d81d38ce8ff6f51be9e024b25cf5dadb`, HEAD initial `83f1712d163143465d762427cbafb84b794905d9` ; dépôt privé au contrôle GitHub. AGENTS.md, documents maîtres 00–15, checkpoint 2026-11-06 et dernier NEXT_ACTION relus ; PR/issues ouvertes recherchées ; revues #36 = []. Aucune branche concurrente modifiée.
