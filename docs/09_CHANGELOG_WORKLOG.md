@@ -1,5 +1,17 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-22 — PR #36 : CI et Docker du contrat HTML/CSV confirmés (lot 4/11)
+
+- **RECONCILIATION** : PR #1 `closed/merged` ; PR #36 `open/draft`, HEAD vérifié `09af8e4bce436a3a124f37c3f2d5eadcadbc359d`. Lecture de `AGENTS.md`, `docs/15_AUTONOMOUS_AGENT_EXECUTION.md`, du checkpoint `docs/CONTINUITY_CHECKPOINT_2026-11-06.md` et du présent journal ; recherche des issues ouvertes. Les SHA du 06/11 restent historiques.
+- **TEST_EVIDENCE exact HEAD** : CI #627 [run 45013353229](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45013353229) = `completed/success` ; Docker/PostgreSQL isolé #494 [run 45013353242](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45013353242) = `completed/success`. Ces deux runs sont associés au HEAD `09af8e4b` ; ils ne prouvent ni collecte réelle ni exécution S1.
+- **REVUE DE CODE** : le test `test/ingestion-html-csv-contract.test.ts` exerce découverte de liens, parseurs et garde de complétude avec fixtures synthétiques, mais n'exécute pas `runIngestion`, `fetchWithRetry`, `archiveRaw`, `persistRows` ni `finishRun`. Aucune recette HTTP→archive→PostgreSQL→statut final n'est donc attestée.
+- **BLOCK_REASON** : revue indépendante et recette intégrée manquantes ; contrats/licences/échantillons officiels CBE/GOSDMX non qualifiés. Le nouveau commit documentaire doit être revalidé séparément ; ne pas lui attribuer les runs précédents.
+- **NEXT_ACTION** : implémenter sur #36 un test d'intégration isolé qui exerce le véritable chemin HTTP/index HTML/CSV enfant/archive SHA-256/PostgreSQL/statut final, avec fixtures synthétiques, mocks réseau ou serveur local, sans requête aux sources officielles ; contrôler CI exact HEAD, demander revue indépendante ; poursuivre #13/#14 sans toucher #22 ni branches concurrentes.
+- **ROLLBACK** : revert ciblé de cette entrée sur la branche Draft ; aucune migration, donnée, secret ou production modifiés.
+
+---
+
+
 ## 2026-11-22 — PR #36 : contrat HTML → CSV enfant testé avec fixtures synthétiques (lot 4/11)
 
 - **RECONCILIATION** : lecture de `AGENTS.md`, `docs/15_AUTONOMOUS_AGENT_EXECUTION.md`, `docs/09_CHANGELOG_WORKLOG.md` et du checkpoint historique 2026-11-06 ; recherche des 13 PR et 12 issues ouvertes. PR #36 toujours Draft, aucune revue indépendante retournée. PR #22 et autres branches concurrentes non modifiées.
