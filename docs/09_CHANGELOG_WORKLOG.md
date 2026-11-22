@@ -1,5 +1,17 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-22 — PR #36 : réexécution PARTIAL sans doublon (lots 4/11)
+
+- **RECONCILIATION** : PR #1 MERGED ; PR #36 OPEN/DRAFT, base main `73256f48d81d38ce8ff6f51be9e024b25cf5dadb`, HEAD de départ `0fdae0a7bc8d9f485c0ce18917acedb7bb63ee41`. AGENTS.md, docs/15_AUTONOMOUS_AGENT_EXECUTION.md, présent journal et checkpoint historique 2026-11-06 relus ; 13 PR et 12 issues ouvertes recherchées ; reviews #36 = []. Aucun travail sur les branches concurrentes.
+- **TEST_EVIDENCE précédent HEAD** : [CI run 45067707429](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45067707429) et [Docker run 45067707535](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45067707535) : completed/success pour `0fdae0a7bc8d9f485c0ce18917acedb7bb63ee41`, pas pour le nouveau code.
+- **CODE/TEST** : commit `cc5c11ca7773ff23a718d8ac42e61fe301cdf9d6` ; extension additive de `test/integration/ingestion-html-csv.test.ts` pour réexécuter le marché synthétique avec un sibling sain et un sibling HTTP 404. Attendus : second run PARTIAL, summary 2/1/1, deux observations saines conservées, zéro observation du sibling rejeté. Nettoyage de l'ID de run supplémentaire ; aucune source réelle interrogée.
+- **TEST_EVIDENCE nouveau code** : NOT_YET_ATTESTED ; tests locaux NOT_RUN ; attendre et inspecter CI/Docker sur le nouveau HEAD. Le succès des anciens runs n'est pas transférable.
+- **BLOCK_REASON** : validation CI exact-HEAD et revue indépendante #36 absentes pour ce nouveau test ; qualifications officielles #13/#14, historique #5 et recettes #17 incomplètes ; aucune autorisation de merge ou de déploiement S1.
+- **NEXT_ACTION** : contrôler CI/Docker exact-HEAD et corriger toute régression ; obtenir revue indépendante de #36. Puis reprendre une tâche libre des issues #13/#14/#15 après réconciliation/claim, sans toucher aux PR occupées ; ne certifier aucune donnée officielle sans preuve.
+- **ROLLBACK** : revert ciblé du commit de test et de cette entrée sur la branche Draft ; aucune migration, secret, donnée officielle ou production modifiée.
+
+---
+
 ## 2026-11-22 — PR #36 : non-persistance du sibling HTTP 404 en exécution PARTIAL (lots 4/11)
 
 - **RECONCILIATION** : lecture AGENTS.md, docs/15_AUTONOMOUS_AGENT_EXECUTION.md, docs/09_CHANGELOG_WORKLOG.md et docs/CONTINUITY_CHECKPOINT_2026-11-06.md ; recherche des 13 PR et 12 issues ouvertes ; reviews #36 = []. PR #1 précédemment fusionnée selon historique documentaire ; aucune branche concurrente modifiée.
