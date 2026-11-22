@@ -1,5 +1,18 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-22 — PR #36 : non-persistance du sibling HTTP 404 en exécution PARTIAL (lots 4/11)
+
+- **RECONCILIATION** : lecture AGENTS.md, docs/15_AUTONOMOUS_AGENT_EXECUTION.md, docs/09_CHANGELOG_WORKLOG.md et docs/CONTINUITY_CHECKPOINT_2026-11-06.md ; recherche des 13 PR et 12 issues ouvertes ; reviews #36 = []. PR #1 précédemment fusionnée selon historique documentaire ; aucune branche concurrente modifiée.
+- **TEST_EVIDENCE HEAD précédent** : commit `300609f6250a493f0f523ecec96516c4a93a4846`, [CI run 45061311295](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45061311295) completed/success et [Docker run 45061311186](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45061311186) completed/success. Ces succès ne s'appliquent pas au nouveau commit.
+- **CODE/TEST** : commit `b17330da123342b97e35b0ea3de11a1019075664` complète la recette PostgreSQL multi-endpoints : lorsque le sibling renvoie HTTP 404, aucune ligne dans `source.raw_artifacts` ni `market.raw_records` ne doit être persistée pour cet endpoint, tandis que les deux observations du sibling sain restent présentes. Le test conserve les assertions PARTIAL, le rejet strict et le nettoyage borné. Fixture synthétique, aucun accès réseau officiel.
+- **TEST_EVIDENCE nouveau code** : NOT_YET_ATTESTED ; tests locaux NOT_RUN ; vérifier CI/Docker exact-HEAD après cette écriture.
+- **BLOCK_REASON** : CI exact-HEAD du test additionnel et revue indépendante #36 non attestées ; sources officielles #13/#14, historique #5 et recettes métier #17 toujours incomplets. Aucun merge ni déploiement S1 admissible.
+- **NEXT_ACTION** : contrôler CI/Docker du HEAD de #36 et corriger tout échec ; demander revue indépendante après validation. Puis qualifier les travaux libres des issues #13/#14/#15 sans collision avec les branches concurrentes, ni contournement de robots/licences.
+- **ROLLBACK** : revert ciblé du commit de test et de cette entrée sur la branche Draft ; aucune migration, secret, source officielle ou production modifiée.
+
+---
+
+
 ## 2026-11-22 — PR #36 : recette multi-endpoints PARTIAL en mode strict (lots 4/11)
 
 - **RECONCILIATION** : lecture AGENTS.md, docs/15_AUTONOMOUS_AGENT_EXECUTION.md, journal canonique et checkpoint docs/CONTINUITY_CHECKPOINT_2026-11-06.md ; recherche des 13 PR et 12 issues ouvertes. Branche de travail #36 uniquement, aucun changement main, #22 ou autre PR.
