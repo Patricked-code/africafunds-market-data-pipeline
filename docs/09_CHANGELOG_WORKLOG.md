@@ -1,5 +1,17 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-22 — PR #36 : recette multi-endpoints PARTIAL en mode strict (lots 4/11)
+
+- **RECONCILIATION** : lecture AGENTS.md, docs/15_AUTONOMOUS_AGENT_EXECUTION.md, journal canonique et checkpoint docs/CONTINUITY_CHECKPOINT_2026-11-06.md ; recherche des 13 PR et 12 issues ouvertes. Branche de travail #36 uniquement, aucun changement main, #22 ou autre PR.
+- **TEST_EVIDENCE exact HEAD antérieur** : commit 819ed02a22a86233c53787530a20952a937a67e2 ; [Docker run 45056423703](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45056423703) et [CI run 45056423717](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45056423717) retournés completed/success. Ne pas attribuer ces réussites aux nouveaux commits.
+- **CODE/TEST** : commits bac749abf94aa6fb760cff2d760cce6f035bfee9 et 79dff969ba5be4e28f990e506f81f4f17da79f01 ; extension additive de test/integration/ingestion-html-csv.test.ts : deux endpoints synthétiques dans le même marché, un succès HTML→CSV, un HTTP 404, rejet strict attendu, mais statut persistant PARTIAL avec summary endpoints=2, success=1, failed=1 et error_message NULL. Nettoyage du run mixte par ingestion_run_id capturé, sans suppression générique des runs du marché. Fixtures sans accès réseau réel, PostgreSQL CI isolé.
+- **TEST_EVIDENCE nouveau code** : NOT_YET_ATTESTED ; tests locaux NOT_RUN ; vérifier CI et Docker du HEAD après ce checkpoint.
+- **BLOCK_REASON** : validation exact-HEAD du scénario multi-endpoints et revue indépendante #36 encore non attestées ; qualification officielle des sources #13/#14 et recettes métier #17 non terminées.
+- **NEXT_ACTION** : contrôler les nouveaux runs CI/Docker sur le HEAD de #36 ; diagnostiquer/corriger toute erreur de test ou de persistance ; solliciter revue indépendante avant fusion. Ensuite reprendre les lots libres #13/#14/#15 avec preuves et sans collision de branches, sans secrets ni S1.
+- **ROLLBACK** : revert ciblé des deux commits de test et de cette entrée sur la PR Draft ; aucune migration ni production modifiée.
+
+---
+
 ## 2026-11-22 — PR #36 : correction du test strict-mode après CI rouge (lots 4/11)
 
 - RECONCILIATION : PR #36 ouverte Draft ; PR #1 précédemment fusionnée ; AGENTS.md, docs/15_AUTONOMOUS_AGENT_EXECUTION.md et worklog relus ; PR/issues ouvertes recherchées. Aucune branche concurrente modifiée.
