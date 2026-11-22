@@ -1,5 +1,17 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-22 — PR #36 : CI exact-HEAD confirmée et test de dépassement des entiers sûrs
+
+- **RÉCONCILIATION** : PR #1 fermée/fusionnée selon l'état GitHub antérieurement attesté ; PR #36 OPEN/DRAFT, branche `fix/ingestion-false-success-20261122`. Relecture AGENTS.md, protocole autonome, journal de branche, checkpoint historique et recherches des issues/PR ouvertes. Le checkpoint 2026-11-06 n'est pas un état courant.
+- **PREUVE CI EXACTE** : commit `c57e80c1dfecd8e15728b7a76df03b7c4d947a94`, workflow CI [44994654930](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/44994654930) `completed/success` ; workflow Docker/PostgreSQL isolé [44994654941](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/44994654941) `completed/success`. Ces preuves ne sont pas transposables aux nouveaux commits.
+- **TRAVAIL TEST** : commit `b2fb2c74f5c47a9d71715128ee09529a6acd5060` ajoute les tests de refus des compteurs supérieurs à `Number.MAX_SAFE_INTEGER` ou inférieurs à `Number.MIN_SAFE_INTEGER` pour `rows` et `failedChildren`. Le garde-fou existant `Number.isSafeInteger` est conservé sans changement de contrat. Tests ajoutés mais **NOT_RUN** pour ce nouveau commit à la rédaction.
+- **BLOCK_REASON** : CI exact-HEAD après ajout des tests et présent journal non encore attestée ; revue indépendante absente ; pas de preuve de contrats/licences et fixtures officielles pour les six adaptateurs #14 ; tests end-to-end de téléchargement HTML/index et classification des échecs encore incomplets.
+- **NEXT_ACTION** : vérifier CI et Docker sur le nouveau HEAD de PR #36, corriger tout échec sans fusion ; ajouter des tests d'intégration contrôlés du parcours index HTML/CSV et des téléchargements enfants, qualifier le statut des index sans observations, obtenir une revue indépendante ; poursuivre #13/#14 indépendamment des branches occupées. Ne pas revendiquer collecte réelle, HISTORY_COMPLETE, S1 ou runner permanent.
+- **ROLLBACK** : revert ciblé du commit de test et de ce journal sur PR #36 ; aucune migration, source, secret, branche concurrente ni serveur modifié.
+
+---
+
+
 ## 2026-11-22 — PR #36 : durcissement des compteurs de complétude
 
 - **RÉCONCILIATION** : PR #1 fusionnée ; PR #36 toujours Draft. Les runs GitHub Actions du HEAD précédent `2c4de4c3496328f90ec14776442f230a20e9f786` sont `completed/success` : Docker [44990092461](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/44990092461), job `137109088171` ; CI [44990092470](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/44990092470), job `137109041529`. Aucune transposition de ces résultats aux nouveaux commits.
