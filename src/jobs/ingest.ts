@@ -149,10 +149,12 @@ export async function runIngestion(input: { market?: string; family?: string; en
         logger.error({ endpoint: endpoint.id, error }, 'Échec de source');
       }
     }
-    await finishRun(runId, summary.failed === 0 ? 'SUCCESS' : summary.success ? 'PARTIAL' : 'FAILED', summary);
-    if (input.failOnEndpointError) assertIngestionSucceeded(summary);
   } catch (error) {
     await finishRun(runId, 'FAILED', summary, error);
     throw error;
   }
+  // Persist the actual endpoint outcome before strict-mode signalling to callers.
+  // Otherwise a PARTIAL run would be overwritten as FAILED by the catch above.
+  await finishRun(runId, summary.failed === 0 ? 'SUCCESS' : summary.success ? 'PARTIAL' : 'FAILED', summary);
+  if (input.failOnEndpointError) assertIngestionSucceeded(summary);
 }
