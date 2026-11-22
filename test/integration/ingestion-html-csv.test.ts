@@ -75,7 +75,7 @@ test('HTML index -> CSV child -> SHA archive -> PostgreSQL -> SUCCESS; failed ch
     failChild = true;
     await assert.rejects(runIngestion({ endpointCode, failOnEndpointError: true }));
     const failed = await pool.query<{ status: string; summary: { failed: number }; error_message: string | null }>(
-      "SELECT status, summary FROM ops.ingestion_runs WHERE scope->>'endpointCode'=$1 ORDER BY started_at DESC",
+      "SELECT status, summary, error_message FROM ops.ingestion_runs WHERE scope->>'endpointCode'=$1 ORDER BY started_at DESC",
       [endpointCode],
     );
     assert.equal(failed.rows[0]?.status, 'FAILED');
