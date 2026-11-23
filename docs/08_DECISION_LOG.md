@@ -121,6 +121,18 @@ Utiliser ce fichier pour les décisions durables. Ne pas supprimer les anciennes
 - **Vérification requise :** CI du SHA exact, vérification des événements de non-éligibilité (SKIP sans fusion), revue indépendante, preuve d'enrôlement puis fusion native d'une PR pilote après gates ; contrôle `main` et absence de bypass.
 - **Réversibilité :** désactiver le workflow ou le label, ou `Allow auto-merge` ; ne jamais relâcher les protections afin de provoquer une fusion.
 
+## ADR-016 — Auto-fusion des PR ordinaires sans revue indépendante obligatoire
+
+- **Date :** 2026-11-23.
+- **Statut :** ACCEPTED (décision explicite du propriétaire) ; déploiement de la politique GitHub et du workflow **IN_PROGRESS**, non certifié tant que les preuves n'existent pas.
+- **Contexte :** règles GitHub [#27937019](https://github.com/Patricked-code/africafunds-market-data-pipeline/rules/27937019) installées, mais compteur `required_approving_review_count=1`, dernier push soumis à approbation, et PR #37 Draft. Le propriétaire décide de ne plus demander une revue indépendante pour chaque développement ordinaire.
+- **Décision :** pour les PR ordinaires et non sensibles du programme SadiaAF, conserver PR, `main` protégée, checks stricts `validate` et `Build, boot, migrate and verify persistent PostgreSQL`, fils résolus, interdictions force-push/suppression et absence de bypass ; ne plus exiger de revue indépendante : `required_approving_review_count=0`, `require_last_push_approval=false`, `require_code_owner_review=false`, `required_reviewers=[]`, `require_extra_approval_for_unattributed_changes=false`. Conserver l'option `Allow auto-merge` native et l'éligibilité explicite de la PR, sans fusion directe ou approbation artificielle.
+- **Gates réservés :** aucune implication pour la production S1, les secrets, les droits des données sources, les migrations destructives ou les changements sensibles. Ces opérations conservent leurs autorisations spécifiques dans `docs/10_DEPLOYMENT_GATES.md` et les décisions applicables.
+- **Autorité :** la présente décision remplace uniquement l'exigence de revue indépendante universelle de l'ADR-015 pour les PR ordinaires. Les autres exigences et l'historique restent inchangés.
+- **Dépendance administrative :** modifier le ruleset existant **27937019**, sans en créer un second, via l'identité admin `Patricked-code`. Le connecteur GitHub courant ne possède pas la capacité d'écriture sur les réglages admin. Ne jamais prétendre le changement appliqué avant attestation REST.
+- **Recette :** règles `main` actives et vérifiées, CI/Docker au dernier SHA, PR non Draft et éligible, test de fusion native au travers de GitHub sans intervenant, vérification checkpoint et reprise du lot suivant.
+- **Risque accepté :** sans relecteur, un défaut non couvert par les tests peut être intégré ; conserver tests, checks, sécurité de provenance et filtrage des changements sensibles.
+
 ## Modèle d’entrée
 
 ```markdown
