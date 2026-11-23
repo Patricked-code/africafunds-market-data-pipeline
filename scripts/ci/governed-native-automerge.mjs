@@ -92,7 +92,7 @@ export function isSensitiveChangePath(path) {
   if (typeof path !== 'string' || path.length < 1 || path.includes('\\') ||
       path.startsWith('/') || path.split('/').includes('..')) return true;
   return /^(?:\.github\/|deploy\/|sql\/|config\/|scripts\/ci\/|src\/(?:auth\/|identity\/|security\/|config\/)|AGENTS\.md$|Dockerfile(?:\..*)?$|docker-compose(?:\..*)?\.ya?ml$|package(?:-lock)?\.json$|docs\/(?:08_DECISION_LOG|10_DEPLOYMENT_GATES|15_AUTONOMOUS_AGENT_EXECUTION)\.md$)/i.test(path) ||
-    /(^|[\/._-])(?:secret|credential|private.?key|token)(?:$|[\/._-])/i.test(path) ||
+    /(^|[\/._-])(?:secrets?|credentials?|private.?keys?|tokens?)(?:$|[\/._-])/i.test(path) ||
     /^\.env(?:$|\.)/.test(path);
 }
 
