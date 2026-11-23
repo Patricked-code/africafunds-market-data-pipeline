@@ -1,5 +1,17 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-23 — Reprise PR #36 : isolation des runs PARTIAL strict/non-strict
+
+- Branche : `fix/ingestion-false-success-20261122` ; PR #36 Draft ; lot 4/11, issue #14, sans toucher aux PR concurrentes #22/#25/#26/#35.
+- Réconciliation : précédent HEAD `df08a352c9ac1d59acd8d7400575910101e39e63` ; CI run [45089238131](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45089238131) SUCCESS et Docker run [45089237903](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45089237903) SUCCESS, **uniquement pour ce HEAD précédent**. Aucune revue indépendante retournée pour PR #36.
+- Code/test : commit [11456cf9](https://github.com/Patricked-code/africafunds-market-data-pipeline/commit/11456cf91814ccba689803067e412fc2c920001c) ; ajout d'assertions PostgreSQL confirmant deux identifiants distincts de runs, tous deux `PARTIAL`, entre l'exécution stricte et la non stricte ; fixtures synthétiques, aucun HTTP externe.
+- Limites : nouveau test **non encore attesté CI exact-HEAD** ; aucune donnée réelle ni qualification officielle de sources ; revue et gates de fusion manquants.
+- BLOCK_REASON : CI/Docker du nouveau HEAD et revue indépendante non attestés ; issues #13/#14/#15/#17 restent partiellement ouvertes ; aucune preuve d'un déploiement S1 ou de couverture historique complète.
+- NEXT_ACTION : vérifier CI et Docker sur le HEAD final du présent journal, diagnostiquer/corriger tout échec ; solliciter revue indépendante de PR #36 ; sélectionner ensuite une tâche indépendante parmi les lots 0–13 après réconciliation des PR et claims.
+- Rollback : revert des commits de test et journal sur branche PR #36 ; aucune migration ni modification production.
+
+---
+
 ## 2026-11-23 — PR #36 : isolation des endpoints après PARTIAL non strict (lots 4/11)
 
 - **RECONCILIATION** : lecture AGENTS.md, docs/15_AUTONOMOUS_AGENT_EXECUTION.md, journal courant et docs/CONTINUITY_CHECKPOINT_2026-11-06.md ; PR #1 CLOSED (fusion à confirmer par métadonnées de merge), PR #36 OPEN/Draft, recherches PR/issues ouvertes. Branche de travail #36 uniquement.
