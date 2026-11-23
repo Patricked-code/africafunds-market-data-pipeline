@@ -9,6 +9,47 @@ import { pathToFileURL } from 'node:url';
 const REQUIRED_CHECKS = ['validate', 'Build, boot, migrate and verify persistent PostgreSQL'];
 const INTENT_LABEL = 'automerge-eligible';
 
+const TRUSTED_WORKFLOWS = new Set([
+  'CI — AfricaFunds Market Data Pipeline',
+  'SadiaAF — isolated Docker runtime and PostgreSQL persistence smoke'
+]);
+
+/**
+ * Workflow-run webhooks are emitted from the trusted default branch and
+ * carry the actual PR head SHA. Ignore fork runs, stale events, non-PR runs,
+ * failed checks, or ambiguous PR inventories. Do not ingest run artifacts.
+ *
+ * A privileged PR issue-comment is an explicit, SHA-bound recheck/revoke
+ * signal for cases where a readiness label changed after the last CI run.
+ */
+export function resolveTrustedPrSignal(event, repositoryName) {
+  if (event?.repository?.full_name !== repositoryName) return null;
+  if (event?.workflow_run) {
+    const run = event.workflow_run;
+    const matches = run.pull_requests;
+    if (event.action !== 'completed' || run.event !== 'pull_request' ||
+        run.status !== 'completed' || run.conclusion !== 'success' ||
+        run.head_repository?.full_name !== repositoryName ||
+        !TRUSTED_WORKFLOWS.has(run.name) ||
+        !Array.isArray(matches) || matches.length !== 1) return null;
+    const pr = matches[0];
+    if (!Number.isInteger(pr?.number) || !/^[a-f0-9]{40}$/.test(pr?.head?.sha ?? '') ||
+        pr.head.sha !== run.head_sha || pr.base?.ref !== 'main') return null;
+    return { number: pr.number, headSha: pr.head.sha, revoke: false };
+  }
+  if (event?.issue?.pull_request && event?.comment && event.action === 'created') {
+    const association = event.comment.author_association;
+    if (!['OWNER', 'MEMBER', 'COLLABORATOR'].includes(association)) return null;
+    const body = (event.comment.body ?? '').trim();
+    const match = /^\/(sadiaaf-automerge|sadiaaf-revoke-automerge) ([a-f0-9]{40})$/.exec(body);
+    if (!match || !Number.isInteger(event.issue.number)) return null;
+    return { number: event.issue.number, headSha: match[2],
+      revoke: match[1] === 'sadiaaf-revoke-automerge' };
+  }
+  return null;
+}
+
+
 /** Normalize only a fully active ruleset for the exact main branch.
  * GitHub omits bypass_actors for callers without ruleset write access.
  * Missing bypass information must NOT be treated as an empty bypass list.
@@ -165,22 +206,22 @@ async function disableIfEnrolled(pullRequest, token) {
 }
 
 export async function enrollNativeAutoMerge({ repositoryName, token, event }) {
-  const prFromEvent = event?.pull_request;
-  if (!prFromEvent || !Number.isInteger(prFromEvent.number)) {
-    console.log('SKIP: event is not a pull request');
-    return 'SKIPPED';
-  }
-  if (event?.repository?.full_name !== repositoryName) {
-    console.log('SKIP: event repository mismatch');
+  const signal = resolveTrustedPrSignal(event, repositoryName);
+  if (!signal) {
+    console.log('SKIP: no trusted workflow completion or authorized SHA-bound PR comment');
     return 'SKIPPED';
   }
   const api = 'https://api.github.com/repos/' + repositoryName;
   const [repository, branch, pullRequest] = await Promise.all([
     githubRequest(api, token),
     githubRequest(api + '/branches/main', token),
-    githubRequest(api + '/pulls/' + prFromEvent.number, token)
+    githubRequest(api + '/pulls/' + signal.number, token)
   ]);
-  if (isExplicitRevocation(event)) {
+  if (pullRequest?.head?.sha !== signal.headSha) {
+    console.log('SKIP: event SHA is stale relative to live PR');
+    return 'SKIPPED';
+  }
+  if (signal.revoke) {
     await disableIfEnrolled(pullRequest, token);
     return 'REVOKED';
   }
@@ -223,7 +264,7 @@ export async function enrollNativeAutoMerge({ repositoryName, token, event }) {
   });
   const problem = fileScopeBlock || evaluateEnrollment({
     repository, branch, protection, pullRequest,
-    eventSha: prFromEvent.head?.sha
+    eventSha: signal.headSha
   });
   if (problem) {
     if (pullRequest.labels?.some(label => label.name === INTENT_LABEL)) {
