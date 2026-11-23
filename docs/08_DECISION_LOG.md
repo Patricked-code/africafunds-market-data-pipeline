@@ -145,6 +145,17 @@ Utiliser ce fichier pour les décisions durables. Ne pas supprimer les anciennes
 - Gouvernance : seulement PR ordinaires sans chemins sensibles, CI et Docker statutaires stricts, protection main, approbations universelles à zéro selon ADR-016, pas de nouveau scheduler, secret, PAT admin, second orchestrateur, déploiement S1 ou dépense.
 - Condition de DONE : CI et Docker sur le HEAD exact de PR #37, fusion de cette PR de gouvernance sous autorisation du propriétaire, vérification de l'événement workflow_run et du token réel sur main, preuve ENROLLED/SKIPPED/REVOKED puis pilote de PR ordinaire fusionnée par GitHub sans bypass. Aucune annonce de 24/7 sans exécuteur réel attesté.
 
+## ADR-018 — Protection d'enrôlement contre les changements sensibles après inscription
+
+- Date : 2026-11-24.
+- Statut : ACCEPTED pour le code et les tests, recette runtime et fusion encore à contrôler.
+- Problème réel : après un enrôlement auto-merge natif, un contributeur habilité peut pousser un nouveau SHA contenant un chemin sensible ; GitHub ne désactive pas automatiquement l'auto-merge pour tous les auteurs dotés de droits d'écriture. La révocation événementielle peut donc être trop tardive.
+- Décision : prolonger le job de contrôle obligatoire validate pour vérifier chaque nouveau SHA avec un GITHUB_TOKEN uniquement en lecture (contents:read, pull-requests:read). Si le diff est sensible et que la PR est labellisée automerge-eligible OU inscrite dans le native auto-merge, ce check requis doit échouer sur le SHA courant. La PR sensible sans inscription peut suivre la procédure de fusion expressément autorisée sous les autres checks du ruleset. Le diff manquant/tronqué échoue toujours.
+- Autorisation : l'inscription native privilégiée reste dans le workflow_run fiable utilisant uniquement le code main (sans checkout PR ni artefact) ; le jeton d'enrôlement requiert les permissions contents:write et pull-requests:write pour la mutation GraphQL, avec protection main et aucun contournement de ruleset.
+- Fallback : supprimer le fallback de protection classique non normalisé ; accepter uniquement une règle ruleset active et vérifiable correspondant à main. En l'absence de preuve du statut de bypass du token, aucune inscription.
+- Limite de modèle : un collaborateur disposant du droit de modifier un workflow CI ou d'activer lui-même l'auto-merge peut chercher à contourner un contrôle embarqué dans le contenu d'une PR. Les ACL GitHub et l'exigence de gouvernance des PR sensibles restent donc pertinentes ; le nouveau check garantit le scénario de non-régression d'un ajout sensible accidentel/après enrôlement, et ne doit pas être présenté comme un verrou absolu contre un auteur malveillant habilité.
+- Preuves attendues : tests du required head gate (label/auto_merge, fichiers sensibles et non sensibles), CI + Docker sur SHA exact, revue des fils bloquants, fusion autorisée de PR #37, pilote native auto-merge sur PR ordinaire, test de rejet sur nouvelle révision sensible. Aucun assouplissement des deux checks requis, aucun S1, aucun secret tiers.
+
 ## Modèle d’entrée
 
 ```markdown
