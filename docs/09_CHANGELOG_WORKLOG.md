@@ -1,5 +1,17 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-23 — PR #36 : régression non-strict FAILED et investigation CI #669 / Docker #536 (lots 4/11)
+
+- RECONCILIATION : PR #1 merged ; AGENTS.md, contrat docs/15, checkpoint 2026-11-06 et présent journal relus sur main/branche #36. PR/issues ouvertes consultées ; branche #36 Draft, HEAD de départ c4d52f4537947d521500aff2642a690a0f617874. Dépôt retourné private ; aucune modification de visibilité.
+- TEST_EVIDENCE : sur ce HEAD, [CI #669 / run 45148504260](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45148504260) completed/failure, job validate 137603643177 ; [Docker #536 / run 45148504150](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45148504150) completed/failure, job 137603643133. Jobs sans steps/logs_url accessibles. Cause racine inconnue ; aucun test local exécuté.
+- ACTION_CODE : commit 3a8cd3519445a0410b4a6753ed379811e07ad125 sur test/integration/ingestion-html-csv.test.ts : scénario PostgreSQL synthétique d'un endpoint HTTP 404 seul en mode non strict ; la promesse doit se résoudre mais ops.ingestion_runs doit rester FAILED avec compteurs [1,0,1], sans archive ; nettoyage ciblé du run supplémentaire par endpointCode. Aucun changement moteur, source officielle, schéma ou secret.
+- VALIDATION : assertions écrites, NOT_RUN localement ; CI du nouveau HEAD non attestée. L'échec pré-job sur le HEAD antérieur ne constitue pas un échec de ces nouvelles assertions.
+- BLOCK_REASON : GitHub Actions CI/Docker échouent avant étapes observables ; vérifier annotations check-run, paramètres Actions, allocation runners, quotas/facturation par accès administrateur. Revue indépendante #36 absente ; recettes sources et marchés #13–#17 non certifiées.
+- NEXT_ACTION : vérifier les runs sur le HEAD du présent checkpoint, obtenir diagnostic pré-job sans relance aveugle, corriger la cause prouvée et faire exécuter le nouveau test PostgreSQL ; demander revue indépendante avant tout merge. En parallèle poursuivre un travail indépendant admissible après contrôle des claims. Aucun S1.
+- ROLLBACK : revert ciblé du test 3a8cd351 et de cette entrée documentaire sur la branche Draft ; préserver main et les PR concurrentes.
+
+---
+
 ## 2026-11-23 — PR #36 : diagnostic transversal CI #668 / Docker #535 (lots 4/11, issue #8)
 
 - RECONCILIATION : instructions AGENTS.md et docs/15_AUTONOMOUS_AGENT_EXECUTION.md, checkpoint 2026-11-06 et journal courant relus sur GitHub ; PR ouvertes et issues ouvertes recherchées. PR #36 demeure Draft ; comparaison main → branche : 60 commits ahead, 0 behind, base main 73256f48d81d38ce8ff6f51be9e024b25cf5dadb avant ce commit. Aucun claim concurrent modifié.
