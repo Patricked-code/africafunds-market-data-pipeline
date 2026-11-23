@@ -1,5 +1,17 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-23 — PR #36 : échec CI exact-HEAD détecté, relances gouvernées (lots 4/11)
+
+- RECONCILIATION : AGENTS.md, docs/15_AUTONOMOUS_AGENT_EXECUTION.md, worklog courant et docs/CONTINUITY_CHECKPOINT_2026-11-06.md relus ; PR #1 fermée (fusion mentionnée au journal), PR #36 ouverte Draft. Recherche des issues/PR ouvertes ; aucune branche concurrente modifiée.
+- TEST_EVIDENCE : sur le HEAD documentaire antérieur e7262eaa4dc035e7056f90156e329188a02d0ec6, [CI run 45112614755](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45112614755) et [Docker/PostgreSQL run 45112614698](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45112614698) ont retourné completed/failure (première tentative). Jobs 137488152930 et 137488152679 en échec ; téléchargement des logs via connecteur : GitHub 404 BlobNotFound, et liste des steps vide. Cause technique non démontrée ; ne pas attribuer ces échecs au code sans logs.
+- ACTION : relance ciblée des jobs échoués via GitHub Actions pour les deux runs, API success=true pour chaque demande. Résultats des nouvelles tentatives NON ENCORE ATTESTÉS ; ne pas les déclarer réussies. Aucun code, secret, main ni S1 modifié.
+- BLOCK_REASON : CI/Docker exact-HEAD en échec lors de la première tentative et logs indisponibles (BlobNotFound) ; seconde tentative en attente de vérification ; revue indépendante #36 toujours non attestée ; compatibilité HTML index-only et qualifications officielles #13/#14/#15/#17 non certifiées.
+- NEXT_ACTION : récupérer l'état des tentatives relancées 45112614755 et 45112614698, inspecter jobs/logs dès disponibilité ; si échec reproductible, isoler et corriger le défaut sur branche de PR #36 avec tests, sans micro-tests redondants. Vérifier la revue indépendante et les claims avant de reprendre les tâches indépendantes des lots 0–13. Aucune fusion ni déploiement S1.
+- ROLLBACK : entrée documentaire réversible sur branche Draft ; relances GitHub Actions sans mutation de production.
+
+---
+
+
 ## 2026-11-23 — PR #36 : validation CI exact-HEAD et passage en attente de revue (lots 4/11)
 
 - RECONCILIATION : HEAD branche `fix/ingestion-false-success-20261122` = `808b30a6c6e865a764eeaa66e6cc5e1ec417527d` (comparaison GitHub identical). Lecture de AGENTS.md, docs/15_AUTONOMOUS_AGENT_EXECUTION.md, présent journal, checkpoint docs/CONTINUITY_CHECKPOINT_2026-11-06.md, tests et moteur d'ingestion ; recherche des PR/issues ouvertes ; reviews #36 = []. Aucun claim concurrent transféré.
