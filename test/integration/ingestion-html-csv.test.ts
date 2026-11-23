@@ -26,6 +26,7 @@ test('HTML index -> CSV child -> SHA archive -> PostgreSQL -> SUCCESS; failed ch
   process.env.HTTP_MAX_RETRIES = '0';
   let pool: typeof import('../../src/db/pool.js').pool | undefined;
   let mixedRunId: string | undefined;
+  let repeatedMixedRunId: string | undefined;
   let nonStrictRunId: string | undefined;
   try {
     await writeFile(registryPath, JSON.stringify({
@@ -172,6 +173,9 @@ test('HTML index -> CSV child -> SHA archive -> PostgreSQL -> SUCCESS; failed ch
     }>(
       "SELECT ingestion_run_id, status, summary FROM ops.ingestion_runs WHERE scope->>'market'='MAR' ORDER BY started_at DESC LIMIT 1",
     );
+    repeatedMixedRunId = repeatedMixed.rows[0]?.ingestion_run_id;
+    assert.ok(repeatedMixedRunId);
+    assert.notEqual(repeatedMixedRunId, mixedRunId);
     assert.equal(repeatedMixed.rows[0]?.status, 'PARTIAL');
     assert.equal(repeatedMixed.rows[0]?.summary.endpoints, 2);
     assert.equal(repeatedMixed.rows[0]?.summary.success, 1);
@@ -202,9 +206,6 @@ test('HTML index -> CSV child -> SHA archive -> PostgreSQL -> SUCCESS; failed ch
       [failingEndpointCode],
     );
     assert.equal(repeatedRejectedArtifacts.rows[0]?.count, '0');
-    if (repeatedMixed.rows[0]?.ingestion_run_id) {
-      await pool.query('DELETE FROM ops.ingestion_runs WHERE ingestion_run_id=$1', [repeatedMixed.rows[0].ingestion_run_id]);
-    }
     // Non-strict callers must receive a resolved promise while retaining PARTIAL in PostgreSQL.
     await runIngestion({ market: 'MAR', failOnEndpointError: false });
     const nonStrict = await pool.query<{
@@ -253,11 +254,12 @@ test('HTML index -> CSV child -> SHA archive -> PostgreSQL -> SUCCESS; failed ch
     assert.ok(nonStrictRunId);
     assert.ok(mixedRunId);
     assert.notEqual(nonStrictRunId, mixedRunId);
+    assert.notEqual(nonStrictRunId, repeatedMixedRunId);
     const isolatedPartialRuns = await pool.query<{ ingestion_run_id: string; status: string }>(
       'SELECT ingestion_run_id, status FROM ops.ingestion_runs WHERE ingestion_run_id = ANY($1::uuid[])',
-      [[mixedRunId, nonStrictRunId]],
+      [[mixedRunId, repeatedMixedRunId, nonStrictRunId]],
     );
-    assert.equal(isolatedPartialRuns.rowCount, 2);
+    assert.equal(isolatedPartialRuns.rowCount, 3);
     assert.ok(isolatedPartialRuns.rows.every((row) => row.status === 'PARTIAL'));
   } finally {
     globalThis.fetch = originalFetch;
@@ -265,6 +267,7 @@ test('HTML index -> CSV child -> SHA archive -> PostgreSQL -> SUCCESS; failed ch
       // Only synthetic records with a unique endpoint code, in the isolated CI database.
       await pool.query("DELETE FROM ops.ingestion_runs WHERE scope->>'endpointCode'=$1", [endpointCode]);
       if (mixedRunId) await pool.query('DELETE FROM ops.ingestion_runs WHERE ingestion_run_id=$1', [mixedRunId]);
+      if (repeatedMixedRunId) await pool.query('DELETE FROM ops.ingestion_runs WHERE ingestion_run_id=$1', [repeatedMixedRunId]);
       if (nonStrictRunId) await pool.query('DELETE FROM ops.ingestion_runs WHERE ingestion_run_id=$1', [nonStrictRunId]);
       await pool.query(
         'DELETE FROM quality.assessments WHERE object_type=$1 AND object_id IN (SELECT raw_artifact_id FROM source.raw_artifacts WHERE endpoint_code=$2)',
