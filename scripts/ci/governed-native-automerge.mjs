@@ -6,7 +6,7 @@
 import { readFileSync } from 'node:fs';
 import { pathToFileURL } from 'node:url';
 
-const REQUIRED_CHECK = 'validate';
+const REQUIRED_CHECKS = ['validate', 'Build, boot, migrate and verify persistent PostgreSQL'];
 const INTENT_LABEL = 'automerge-eligible';
 
 export function evaluateEnrollment({ repository, branch, protection, pullRequest, eventSha }) {
@@ -18,9 +18,10 @@ export function evaluateEnrollment({ repository, branch, protection, pullRequest
   }
   if (protection?.requiresStatusChecks !== true ||
       !Array.isArray(protection?.requiredStatusCheckContexts) ||
-      !protection.requiredStatusCheckContexts.includes(REQUIRED_CHECK)) {
-    return 'the validate status check is not required';
+      !REQUIRED_CHECKS.every(check => protection.requiredStatusCheckContexts.includes(check))) {
+    return 'the CI and Docker status checks are not both required';
   }
+  if (protection?.requiresStrictStatusChecks !== true) return 'strict up-to-date checks are not required';
   if (protection?.dismissesStaleReviews !== true) return 'stale approvals are not dismissed';
   if (protection?.requiresConversationResolution !== true) return 'review-thread resolution is not required';
   if (protection?.isAdminEnforced !== true) return 'branch protection does not apply to administrators';
@@ -75,7 +76,7 @@ export async function enrollNativeAutoMerge({ repositoryName, token, event }) {
     return 'SKIPPED';
   }
   const [owner, name] = repositoryName.split('/');
-  const query = 'query($owner: String!, $name: String!) { repository(owner: $owner, name: $name) { ref(qualifiedName: "refs/heads/main") { branchProtectionRule { requiresApprovingReviews requiredApprovingReviewCount requiresStatusChecks requiredStatusCheckContexts dismissesStaleReviews requiresConversationResolution isAdminEnforced } } } }';
+  const query = 'query($owner: String!, $name: String!) { repository(owner: $owner, name: $name) { ref(qualifiedName: "refs/heads/main") { branchProtectionRule { requiresApprovingReviews requiredApprovingReviewCount requiresStatusChecks requiredStatusCheckContexts requiresStrictStatusChecks dismissesStaleReviews requiresConversationResolution isAdminEnforced } } } }';
   const result = await githubRequest('https://api.github.com/graphql', token, {
     method: 'POST',
     body: { query, variables: { owner, name } }
