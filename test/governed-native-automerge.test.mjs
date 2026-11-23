@@ -13,7 +13,8 @@ function fixture() {
       requiresApprovingReviews: true,
       requiredApprovingReviewCount: 1,
       requiresStatusChecks: true,
-      requiredStatusCheckContexts: ['validate'],
+      requiredStatusCheckContexts: ['validate', 'Build, boot, migrate and verify persistent PostgreSQL'],
+      requiresStrictStatusChecks: true,
       dismissesStaleReviews: true,
       requiresConversationResolution: true,
       isAdminEnforced: true
@@ -46,6 +47,8 @@ const refusals = [
   ['missing classic branch rule', d => { d.protection = null; }],
   ['no review policy', d => { d.protection.requiresApprovingReviews = false; }],
   ['zero required reviews', d => { d.protection.requiredApprovingReviewCount = 0; }],
+  ['non-strict stale base branch', d => { d.protection.requiresStrictStatusChecks = false; }],
+  ['missing Docker smoke check', d => { d.protection.requiredStatusCheckContexts = ['validate']; }],
   ['no status-check enforcement', d => { d.protection.requiresStatusChecks = false; }],
   ['missing mandatory validate check', d => { d.protection.requiredStatusCheckContexts = ['lint']; }],
   ['stale reviews permitted', d => { d.protection.dismissesStaleReviews = false; }],
