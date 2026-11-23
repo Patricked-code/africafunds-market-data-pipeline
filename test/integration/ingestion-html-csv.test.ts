@@ -243,6 +243,27 @@ test('HTML index -> CSV child -> SHA archive -> PostgreSQL -> SUCCESS; failed ch
       [endpointCode],
     );
     assert.equal(nonStrictHealthyArtifacts.rows[0]?.count, '2');
+    // All-failed non-strict runs must persist FAILED, not falsely resolve as SUCCESS.
+    // This is distinct from the mixed PARTIAL case above.
+    await runIngestion({ endpointCode: failingEndpointCode, failOnEndpointError: false });
+    const allFailedNonStrict = await pool.query<{
+      ingestion_run_id: string;
+      status: string;
+      summary: { endpoints: number; success: number; failed: number };
+    }>(
+      "SELECT ingestion_run_id, status, summary FROM ops.ingestion_runs WHERE scope->>'endpointCode'=$1 ORDER BY started_at DESC LIMIT 1",
+      [failingEndpointCode],
+    );
+    assert.equal(allFailedNonStrict.rows[0]?.status, 'FAILED');
+    assert.deepEqual(
+      [allFailedNonStrict.rows[0]?.summary.endpoints, allFailedNonStrict.rows[0]?.summary.success, allFailedNonStrict.rows[0]?.summary.failed],
+      [1, 0, 1],
+    );
+    const allFailedArtifacts = await pool.query<{ count: string }>(
+      'SELECT count(*)::text AS count FROM source.raw_artifacts WHERE endpoint_code=$1',
+      [failingEndpointCode],
+    );
+    assert.equal(allFailedArtifacts.rows[0]?.count, '0');
     // The previous strict-mode PARTIAL must remain intact after the non-strict run.
     const retainedMixed = await pool.query<{ status: string }>(
       'SELECT status FROM ops.ingestion_runs WHERE ingestion_run_id=$1',
@@ -286,6 +307,7 @@ test('HTML index -> CSV child -> SHA archive -> PostgreSQL -> SUCCESS; failed ch
     if (pool) {
       // Only synthetic records with a unique endpoint code, in the isolated CI database.
       await pool.query("DELETE FROM ops.ingestion_runs WHERE scope->>'endpointCode'=$1", [endpointCode]);
+      await pool.query("DELETE FROM ops.ingestion_runs WHERE scope->>'endpointCode'=$1", [failingEndpointCode]);
       if (mixedRunId) await pool.query('DELETE FROM ops.ingestion_runs WHERE ingestion_run_id=$1', [mixedRunId]);
       if (repeatedMixedRunId) await pool.query('DELETE FROM ops.ingestion_runs WHERE ingestion_run_id=$1', [repeatedMixedRunId]);
       if (nonStrictRunId) await pool.query('DELETE FROM ops.ingestion_runs WHERE ingestion_run_id=$1', [nonStrictRunId]);
