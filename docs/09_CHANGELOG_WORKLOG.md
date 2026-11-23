@@ -1,5 +1,18 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-23 — PR #36 : isolation des endpoints après PARTIAL non strict (lots 4/11)
+
+- **RECONCILIATION** : lecture AGENTS.md, docs/15_AUTONOMOUS_AGENT_EXECUTION.md, journal courant et docs/CONTINUITY_CHECKPOINT_2026-11-06.md ; PR #1 CLOSED (fusion à confirmer par métadonnées de merge), PR #36 OPEN/Draft, recherches PR/issues ouvertes. Branche de travail #36 uniquement.
+- **TEST_EVIDENCE HEAD précédent** : commit `1a3f0a9972b11d37ef0435ea5cf357a782a5d1e7` ; [CI run 45084230455](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45084230455) et [Docker run 45084230461](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45084230461) : completed/success, exact HEAD précédent uniquement.
+- **CODE/TEST** : commit `ac7be693f12cfc622828f20e101948513653a279` ; assertions PostgreSQL supplémentaires après la troisième ingestion non stricte : zéro raw_records et zéro raw_artifacts pour le sibling HTTP 404, exactement deux archives pour le sibling sain, et statut PARTIAL du premier run strict inchangé. Fixtures synthétiques et suppression bornée, sans source officielle interrogée.
+- **TEST_EVIDENCE nouveau HEAD** : tests locaux NOT_RUN ; CI/Docker du nouveau HEAD NOT_YET_ATTESTED, à contrôler sur le SHA exact après cette entrée.
+- **BLOCK_REASON** : CI exact-HEAD et revue indépendante #36 non attestées pour les nouvelles assertions ; qualification officielle #13/#14, normalisation #15 et recette réelle #17 incomplètes. Aucun merge ni déploiement S1 autorisé.
+- **NEXT_ACTION** : vérifier CI/Docker exact-HEAD de #36, corriger toute régression et obtenir une revue indépendante ; réconcilier les claims des PR concurrentes puis reprendre une tâche indépendante des lots 0–13. Ne pas déclarer HISTORY_COMPLETE sans données réelles.
+- **ROLLBACK** : revert ciblé du commit `ac7be693` et de cette entrée documentaire sur la branche Draft ; aucun schéma, secret, main, source officielle ou S1 modifié.
+
+---
+
+
 ## 2026-11-23 — PR #36 : comportement PARTIAL non strict après répétitions (lots 4/11)
 
 - **RECONCILIATION** : AGENTS.md, docs/15_AUTONOMOUS_AGENT_EXECUTION.md, docs/09_CHANGELOG_WORKLOG.md et checkpoint docs/CONTINUITY_CHECKPOINT_2026-11-06.md relus ; 13 PR ouvertes dont #36 Draft, 12 issues ouvertes retrouvées. Branches concurrentes non modifiées ; aucune fusion ni S1.
