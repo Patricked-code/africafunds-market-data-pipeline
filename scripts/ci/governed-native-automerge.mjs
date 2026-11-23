@@ -26,14 +26,20 @@ export function normalizeActiveRulesetPolicy(rs) {
   const hasNoBypass = Array.isArray(rs.bypass_actors) && rs.bypass_actors.length === 0;
   return {
     isEnforcedRuleset: true,
-    requiresApprovingReviews: !!pull && pull.required_approving_review_count >= 1,
-    requiredApprovingReviewCount: pull?.required_approving_review_count ?? 0,
+    requiresPullRequest: !!pull,
+    requiredApprovingReviewCount: pull?.required_approving_review_count,
+    hasRequiredReviewers: Array.isArray(pull?.required_reviewers) ? pull.required_reviewers.length > 0 : true,
+    requiresCodeOwnerReview: pull?.require_code_owner_review !== false,
+    requiresExtraUnattributedApproval: pull?.require_extra_approval_for_unattributed_changes !== false,
     requiresStatusChecks: !!status,
     requiredStatusCheckContexts: checks,
     requiresStrictStatusChecks: status?.strict_required_status_checks_policy === true,
     dismissesStaleReviews: pull?.dismiss_stale_reviews_on_push === true,
     requiresConversationResolution: pull?.required_review_thread_resolution === true,
-    isAdminEnforced: hasNoBypass,
+    // GitHub omits bypass_actors for a non-admin token. Refuse enrollment
+    // unless this workflow's own token is explicitly confirmed non-bypassing.
+    isAdminEnforced: rs.current_user_can_bypass === 'never' &&
+      (rs.bypass_actors === undefined || hasNoBypass),
     requiresLastPushApproval: pull?.require_last_push_approval === true,
     blocksForcePushes: rs.rules.some(r => r.type === 'non_fast_forward'),
     blocksDeletions: rs.rules.some(r => r.type === 'deletion')
@@ -44,8 +50,13 @@ export function evaluateEnrollment({ repository, branch, protection, pullRequest
   if (repository?.allow_auto_merge !== true) return 'repository auto-merge is disabled';
   if (repository?.full_name !== pullRequest?.base?.repo?.full_name) return 'repository identity mismatch';
   if (branch?.name !== 'main' || (branch?.protected !== true && protection?.isEnforcedRuleset !== true)) return 'main is not protected';
-  if (protection?.requiresApprovingReviews !== true || protection?.requiredApprovingReviewCount < 1) {
-    return 'an independent approving review is not required';
+  if (protection?.requiresPullRequest !== true) return 'a pull request is not required';
+  if (protection?.requiredApprovingReviewCount !== 0) return 'manual approvals remain required';
+  if (protection?.hasRequiredReviewers !== false ||
+      protection?.requiresCodeOwnerReview !== false ||
+      protection?.requiresExtraUnattributedApproval !== false ||
+      protection?.requiresLastPushApproval === true) {
+    return 'a mandatory reviewer gate still exists';
   }
   if (protection?.requiresStatusChecks !== true ||
       !Array.isArray(protection?.requiredStatusCheckContexts) ||
@@ -53,12 +64,12 @@ export function evaluateEnrollment({ repository, branch, protection, pullRequest
     return 'the CI and Docker status checks are not both required';
   }
   if (protection?.requiresStrictStatusChecks !== true) return 'strict up-to-date checks are not required';
-  if (protection?.dismissesStaleReviews !== true) return 'stale approvals are not dismissed';
+  // Dismissal of approvals is irrelevant when no approval is required.
   if (protection?.requiresConversationResolution !== true) return 'review-thread resolution is not required';
-  if (protection?.isAdminEnforced !== true) return 'branch protection bypass scope cannot be certified';
+  if (protection?.isAdminEnforced !== true) return 'the workflow token bypass status is not certified';
   if (protection?.isEnforcedRuleset === true &&
-      (protection.requiresLastPushApproval !== true || protection.blocksForcePushes !== true || protection.blocksDeletions !== true)) {
-    return 'active ruleset lacks last-push approval, force-push or deletion protections';
+      (protection.requiresLastPushApproval !== false || protection.blocksForcePushes !== true || protection.blocksDeletions !== true)) {
+    return 'active ruleset still requires a last-push approval or permits unsafe branch operations';
   }
   if (pullRequest?.state !== 'open' || pullRequest?.draft !== false) return 'pull request is not open and ready';
   if (pullRequest?.base?.ref !== 'main') return 'pull request does not target main';
