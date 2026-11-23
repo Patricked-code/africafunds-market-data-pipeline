@@ -1,5 +1,17 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-23 — PR #36 : nouvel échec pré-étapes, diagnostic GitHub Actions confirmé (lots 4/11)
+
+- RECONCILIATION : AGENTS.md, docs/15_AUTONOMOUS_AGENT_EXECUTION.md, journal actuel et checkpoint docs/CONTINUITY_CHECKPOINT_2026-11-06.md consultés via le connecteur Patricked-code ; recherche des PR/issues ouvertes et reviews #36 (reviews=[]). Travail limité à la branche Draft #36, sans modification des branches concurrentes.
+- TEST_EVIDENCE : commit précédent 7228e26b0e25dd25b955cbf4624198a6b4ace038 ; [CI #666 run 45125135566](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45125135566) completed/failure, job validate 137527626753 ; [Docker #533 run 45125135560](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45125135560) completed/failure, job 137527626853. Les deux jobs retournent steps=[] et logs 404 BlobNotFound. Aucune commande de test observable ; ne pas conclure à un échec applicatif ni à une cause infrastructure spécifique.
+- ACTION : lecture des runs, jobs, étapes et logs exacts, sans relance aveugle ; aucune modification métier ni exécution locale. La revue indépendante reste absente. Échecs successifs similaires aux runs 45112614755, 45112614698, 45119240423 et 45119240387.
+- BLOCK_REASON : CI et Docker échouent avant toute étape accessible, journaux indisponibles ; cause racine non démontrée. Impossible de certifier la branche #36 ou de fusionner ; sources officielles et recettes réelles non attestées.
+- NEXT_ACTION : consulter les annotations/check-runs et la page Actions des runs 45125135566/45125135560 ; vérifier les paramètres d'activation Actions, disponibilité des runners et éventuelles restrictions de facturation/quotas par une autorité ayant accès aux réglages. Corriger uniquement la cause prouvée, puis valider le nouveau HEAD. En parallèle, reprendre une tâche indépendante des lots 0–13 après contrôle des claims, sans toucher aux branches possédées.
+- ROLLBACK : revert documentaire ciblé de cette entrée sur la branche Draft ; aucun secret, main, source officielle ni S1 modifié.
+
+---
+
+
 ## 2026-11-23 — PR #36 : diagnostic CI élargi, échec avant étapes observables (lots 4/11)
 
 - RECONCILIATION : AGENTS.md, docs/15_AUTONOMOUS_AGENT_EXECUTION.md, présent journal et docs/CONTINUITY_CHECKPOINT_2026-11-06.md relus via GitHub ; recherche des PR ouvertes (dont #36 Draft et branches concurrentes). Aucune modification de code ni des autres branches.
