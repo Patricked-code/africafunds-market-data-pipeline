@@ -28,8 +28,11 @@ export async function validateGovernedHead({ eventName, event, repositoryName, t
       !token) throw new Error('missing trusted PR execution context');
   const api = 'https://api.github.com/repos/' + repositoryName;
   const pr = await json(api + '/pulls/' + number, token);
-  if (pr?.state !== 'open' || pr?.head?.sha !== expectedSha ||
-      pr?.base?.ref !== 'main') throw new Error('PR changed or no longer targets main');
+  if (pr?.state !== 'open' || pr?.head?.sha !== expectedSha)
+    throw new Error('PR changed during governed head validation');
+  // The pre-existing CI explicitly supports stacked PRs targeting feature
+  // branches. Main-only auto-merge governance must not break those builds.
+  if (pr?.base?.ref !== 'main') return 'NOT_APPLICABLE_STACKED_PR';
   if (!Number.isSafeInteger(pr.changed_files) || pr.changed_files < 1 ||
       pr.changed_files > 500) throw new Error('unverifiable PR file count');
   const files = [];
