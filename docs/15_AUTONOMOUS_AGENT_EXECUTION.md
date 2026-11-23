@@ -260,3 +260,13 @@ Ne pas bloquer des travaux non dépendants pendant l'attente d'un gate ou d'une 
 - Avant la présente mise à jour documentaire : PR #37 HEAD bc71e107925b91632ee19413c664240d601c303d, READY, CI #714 et Docker #578 SUCCESS ; main protégée inchangée, PR #36 DRAFT. Le présent ajout produira un nouveau SHA à vérifier à nouveau, sans extrapoler les tests anciens.
 - **BLOCK_REASON :** PR #37 de gouvernance non fusionnée et workflow non validé en runtime, token/événement à certifier ; fusion pilote absente ; runner codeur permanent non attesté ; six chantiers et recettes financières non terminés ; S1 non autorisé.
 - **NEXT_ACTION :** vérifier CI/Docker sur le nouveau SHA, qualifier les permissions et l'événement de la PR #37, autoriser/gouverner l'intégration de cette PR sensible, recetter un vrai auto-merge natif et deux cycles de développement sans collision, poursuivre PR #36 et les lots existants, puis staging/production selon gates distincts.
+
+### 13.13.1 — Événement GitHub fiable, compatibilité 2026-12-02 (ADR-017)
+
+Le workflow de la PR #37 a été migré depuis pull_request_target (dont le blocage par défaut sur les dépôts publics est annoncé pour le 2 décembre 2026) vers workflow_run sur la fin de la CI et du smoke Docker déjà existants. Aucun second scheduler ni file de tâches. Seul le code du checkout fiable main, sur le workflow présent dans main, peut utiliser le jeton pull-requests:write ; aucun checkout/artefact du code PR.
+
+Vérification signal : événement completed/success provenant de CI ou Docker du dépôt SadiaAF, event pull_request, dépôt head identique, exactement une PR cible main et un SHA de head identique au SHA du run et à la PR active. Toute absence ou divergence => SKIP. Le filtrage des chemins sensibles et du label automerge-eligible reste obligatoire.
+
+En cas de changement de label après la conclusion des jobs, le seul signal immédiat explicite est un commentaire de PR par une identité OWNER/MEMBER/COLLABORATOR avec commande exacte /sadiaaf-automerge SHA ou /sadiaaf-revoke-automerge SHA. Ce signal est strictement SHA-bound et ne peut pas élargir les autorisations de fusion. Le retrait du label SEUL ne déclenche plus immédiatement la révocation : l'agent propriétaire doit poster la commande de révocation avant de retirer le label, ou utiliser Disable auto-merge dans GitHub. Ne pas prétendre l'ancienne révocation via unlabeled encore active.
+
+Au moment de la rédaction : seul le CODE et ses tests sont candidats sur la PR #37, encore non fusionnée. L'intégration dans main, la validation effective du token et une fusion auto-merge de PR pilote sous les deux checks stricts restent à prouver et à conserver dans docs/09.
