@@ -9,10 +9,41 @@ import { pathToFileURL } from 'node:url';
 const REQUIRED_CHECKS = ['validate', 'Build, boot, migrate and verify persistent PostgreSQL'];
 const INTENT_LABEL = 'automerge-eligible';
 
+/** Normalize only a fully active ruleset for the exact main branch.
+ * GitHub omits bypass_actors for callers without ruleset write access.
+ * Missing bypass information must NOT be treated as an empty bypass list.
+ */
+export function normalizeActiveRulesetPolicy(rs) {
+  if (rs?.enforcement !== 'active' || rs?.target !== 'branch') return null;
+  const refs = rs?.conditions?.ref_name;
+  if (!Array.isArray(refs?.include) || !refs.include.includes('refs/heads/main') ||
+      !Array.isArray(refs.exclude) || refs.exclude.length > 0) return null;
+  if (!Array.isArray(rs.rules)) return null;
+  const pull = rs.rules.find(r => r.type === 'pull_request')?.parameters;
+  const status = rs.rules.find(r => r.type === 'required_status_checks')?.parameters;
+  const checks = Array.isArray(status?.required_status_checks)
+    ? status.required_status_checks.map(c => c.context) : [];
+  const hasNoBypass = Array.isArray(rs.bypass_actors) && rs.bypass_actors.length === 0;
+  return {
+    isEnforcedRuleset: true,
+    requiresApprovingReviews: !!pull && pull.required_approving_review_count >= 1,
+    requiredApprovingReviewCount: pull?.required_approving_review_count ?? 0,
+    requiresStatusChecks: !!status,
+    requiredStatusCheckContexts: checks,
+    requiresStrictStatusChecks: status?.strict_required_status_checks_policy === true,
+    dismissesStaleReviews: pull?.dismiss_stale_reviews_on_push === true,
+    requiresConversationResolution: pull?.required_review_thread_resolution === true,
+    isAdminEnforced: hasNoBypass,
+    requiresLastPushApproval: pull?.require_last_push_approval === true,
+    blocksForcePushes: rs.rules.some(r => r.type === 'non_fast_forward'),
+    blocksDeletions: rs.rules.some(r => r.type === 'deletion')
+  };
+}
+
 export function evaluateEnrollment({ repository, branch, protection, pullRequest, eventSha }) {
   if (repository?.allow_auto_merge !== true) return 'repository auto-merge is disabled';
   if (repository?.full_name !== pullRequest?.base?.repo?.full_name) return 'repository identity mismatch';
-  if (branch?.name !== 'main' || branch?.protected !== true) return 'main is not protected';
+  if (branch?.name !== 'main' || (branch?.protected !== true && protection?.isEnforcedRuleset !== true)) return 'main is not protected';
   if (protection?.requiresApprovingReviews !== true || protection?.requiredApprovingReviewCount < 1) {
     return 'an independent approving review is not required';
   }
@@ -24,7 +55,11 @@ export function evaluateEnrollment({ repository, branch, protection, pullRequest
   if (protection?.requiresStrictStatusChecks !== true) return 'strict up-to-date checks are not required';
   if (protection?.dismissesStaleReviews !== true) return 'stale approvals are not dismissed';
   if (protection?.requiresConversationResolution !== true) return 'review-thread resolution is not required';
-  if (protection?.isAdminEnforced !== true) return 'branch protection does not apply to administrators';
+  if (protection?.isAdminEnforced !== true) return 'branch protection bypass scope cannot be certified';
+  if (protection?.isEnforcedRuleset === true &&
+      (protection.requiresLastPushApproval !== true || protection.blocksForcePushes !== true || protection.blocksDeletions !== true)) {
+    return 'active ruleset lacks last-push approval, force-push or deletion protections';
+  }
   if (pullRequest?.state !== 'open' || pullRequest?.draft !== false) return 'pull request is not open and ready';
   if (pullRequest?.base?.ref !== 'main') return 'pull request does not target main';
   if (pullRequest?.head?.repo?.full_name !== repository.full_name) return 'pull request originates from a fork';
@@ -90,20 +125,36 @@ export async function enrollNativeAutoMerge({ repositoryName, token, event }) {
     await disableIfEnrolled(pullRequest, token);
     return 'REVOKED';
   }
-  if (repository.allow_auto_merge !== true || branch.protected !== true) {
+  if (repository.allow_auto_merge !== true) {
     if (pullRequest.labels?.some(label => label.name === INTENT_LABEL)) {
       await disableIfEnrolled(pullRequest, token);
     }
     console.log('SKIP: repository auto-merge or main protection is not enabled');
     return 'SKIPPED';
   }
-  const [owner, name] = repositoryName.split('/');
-  const query = 'query($owner: String!, $name: String!) { repository(owner: $owner, name: $name) { ref(qualifiedName: "refs/heads/main") { branchProtectionRule { requiresApprovingReviews requiredApprovingReviewCount requiresStatusChecks requiredStatusCheckContexts requiresStrictStatusChecks dismissesStaleReviews requiresConversationResolution isAdminEnforced } } } }';
-  const result = await githubRequest('https://api.github.com/graphql', token, {
-    method: 'POST',
-    body: { query, variables: { owner, name } }
-  });
-  const protection = result.data?.repository?.ref?.branchProtectionRule;
+  let protection = null;
+  // API rulesets can enforce main even when classic /branches/main/protection is disabled.
+  // This path never trusts an omitted bypass_actors field as an empty list.
+  const rulesets = await githubRequest(api + '/rulesets', token);
+  if (!Array.isArray(rulesets)) throw new Error('Rulesets API returned non-array');
+  const candidates = rulesets.filter(rs => rs.target === 'branch' && rs.enforcement === 'active');
+  for (const rs of candidates) {
+    const full = await githubRequest(api + '/rulesets/' + rs.id, token);
+    const normalized = normalizeActiveRulesetPolicy(full);
+    if (normalized) {
+      protection = normalized;
+      break;
+    }
+  }
+  if (!protection) {
+    // Legacy classic branch protection is still supported.
+    const [owner, name] = repositoryName.split('/');
+    const query = 'query($owner: String!, $name: String!) { repository(owner: $owner, name: $name) { ref(qualifiedName: "refs/heads/main") { branchProtectionRule { requiresApprovingReviews requiredApprovingReviewCount requiresStatusChecks requiredStatusCheckContexts requiresStrictStatusChecks dismissesStaleReviews requiresConversationResolution isAdminEnforced } } } }';
+    const result = await githubRequest('https://api.github.com/graphql', token, {
+      method: 'POST', body: { query, variables: { owner, name } }
+    });
+    protection = result.data?.repository?.ref?.branchProtectionRule;
+  }
   const problem = evaluateEnrollment({
     repository, branch, protection, pullRequest,
     eventSha: prFromEvent.head?.sha
