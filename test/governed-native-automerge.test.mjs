@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { evaluateEnrollment } from '../scripts/ci/governed-native-automerge.mjs';
+import { evaluateEnrollment, isExplicitRevocation } from '../scripts/ci/governed-native-automerge.mjs';
 
 function fixture() {
   return {
@@ -68,3 +68,16 @@ for (const [name, change] of refusals) {
     assert.equal(typeof evaluateEnrollment(input), 'string');
   });
 }
+
+test('withdrawal of readiness label is a revocation', () => {
+  assert.equal(isExplicitRevocation({ action: 'unlabeled', label: { name: 'automerge-eligible' } }), true);
+});
+test('turning a PR into Draft revokes readiness', () => {
+  assert.equal(isExplicitRevocation({ action: 'converted_to_draft' }), true);
+});
+test('removing another label does not revoke auto-merge', () => {
+  assert.equal(isExplicitRevocation({ action: 'unlabeled', label: { name: 'other-label' } }), false);
+});
+test('synchronize alone is not explicit revocation', () => {
+  assert.equal(isExplicitRevocation({ action: 'synchronize' }), false);
+});
