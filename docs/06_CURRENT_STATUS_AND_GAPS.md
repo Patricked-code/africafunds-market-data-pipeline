@@ -1,5 +1,15 @@
 # 06 — État réel et écarts
 
+## 2026-11-23 — Lot 11 / issues #3 et #9 : préparation de l'auto-merge natif GitHub
+
+- **État GitHub vérifié :** dépôt public, `main=73256f48d81d38ce8ff6f51be9e024b25cf5dadb`, `protected=false`, rulesets `[]`, `allow_auto_merge=false` ; PR #36 Draft, sans review indépendante, HEAD `df0129b625798147eb1dc3f283fcbd7fd19fac99`. Aucun mécanisme de fusion autonome n'est actuellement activé.
+- **Travail réalisé sur branche indépendante :** création d'un vérificateur fail-closed d'éligibilité `scripts/ci/governed-native-automerge.mjs`, ses tests de politique, et d'un workflow GitHub Actions exploitant le code de `main` seulement. Extension additive de la CI existante pour les tests du vérificateur. Pas de mutation de settings/admin, pas de fusion, pas de S1.
+- **Gates :** exigence d'une protection réelle de `main` (checks `validate` obligatoires, revue indépendante requise, approbations obsolètes rejetées, fils résolus, admin inclus), de l'option native Allow auto-merge, d'une PR non Draft et d'un label de préparation posé après contrôles de l'agent. Le workflow ne fait jamais de merge direct.
+- **État des tests :** code committé sur branche, CI GitHub de cette branche à observer à l'ouverture de PR. Pas de test déclaré PASS avant la fin de son workflow.
+- **BLOCK_REASON :** protection et allow-auto-merge actuellement absents, accès d'administration non disponible dans le connecteur GitHub, acteur indépendant de revue automatique non attesté. L'outil GitHub ne peut pas activer la configuration du dépôt via les fonctions actuellement disponibles.
+- **NEXT_ACTION :** ouvrir PR de lot 11 et valider tests sur SHA exact ; appliquer et attester une fois la protection main et Allow auto-merge par un moyen admin autorisé ; intégrer la PR seulement après revue indépendante ; tester l'enrôlement auto-merge natif sur une PR pilote sans bypass, puis reprendre les lots 0–13. Aucun besoin d'intervention humaine à chaque développement si un reviewer indépendant automatisé effectivement habilité intervient.
+
+
 ## Audit S1 et sécurité de déploiement — 2026-11-07
 
 - **PREUVE SERVEUR READ-ONLY** : les domaines `sadiaaf.wealthtechinnovations.com` et `api.sadiaaf.wealthtechinnovations.com` existent et répondent tous deux **HTTP 500** à `curl -I` depuis S1 ; aucun dépôt Git racine dans leurs vhosts ; le seul conteneur Docker actif observé est le bridge MCP. Cela n'atteste pas l'absence d'autres bases/service hors Docker.
