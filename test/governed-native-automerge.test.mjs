@@ -363,3 +363,30 @@ test('required HEAD guard rejects missing PR data or changed-file metadata', () 
   assert.equal(typeof evaluateRequiredScopeGate({pullRequest:null,files:[]}), 'string');
   assert.equal(typeof evaluateRequiredScopeGate({pullRequest:{},files:[]}), 'string');
 });
+
+test('stacked PR targets another feature branch and retains ordinary CI validation', async () => {
+  const sha = 'abc123abc123abc123abc123abc123abc123abcd';
+  const event = {
+    repository: { full_name: 'Patricked-code/africafunds-market-data-pipeline' },
+    pull_request: { number: 99, head: { sha } }
+  };
+  const fetchBefore = globalThis.fetch;
+  let calls = 0;
+  globalThis.fetch = async () => {
+    calls += 1;
+    return {ok: true, json: async () => ({
+      state: 'open', head: {sha}, base: {ref: 'feature/parent'},
+      changed_files: 1
+    })};
+  };
+  try {
+    const { validateGovernedHead } = await import('../scripts/ci/validate-governed-head.mjs');
+    assert.equal(await validateGovernedHead({
+      eventName: 'pull_request', event, token: 'ci-read-test-only',
+      repositoryName: 'Patricked-code/africafunds-market-data-pipeline'
+    }), 'NOT_APPLICABLE_STACKED_PR');
+    assert.equal(calls, 1, 'stacked PR must not require main-only files gate');
+  } finally {
+    globalThis.fetch = fetchBefore;
+  }
+});
