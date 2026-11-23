@@ -1,0 +1,36 @@
+name: SadiaAF — governed native auto-merge enrollment
+
+# Runs the trusted version from main. Never checks out or executes PR code.
+# This does NOT directly merge anything or change repository protections.
+on:
+  pull_request_target:
+    types: [opened, reopened, synchronize, ready_for_review, labeled]
+  pull_request_review:
+    types: [submitted, dismissed]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+concurrency:
+  group: sadiaaf-native-automerge-${{ github.event.pull_request.number }}
+  cancel-in-progress: false
+
+jobs:
+  enroll-native-automerge:
+    name: Governed native auto-merge eligibility
+    if: >-
+      github.event.pull_request.base.ref == 'main' &&
+      github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout trusted base branch only
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          persist-credentials: false
+      - name: Validate prerequisites and enroll in native GitHub auto-merge
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: node scripts/ci/governed-native-automerge.mjs
