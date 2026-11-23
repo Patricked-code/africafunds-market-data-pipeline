@@ -286,6 +286,13 @@ test('HTML index -> CSV child -> SHA archive -> PostgreSQL -> SUCCESS; failed ch
       assert.equal(attempt.status, 'FAILED');
       assert.deepEqual([attempt.summary.endpoints, attempt.summary.success, attempt.summary.failed], [1, 0, 1]);
     }
+    // A resolved non-strict promise must never create a SUCCESS audit for either
+    // failed attempt; query the persisted state rather than trusting the return value.
+    const falseSuccessAudits = await pool.query<{ count: string }>(
+      "SELECT count(*)::text AS count FROM ops.ingestion_runs WHERE scope->>'endpointCode'=$1 AND status='SUCCESS'",
+      [failingEndpointCode],
+    );
+    assert.equal(falseSuccessAudits.rows[0]?.count, '0');
     // Both failed attempts must remain free of financial observations, not only archives.
     const allFailedRecords = await pool.query<{ count: string }>(
       'SELECT count(*)::text AS count FROM market.raw_records WHERE endpoint_code=$1',
