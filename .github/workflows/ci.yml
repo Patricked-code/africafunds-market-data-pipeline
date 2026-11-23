@@ -8,6 +8,7 @@ on:
 
 permissions:
   contents: read
+  pull-requests: read
 
 concurrency:
   group: ci-${{ github.workflow }}-${{ github.ref }}
@@ -54,6 +55,10 @@ jobs:
         run: npm run test:ci
       - name: Governed auto-merge policy regression tests
         run: node --test test/governed-native-automerge.test.mjs
+      - name: Required governed PR HEAD scope check
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: node scripts/ci/validate-governed-head.mjs
       - name: S1 deployment safety and shell syntax
         run: |
           bash -n deploy/s1/preflight.sh deploy/s1/deploy.sh deploy/s1/rollback.sh
