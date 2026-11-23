@@ -1,5 +1,17 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-23 — PR #36 : absence de faux audit SUCCESS sur deux échecs non stricts (lots 4/11)
+
+- RECONCILIATION : dépôt private, PR #1 merged ; PR #36 OPEN/Draft, base main `73256f48d81d38ce8ff6f51be9e024b25cf5dadb`, HEAD initial `4714904c83177cbc0d218b3181eb3154cdc18552`. AGENTS.md, docs/15_AUTONOMOUS_AGENT_EXECUTION.md, journal actuel et checkpoint 2026-11-06 consultés ; PR et issues ouvertes recherchées. PR #22/#25/#26/#35 et autres branches concurrentes non modifiées.
+- TEST_EVIDENCE : sur HEAD initial, [CI run 45195289642](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45195289642) = completed/failure, job validate 137763988912 sans steps/logs_url ; [Docker run 45195289725](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45195289725) = completed/failure, job 137763988826 sans steps/logs_url. Cause racine non déterminée, aucun test applicatif PASS attesté.
+- ACTION_CODE : commit [93043b93c4a9d2c228a4cb12ce9d7b6c17faaa3a](https://github.com/Patricked-code/africafunds-market-data-pipeline/commit/93043b93c4a9d2c228a4cb12ce9d7b6c17faaa3a) dans test/integration/ingestion-html-csv.test.ts : après deux ingestions synthétiques HTTP 404 en mode non strict, assertion SQL explicite qu'aucun audit `ops.ingestion_runs` du endpoint échoué ne porte `SUCCESS`. Test additif, sans modification du moteur ni des données officielles.
+- VALIDATION : commit créé ; tests locaux NOT_RUN ; CI sur le nouveau HEAD NON ATTESTÉ ; revue indépendante absente. Ne pas déduire un échec de ce test des runs antérieurs.
+- BLOCK_REASON : GitHub Actions CI et Docker en failure sans étapes ni journaux accessibles ; diagnostic pré-job administratif/check-run indisponible ; revue et gates de fusion manquants. Couverture des sources, adaptateurs, historiques et recette #13–#17 non certifiée.
+- NEXT_ACTION : vérifier CI/Docker sur le HEAD exact issu de cette entrée ; obtenir annotations/check-run et message d'allocation runner/quota/facturation depuis GitHub Actions, corriger uniquement la cause prouvée, exécuter les tests PostgreSQL et demander revue indépendante. Poursuivre une tâche indépendante uniquement après claim/réconciliation ; ne pas fusionner, ne pas déployer S1.
+- ROLLBACK : revert ciblé du commit test 93043b93 et de cette entrée sur la branche Draft ; aucun changement main, secret, source officielle ou runtime.
+
+---
+
 ## 2026-11-23 — PR #36 : garde de non-persistance après deux échecs non stricts (lots 4/11)
 
 - RECONCILIATION : PR #1 merged, PR #36 OPEN/Draft, base main 73256f48d81d38ce8ff6f51be9e024b25cf5dadb, HEAD initial 75584e21ab628f8d70a925b6ae88f1ecf5db8867 ; AGENTS.md, docs/15_AUTONOMOUS_AGENT_EXECUTION.md, journal et checkpoint 2026-11-06 relus via GitHub ; PR/issues ouvertes consultées ; dépôt private. Aucune modification de PR concurrente.
