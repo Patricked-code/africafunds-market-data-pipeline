@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { evaluateEnrollment, isExplicitRevocation, normalizeActiveRulesetPolicy, isSensitiveChangePath, checkPullRequestFileScope, resolveTrustedPrSignal, evaluateRequiredScopeGate } from '../scripts/ci/governed-native-automerge.mjs';
+import { evaluateEnrollment, isExplicitRevocation, normalizeActiveRulesetPolicy, isSensitiveChangePath, checkPullRequestFileScope, resolveTrustedPrSignal, evaluateRequiredScopeGate, isTerminalPullRequest } from '../scripts/ci/governed-native-automerge.mjs';
 
 function fixture() {
   return {
@@ -389,4 +389,25 @@ test('stacked PR targets another feature branch and retains ordinary CI validati
   } finally {
     globalThis.fetch = fetchBefore;
   }
+});
+
+test('native auto-merge ignores a PR already merged after the first CI completes', () => {
+  assert.equal(isTerminalPullRequest({
+    state: 'closed', merged: true,
+    auto_merge: { merge_method: 'squash', enabled_by: { login: 'github-actions[bot]' } }
+  }), true);
+});
+test('native auto-merge ignores a closed PR retaining enrollment metadata', () => {
+  assert.equal(isTerminalPullRequest({
+    state: 'closed', merged: false, auto_merge: { merge_method: 'squash' }
+  }), true);
+});
+test('native auto-merge keeps an open PR eligible for rechecks', () => {
+  assert.equal(isTerminalPullRequest({
+    state: 'open', merged: false, auto_merge: { merge_method: 'squash' }
+  }), false);
+});
+test('native auto-merge fails closed for missing PR metadata', () => {
+  assert.equal(isTerminalPullRequest(null), true);
+  assert.equal(isTerminalPullRequest({}), true);
 });
