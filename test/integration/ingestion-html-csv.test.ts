@@ -255,6 +255,16 @@ test('HTML index -> CSV child -> SHA archive -> PostgreSQL -> SUCCESS; failed ch
       [failingEndpointCode],
     );
     assert.equal(allFailedNonStrict.rows[0]?.status, 'FAILED');
+    assert.ok(allFailedNonStrict.rows[0]?.ingestion_run_id);
+    // Non-strict FAILED must not be mistaken for a successful run, even when
+    // no exception propagates to the caller. Verify its persisted audit record.
+    const failedAudit = await pool.query<{ status: string; error_message: string | null }>(
+      'SELECT status, error_message FROM ops.ingestion_runs WHERE ingestion_run_id=$1',
+      [allFailedNonStrict.rows[0]?.ingestion_run_id],
+    );
+    assert.equal(failedAudit.rowCount, 1);
+    assert.equal(failedAudit.rows[0]?.status, 'FAILED');
+    assert.equal(failedAudit.rows[0]?.error_message, null);
     assert.deepEqual(
       [allFailedNonStrict.rows[0]?.summary.endpoints, allFailedNonStrict.rows[0]?.summary.success, allFailedNonStrict.rows[0]?.summary.failed],
       [1, 0, 1],
