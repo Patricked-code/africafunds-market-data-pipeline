@@ -108,6 +108,19 @@ Utiliser ce fichier pour les décisions durables. Ne pas supprimer les anciennes
 - Conséquences : l'issue #3 passe d'un projet de protection GitHub à un registre historique de décision et de risques, sans masquer que les contrôles serveur restent non enforced. Les gates de production S1 de l'ADR-002 restent pleinement applicables ; aucun déploiement implicite.
 - Remplace / remplacée par : supplanter uniquement les exigences antérieures de **réactivation obligatoire de la protection GitHub** ; ne remplace pas ADR-002 ni les tests, revues de différences et exigences métier.
 
+## ADR-015 — Auto-fusion native GitHub soumise aux protections vérifiées
+
+- **Date :** 2026-11-23
+- **Statut :** ACCEPTED pour la conception et la préparation du code ; activation runtime **BLOCKED** jusqu'à la configuration et aux vérifications GitHub.
+- **Contexte vérifié :** dépôt PUBLIC, branche main HEAD `73256f48d81d38ce8ff6f51be9e024b25cf5dadb` avec `protected=false`, `GET /rulesets=[]`, dépôt `allow_auto_merge=false`, PR #36 Draft sans revue. La prémisse historique « dépôt privé » de l'ADR-014 est désormais obsolète, mais l'historique reste conservé.
+- **Décision :** réutiliser les CI GitHub et **l'auto-merge natif GitHub**, sans merger par API directe, ni GitHub App de contournement, ni orchestrateur indépendant. Un workflow de confiance depuis main peut inscrire une PR interne, non Draft, portant le label `automerge-eligible` dans l'auto-merge **uniquement après vérification** d'une protection effective de main, d'au moins une revue requise, des approbations obsolètes invalidées, des fils résolus, du check `validate` exigé et de l'application aux administrateurs.
+- **Revue indépendante :** aucun compte/agent de revue indépendant n'est attesté à cette date. Le mécanisme ne doit ni s'auto-approuver, ni inventer une revue, ni réduire le nombre de revues requises ; l'absence de relecteur reste BLOCKED.
+- **Portée :** autorisation de préparer les tests, le script de vérification et le workflow en PR dédiée issue #3/#9 ; **pas d'autorisation implicite de merger cette PR ni les PR fonctionnelles**, de modifier les paramètres admin à l'aveugle ou de déployer S1.
+- **Préconditions de fonctionnement :** configurer une fois les protections réelles et `Allow auto-merge` via administration GitHub ; fusionner la PR seulement après ses propres gates ; disposer d'une identité distincte pour les revues et d'une vérification de compatibilité GitHub_TOKEN/GraphQL. Aucun coût additionnel autorisé.
+- **Rétrocompatibilité :** ne pas modifier le scheduler métier, les 14 lots, les 44 sources, les bases ou le circuit de déploiement ; aucun secret ajouté.
+- **Vérification requise :** CI du SHA exact, vérification des événements de non-éligibilité (SKIP sans fusion), revue indépendante, preuve d'enrôlement puis fusion native d'une PR pilote après gates ; contrôle `main` et absence de bypass.
+- **Réversibilité :** désactiver le workflow ou le label, ou `Allow auto-merge` ; ne jamais relâcher les protections afin de provoquer une fusion.
+
 ## Modèle d’entrée
 
 ```markdown
