@@ -13,7 +13,9 @@ on:
     types: [created]
 
 permissions:
-  contents: read
+  # GitHub GraphQL enablePullRequestAutoMerge requires both Contents and PR write.
+  # This token is used only by trusted main code; main is protected by GitHub ruleset.
+  contents: write
   pull-requests: write
 
 concurrency:
