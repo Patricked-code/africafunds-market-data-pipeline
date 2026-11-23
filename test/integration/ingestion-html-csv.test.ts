@@ -269,6 +269,23 @@ test('HTML index -> CSV child -> SHA archive -> PostgreSQL -> SUCCESS; failed ch
       [allFailedNonStrict.rows[0]?.summary.endpoints, allFailedNonStrict.rows[0]?.summary.success, allFailedNonStrict.rows[0]?.summary.failed],
       [1, 0, 1],
     );
+    // A second non-strict all-failed attempt must create a distinct FAILED audit
+    // run rather than reusing the prior run or manufacturing a SUCCESS.
+    await runIngestion({ endpointCode: failingEndpointCode, failOnEndpointError: false });
+    const failedAttempts = await pool.query<{
+      ingestion_run_id: string;
+      status: string;
+      summary: { endpoints: number; success: number; failed: number };
+    }>(
+      "SELECT ingestion_run_id, status, summary FROM ops.ingestion_runs WHERE scope->>'endpointCode'=$1 ORDER BY started_at DESC",
+      [failingEndpointCode],
+    );
+    assert.equal(failedAttempts.rowCount, 2);
+    assert.notEqual(failedAttempts.rows[0]?.ingestion_run_id, failedAttempts.rows[1]?.ingestion_run_id);
+    for (const attempt of failedAttempts.rows) {
+      assert.equal(attempt.status, 'FAILED');
+      assert.deepEqual([attempt.summary.endpoints, attempt.summary.success, attempt.summary.failed], [1, 0, 1]);
+    }
     const allFailedArtifacts = await pool.query<{ count: string }>(
       'SELECT count(*)::text AS count FROM source.raw_artifacts WHERE endpoint_code=$1',
       [failingEndpointCode],
