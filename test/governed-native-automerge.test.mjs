@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { evaluateEnrollment, isExplicitRevocation } from '../scripts/ci/governed-native-automerge.mjs';
+import { evaluateEnrollment, isExplicitRevocation, normalizeActiveRulesetPolicy } from '../scripts/ci/governed-native-automerge.mjs';
 
 function fixture() {
   return {
@@ -81,3 +81,63 @@ test('removing another label does not revoke auto-merge', () => {
 test('synchronize alone is not explicit revocation', () => {
   assert.equal(isExplicitRevocation({ action: 'synchronize' }), false);
 });
+
+function rulesetFixture() {
+  return {
+    id: 123,
+    target: 'branch', enforcement: 'active', bypass_actors: [],
+    conditions: { ref_name: { include: ['refs/heads/main'], exclude: [] } },
+    rules: [
+      { type: 'deletion' }, { type: 'non_fast_forward' },
+      { type: 'pull_request', parameters: {
+        required_approving_review_count: 1,
+        dismiss_stale_reviews_on_push: true,
+        require_last_push_approval: true,
+        required_review_thread_resolution: true
+      } },
+      { type: 'required_status_checks', parameters: {
+        strict_required_status_checks_policy: true,
+        required_status_checks: [
+          { context: 'validate' },
+          { context: 'Build, boot, migrate and verify persistent PostgreSQL' }
+        ]
+      } }
+    ]
+  };
+}
+test('a fully audited active ruleset can protect main even without classic API branch protection', () => {
+  const d = fixture();
+  d.branch.protected = false;
+  d.protection = normalizeActiveRulesetPolicy(rulesetFixture());
+  assert.equal(evaluateEnrollment(d), null);
+});
+test('an unauditable ruleset bypass list must never be silently treated as empty', () => {
+  const d = fixture();
+  d.branch.protected = false;
+  const rs = rulesetFixture();
+  delete rs.bypass_actors;
+  d.protection = normalizeActiveRulesetPolicy(rs);
+  assert.match(evaluateEnrollment(d), /bypass/);
+});
+const rulesetRefusals = [
+  ['ruleset inactive', rs => { rs.enforcement = 'disabled'; }],
+  ['ruleset points to another branch', rs => { rs.conditions.ref_name.include = ['refs/heads/dev']; }],
+  ['ruleset excludes main', rs => { rs.conditions.ref_name.exclude = ['refs/heads/main']; }],
+  ['ruleset bypass actor present', rs => { rs.bypass_actors.push({ actor_type: 'RepositoryRole', actor_id: 5 }); }],
+  ['ruleset missing PR gate', rs => { rs.rules = rs.rules.filter(r => r.type !== 'pull_request'); }],
+  ['ruleset missing Docker check', rs => { rs.rules.find(r => r.type === 'required_status_checks').parameters.required_status_checks.pop(); }],
+  ['ruleset allows stale base', rs => { rs.rules.find(r => r.type === 'required_status_checks').parameters.strict_required_status_checks_policy = false; }],
+  ['ruleset does not require last-push review', rs => { rs.rules.find(r => r.type === 'pull_request').parameters.require_last_push_approval = false; }],
+  ['ruleset allows force push', rs => { rs.rules = rs.rules.filter(r => r.type !== 'non_fast_forward'); }],
+  ['ruleset allows deletion', rs => { rs.rules = rs.rules.filter(r => r.type !== 'deletion'); }]
+];
+for (const [name, change] of rulesetRefusals) {
+  test('ruleset fail closed: ' + name, () => {
+    const rs = rulesetFixture();
+    change(rs);
+    const d = fixture();
+    d.branch.protected = false;
+    d.protection = normalizeActiveRulesetPolicy(rs);
+    assert.equal(typeof evaluateEnrollment(d), 'string');
+  });
+}
