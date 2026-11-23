@@ -133,6 +133,18 @@ Utiliser ce fichier pour les décisions durables. Ne pas supprimer les anciennes
 - **Recette :** règles `main` actives et vérifiées, CI/Docker au dernier SHA, PR non Draft et éligible, test de fusion native au travers de GitHub sans intervenant, vérification checkpoint et reprise du lot suivant.
 - **Risque accepté :** sans relecteur, un défaut non couvert par les tests peut être intégré ; conserver tests, checks, sécurité de provenance et filtrage des changements sensibles.
 
+## ADR-017 — Déclenchement de fusion par workflows GitHub fiables et SHA attesté
+
+- Date : 2026-11-24.
+- Statut : ACCEPTED pour la conception ; activation pratique à tester après intégration gouvernée de PR #37.
+- Source externe vérifiée : GitHub Changelog du 2026-11-02 annonce le blocage par défaut de pull_request_target sur les dépôts PUBLIC au 2026-12-02 en l'absence de politique d'exception explicite. Référence : https://github.blog/changelog/2026-11-02-pull_request_target-blocked-by-default-december-2/
+- Décision : ne pas dépendre du déclencheur pull_request_target. Déclencher le workflow d'enrôlement natif avec workflow_run completed depuis les workflows CI et Docker déjà présents, qui s'exécutent sur les PR. Le workflow privilégié doit exister dans main, exclusivement utiliser le checkout de main et n'exécuter ni PR head, ni archive, ni artefact téléchargé depuis la PR.
+- Contrôle de provenance : accepter uniquement un événement de workflow de pull_request, completed/success, provenant du dépôt SadiaAF, portant exactement l'un des deux noms de workflows de confiance ; exiger une unique PR rattachée, sa branche main et son SHA head identique au SHA de l'exécution et au SHA de la PR relue au moment d'agir.
+- Signal de reprise ou révocation : accepter uniquement les commandes exactes /sadiaaf-automerge SHA ou /sadiaaf-revoke-automerge SHA en commentaire de PR par OWNER/MEMBER/COLLABORATOR, jamais un commentaire anonyme, ni un SHA obsolète. Le label automerge-eligible reste une condition obligatoire et ne constitue pas une autorisation pour les chemins sensibles.
+- Révocation : un retrait de label, sans commande d'annulation, ne réveille pas immédiatement workflow_run. L'exécuteur propriétaire doit donc émettre la commande SHA-bound de révocation avant toute suppression de label sur une PR déjà enrôlée, ou désactiver l'auto-merge natif dans GitHub. Ne jamais promettre une révocation événementielle automatique non implémentée.
+- Gouvernance : seulement PR ordinaires sans chemins sensibles, CI et Docker statutaires stricts, protection main, approbations universelles à zéro selon ADR-016, pas de nouveau scheduler, secret, PAT admin, second orchestrateur, déploiement S1 ou dépense.
+- Condition de DONE : CI et Docker sur le HEAD exact de PR #37, fusion de cette PR de gouvernance sous autorisation du propriétaire, vérification de l'événement workflow_run et du token réel sur main, preuve ENROLLED/SKIPPED/REVOKED puis pilote de PR ordinaire fusionnée par GitHub sans bypass. Aucune annonce de 24/7 sans exécuteur réel attesté.
+
 ## Modèle d’entrée
 
 ```markdown
