@@ -1,5 +1,17 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-23 — PR #36 : conserver les trois tentatives PARTIAL distinctes (lots 4/11)
+
+- RECONCILIATION : AGENTS.md, docs/15_AUTONOMOUS_AGENT_EXECUTION.md, journal et docs/CONTINUITY_CHECKPOINT_2026-11-06.md relus sur GitHub ; recherches des 12 issues ouvertes et PR concurrentes ; aucun changement main, S1, secrets ou branches concurrentes.
+- TEST_EVIDENCE HEAD précédent : `98d8a824c84690728058fb21bbcbe6a707a58482` ; [CI 45095619909](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45095619909) et [Docker 45095619921](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45095619921) retournés completed/success pour ce commit seulement.
+- CODE/TEST : commit [d96283af](https://github.com/Patricked-code/africafunds-market-data-pipeline/commit/d96283afc4c727cf6ce2dfca74e2878a9d0c7de1) ; `test/integration/ingestion-html-csv.test.ts` conserve désormais la deuxième tentative stricte PARTIAL jusqu'à la fin du scénario et vérifie trois identifiants de runs distincts (strict, strict répété, non strict), trois lignes PARTIAL et nettoyage par UUID. Auparavant, le deuxième run était supprimé avant l'assertion finale, limitant la vérification à deux runs. Fixtures synthétiques, aucun appel officiel.
+- TEST_EVIDENCE nouveau HEAD : tests locaux NOT_RUN ; CI/Docker exact-HEAD après les commits de cette entrée NOT_YET_ATTESTED. Ne pas transférer les succès précédents.
+- BLOCK_REASON : validation CI exact-HEAD et revue indépendante #36 non attestées ; qualifications officielles #13/#14, normalisation #15 et recettes de données réelles #17 non certifiées.
+- NEXT_ACTION : vérifier les nouveaux runs CI/Docker sur HEAD final de #36 ; corriger toute anomalie ; obtenir revue indépendante, sans fusion implicite. Ensuite sélectionner un travail indépendant des lots 0–13 après réconciliation des claims et contrats des sources.
+- ROLLBACK : revert ciblé du commit de test et de cette entrée sur branche Draft ; aucune migration ni opération production.
+
+---
+
 ## 2026-11-23 — Reprise PR #36 : isolation des runs PARTIAL strict/non-strict
 
 - Branche : `fix/ingestion-false-success-20261122` ; PR #36 Draft ; lot 4/11, issue #14, sans toucher aux PR concurrentes #22/#25/#26/#35.
