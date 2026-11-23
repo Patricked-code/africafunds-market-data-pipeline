@@ -1,5 +1,17 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-23 — PR #36 : CI #671 et Docker #538 échoués, suivi issue #8 (lots 4/11)
+
+- RECONCILIATION : PR #1 merged ; AGENTS.md, docs/15_AUTONOMOUS_AGENT_EXECUTION.md, présent journal et docs/CONTINUITY_CHECKPOINT_2026-11-06.md consultés ; recherche des PR/issues ouvertes ; dépôt privé selon get_repo. Branche Draft #36 conservée.
+- TEST_EVIDENCE : sur commit `369bc6dbffd7ebe10a1e818d43febab025c81695`, [CI #671 / 45158263775](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45158263775) et [Docker #538 / 45158263830](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45158263830) `completed/failure`. Jobs 137636683518 et 137636683973 retournés `steps=null`, `logs_url=null`. Aucun test local exécuté ; nouveau test PostgreSQL non validé.
+- ACTION : escalade factuelle dans [issue #8 commentaire 7099903998](https://github.com/Patricked-code/africafunds-market-data-pipeline/issues/8#issuecomment-7099903998), sans relance aveugle, sans modification du code ni autre branche.
+- BLOCK_REASON : CI et Docker en échec sans trace d'étapes accessible ; cause inconnue, revue indépendante et gates de fusion non attestés. Ne pas attribuer les échecs au code sans preuve.
+- NEXT_ACTION : obtenir annotations/check-runs et message d'allocation runner depuis Actions et paramètres admin/quota/facturation ; corriger seulement le défaut démontré et revalider SHA exact. Puis poursuivre lot indépendant après contrôle des claims ; aucune fusion ni S1.
+- ROLLBACK : revert de cette entrée documentaire uniquement sur branche Draft.
+
+---
+
+
 ## 2026-11-23 — PR #36 : régression non-strict FAILED et investigation CI #669 / Docker #536 (lots 4/11)
 
 - RECONCILIATION : PR #1 merged ; AGENTS.md, contrat docs/15, checkpoint 2026-11-06 et présent journal relus sur main/branche #36. PR/issues ouvertes consultées ; branche #36 Draft, HEAD de départ c4d52f4537947d521500aff2642a690a0f617874. Dépôt retourné private ; aucune modification de visibilité.
