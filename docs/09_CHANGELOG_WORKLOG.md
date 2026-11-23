@@ -1,5 +1,17 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-23 — PR #36 : réexécution FAILED non stricte, deux audits distincts (lots 4/11)
+
+- RECONCILIATION : AGENTS.md, docs/15_AUTONOMOUS_AGENT_EXECUTION.md, journal courant et checkpoint 2026-11-06 relus via GitHub ; PR/issues ouvertes recherchées ; PR #36 OPEN/Draft. PR #1 documentaire fusionnée d'après réconciliation précédente, sans réouverture. Aucun travail sur les PR concurrentes.
+- TEST_EVIDENCE : sur HEAD précédent `c4420a5d5390f00cdd87c532e031c78d890c6171`, [CI #673 / 45176352842](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45176352842) et [Docker #540 / 45176353722](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45176353722) = completed/failure ; jobs 137698497708 et 137698500318, steps/logs_url null. Aucune exécution de test applicatif prouvée, cause racine non établie.
+- ACTION_CODE : commit [af21b5855c4f5a86ffc1fcc88e290802fcfbcd62](https://github.com/Patricked-code/africafunds-market-data-pipeline/commit/af21b5855c4f5a86ffc1fcc88e290802fcfbcd62) sur test/integration/ingestion-html-csv.test.ts : seconde ingestion HTTP 404 synthétique en mode non strict, vérification de deux UUID distincts, deux statuts FAILED et compteurs [1,0,1] pour chaque tentative. Préserve la vérification d'absence d'archive et le nettoyage ciblé existants. Aucun changement du moteur, des sources officielles, du schéma, des secrets ou de main.
+- VALIDATION : test ajouté, NOT_RUN localement ; CI du nouveau HEAD non attestée. Ce test reste une hypothèse vérifiable, pas une recette PASS.
+- BLOCK_REASON : GitHub Actions CI/Docker en échec avant étapes accessibles, origine inconnue ; revue indépendante et gates de fusion non attestés. Couverture des marchés et historique réel #13–#17 non certifiés.
+- NEXT_ACTION : contrôler les runs sur le HEAD documentaire issu de cette entrée ; obtenir annotations/check-runs et diagnostic administratif Actions (runner/quota/facturation), corriger seulement la cause démontrée, exécuter les tests PostgreSQL et obtenir revue indépendante. En parallèle choisir une tâche indépendante des lots 0–13 après claim vérifié. Aucune fusion, aucun S1.
+- ROLLBACK : revert ciblé du commit test af21b585 et de cette entrée sur la branche Draft.
+
+---
+
 ## 2026-11-23 — PR #36 : identité audit FAILED non strict et CI toujours bloquée (lots 4/11)
 
 - RECONCILIATION : PR #36 OPEN/Draft, HEAD précédent bf8bc3d13caecbc521bdaa84862c9537b9bd3fb8 ; AGENTS.md, docs/15_AUTONOMOUS_AGENT_EXECUTION.md, checkpoint historique et journal relus ; PR/issues ouvertes recherchées ; dépôt privé. PR #1 déjà fusionnée.
