@@ -1,5 +1,13 @@
 # 06 — État réel et écarts
 
+## 2026-11-24 — Lot 11 : intégration automatique native démontrée sur première PR pilote
+
+- **PROUVÉ** : PR #37 fusionnée dans main, squash ed78d253fbce9b5f94b9ef4d9a38803c6b63d417, CI #733 SUCCESS, Docker #597 SUCCESS, 4/4 fils résolus ; ruleset GitHub #27937019, approvals ordinaires 0 et checks validate/Docker obligatoires préservés.
+- **PREMIER PILOTE E2E DU MERGE NATIF** : PR #38 READY, seul docs/09, label automerge-eligible ; CI #735 et Docker #599 SUCCESS ; workflow_run auto-merge #5 SUCCESS depuis code main ; GitHub API auto_merge enabled_by github-actions[bot] puis PR #38 merged=true avec SHA ffdf04a6fcb534fa1c807cafb867d9de998320d2. Aucune fusion directe de la PR #38 effectuée par le connecteur.
+- **RESTE À PROUVER** : second cycle pilote de la mise à jour documentaire présente ; recrutement/installation réelle d'un exécuteur codeur auto-géré si déjà disponible, 2 tâches de développement distinctes enchaînées, claims atomiques inter-agent, retour après panne, gestion CI rouge et licences/données sources ; aucun agent 24h/24 ni plateforme S1 en production ne sont certifiés par la recette GitHub.
+- **RISQUES** : l'auto-merge natif doit rester limité aux PR internes non sensibles qualifiées, SHA exact, workflow_run authentique, diffusion du label par propriétaire ; les PR sensibles et les opérations S1 relèvent des autorisations gouvernées.
+- **NEXT_ACTION** : valider cette seconde PR documentaire et le mécanisme de merge natif via CI/Docker ; puis poursuivre PR métier #36, les six chantiers #5/#13–#17 et les 14 lots selon dépendances et gates, sans refaire GitHub ruleset ni créer de seconde autorité.
+
 ## 2026-11-23 — Lot 11 : sécurisation de l'admission auto-merge, protections et CI partagée
 
 - **État GitHub actuel vérifié** : dépôt public, `main=73256f48d81d38ce8ff6f51be9e024b25cf5dadb`, protected=true, ruleset #27937019 ACTIF, zéro revue obligatoire, `validate` et Docker/PostgreSQL requis strictement, `allow_auto_merge=true`. Les anciens diagnostics `main` non protégée / auto-merge désactivé sont historiques et remplacés.

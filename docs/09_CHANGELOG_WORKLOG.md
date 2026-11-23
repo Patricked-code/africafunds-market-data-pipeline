@@ -1,5 +1,17 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-24 — RECETTE PILOTE AUTO-MERGE RÉUSSIE : premier cycle de GitHub natif
+
+- **PR #37 intégrée, preuve de branche** : GitHub `merged=true` sur PR #37 après CI #733 et Docker #597 `SUCCESS`, les quatre conversations résolues, fusion SQUASH `ed78d253fbce9b5f94b9ef4d9a38803c6b63d417`, ruleset #27937019 maintenu actif.
+- **PR pilote #38** : `docs/09_CHANGELOG_WORKLOG.md` seul fichier modifié, HEAD `7abe646d48032e8c5f4612b5970e03d9a121ec62`, PR interne READY avec label `automerge-eligible` posé après vérification de l'inventaire des fichiers.
+- **Preuves du mécanisme autonome** : [Docker #599](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45288844292) `completed/success` a déclenché [workflow GitHub auto-merge #5](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45289103419) `completed/success` via `workflow_run` sur `main`. Lecture API avant fusion : `auto_merge.merge_method=squash`, `enabled_by=github-actions[bot]`. Après [CI #735](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45288844297) `SUCCESS` : PR #38 `merged=true`, commit SQUASH `ffdf04a6fcb534fa1c807cafb867d9de998320d2`, `main` protégée avancée sur ce SHA. Aucun merge manuel de PR #38.
+- **SECOND CYCLE DE VALIDATION NON SENSIBLE (ce présent changement)** : mise à jour additive de `docs/09_CHANGELOG_WORKLOG.md` et `docs/06_CURRENT_STATUS_AND_GAPS.md` pour distinguer tests de fusion native réellement obtenus de la cible « agent codeur 24h/24 ». Cette branche documentaire doit être examinée, labellisée `automerge-eligible` seulement si le diff est vérifié, puis soumise aux checks stricts et à un nouvel enrôlement natif GitHub. Aucun changement métier, SQL, workflow, secrets ou S1.
+- **STATUT RÉEL** : la première fusion GitHub native entièrement gouvernée est réussie. Cela ne prouve pas encore l'auto-sélection, le codage autonome, le claim/lease/reprise crash de plusieurs unités de développement ni l'absence de tous les problèmes financiers des 11 marchés.
+- **BLOCK_REASON** : maturité codeur autonome permanent et preuves multi-agent/anti-collision non attestées ; 14 lots et 6 chantiers officiels non finalisés ; production S1 bloquée par les gates indépendants.
+- **NEXT_ACTION** : valider et intégrer la seconde PR documentaire par le mécanisme natif sans merge manuel ; rapporter ses preuves dans issue #9 ; reprendre la qualification ciblée des PR métier existantes (notamment #36), corriger les incompatibilités sans collision, achever les six chantiers de données (#5/#13-#17), sécurité, méthodologies/recettes financières puis staging et production S1 uniquement sous gates.
+
+---
+
 ## 2026-11-24 — PR pilote — recette effective de l'auto-merge natif (lot 11)
 
 - **OBJET** : essai non sensible et traçable d'intégration native GitHub à partir du mécanisme désormais installé dans main. Cette PR ne modifie que le journal canonique docs/09_CHANGELOG_WORKLOG.md et n'a aucun impact sur la collecte, les données, la facturation, les secrets ou S1.
