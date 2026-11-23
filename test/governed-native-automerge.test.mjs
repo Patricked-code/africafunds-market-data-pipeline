@@ -10,8 +10,12 @@ function fixture() {
     },
     branch: { name: 'main', protected: true },
     protection: {
-      requiresApprovingReviews: true,
-      requiredApprovingReviewCount: 1,
+      requiresPullRequest: true,
+      requiredApprovingReviewCount: 0,
+      hasRequiredReviewers: false,
+      requiresCodeOwnerReview: false,
+      requiresExtraUnattributedApproval: false,
+      requiresLastPushApproval: false,
       requiresStatusChecks: true,
       requiredStatusCheckContexts: ['validate', 'Build, boot, migrate and verify persistent PostgreSQL'],
       requiresStrictStatusChecks: true,
@@ -45,13 +49,16 @@ const refusals = [
   ['repo identity mismatch', d => { d.repository.full_name = 'other/repo'; }],
   ['unprotected main', d => { d.branch.protected = false; }],
   ['missing classic branch rule', d => { d.protection = null; }],
-  ['no review policy', d => { d.protection.requiresApprovingReviews = false; }],
-  ['zero required reviews', d => { d.protection.requiredApprovingReviewCount = 0; }],
+  ['no PR requirement', d => { d.protection.requiresPullRequest = false; }],
+  ['human approvals still required', d => { d.protection.requiredApprovingReviewCount = 1; }],
+  ['required reviewer teams present', d => { d.protection.hasRequiredReviewers = true; }],
+  ['CODEOWNERS review required', d => { d.protection.requiresCodeOwnerReview = true; }],
+  ['extra review required', d => { d.protection.requiresExtraUnattributedApproval = true; }],
+  ['latest push approval required', d => { d.protection.requiresLastPushApproval = true; }],
   ['non-strict stale base branch', d => { d.protection.requiresStrictStatusChecks = false; }],
   ['missing Docker smoke check', d => { d.protection.requiredStatusCheckContexts = ['validate']; }],
   ['no status-check enforcement', d => { d.protection.requiresStatusChecks = false; }],
   ['missing mandatory validate check', d => { d.protection.requiredStatusCheckContexts = ['lint']; }],
-  ['stale reviews permitted', d => { d.protection.dismissesStaleReviews = false; }],
   ['unresolved threads permitted', d => { d.protection.requiresConversationResolution = false; }],
   ['admin bypass', d => { d.protection.isAdminEnforced = false; }],
   ['draft PR', d => { d.pullRequest.draft = true; }],
@@ -85,14 +92,17 @@ test('synchronize alone is not explicit revocation', () => {
 function rulesetFixture() {
   return {
     id: 123,
-    target: 'branch', enforcement: 'active', bypass_actors: [],
+    target: 'branch', enforcement: 'active', bypass_actors: [], current_user_can_bypass: 'never',
     conditions: { ref_name: { include: ['refs/heads/main'], exclude: [] } },
     rules: [
       { type: 'deletion' }, { type: 'non_fast_forward' },
       { type: 'pull_request', parameters: {
-        required_approving_review_count: 1,
-        dismiss_stale_reviews_on_push: true,
-        require_last_push_approval: true,
+        required_approving_review_count: 0,
+        required_reviewers: [],
+        require_code_owner_review: false,
+        require_extra_approval_for_unattributed_changes: false,
+        dismiss_stale_reviews_on_push: false,
+        require_last_push_approval: false,
         required_review_thread_resolution: true
       } },
       { type: 'required_status_checks', parameters: {
@@ -116,6 +126,7 @@ test('an unauditable ruleset bypass list must never be silently treated as empty
   d.branch.protected = false;
   const rs = rulesetFixture();
   delete rs.bypass_actors;
+  delete rs.current_user_can_bypass;
   d.protection = normalizeActiveRulesetPolicy(rs);
   assert.match(evaluateEnrollment(d), /bypass/);
 });
@@ -127,7 +138,12 @@ const rulesetRefusals = [
   ['ruleset missing PR gate', rs => { rs.rules = rs.rules.filter(r => r.type !== 'pull_request'); }],
   ['ruleset missing Docker check', rs => { rs.rules.find(r => r.type === 'required_status_checks').parameters.required_status_checks.pop(); }],
   ['ruleset allows stale base', rs => { rs.rules.find(r => r.type === 'required_status_checks').parameters.strict_required_status_checks_policy = false; }],
-  ['ruleset does not require last-push review', rs => { rs.rules.find(r => r.type === 'pull_request').parameters.require_last_push_approval = false; }],
+  ['ruleset still requires last-push review', rs => { rs.rules.find(r => r.type === 'pull_request').parameters.require_last_push_approval = true; }],
+  ['ruleset still requires an approval', rs => { rs.rules.find(r => r.type === 'pull_request').parameters.required_approving_review_count = 1; }],
+  ['ruleset requires CODEOWNERS', rs => { rs.rules.find(r => r.type === 'pull_request').parameters.require_code_owner_review = true; }],
+  ['ruleset requires extra approval', rs => { rs.rules.find(r => r.type === 'pull_request').parameters.require_extra_approval_for_unattributed_changes = true; }],
+  ['ruleset has required reviewers', rs => { rs.rules.find(r => r.type === 'pull_request').parameters.required_reviewers = [{ reviewer: { type: 'Team', id: 1 }, file_patterns: ['*'], minimum_approvals: 1 }]; }],
+  ['ruleset token can bypass', rs => { rs.current_user_can_bypass = 'always'; }],
   ['ruleset allows force push', rs => { rs.rules = rs.rules.filter(r => r.type !== 'non_fast_forward'); }],
   ['ruleset allows deletion', rs => { rs.rules = rs.rules.filter(r => r.type !== 'deletion'); }]
 ];
@@ -141,3 +157,12 @@ for (const [name, change] of rulesetRefusals) {
     assert.equal(typeof evaluateEnrollment(d), 'string');
   });
 }
+
+test('a ruleset can hide the bypass list only if it explicitly proves this token cannot bypass', () => {
+  const d = fixture();
+  d.branch.protected = false;
+  const rs = rulesetFixture();
+  delete rs.bypass_actors;
+  d.protection = normalizeActiveRulesetPolicy(rs);
+  assert.equal(evaluateEnrollment(d), null);
+});
