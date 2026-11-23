@@ -270,3 +270,13 @@ Vérification signal : événement completed/success provenant de CI ou Docker d
 En cas de changement de label après la conclusion des jobs, le seul signal immédiat explicite est un commentaire de PR par une identité OWNER/MEMBER/COLLABORATOR avec commande exacte /sadiaaf-automerge SHA ou /sadiaaf-revoke-automerge SHA. Ce signal est strictement SHA-bound et ne peut pas élargir les autorisations de fusion. Le retrait du label SEUL ne déclenche plus immédiatement la révocation : l'agent propriétaire doit poster la commande de révocation avant de retirer le label, ou utiliser Disable auto-merge dans GitHub. Ne pas prétendre l'ancienne révocation via unlabeled encore active.
 
 Au moment de la rédaction : seul le CODE et ses tests sont candidats sur la PR #37, encore non fusionnée. L'intégration dans main, la validation effective du token et une fusion auto-merge de PR pilote sous les deux checks stricts restent à prouver et à conserver dans docs/09.
+
+### 13.13.2 — Poussées après enrôlement, validation requise et résolution des fils (ADR-018)
+
+Le job obligatoire validate comporte désormais une vérification lecture seule de l'inventaire COMPLET des fichiers du HEAD de PR via API GitHub. Elle refuse un SHA si les chemins sont sensibles et si la PR porte encore automerge-eligible ou si auto_merge est déjà activé, même en cas de retrait du label. L'absence d'inventaire ou divergence HEAD bloque validate. Pour une PR sensible non enrôlée, la fusion expressément autorisée reste possible après tous les autres checks. Cela prévient le cas de poussée accidentelle sensible pendant une attente auto-merge.
+
+Le workflow d'enrôlement lit exclusivement le code main via workflow_run ; GitHub GraphQL exige, pour cet acte, contents:write et pull-requests:write sur le GITHUB_TOKEN du seul workflow de confiance. Aucun jeton n'est passé au code issu d'une PR. L'ancien fallback de protection classique était mal normalisé et a été supprimé : ruleset exact/actif/main requis, sans bypass connu.
+
+Une modification malveillante du CI par un acteur déjà autorisé à écrire reste une hypothèse de menace externe : on ne certifie pas un verrou absolu sans contrôle supplémentaire indépendant du code PR et ACL de gouvernance. Les opérations de règles de sécurité et S1 restent gouvernées, aucune revue humaine universelle pour PR ordinaires n'est réintroduite.
+
+Les trois fils de revue PR #37 (permissions de mutation, fallback classique, garde de chemin sensible après push) doivent recevoir des réponses techniques et être résolus seulement après vérification des tests et corrections. Une CI verte ne remplace pas la résolution des fils obligatoire dans le ruleset.
