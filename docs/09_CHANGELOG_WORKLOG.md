@@ -1,5 +1,18 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-23 — PR #36 : reprise des runners gratuits et CI exacte validée (lots 4/11)
+
+- RECONCILIATION : dépôt `Patricked-code/africafunds-market-data-pipeline` désormais PUBLIC (changement du propriétaire, sans action de cet agent). PR #36 OPEN/Draft, branche `fix/ingestion-false-success-20261122`, HEAD de code contrôlé `08890d744d1c88158bfcacdbf84d1cba6c12dc9c`, base `main` `73256f48d81d38ce8ff6f51be9e024b25cf5dadb`. PR concurrentes #22/#25/#26/#35 préservées. AGENTS.md, documents de cadrage obligatoires, contrat d'autonomie et worklog consultés.
+- PREUVE CI : [CI #679 run 45206967495](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45206967495) relancé après publication, job `validate` ID `137825519902` = `completed/success` ; [Docker/PostgreSQL #546 run 45206967481](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45206967481), job `137825555802` = `completed/success`. Ces preuves concernent **uniquement** le HEAD `08890d744d1c88158bfcacdbf84d1cba6c12dc9c` avant le présent commit documentaire ; aucun PASS ne doit être transféré automatiquement à un HEAD différent.
+- AUDIT PUBLICATION PARTIEL : recherche initiale de quatre termes sensibles dans le code indexé sans résultat ; absence de secret NON CERTIFIÉE : historique complet, branches, archives, artefacts, licences, scanning et droits de redistribution restent à auditer. L'issue #3 décrit historiquement une `main` non protégée et un blocage GitHub Free sur dépôt privé ; les règles effectives actuelles du dépôt public ne sont pas encore attestées.
+- REVUE : `list_pull_request_reviews` de PR #36 = `[]`, PR toujours Draft ; aucun avis indépendant ni gate de fusion attesté. Les tests synthétiques CI/Docker ne prouvent pas la couverture réelle des six adaptateurs, des 44 endpoints, ni des historiques officiels.
+- ACTION : checkpoint documentaire additif sur branche PR #36, sans modification de moteur, migration, source, secret, visibilité, serveur S1 ou `main` ; aucun merge. Tests locaux NOT_RUN ; la CI du nouveau HEAD documentaire doit être contrôlée séparément.
+- BLOCK_REASON : revue indépendante absente, protections main et audit de publication incomplets, validation exacte du HEAD après ce checkpoint encore à obtenir, classification des index HTML sans observation et licences officielles à qualifier.
+- NEXT_ACTION : vérifier les nouveaux runs CI/Docker sur le SHA de ce checkpoint, demander une revue indépendante de PR #36, vérifier protections de `main` et scanner l'historique public ; poursuivre les tâches admissibles indépendantes des lots 0–13 sans collision de PR. Ne pas fusionner ni déployer S1 sans gates.
+- ROLLBACK : revert du présent commit documentaire sur la branche PR #36 uniquement.
+
+---
+
 ## 2026-11-23 — PR #36 : absence de faux audit SUCCESS sur deux échecs non stricts (lots 4/11)
 
 - RECONCILIATION : dépôt private, PR #1 merged ; PR #36 OPEN/Draft, base main `73256f48d81d38ce8ff6f51be9e024b25cf5dadb`, HEAD initial `4714904c83177cbc0d218b3181eb3154cdc18552`. AGENTS.md, docs/15_AUTONOMOUS_AGENT_EXECUTION.md, journal actuel et checkpoint 2026-11-06 consultés ; PR et issues ouvertes recherchées. PR #22/#25/#26/#35 et autres branches concurrentes non modifiées.
