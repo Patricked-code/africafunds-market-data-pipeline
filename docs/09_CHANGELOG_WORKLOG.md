@@ -1,5 +1,16 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-24 — Lot 11 : corriger un workflow_run tardif après auto-fusion native
+
+- **RECETTE PR #38** : Docker #599 SUCCESS a déclenché workflow auto-merge #5 SUCCESS ; GitHub a enrôlé PR #38 sous github-actions[bot], CI #735 SUCCESS, GitHub a fusionné PR #38 en squash ffdf04a6fcb534fa1c807cafb867d9de998320d2. La PR #39 a ensuite réussi CI #736, Docker #600 et workflow auto-merge #9, fusion native avec SHA 8b8953c753a0b2360f15418bf902c04d89778fc7.
+- **INCIDENT POST-FUSION** : le workflow auto-merge #6 run 45289156531 a reçu un second événement workflow_run après la fusion de PR #38. GitHub REST pouvait encore présenter auto_merge activé alors que la PR était fermée ; le script a tenté GraphQL disablePullRequestAutoMerge et GitHub a répondu HTTP 200 avec erreur 'Can\'t disable auto-merge for this pull request.' Le job a échoué, sans effet négatif sur la fusion ni sur main. Cause directement confirmée par logs du job 138093162680.
+- **CORRECTIF TECHNIQUE** : branche fix/sadiaaf-automerge-post-merge-idempotency-20261124, commit a78d2a8f43b9560e76b5f74033d2da8998da13ff ; isTerminalPullRequest retourne true si état autre que open ou merged=true ; toute exécution tardive se termine SKIPPED sans mutation, AVANT toute tentative de révocation. Tests de non-régression sur open/closed/merged et données absentes, commit a7163a6e17cd9d1a0fba132ac36c7d4752a8ee0f.
+- **GOUVERNANCE** : chemin scripts/ci/** sensible ; cette PR ne reçoit PAS de label automerge-eligible et ne doit pas être fusionnée automatiquement. Fusion gouvernée en squash admise par le mandat propriétaire uniquement après CI validate et Docker/PostgreSQL exact SHA, aucune conversation non résolue, ruleset #27937019 actif, absence de collision ou de changement main incompatible. Aucun Codeur Codex/Copilot utilisé ; aucun S1.
+- **BLOCK_REASON** : correction committée mais non encore certifiée par CI sur le dernier SHA ; test runtime de non-régression après fusion à obtenir sur événement tardif de PR.
+- **NEXT_ACTION** : ouvrir la PR correction, contrôler CI/Docker exact SHA ; corriger échecs, vérifier protections/absence de conversations et intégrer sous gates gouvernées. À la reprise vérifier les deux auto-fusions #38/#39 et poursuivre l'issue #9, PR #36, six chantiers #5/#13–#17 et lots 0–13 sans collision ; autonomie codeur 24h/24 toujours non attestée.
+
+---
+
 ## 2026-11-24 — RECETTE PILOTE AUTO-MERGE RÉUSSIE : premier cycle de GitHub natif
 
 - **PR #37 intégrée, preuve de branche** : GitHub `merged=true` sur PR #37 après CI #733 et Docker #597 `SUCCESS`, les quatre conversations résolues, fusion SQUASH `ed78d253fbce9b5f94b9ef4d9a38803c6b63d417`, ruleset #27937019 maintenu actif.

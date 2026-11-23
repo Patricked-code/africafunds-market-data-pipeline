@@ -198,6 +198,14 @@ async function readAllPrFiles(api, number, changedFiles, token) {
   return files;
 }
 
+/** Merged/closed PRs can retain auto_merge metadata in REST responses.
+ * Native auto-merge is immutable once the PR has merged; late CI webhooks
+ * must be harmless and must never attempt disablePullRequestAutoMerge.
+ */
+export function isTerminalPullRequest(pr) {
+  return !pr || pr.state !== 'open' || pr.merged === true;
+}
+
 export function isExplicitRevocation(event) {
   return event?.action === 'converted_to_draft' ||
     (event?.action === 'unlabeled' && event?.label?.name === INTENT_LABEL);
@@ -244,6 +252,13 @@ export async function enrollNativeAutoMerge({ repositoryName, token, event }) {
     githubRequest(api + '/branches/main', token),
     githubRequest(api + '/pulls/' + signal.number, token)
   ]);
+  // A later successful CI may arrive AFTER the first run already merged
+  // the PR. GitHub then keeps auto_merge metadata on some closed PRs.
+  // Do not attempt to disable a completed merge (GraphQL rejects it).
+  if (isTerminalPullRequest(pullRequest)) {
+    console.log('SKIP: PR is already closed or merged; no mutation required');
+    return 'SKIPPED';
+  }
   if (pullRequest?.head?.sha !== signal.headSha) {
     console.log('SKIP: event SHA is stale relative to live PR');
     return 'SKIPPED';
