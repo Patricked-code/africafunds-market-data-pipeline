@@ -1,5 +1,20 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-23 — ADR-016 : retirer l'approbation indépendante pour les PR ordinaires, maintenir les checks
+
+- **INTENTION EXPLICITE** : le propriétaire demande de supprimer l'exigence de revues indépendantes récurrentes sur les développements SadiaAF, pour avancer avec une intégration automatique des unités admissibles ; pas de suppression des exigences S1 ou d'autorisations réservées.
+- **PRÉFLIGHT ACTUEL** : repo PUBLIC, `allow_auto_merge=true`, ruleset [#27937019](https://github.com/Patricked-code/africafunds-market-data-pipeline/rules/27937019) ACTIF sur `main`, mais `required_approving_review_count=1`, `require_last_push_approval=true`, `require_extra_approval_for_unattributed_changes=true` ; `validate` et `Build, boot, migrate and verify persistent PostgreSQL` requis, strict, `bypass_actors=[]`, suppression/force-push interdits. Aucun changement des paramètres administratifs par le connecteur GitHub disponible.
+- **CODE (PR #37)** : adaptation de `scripts/ci/governed-native-automerge.mjs` pour exiger une PR et un ruleset actif sans approbation obligatoire (`required_approving_review_count=0`), sans exigences des derniers commits, reviewers, CODEOWNERS ni approbation supplémentaire ; préservation des checks stricts et des refus de fusion directe ; `test/governed-native-automerge.test.mjs` enrichi avec scénarios qui rejettent toute revue obligatoire résiduelle et toute configuration non attestée.
+- **DOCUMENTATION** : ADR-016 ACCEPTED et contrat agents §12 modifiés additivement ; aucune autre PR de lots 0–13 modifiée.
+- **RISQUE** : un code incorrect non détecté par les tests peut être fusionné sans seconde lecture ; les opérations sensibles restent soumises à autorisation distincte et les PR doivent être explicitement qualifiées `automerge-eligible`.
+- **TESTS** : GitHub Actions a été déclenché sur la branche, mais les checks de ce dernier SHA ne sont pas encore certifiés à ce checkpoint.
+- **BLOCK_REASON** : le ruleset actuel exige encore 1 approbation ; le connecteur GitHub n'expose pas les mutations administratives nécessaires ; PR #37 encore Draft et workflow non intégré à main ; la lecture de bypass_actor par GITHUB_TOKEN du workflow n'est pas attestée.
+- **NEXT_ACTION** : le propriétaire, via GitHub CLI déjà connecté à `Patricked-code`, modifie UNIQUEMENT ruleset `27937019` (compteur 0, approbation dernier push désactivée, approbations supplémentaires/CODEOWNERS désactivées) sans supprimer PR/CI/Docker/non-fast-forward/deletion. Vérifier API GET exact et l'état des checks sur le SHA actuel ; qualifier workflow d'enrôlement et sa permission, rendre PR #37 Ready si admissible, intégrer selon règles GitHub sans bypass, tester l'auto-merge réel sur PR pilote ; reprendre les travaux des lots 0–13.
+- **ROLLBACK** : sur le ruleset, rétablir le nombre d'approbations initial et `require_last_push_approval=true` si nécessaire ; pour le code, revert des changements ciblés sur la PR. Aucune action S1.
+
+---
+
+
 ## 2026-11-23 — Administration GitHub V2 validée : main protégée et auto-merge autorisé
 
 - **OPÉRATION EFFECTUÉE PAR L'UTILISATEUR** : lancement via GitHub CLI authentifié `Patricked-code` de la configuration GitHub ruleset V2 sous confirmation explicite `CONFIGURER` ; script a retourné `SUCCESS` avec ruleset ID `27937019`.
