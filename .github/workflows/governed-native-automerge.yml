@@ -1,36 +1,47 @@
 name: SadiaAF — governed native auto-merge enrollment
 
-# Runs the trusted version from main. Never checks out or executes PR code.
-# This does NOT directly merge anything or change repository protections.
+# Trusted default-branch code. Never execute files/artifacts from a PR.
+# workflow_run bypasses GitHub's public-repo pull_request_target default block
+# scheduled for December 2, 2026.
 on:
-  pull_request_target:
-    types: [opened, reopened, synchronize, ready_for_review, labeled, unlabeled, converted_to_draft]
-  pull_request_review:
-    types: [submitted, dismissed]
+  workflow_run:
+    workflows:
+      - CI — AfricaFunds Market Data Pipeline
+      - SadiaAF — isolated Docker runtime and PostgreSQL persistence smoke
+    types: [completed]
+  issue_comment:
+    types: [created]
 
 permissions:
   contents: read
   pull-requests: write
 
 concurrency:
-  group: sadiaaf-native-automerge-${{ github.event.pull_request.number }}
+  group: sadiaaf-native-automerge-${{ github.event.workflow_run.head_sha || github.event.issue.number || github.run_id }}
   cancel-in-progress: false
 
 jobs:
   enroll-native-automerge:
     name: Governed native auto-merge eligibility
     if: >-
-      github.event.pull_request.base.ref == 'main' &&
-      github.event.pull_request.head.repo.full_name == github.repository
+      (github.event_name == 'workflow_run' &&
+       github.event.workflow_run.event == 'pull_request' &&
+       github.event.workflow_run.conclusion == 'success' &&
+       github.event.workflow_run.head_repository.full_name == github.repository) ||
+      (github.event_name == 'issue_comment' &&
+       github.event.issue.pull_request &&
+       (github.event.comment.author_association == 'OWNER' ||
+        github.event.comment.author_association == 'MEMBER' ||
+        github.event.comment.author_association == 'COLLABORATOR'))
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      - name: Checkout trusted base branch only
+      - name: Checkout trusted main only (no PR head, no artifacts)
         uses: actions/checkout@v4
         with:
           ref: main
           persist-credentials: false
-      - name: Validate prerequisites and enroll in native GitHub auto-merge
+      - name: Enroll or revoke only after policy and SHA validation
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: node scripts/ci/governed-native-automerge.mjs
