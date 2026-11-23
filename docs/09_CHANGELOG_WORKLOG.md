@@ -1,5 +1,19 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-24 — Reprise du programme des 14 lots : composant JSON sûr, chantier officiel #14
+
+- **LECTURES** : AGENTS.md ; documents maîtres 00/01/11/02/12/03/04/13/14/05/06/07/08/09/10/15 ; issues #5/#13–#17 et PR ouvertes #22/#25–#36 ; arbre `src/parsers`, ingestion actuelle, contrat des adaptateurs et test existant.
+- **BASE** : main ff23886d78f42a17656df88ab4a65d682b957833 protégée et CI #738 success. Anciennes PR fonctionnelles conservées (y compris #35 CSV, #36 ingestion) ; aucune modification de leur branche et aucun nouveau registre/orchestrateur.
+- **CHANTIER ET TRAVAIL** : issue #14, lot 4 ; branche feat/sadiaaf-json-source-admission-20261124 depuis main. Ajout isolé `src/parsers/json.ts` (commit e5fd4c8238cbf87e20b42b6c7885cf49db496814) et `test/json-document-admission.test.ts` (commit 4a9fc6a436598f3dc2103e82c26fefd8e2571a66), tests de la forme JSON admise, sécurité, tableaux ambigus, taille/colonnes, nombre unsafe et décimal potentiellement arrondi.
+- **PRINCIPES DE PRÉCISION** : des nombres décimaux JSON ne sont pas implicitement fiables pour la finance sous JSON.parse. Le nouveau parseur les refuse jusqu'à l'approbation d'un contrat lossless ; la chaîne actuelle ingest n'est pas modifiée. Aucun mapping d'une source officielle n'est inventé. Aucune disponibilité, licence ou donnée historique n'est attestée.
+- **DOCUMENTATION** : docs/06 nouveau statut PARTIAL et NEXT_ACTION ; présent worklog. Critères des lots et six chantiers sont conservés dans docs/13, docs/14 et docs/15 section 13.
+- **TESTS** : NON ENCORE CERTIFIÉS sur le HEAD du checkpoint à cet instant ; CI/Docker exact SHA seront interrogés après PR. Ne pas déclarer DONE ni HISTORY_COMPLETE.
+- **BLOCK_REASON** : qualification officielle des six adaptateurs, formats JSON/XML-SDMX/PDF, schémas témoins, mapping des dates et des champs, droits et licences ; PRs ingestion concurrentes toujours Draft.
+- **NEXT_ACTION** : ouvrir une PR ordinaire sur main, contrôler fichiers modifiés et collision, CI validate/Docker exact-SHA, qualification automerge-eligible si fail-closed et absence d'anomalies ; observer fusion native et checkpoint main, puis poursuivre les contrats source et tests d'adaptateurs #14, backfill #5 et autres lots selon dépendances.
+- **ROLLBACK** : revert de la PR ou des deux nouveaux fichiers avant toute intégration ; aucun état métier ou serveur n'est modifié.
+
+---
+
 ## 2026-11-24 — Lot 11 : corriger un workflow_run tardif après auto-fusion native
 
 - **RECETTE PR #38** : Docker #599 SUCCESS a déclenché workflow auto-merge #5 SUCCESS ; GitHub a enrôlé PR #38 sous github-actions[bot], CI #735 SUCCESS, GitHub a fusionné PR #38 en squash ffdf04a6fcb534fa1c807cafb867d9de998320d2. La PR #39 a ensuite réussi CI #736, Docker #600 et workflow auto-merge #9, fusion native avec SHA 8b8953c753a0b2360f15418bf902c04d89778fc7.
