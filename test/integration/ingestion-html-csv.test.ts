@@ -261,6 +261,26 @@ test('HTML index -> CSV child -> SHA archive -> PostgreSQL -> SUCCESS; failed ch
     );
     assert.equal(isolatedPartialRuns.rowCount, 3);
     assert.ok(isolatedPartialRuns.rows.every((row) => row.status === 'PARTIAL'));
+    // Each attempt must retain its own endpoint counters: status alone is insufficient
+    // to prove that a failed sibling was not silently counted as successful.
+    const partialSummaries = await pool.query<{
+      ingestion_run_id: string;
+      status: string;
+      summary: { endpoints: number; success: number; failed: number };
+      error_message: string | null;
+    }>(
+      'SELECT ingestion_run_id, status, summary, error_message FROM ops.ingestion_runs WHERE ingestion_run_id = ANY($1::uuid[])',
+      [[mixedRunId, repeatedMixedRunId, nonStrictRunId]],
+    );
+    assert.equal(partialSummaries.rowCount, 3);
+    for (const attempt of partialSummaries.rows) {
+      assert.equal(attempt.status, 'PARTIAL');
+      assert.deepEqual(
+        [attempt.summary.endpoints, attempt.summary.success, attempt.summary.failed],
+        [2, 1, 1],
+      );
+      assert.equal(attempt.error_message, null);
+    }
   } finally {
     globalThis.fetch = originalFetch;
     if (pool) {
