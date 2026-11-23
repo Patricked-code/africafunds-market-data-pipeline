@@ -1,5 +1,17 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-24 — PR pilote — recette effective de l'auto-merge natif (lot 11)
+
+- **OBJET** : essai non sensible et traçable d'intégration native GitHub à partir du mécanisme désormais installé dans main. Cette PR ne modifie que le journal canonique docs/09_CHANGELOG_WORKLOG.md et n'a aucun impact sur la collecte, les données, la facturation, les secrets ou S1.
+- **BASE ATTESTÉE** : main SHA ed78d253fbce9b5f94b9ef4d9a38803c6b63d417, issu de la fusion squash gouvernée de PR #37 (HEAD validé 2177c6577bc52b14e48414e876a08a66854eeaf6 ; CI #733 run 45288079821 SUCCESS ; Docker #597 run 45288079751 SUCCESS ; 4/4 fils de revue résolus). GitHub main protected, ruleset #27937019 ACTIF, 0 approbation requise, checks validate + Docker/PostgreSQL obligatoires stricts, auto-merge autorisé.
+- **WORKFLOW RÉEL INTÉGRÉ** : .github/workflows/governed-native-automerge.yml dans main, déclencheurs workflow_run success CI/Docker et commentaire SHA-bound par collaborateur autorisé ; script fail-closed refuse chemins sensibles, forks, SHA obsolètes, diff incomplet et main non protégée. Les jetons/événements réels n'étaient pas encore démontrés avant ce pilote.
+- **TEST À EFFECTUER** : créer une PR READY à partir de cette branche, ne poser le label automerge-eligible qu'après qualification exhaustive du seul fichier modifié ; exiger CI et Docker sur le SHA exact et observer un run de workflow_run de la branche main, puis l'inscription native de la PR, sa fusion par GitHub et le checkpoint importé dans main. Si non déclenché, un commentaire de PR strict /sadiaaf-automerge SHA par OWNER/COLLABORATOR peut demander un recheck, sans bypass.
+- **BLOCK_REASON À CE CHECKPOINT** : PR pilote pas encore créée à l'instant de l'écriture, CI/Docker et premier run du workflow de confiance non encore attestés. Ne pas proclamer DONE tant qu'aucune fusion native n'est observée.
+- **NEXT_ACTION** : ouvrir cette PR de lot 11, vérifier le SHA et l'inventaire complet des fichiers, qualifier et appliquer le label sans collision, laisser GitHub exécuter les checks et la fusion native. Contrôler le commit main post-merge, mettre à jour issue #9 et l'automatisation horaire existante ; poursuivre ensuite les lots 0–13 et les six chantiers de données sans second orchestrateur.
+- **LIMITES** : le test vérifie la fusion d'une PR documentaire, pas l'exécution d'un agent codeur permanent ni la qualité financière des 11 marchés ; S1 demeure séparé.
+
+---
+
 ## 2026-11-24 — PR #37 : compatibilité CI des PR empilées, quatrième fil de revue
 
 - **PREUVE AVANT NOUVEAU CORRECTIF** : PR #37 HEAD dc01a6d823ea99df55a6e807a33ef80d00a43b2e ; CI #730 run 45287547194 et Docker #594 run 45287547070 completed/success, dont le nouveau required HEAD guard en mode lecture seule sur ce SHA.
