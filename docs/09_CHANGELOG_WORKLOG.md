@@ -1,5 +1,18 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-23 — PR #36 : contrôle des compteurs pour chaque tentative PARTIAL (lots 4/11)
+
+- RECONCILIATION : PR #1 merged=true ; PR #36 OPEN/Draft sur HEAD initial `c12a579de337799af81f2e338d34b9ff05495330` ; AGENTS.md, docs/15_AUTONOMOUS_AGENT_EXECUTION.md, journal canonique et checkpoint du 06/11 relus ; recherche PR/issues et reviews #36 (aucune revue enregistrée). Les branches concurrentes restent intactes.
+- TEST_EVIDENCE HEAD initial : [CI 45100890397](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45100890397) et [Docker 45100890400](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45100890400) : completed/success pour `c12a579de337799af81f2e338d34b9ff05495330` seulement.
+- CODE/TEST : commit `c4c2c60201d182d61b85e140b83c6fb6848f933c` ; `test/integration/ingestion-html-csv.test.ts` vérifie maintenant, sur les trois UUID distincts de tentatives mixtes (strict, strict répété, non strict), le statut PARTIAL, les compteurs persistés endpoints=2/success=1/failed=1 et error_message=NULL. Cela prévient un faux PARTIAL dont les compteurs masqueraient l'échec du sibling HTTP 404. Fixtures synthétiques uniquement ; aucun appel réseau officiel.
+- TEST_EVIDENCE nouveau code : tests locaux NOT_RUN ; CI/Docker du HEAD après cette entrée NOT_YET_ATTESTED ; ne pas attribuer les succès antérieurs au nouveau code.
+- BLOCK_REASON : CI exact-HEAD du nouveau test et revue indépendante #36 non attestées ; contrats/licences #13/#14, normalisation #15 et recette officielle #17 incomplètes ; aucune autorisation S1.
+- NEXT_ACTION : contrôler CI/Docker du HEAD final, diagnostiquer/corriger tout échec, demander une revue indépendante de PR #36 ; puis sélectionner une tâche fonctionnelle indépendante des lots 0–13 après réconciliation des claims. Ne pas fusionner ni déclarer HISTORY_COMPLETE sans données réelles.
+- ROLLBACK : revert ciblé du commit `c4c2c602` et de l'entrée documentaire sur la branche Draft ; aucune migration, secret, source officielle, main ou S1 modifié.
+
+---
+
+
 ## 2026-11-23 — PR #36 : conserver les trois tentatives PARTIAL distinctes (lots 4/11)
 
 - RECONCILIATION : AGENTS.md, docs/15_AUTONOMOUS_AGENT_EXECUTION.md, journal et docs/CONTINUITY_CHECKPOINT_2026-11-06.md relus sur GitHub ; recherches des 12 issues ouvertes et PR concurrentes ; aucun changement main, S1, secrets ou branches concurrentes.
