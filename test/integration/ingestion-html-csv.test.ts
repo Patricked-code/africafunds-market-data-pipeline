@@ -248,6 +248,17 @@ test('HTML index -> CSV child -> SHA archive -> PostgreSQL -> SUCCESS; failed ch
       [mixedRunId],
     );
     assert.equal(retainedMixed.rows[0]?.status, 'PARTIAL');
+    // Non-strict execution must create its own auditable PARTIAL run, not
+    // mutate or silently reuse the earlier strict-mode attempt.
+    assert.ok(nonStrictRunId);
+    assert.ok(mixedRunId);
+    assert.notEqual(nonStrictRunId, mixedRunId);
+    const isolatedPartialRuns = await pool.query<{ ingestion_run_id: string; status: string }>(
+      'SELECT ingestion_run_id, status FROM ops.ingestion_runs WHERE ingestion_run_id = ANY($1::uuid[])',
+      [[mixedRunId, nonStrictRunId]],
+    );
+    assert.equal(isolatedPartialRuns.rowCount, 2);
+    assert.ok(isolatedPartialRuns.rows.every((row) => row.status === 'PARTIAL'));
   } finally {
     globalThis.fetch = originalFetch;
     if (pool) {
