@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { evaluateEnrollment, isExplicitRevocation, normalizeActiveRulesetPolicy } from '../scripts/ci/governed-native-automerge.mjs';
+import { evaluateEnrollment, isExplicitRevocation, normalizeActiveRulesetPolicy, isSensitiveChangePath, checkPullRequestFileScope } from '../scripts/ci/governed-native-automerge.mjs';
 
 function fixture() {
   return {
@@ -165,4 +165,92 @@ test('a ruleset can hide the bypass list only if it explicitly proves this token
   delete rs.bypass_actors;
   d.protection = normalizeActiveRulesetPolicy(rs);
   assert.equal(evaluateEnrollment(d), null);
+});
+
+
+// describePrScopeCases: an explicit label is not an authorization to change
+// security/governance/deployment/credentials, even when CI is green.
+const routinePaths = [
+  'src/parsers/csv.ts',
+  'src/jobs/ingest.ts',
+  'test/integration/ingestion-html-csv.test.ts',
+  'docs/09_CHANGELOG_WORKLOG.md',
+  'docs/06_CURRENT_STATUS_AND_GAPS.md'
+];
+for (const path of routinePaths) {
+  test('routine PR path can be considered for auto-merge: ' + path, () => {
+    assert.equal(isSensitiveChangePath(path), false);
+  });
+}
+const protectedPaths = [
+  '.github/workflows/ci.yml',
+  '.github/CODEOWNERS',
+  'deploy/s1/deploy.sh',
+  'sql/002-migration.sql',
+  'config/sources.json',
+  'config/sources/egypt.json',
+  'scripts/ci/governed-native-automerge.mjs',
+  'src/auth/session.ts',
+  'src/config/env.ts',
+  'AGENTS.md',
+  'Dockerfile',
+  'Dockerfile.production',
+  'docker-compose.yml',
+  'package.json',
+  'package-lock.json',
+  'docs/08_DECISION_LOG.md',
+  'docs/10_DEPLOYMENT_GATES.md',
+  'docs/15_AUTONOMOUS_AGENT_EXECUTION.md',
+  '.env',
+  '.env.production',
+  'scripts/credentials-init.sh',
+  'web/private-key.pem',
+  '../deploy/s1/deploy.sh',
+  '/etc/passwd',
+  'src\\jobs\\ingest.ts'
+];
+for (const path of protectedPaths) {
+  test('sensitive PR path cannot auto-merge: ' + path, () => {
+    assert.equal(isSensitiveChangePath(path), true);
+  });
+}
+test('complete routine changed-file list is eligible for path gate', () => {
+  const files = [
+    { filename: 'src/jobs/ingest.ts', status: 'modified' },
+    { filename: 'test/integration/ingestion-html-csv.test.ts', status: 'added' }
+  ];
+  assert.equal(checkPullRequestFileScope({ files, changedFiles: 2 }), null);
+});
+test('scope gate refuses missing, zero, or truncated file inventories', () => {
+  for (const [files, changedFiles] of [[null, 1], [[], 0], [[], 1], [[], 501]]) {
+    assert.equal(typeof checkPullRequestFileScope({ files, changedFiles }), 'string');
+  }
+});
+test('scope gate refuses invalid entries and repeated filenames', () => {
+  assert.equal(typeof checkPullRequestFileScope({
+    files: [{ filename: 'src/jobs/ingest.ts', status: 'unexpected' }], changedFiles: 1
+  }), 'string');
+  assert.equal(typeof checkPullRequestFileScope({
+    files: [
+      { filename: 'src/jobs/ingest.ts', status: 'modified' },
+      { filename: 'src/jobs/ingest.ts', status: 'modified' }
+    ], changedFiles: 2
+  }), 'string');
+});
+test('scope gate refuses renaming a sensitive path to a routine path', () => {
+  assert.equal(typeof checkPullRequestFileScope({
+    files: [{filename:'src/jobs/ingest.ts',previous_filename:'deploy/s1/deploy.sh', status:'renamed'}],
+    changedFiles:1
+  }), 'string');
+});
+test('scope gate refuses renaming a routine path to a sensitive path', () => {
+  assert.equal(typeof checkPullRequestFileScope({
+    files: [{filename:'deploy/s1/deploy.sh',previous_filename:'src/jobs/ingest.ts', status:'renamed'}],
+    changedFiles:1
+  }), 'string');
+});
+test('scope gate refuses file modifications in protected policy scope', () => {
+  assert.equal(typeof checkPullRequestFileScope({
+    files: [{ filename:'.github/workflows/ci.yml', status:'modified'}], changedFiles:1
+  }), 'string');
 });
