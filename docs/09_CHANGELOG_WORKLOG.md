@@ -1,5 +1,17 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-23 — PR #36 : diagnostic CI élargi, échec avant étapes observables (lots 4/11)
+
+- RECONCILIATION : AGENTS.md, docs/15_AUTONOMOUS_AGENT_EXECUTION.md, présent journal et docs/CONTINUITY_CHECKPOINT_2026-11-06.md relus via GitHub ; recherche des PR ouvertes (dont #36 Draft et branches concurrentes). Aucune modification de code ni des autres branches.
+- TEST_EVIDENCE : sur le SHA a4404fb25908127c4e3b3e16cfbbb04f72181b38, nouvelles exécutions [CI 45119240423](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45119240423) et [Docker 45119240387](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45119240387) = completed/failure. Jobs respectifs 137508961137 (validate) et 137508960548 (Docker). Pour ces deux jobs et ceux des tentatives précédentes (137508814763 et 137508829477), l'API des steps renvoie [] ; téléchargement des logs = HTTP 404 BlobNotFound. Aucun échec de commande applicative identifié ; ne pas conclure à une régression ni à une panne de runner sans preuve.
+- ACTION : contrôles additionnels GitHub Actions (nouveaux runs, jobs, steps, logs) ; aucune relance aveugle supplémentaire, car les relances antérieures ont reproduit l'échec et les logs restent absents. Aucun test local exécuté.
+- BLOCK_REASON : CI et Docker échouent sur le SHA documentaire ci-dessus, sans steps ni logs récupérables via connecteur ; diagnostic de cause racine impossible à ce stade ; revue indépendante de #36 et gates de fusion non attestés ; couverture officielle des sources et recettes financières non certifiée.
+- NEXT_ACTION : vérifier la page GitHub Actions et les annotations/check-runs des runs 45119240423 et 45119240387 ; examiner l'état du runner, les permissions et la facturation Actions si les jobs échouent avant toute étape ; dès qu'un log exploitable est disponible, isoler la cause démontrée et corriger code/workflow sur branche dédiée, puis CI exact-HEAD. Pendant le blocage, sélectionner un chantier indépendant des lots 0–13 après vérification des claims et contrats/licences ; aucune fusion ni S1.
+- ROLLBACK : revert documentaire ciblé sur la branche Draft ; aucun secret, main ou production modifié.
+
+---
+
+
 ## 2026-11-23 — PR #36 : échec CI exact-HEAD détecté, relances gouvernées (lots 4/11)
 
 - RECONCILIATION : AGENTS.md, docs/15_AUTONOMOUS_AGENT_EXECUTION.md, worklog courant et docs/CONTINUITY_CHECKPOINT_2026-11-06.md relus ; PR #1 fermée (fusion mentionnée au journal), PR #36 ouverte Draft. Recherche des issues/PR ouvertes ; aucune branche concurrente modifiée.
