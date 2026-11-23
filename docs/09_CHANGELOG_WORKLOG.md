@@ -1,5 +1,18 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-23 — Administration GitHub V2 validée : main protégée et auto-merge autorisé
+
+- **OPÉRATION EFFECTUÉE PAR L'UTILISATEUR** : lancement via GitHub CLI authentifié `Patricked-code` de la configuration GitHub ruleset V2 sous confirmation explicite `CONFIGURER` ; script a retourné `SUCCESS` avec ruleset ID `27937019`.
+- **ATTESTATION INDÉPENDANTE DU SCRIPT — API GITHUB CONNECTÉE** : `GET /branches/main` → `protected=true`, HEAD `73256f48d81d38ce8ff6f51be9e024b25cf5dadb` ; `GET /rulesets/27937019` → `active`, `refs/heads/main`, aucun exclude, `bypass_actors=[]`, `current_user_can_bypass=never` ; règles `deletion`, `non_fast_forward`, `pull_request` (1 approbation, dismissal stale, approval last push, résolution des conversations), status checks stricts `validate` et `Build, boot, migrate and verify persistent PostgreSQL` ; `get_repo` → `allow_auto_merge=true`.
+- **CI SUR HEAD COURANT PR #37** : `fe99e1cae4de5ccc7990b898171d093ae121451f` → [CI #700 run 45266448179](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45266448179) SUCCESS et [Docker #564 run 45266448234](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45266448234) SUCCESS ; la présente entrée documentaire provoquera un NOUVEAU SHA non couvert par ces attestations.
+- **ÉTAT DE LA PR #37** : OPEN/Draft, `reviews=[]`, aucune fusion ; pas de déploiement S1 ; source canonique de preuves dans [commentaire de PR #37](https://github.com/Patricked-code/africafunds-market-data-pipeline/pull/37#issuecomment-7114214485).
+- **BLOCK_REASON ACTUALISÉ** : administration initiale RÉSOLUE. Restent la revue indépendante réellement habilitée, la sortie de Draft, les checks du futur SHA, la vérification en runtime GitHub Actions de l'accès `bypass_actors` par `GITHUB_TOKEN` (potentiellement absent sans admin), et la compatibilité du déclencheur `pull_request_target` avec la politique de sécurité des dépôts publics. Aucun reviewer/exécuteur autonome en production attesté.
+- **NEXT_ACTION** : contrôler les checks exact SHA de ce checkpoint ; corriger/tester la stratégie d'événement et d'attestation des rulesets sans ajouter de PAT administrateur ni de bypass ; obtenir revue indépendante de PR #37 ; fusion uniquement selon les règles désormais en vigueur ; tester l'inscription native auto-merge sur une PR pilote, puis reprendre les lots 0–13 sans collision.
+- **ROLLBACK** : aucun réglage GitHub à défaire pour ce checkpoint ; les protections main doivent être conservées. La PR #37 reste indépendante et réversible par ses commits, sans action S1.
+
+---
+
+
 ## 2026-11-23 — PR #37 : correctif rulesets après échec GitHub CLI 404
 
 - **INCIDENT UTILISATEUR :** le script administrateur GitHub V1, exécuté par `gh` sous le compte confirmé `Patricked-code`, a échoué au `PUT /branches/main/protection` avec le message exact `Branch protection has been disabled on this repository. (HTTP 404)`. Le `else` isolé affiché ultérieurement par PowerShell est sans impact sur GitHub.
