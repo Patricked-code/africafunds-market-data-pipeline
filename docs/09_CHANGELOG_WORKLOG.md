@@ -1,5 +1,17 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-23 — PR #36 : identité audit FAILED non strict et CI toujours bloquée (lots 4/11)
+
+- RECONCILIATION : PR #36 OPEN/Draft, HEAD précédent bf8bc3d13caecbc521bdaa84862c9537b9bd3fb8 ; AGENTS.md, docs/15_AUTONOMOUS_AGENT_EXECUTION.md, checkpoint historique et journal relus ; PR/issues ouvertes recherchées ; dépôt privé. PR #1 déjà fusionnée.
+- TEST_EVIDENCE : sur HEAD bf8bc3d13caecbc521bdaa84862c9537b9bd3fb8, CI [45167071560](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45167071560) et Docker [45167071619](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45167071619) = completed/failure ; jobs 137666666756 et 137666667224 sans steps/logs_url. Aucune commande de test attestée.
+- ACTION_CODE : ajout sur la branche de PR #36 d'assertions PostgreSQL vérifiant l'identité UUID, la persistance du statut FAILED et error_message NULL du run non strict entièrement échoué ; le test existant contrôle déjà les compteurs 1/0/1 et l'absence d'archives. Code métier inchangé, tests ajoutés NOT_RUN.
+- BLOCK_REASON : échec pré-étapes observable de deux workflows ; cause non déterminée ; validation CI du nouveau HEAD et revue indépendante manquantes.
+- NEXT_ACTION : obtenir annotations et message d'allocation des jobs via Actions et réglages administratifs ; vérifier quota/facturation/runner sans attribuer de cause sans preuve. Revalider CI/Docker et le test PostgreSQL sur HEAD exact après déblocage ; revue indépendante avant toute fusion. Continuer un lot indépendant seulement après claim. Aucun S1.
+- ROLLBACK : revert ciblé du test et de cette entrée sur branche Draft ; main, secrets et sources officielles inchangés.
+
+---
+
+
 ## 2026-11-23 — PR #36 : CI #671 et Docker #538 échoués, suivi issue #8 (lots 4/11)
 
 - RECONCILIATION : PR #1 merged ; AGENTS.md, docs/15_AUTONOMOUS_AGENT_EXECUTION.md, présent journal et docs/CONTINUITY_CHECKPOINT_2026-11-06.md consultés ; recherche des PR/issues ouvertes ; dépôt privé selon get_repo. Branche Draft #36 conservée.
