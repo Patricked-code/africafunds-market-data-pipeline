@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { evaluateEnrollment, isExplicitRevocation, normalizeActiveRulesetPolicy, isSensitiveChangePath, checkPullRequestFileScope } from '../scripts/ci/governed-native-automerge.mjs';
+import { evaluateEnrollment, isExplicitRevocation, normalizeActiveRulesetPolicy, isSensitiveChangePath, checkPullRequestFileScope, resolveTrustedPrSignal } from '../scripts/ci/governed-native-automerge.mjs';
 
 function fixture() {
   return {
@@ -253,4 +253,78 @@ test('scope gate refuses file modifications in protected policy scope', () => {
   assert.equal(typeof checkPullRequestFileScope({
     files: [{ filename:'.github/workflows/ci.yml', status:'modified'}], changedFiles:1
   }), 'string');
+});
+
+function trustedWorkflowRunFixture() {
+  const sha = 'abc123abc123abc123abc123abc123abc123abcd';
+  return {
+    action: 'completed',
+    repository: { full_name: 'Patricked-code/africafunds-market-data-pipeline' },
+    workflow_run: {
+      event: 'pull_request', name: 'CI — AfricaFunds Market Data Pipeline',
+      status: 'completed', conclusion: 'success',
+      head_repository: { full_name: 'Patricked-code/africafunds-market-data-pipeline' },
+      head_sha: sha, pull_requests: [
+        { number: 38, head: { sha }, base: { ref: 'main' } }
+      ]
+    }
+  };
+}
+test('trusted completed CI run resolves exactly one same-repo PR and exact SHA', () => {
+  const f = trustedWorkflowRunFixture();
+  assert.deepEqual(resolveTrustedPrSignal(f, f.repository.full_name),
+    { number: 38, headSha: f.workflow_run.head_sha, revoke: false });
+});
+test('trusted Docker/PostgreSQL completion resolves same PR', () => {
+  const f = trustedWorkflowRunFixture();
+  f.workflow_run.name = 'SadiaAF — isolated Docker runtime and PostgreSQL persistence smoke';
+  assert.equal(resolveTrustedPrSignal(f, f.repository.full_name)?.number, 38);
+});
+const untrustedWorkflowRuns = [
+  ['untrusted repository', x => { x.repository.full_name = 'external/repo'; }],
+  ['fork run', x => { x.workflow_run.head_repository.full_name = 'attacker/repo'; }],
+  ['failed CI', x => { x.workflow_run.conclusion = 'failure'; }],
+  ['pending CI', x => { x.workflow_run.status = 'in_progress'; }],
+  ['non-PR run', x => { x.workflow_run.event = 'push'; }],
+  ['missing PR inventory', x => { x.workflow_run.pull_requests = []; }],
+  ['ambiguous two-PR run', x => { x.workflow_run.pull_requests.push(x.workflow_run.pull_requests[0]); }],
+  ['changed run SHA', x => { x.workflow_run.head_sha = '0000000000000000000000000000000000000000'; }],
+  ['different PR base', x => { x.workflow_run.pull_requests[0].base.ref = 'dev'; }],
+  ['unknown workflow', x => { x.workflow_run.name = 'attacker test'; }],
+  ['incomplete webhook action', x => { x.action = 'requested'; }],
+  ['short SHA', x => { x.workflow_run.pull_requests[0].head.sha = 'abc'; }]
+];
+for (const [name, mutate] of untrustedWorkflowRuns) {
+  test('fail closed trusted workflow completion: ' + name, () => {
+    const f = trustedWorkflowRunFixture();
+    mutate(f);
+    assert.equal(resolveTrustedPrSignal(f, 'Patricked-code/africafunds-market-data-pipeline'), null);
+  });
+}
+test('privileged comment requires exact SHA and a recognized command', () => {
+  const sha = 'abc123abc123abc123abc123abc123abc123abcd';
+  const f = {
+    action: 'created',
+    repository: { full_name: 'Patricked-code/africafunds-market-data-pipeline' },
+    issue: { number: 38, pull_request: { url: 'https://api.github.com/repos/owner/repo/pulls/38' } },
+    comment: { author_association: 'OWNER', body: '/sadiaaf-automerge ' + sha }
+  };
+  assert.deepEqual(resolveTrustedPrSignal(f, f.repository.full_name),
+    {number:38,headSha:sha,revoke:false});
+  f.comment.body = '/sadiaaf-revoke-automerge ' + sha;
+  assert.equal(resolveTrustedPrSignal(f, f.repository.full_name)?.revoke, true);
+  f.comment.author_association = 'NONE';
+  assert.equal(resolveTrustedPrSignal(f, f.repository.full_name), null);
+});
+test('unknown PR comment, issue-only comment, and non-SHA-bound signal are rejected', () => {
+  const f = {
+    action: 'created',
+    repository: { full_name: 'Patricked-code/africafunds-market-data-pipeline' },
+    issue: { number: 38, pull_request: {} },
+    comment: { author_association: 'OWNER', body: '/sadiaaf-automerge' }
+  };
+  assert.equal(resolveTrustedPrSignal(f, f.repository.full_name), null);
+  f.comment.body = '/sadiaaf-automerge abc123abc123abc123abc123abc123abc123abcd';
+  delete f.issue.pull_request;
+  assert.equal(resolveTrustedPrSignal(f, f.repository.full_name), null);
 });
