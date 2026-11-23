@@ -1,5 +1,17 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-23 — PR #36 : validation CI exact-HEAD et passage en attente de revue (lots 4/11)
+
+- RECONCILIATION : HEAD branche `fix/ingestion-false-success-20261122` = `808b30a6c6e865a764eeaa66e6cc5e1ec417527d` (comparaison GitHub identical). Lecture de AGENTS.md, docs/15_AUTONOMOUS_AGENT_EXECUTION.md, présent journal, checkpoint docs/CONTINUITY_CHECKPOINT_2026-11-06.md, tests et moteur d'ingestion ; recherche des PR/issues ouvertes ; reviews #36 = []. Aucun claim concurrent transféré.
+- TEST_EVIDENCE exact-HEAD : [CI #662, run 45107139798](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45107139798) et [Docker/PostgreSQL #529, run 45107139876](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45107139876) : `completed/success` sur `808b30a6`. Ces runs valident les assertions précédentes, pas une recette officielle ni le présent commit documentaire.
+- CONTRÔLE FONCTIONNEL : la branche contient les tests synthétiques strict/non-strict, trois runs PARTIAL distincts et compteurs 2/1/1 ; le code `src/jobs/ingest.ts` termine PARTIAL avant de signaler l'erreur stricte. Aucune nouvelle modification métier lors de ce contrôle ; éviter de multiplier les micro-tests sans lacune de recette démontrée.
+- BLOCK_REASON : revue indépendante #36 absente ; compatibilité des index HTML légitimes sans ligne et qualifications de sources officielles #13/#14, normalisation #15 et recette financière #17 non certifiées. Gates de fusion non démontrés ; pas de S1.
+- NEXT_ACTION : obtenir une revue indépendante du code et des scénarios HTML index-only de PR #36 ; traiter les observations de revue et revalider la CI exact-HEAD après toute correction. Puis qualifier un contrat officiel/fixture autorisée et coordonner les claims #26/#27 avant toute implémentation d'adaptateur ou recette financière. Aucune fusion sans gates, aucune déclaration HISTORY_COMPLETE.
+- ROLLBACK : entrée documentaire réversible sur branche Draft ; aucune migration, source officielle, secret, main ni S1 modifié.
+
+---
+
+
 ## 2026-11-23 — PR #36 : contrôle des compteurs pour chaque tentative PARTIAL (lots 4/11)
 
 - RECONCILIATION : PR #1 merged=true ; PR #36 OPEN/Draft sur HEAD initial `c12a579de337799af81f2e338d34b9ff05495330` ; AGENTS.md, docs/15_AUTONOMOUS_AGENT_EXECUTION.md, journal canonique et checkpoint du 06/11 relus ; recherche PR/issues et reviews #36 (aucune revue enregistrée). Les branches concurrentes restent intactes.
