@@ -167,3 +167,96 @@ Un agent peut proposer `automerge-eligible` après preuve CI/Docker et qualifica
 La suppression des approbations n'équivaut PAS à une fusion autorisée par défaut : ni PR Draft, ni dossier sans droits/licences vérifiés, ni changement sensible, ni absence de tests, ni exposition de secret, ni S1 ne doivent être intégrés automatiquement. La mission et la mémoire canonique restent dans ce dépôt, aucun deuxième orchestrateur n'est créé.
 
 État d'exécution à revalider : GitHub a enregistré le ruleset `27937019` avec compteur initial 1 ; l'application du nouveau compteur 0 nécessite des droits d'administration du compte `Patricked-code`. La PR #37 reste Draft jusqu'aux contrôles exact SHA et à la qualification opérationnelle du workflow ; aucune preuve d'automatisation effective par GitHub Actions n'est anticipée.
+
+
+## 13. Cartographie vérifiable des treize dimensions de continuité SadiaAF (2026-11-23)
+
+**Objet :** rattacher les treize dimensions du suivi transversal aux documents, lots, issues et PR déjà existants. Cette section est une **extension du contrat canonique**, pas un second registre, une autre roadmap ou un nouvel orchestrateur. Elle ne prétend pas sauvegarder le verbatim intégral et horodaté de toutes les conversations : l'exhaustivité conversationnelle littérale n'est pas attestée. Les documents maîtres restent AGENTS.md, docs/05_IMPLEMENTATION_ROADMAP.md, docs/06_CURRENT_STATUS_AND_GAPS.md, docs/08_DECISION_LOG.md, docs/09_CHANGELOG_WORKLOG.md, docs/13_MODE_DE_REALISATION_ET_PLAN_DE_LOTS.md, docs/14_MATRICE_EXIGENCES_RECETTE.md et le présent fichier. Le dernier état LIVE GitHub prime sur les descriptions historiques.
+
+### 13.1 — Identité, dépôt, gouvernance GitHub
+- **SadiaAF** est la plateforme centrale indépendante des applications consommatrices comme AfricaFunds. Dépôt technique canonique unique : Patricked-code/africafunds-market-data-pipeline. Ni MCP, ni UAES, ni Workers ne deviennent une autorité ou un nouveau runtime de SadiaAF.
+- Au contrôle du 23/11/2026 : dépôt PUBLIC ; main au SHA 73256f48d81d38ce8ff6f51be9e024b25cf5dadb, protégée par ruleset actif n° 27937019 ; aucun bypass ; PR obligatoire ; 0 approbation requise pour les PR ordinaires (ADR-016) ; conversations de revue résolues ; checks stricts obligatoires validate et Build, boot, migrate and verify persistent PostgreSQL ; interdictions de force-push et suppression ; allow_auto_merge=true. Issue #3 clôturée.
+- La signature cryptographique des commits est un **sujet distinct**, non certifié exécuté.
+
+### 13.2 — Déblocages réalisés et limites de certification
+- Authentification GitHub CLI Patricked-code et configuration unique du ruleset par le script Windows V2 exécutées et vérifiées par API. Inutile de refaire ces réglages.
+- GitHub CI et Docker tournent sur les PR ; le dépôt public permet des runners standards sans nouvelle dépense constatée. Ces tests ne valent ni fusion native certifiée, ni moteur codeur autonome 24 h/24, ni production S1.
+- Ne jamais reporter un SUCCESS d'un ancien SHA sur un nouveau commit. Aucun nouveau service payant, Codex, Copilot, file ou orchestrateur demandé.
+
+### 13.3 — PR #37, automatisation d'intégration, lot 11
+- Branche feat/sadiaaf-governed-native-automerge-20261123 ; script scripts/ci/governed-native-automerge.mjs, workflow .github/workflows/governed-native-automerge.yml, tests et modifications des CI existantes.
+- Au checkpoint d'entrée : PR #37 OPEN/READY non fusionnée, HEAD bc71e107925b91632ee19413c664240d601c303d, CI #714 (run 45280800082) et Docker #578 (run 45280800083) SUCCESS sur ce SHA seulement.
+- Mécanisme : GitHub native auto-merge sans merge direct ; PR interne, READY, label explicite automerge-eligible, événement SHA actuel, règles strictes actives. Diff exhaustif exigé ; refus des changements .github, sécurité, secrets/credentials, SQL, déploiement, dépendances et renommages sensibles. Révocation au retrait du signal.
+- **BLOQUÉ** : PR non intégrée à main ; permissions réelles du GITHUB_TOKEN, compatibilité événement pull_request_target et pilote de fusion native non certifiés. La PR #37 est elle-même sensible car elle modifie la gouvernance ; ne pas lui appliquer aveuglément la voie ordinaire.
+
+### 13.4 — Historique des opérations techniques et correctifs
+- Tests fail-closed renforcés sur la PR #37. CI #710 a initialement détecté un chemin credentials au pluriel non refusé (80/81 tests) ; commit 022ade7eb238bc59a9b4c52ed6fc2539ac089544 corrige la reconnaissance singulier/pluriel.
+- La contention potentielle entre les fichiers backfill-claim.test.ts et backfill-window.test.ts utilisant une même base PostgreSQL a conduit au commit c76bd26406a7bb4325d8f31f829a18b6052390ef : test:integration fonctionne avec --test-concurrency=1 ENTRE fichiers, tout en gardant la concurrence entre workers DANS les tests. Hypothèse de cause non déterministe encore à valider par répétitions. Issue #5 renseignée ; ne pas modifier la branche PR #22 sans claim.
+
+### 13.5 — PR #36, ingestion
+- PR #36 OPEN/DRAFT, HEAD observé df0129b625798147eb1dc3f283fcbd7fd19fac99 ; CI #686 et Docker #553 SUCCESS sur son SHA, non fusionnée.
+- Refuser les faux SUCCESS lorsque zéro observation ou téléchargement enfant échoué ; vérifier la compatibilité des pages HTML d'index légitimes et le comportement officiel de chaque adaptateur. Conserver propriété/claim de sa branche.
+
+### 13.6 — Inventaire des PR candidates
+- Quatorze PR ouvertes au contrôle : #22 et #25 à #37. #22 backfill/fencing ; #25 preuve audit 44 sources ; #26 collecteurs API non implémentés ; #27 admission typée ; #28 scoring qualité ; #29 registre FX/inflation/VL ; #30 CORS ; #31 gates S1 documentaires ; #32 obligations ; #33 HTTP retry ; #34 calcul index/FX ; #35 parsing CSV ; #36 faux succès ; #37 auto-merge.
+- Chaque PR doit être qualifiée selon ownership/branches, diff, SHA, dépendances, tests, droits des sources et autorisations sensibles. PR ouverte ou CI verte ne signifie pas un lot complet.
+
+### 13.7 — Les six chantiers de données du mandat complémentaire
+1. **Issue #13 / PR #18 fusionnée :** qualifier les 44 endpoints / 11 marchés. Matrice historique docs/SOURCE_AUDIT_RUN_42314547906.md : 14 HEAD 200, 7 HEAD 403, 1 HEAD 404, 22 NOT_PROBED au 07/11 ; résoudre par preuves officielles sans contourner robots/licences ; HTTP 200 ne certifie pas une série historisée.
+2. **Issue #14 :** six adaptateurs dynamiques, cinq CBE Égypte et un GOSDMX Tunisie ; formats API/documentaires, droits et données témoins obligatoires. Les PR de sécurité/CSV seules ne sont pas six adaptateurs DONE.
+3. **Issue #5, PR #12 fusionnée, PR #22 ouverte :** fenêtres historiques réellement appliquées, claims atomiques, leases/fencing, crash recovery, retry, zéro faux SUCCESS, répétabilité PostgreSQL.
+4. **Issue #15 :** provenance, dates économiques, normalisation, validation et qualité dans les schémas ref/source/market/fund/method/calc/quality ; aucune observation invalide publiée.
+5. **Issue #16 :** sources officielles FX, inflation, fonds/VL, droits/licences, enrichissement additif préservant les 44 sources initiales.
+6. **Issue #17 :** historiques, trous, révisions, indices, courbes, obligations et Total Return, méthodes comparées aux valeurs témoins puis publication API ; aucun HISTORY_COMPLETE sans preuves.
+Les issues #5, #13–#17 restent ouvertes. Ce programme est transversal aux lots existants, pas une nouvelle usine ou un lot 14.
+
+### 13.8 — Les quatorze lots canoniques, de 0 à 13
+- Lot 0 : consolidation documentaire, existant à réconcilier, non certifié totalement achevé.
+- Lot 1 : sécurité, identité, bootstrap, SUPER_ADMIN, MFA et RBAC, non certifiés DONE.
+- Lot 2 : modèle canonique exécutable, normalisation et provenance, qualification non achevée.
+- Lot 3 : interopérabilité, mappings et drift, pilotes non certifiés.
+- Lot 4 : adaptateurs officiels, inventaire initial présent, six adaptateurs et couverture historique non achevés.
+- Lot 5 : courbes de taux, séries et recettes de marché non certifiées.
+- Lot 6 : obligations et Total Return, calculs réels à recetter.
+- Lot 7 : fonds/VL, catégories et benchmarks, sources/méthodes/recettes à compléter.
+- Lot 8 : cockpit Super Administrateur, parcours sécurisé end-to-end non attesté.
+- Lot 9 : API, exports, webhooks, sécurité et contrats à valider.
+- Lot 10 : PostHog et observabilité, exploitation et protections à attester.
+- Lot 11 : CI/tests/sécurité, CI fonctionnelle, auto-merge et stabilité à terminer.
+- Lot 12 : staging : runner Docker éphémère != staging durable sur S1 ; préflight/DB/collecte et backup à vérifier.
+- Lot 13 : production S1 bloquée par gates de recette et autorisation explicite.
+La définition complète, les critères de réception et les dépendances restent dans docs/13 et docs/14. Ne jamais déduire DONE d'une simple présence de code ou d'une checklist.
+
+### 13.9 — Staging S1, recettes financières, production
+- Architecture SadiaAF prévue : API/cockpit propres, PostgreSQL, archives brutes persistantes, collecte indépendante de ChatGPT et supervision. Les observations HTTP 500 sur les domaines au 07/11 sont historiques, pas un contrôle live S1.
+- docs/10_DEPLOYMENT_GATES.md exige authentification/RBAC/MFA, scan de secrets, licences des sources, migrations/seeds, qualité/provenance, calculs de référence (courbes, fonds, obligations, Total Return et absence de look-ahead), API, charge, staging, sauvegarde/restauration, rollback, approbation de mise en production.
+- Aucun S1 sans autorisation spécifique, aucune suppression d'existant et aucune assimilation des tests Docker CI à une recette de production.
+
+### 13.10 — Enchaînement strict des travaux et parallélisme admissible
+1. Réconcilier main, PR #37, checks SHA et dernier NEXT_ACTION.
+2. Qualifier permissions token, événement pull_request_target, refus des changements sensibles et test fail-closed.
+3. Intégration PR #37 seulement après autorisation gouvernée de cette PR de sécurité ; jamais de fusion directe ou implicite.
+4. Recette d'enrôlement et fusion native sur une PR pilote ordinaire non sensible, puis preuve de reprise.
+5. Traiter la non-détermination des tests backfill sans collision PR #22.
+6. Qualifier PR #36 et les autres PR selon dépendances, propriété, droits et tests.
+7. Réaliser les six chantiers de données par marché avec valeurs témoins, licences, provenance, historique et publication.
+8. Terminer les autres lots 0–11, identité, calculs, cockpit, API, observabilité.
+9. Préflight lecture seule S1 puis staging isolé AUTORISÉ, PostgreSQL persistant, sauvegardes/restauration et collecte pilote.
+10. Production uniquement après gates documentés et autorisation explicite.
+Ne pas bloquer des travaux non dépendants pendant l'attente d'un gate ou d'une autre branche propriétaire.
+
+### 13.11 — Exécution autonome : ce qui est présent et ce qui reste à démontrer
+- Automatisation ChatGPT existante « Continuité AfricaFunds Data Pipeline » : Automation_a523352a7c448191a41080097ce8b01f, active avec cadence horaire, mandat GitHub-first et anti-collision, sans nouvelle file/autorité.
+- Les runners GitHub Actions effectuent CI et Docker ; ils ne sont pas des agents codeurs autonomes. Les sections 1–10 du présent contrat définissent déjà une boucle objectif → lecture → NEXT_ACTION → claim → code → tests → PR → preuves → reprise.
+- L'exécuteur codeur réel permanent/repris, ses permissions et son accès modèle, ses claims et crash recovery, le budget zéro coût supplémentaire et deux lots successifs end-to-end doivent être **attestés par preuves** avant d'affirmer 24 h/24.
+
+### 13.12 — Anti-régression, anti-dispersion et décisions durables
+- Sources existantes seulement : AGENTS.md pour les règles, docs/08 pour ADR, docs/09 pour checkpoints, docs/05/06/13/14 pour lots/statuts/gates, GitHub PR/issues pour ownership et tests.
+- À chaque exécution : recharger SHA, CI, PR, dépendances et autorisations ; pas de push direct main, force-push, fusion de gouvernance sans autorisation, nouveau secret, service payant, déploiement S1 non autorisé.
+- ADR-016 supprime la revue indépendante UNIVERSSELLE des PR ordinaires, pas les autres gates sensibles. L'absence de secrets dans l'historique public reste non certifiée.
+
+### 13.13 — Point de reprise vérifiable et critères de fin
+- Lecture : AGENTS.md → docs/09 et dernier checkpoint → présent docs/15 → docs/05/06/08/10/13/14 → état GitHub réel. Cet ordre complète le parcours documentaire d'arrivée existant, sans le remplacer.
+- Avant la présente mise à jour documentaire : PR #37 HEAD bc71e107925b91632ee19413c664240d601c303d, READY, CI #714 et Docker #578 SUCCESS ; main protégée inchangée, PR #36 DRAFT. Le présent ajout produira un nouveau SHA à vérifier à nouveau, sans extrapoler les tests anciens.
+- **BLOCK_REASON :** PR #37 de gouvernance non fusionnée et workflow non validé en runtime, token/événement à certifier ; fusion pilote absente ; runner codeur permanent non attesté ; six chantiers et recettes financières non terminés ; S1 non autorisé.
+- **NEXT_ACTION :** vérifier CI/Docker sur le nouveau SHA, qualifier les permissions et l'événement de la PR #37, autoriser/gouverner l'intégration de cette PR sensible, recetter un vrai auto-merge natif et deux cycles de développement sans collision, poursuivre PR #36 et les lots existants, puis staging/production selon gates distincts.
