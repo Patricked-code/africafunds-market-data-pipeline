@@ -139,3 +139,21 @@ Le mécanisme ne pourra être déclaré **DONE** que si un exécuteur réel dém
 7. La remontée de l'état final, des preuves et des blocages dans GitHub, puis le retour à `IDLE` ou la sélection du prochain travail.
 
 Aucune de ces recettes n'est attestée comme passée le 2026-11-06.
+
+## 11. Intégration automatique gouvernée — préparation 2026-11-23
+
+Cette section complète la boucle du §3 sans créer de seconde file de tâches, de nouveau scheduler ou d'autorité concurrente. Les seules autorités de validation sont les protections GitHub, les reviews et les checks réels du SHA concerné.
+
+**Code candidat :** `scripts/ci/governed-native-automerge.mjs`, `test/governed-native-automerge.test.mjs` et `.github/workflows/governed-native-automerge.yml`. Le workflow `pull_request_target` utilise exclusivement un checkout de `main`, et n'exécute JAMAIS le code des PR non fiables. Il dispose seulement de `contents: read` et `pull-requests: write`. Aucune API de fusion directe n'est utilisée : seule l'inscription dans l'**auto-merge natif GitHub** est proposée, si toutes les conditions d'éligibilité sont vérifiées.
+
+**Déclenchement :** PR interne ciblant `main`, ouverte, non Draft, au dernier SHA reçu, labellisée `automerge-eligible` par l'agent propriétaire après revue des changements et tests applicables. Une PR sans ce signal reste non éligible. Le workflow se déclenche par événement GitHub ; l'automatisation horaire existante reste responsable du `NEXT_ACTION` et du travail de code, sans duplication.
+
+**Gates fail-closed :** `main.protected=true`, option `allow_auto_merge=true`, règle de protection classique effective avec au moins une approbation obligatoire, `validate` comme contrôle statutaire requis, approbations anciennes invalidées, résolution des conversations de revue obligatoire et protections appliquées aux administrateurs. Si ces données ne sont pas vérifiables par le token GitHub Actions ou si un seul gate manque, le workflow n'enrôle pas la PR. GitHub vérifie ensuite les reviews et checks avant sa fusion native.
+
+**Statut live observé au 2026-11-23 :** `main.protected=false`, aucun ruleset retourné, `allow_auto_merge=false`, PR #36 Draft et `reviews=[]`. Le mécanisme est donc **PREPARED / NOT ACTIVE** ; il ne peut en aucun cas être déclaré autonome en production. En outre, une revue humaine ou par un **acteur indépendant réellement habilité** reste obligatoire ; aucun tel reviewer automatique n'est actuellement attesté.
+
+**Configuration administrative UNIQUE nécessaire :** créer sur `main` une protection GitHub réelle exigeant PR, `validate` au SHA courant, au moins une revue indépendante, dismissal des approvals obsolètes, résolution des conversations, absence de bypass administrateur, force-push/suppression interdits ; puis autoriser `Allow auto-merge` dans les paramètres du dépôt. Vérifier que le token natif peut lire la règle via GraphQL et enrôler la PR ; sinon conserver le gate fermé, sans ajouter de token personnel ou de service payant.
+
+**Limites :** `staging-runtime-smoke.yml` n'exécute pas son job sur les PR purement documentaires à cause de ses filtres `paths`. Il ne doit pas être déclaré requis globalement tant que cette condition n'est pas rendue compatible. Pour les modifications runtime, son run exact-SHA doit néanmoins être évalué dans les gates métier avant l'ajout du label. Aucun S1, secrets, intégration de données officielles ni déploiement automatique implicite.
+
+**Recette avant DONE :** tests unitaires du fail-closed sur CI au SHA exact ; protection main attestée ; auto-merge effectivement configuré ; PR pilote non Draft et éligible, revue indépendante après le dernier push, status `validate=SUCCESS` et, si pertinent, Docker SUCCESS ; inscription auto-merge attestée, fusion native, aucun bypass ; second chantier continué à partir du checkpoint, sans collision. En cas de défaut : `BLOCK_REASON` et `NEXT_ACTION` dans les autorités GitHub existantes.
