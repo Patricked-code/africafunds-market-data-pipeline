@@ -1,5 +1,17 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-23 — PR #36 : validation du HEAD précédent et statut canonique réconcilié
+
+- RECONCILIATION : dépôt PUBLIC ; PR #1 fusionnée ; PR #36 OPEN/Draft ; PR concurrentes #22/#25/#26/#35 et autres PR ouvertes non modifiées. Lecture de `AGENTS.md`, du contrat `docs/15_AUTONOMOUS_AGENT_EXECUTION.md` et du checkpoint précédent. Aucun accès S1 ni action sur `main`.
+- PREUVES EXACT-SHA : SHA documentaire `1b477720ce2edda6db0e51bec7f872711265102e` : [CI #680](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45217938883) `completed/success` et [Docker/PostgreSQL #547](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45217939128) `completed/success`. Ces résultats ne valident pas automatiquement les commits ultérieurs.
+- ACTION : mise à jour additive du statut `docs/06_CURRENT_STATUS_AND_GAPS.md` dans commit `edffbaa0a0120c7a0d53f8819770f239cd56ab46` sur branche PR #36 pour remplacer l'ancien état « CI non attestée » ; journal présent ajouté ensuite, sans changement de code, tests, schéma, secret ou serveur. Tests locaux NOT_RUN.
+- LIMITES : PR #36 toujours Draft, revue indépendante absente au dernier contrôle ; protections main et audit de l'historique public non attestés ; six adaptateurs dynamiques, index HTML sans observations et droits des données réelles non certifiés. Aucune fusion ni S1.
+- BLOCK_REASON : revue indépendante et règles de protection de main non vérifiées ; audit publication incomplet ; CI du nouveau HEAD après commits documentaires à vérifier.
+- NEXT_ACTION : vérifier CI/Docker exact SHA de ce checkpoint, poursuivre audit secrets/protections main et revue PR #36 ; sélectionner correction fonctionnelle non revendiquée dans les lots 0–13 et produire tests RED/GREEN avec preuves, sans collisions. Ne pas fusionner sans gates.
+- ROLLBACK : revert ciblé des commits documentaires de PR #36.
+
+---
+
 ## 2026-11-23 — PR #36 : reprise des runners gratuits et CI exacte validée (lots 4/11)
 
 - RECONCILIATION : dépôt `Patricked-code/africafunds-market-data-pipeline` désormais PUBLIC (changement du propriétaire, sans action de cet agent). PR #36 OPEN/Draft, branche `fix/ingestion-false-success-20261122`, HEAD de code contrôlé `08890d744d1c88158bfcacdbf84d1cba6c12dc9c`, base `main` `73256f48d81d38ce8ff6f51be9e024b25cf5dadb`. PR concurrentes #22/#25/#26/#35 préservées. AGENTS.md, documents de cadrage obligatoires, contrat d'autonomie et worklog consultés.
