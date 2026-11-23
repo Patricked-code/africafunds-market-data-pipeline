@@ -1,5 +1,13 @@
 # 06 — État réel et écarts
 
+## 2026-11-23 — Lot 4/11 : validation CI/Docker du HEAD documentaire de PR #36
+
+- **Preuves exactes :** SHA `1b477720ce2edda6db0e51bec7f872711265102e` (checkpoint documentaire sur PR #36) : [CI #680](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45217938883) `completed/success` et [Docker/PostgreSQL #547](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45217939128) `completed/success`, contrôlés par API GitHub le 2026-11-23. Le HEAD de code précédent `08890d744d1c88158bfcacdbf84d1cba6c12dc9c` avait également CI #679 et Docker #546 SUCCESS. Aucune preuve CI d'un SHA ultérieur n'est implicitement transférable.
+- **Fonctionnel :** les protections contre les faux SUCCESS d'ingestion sont implémentées et couvertes par tests synthétiques ; la classification des pages HTML d'index sans observations, les formats PDF/JSON/SDMX et les six adaptateurs dynamiques restent ouverts. La réussite CI ne prouve pas la couverture des 44 endpoints réels ni leurs droits de redistribution.
+- **Gouvernance :** dépôt PUBLIC ; PR #36 toujours Draft, revue indépendante non attestée, protection effective de `main` non encore vérifiée, audit de secrets sur l'historique public incomplet. Aucune fusion ni mise en production autorisée.
+- **BLOCK_REASON :** revue, audit de publication et règles de protection de `main` non attestés ; tests réels des sources et qualification des licences non terminés.
+- **NEXT_ACTION :** vérifier les protections de `main`, obtenir revue indépendante de PR #36 et qualifier les index HTML sans observations ; poursuivre les lots 0–13 indépendants des PR concurrentes. Ne pas fusionner ni déployer S1 sans gates.
+
 ## 2026-11-22 — Lot 4/11 : classification des faux succès d'ingestion
 
 - Branche dédiée `fix/ingestion-false-success-20261122` depuis main `73256f48d81d38ce8ff6f51be9e024b25cf5dadb` : correctif proposé dans `src/jobs/ingest.ts`, garde pure et tests associés. Les archives SHA-256 sont conservées ; les réponses non parsables et les liens enfants échoués ne sont plus silencieusement classés comme succès.
