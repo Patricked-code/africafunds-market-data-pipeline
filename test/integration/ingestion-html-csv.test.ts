@@ -226,6 +226,28 @@ test('HTML index -> CSV child -> SHA archive -> PostgreSQL -> SUCCESS; failed ch
       'SELECT count(*)::text AS count FROM market.raw_records WHERE endpoint_code=$1', [endpointCode],
     );
     assert.equal(nonStrictRecords.rows[0]?.count, '2');
+    // Non-strict PARTIAL must not persist records or archives for the rejected sibling.
+    const nonStrictRejectedRecords = await pool.query<{ count: string }>(
+      'SELECT count(*)::text AS count FROM market.raw_records WHERE endpoint_code=$1',
+      [failingEndpointCode],
+    );
+    assert.equal(nonStrictRejectedRecords.rows[0]?.count, '0');
+    const nonStrictRejectedArtifacts = await pool.query<{ count: string }>(
+      'SELECT count(*)::text AS count FROM source.raw_artifacts WHERE endpoint_code=$1',
+      [failingEndpointCode],
+    );
+    assert.equal(nonStrictRejectedArtifacts.rows[0]?.count, '0');
+    const nonStrictHealthyArtifacts = await pool.query<{ count: string }>(
+      'SELECT count(*)::text AS count FROM source.raw_artifacts WHERE endpoint_code=$1',
+      [endpointCode],
+    );
+    assert.equal(nonStrictHealthyArtifacts.rows[0]?.count, '2');
+    // The previous strict-mode PARTIAL must remain intact after the non-strict run.
+    const retainedMixed = await pool.query<{ status: string }>(
+      'SELECT status FROM ops.ingestion_runs WHERE ingestion_run_id=$1',
+      [mixedRunId],
+    );
+    assert.equal(retainedMixed.rows[0]?.status, 'PARTIAL');
   } finally {
     globalThis.fetch = originalFetch;
     if (pool) {
