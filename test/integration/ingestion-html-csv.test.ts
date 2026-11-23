@@ -46,13 +46,14 @@ test('HTML index -> CSV child -> SHA archive -> PostgreSQL -> SUCCESS; failed ch
     pool = db.pool;
     const { runIngestion } = await import('../../src/jobs/ingest.js');
     let failChild = false;
+    let emptyIndex = false;
     globalThis.fetch = async (input) => {
       const url = String(input);
       if (url === failingIndexUrl) return new Response('unavailable', { status: 404 });
       if (url !== indexUrl && url !== childUrl) throw new Error('Unexpected outbound URL: ' + url);
       const response = url === childUrl && failChild
         ? new Response('unavailable', { status: 404 })
-        : new Response(url === indexUrl ? html : csv, {
+        : new Response(url === indexUrl ? (emptyIndex ? '<html><body>No downloadable observations</body></html>' : html) : csv, {
             status: 200,
             headers: { 'content-type': url === indexUrl ? 'text/html' : 'text/csv' },
           });
@@ -340,6 +341,24 @@ test('HTML index -> CSV child -> SHA archive -> PostgreSQL -> SUCCESS; failed ch
     );
     assert.equal(isolatedPartialRuns.rowCount, 3);
     assert.ok(isolatedPartialRuns.rows.every((row) => row.status === 'PARTIAL'));
+    // An HTML landing page with no table and no downloadable child must not
+    // be reported as SUCCESS just because its HTTP request and raw archive succeed.
+    // Exercise the real ingestion path and persisted audit, not only the pure guard.
+    emptyIndex = true;
+    await assert.rejects(runIngestion({ endpointCode, failOnEndpointError: true }));
+    const emptyIndexAudit = await pool.query<{ status: string; summary: { success: number; failed: number; rows: number } }>(
+      "SELECT status, summary FROM ops.ingestion_runs WHERE scope->>'endpointCode'=$1 ORDER BY started_at DESC LIMIT 1",
+      [endpointCode],
+    );
+    assert.equal(emptyIndexAudit.rows[0]?.status, 'FAILED');
+    assert.equal(emptyIndexAudit.rows[0]?.summary.success, 0);
+    assert.equal(emptyIndexAudit.rows[0]?.summary.failed, 1);
+    assert.equal(emptyIndexAudit.rows[0]?.summary.rows, 0);
+    const emptyIndexRecords = await pool.query<{ count: string }>(
+      'SELECT count(*)::text AS count FROM market.raw_records WHERE endpoint_code=$1',
+      [endpointCode],
+    );
+    assert.equal(emptyIndexRecords.rows[0]?.count, '2');
     // Each attempt must retain its own endpoint counters: status alone is insufficient
     // to prove that a failed sibling was not silently counted as successful.
     const partialSummaries = await pool.query<{
