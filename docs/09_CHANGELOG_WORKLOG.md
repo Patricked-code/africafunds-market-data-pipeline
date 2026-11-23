@@ -1,5 +1,18 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-23 — PR #36 : invariant de conservation d'archive après reprise (lot 4/11)
+
+- **RECONCILIATION** : dépôt `Patricked-code/africafunds-market-data-pipeline` public, PR #36 OPEN/Draft ; 13 PR ouvertes #22 et #25–#36 (hors #23/#24), aucune branche concurrente modifiée. Lecture `AGENTS.md`, présent journal et `docs/15_AUTONOMOUS_AGENT_EXECUTION.md` ; issue #3 ancienne description « privé » désormais obsolète et à réconcilier avant modification des protections.
+- **PREUVES EXACT-SHA** : PR #36 SHA précédent `fb19b76696a7de7072e6ab7c1969361cb321af11` : [CI #682](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45230209948) et [Docker #549](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45230209760) `completed/success`. Ne pas attribuer ces succès au nouveau code.
+- **TRAVAIL FONCTIONNEL / TEST** : commit `867120dbb916a708a164f2e85a4266f4ac77da59` sur branche PR #36, test d'intégration `test/integration/ingestion-html-csv.test.ts` enrichi : après une ingestion réussie, un téléchargement enfant échoué et une reprise saine, vérifier l'unicité du lien archive parent-enfant, la conservation du SHA-256, du chemin d'archive et des octets CSV, au-delà des simples compteurs. Aucune modification du moteur, des sources officielles ou des schémas.
+- **TESTS** : locaux NOT_RUN ; CI/Docker exact nouveau HEAD à contrôler après ce checkpoint, aucun PASS déclaré sur ce nouveau SHA.
+- **BLOCK_REASON** : CI exacte et revue indépendante sur HEAD final non attestées ; protection réelle `main`, audit secrets/historique public et contrats/licences non certifiés ; PR #36 toujours Draft.
+- **NEXT_ACTION** : inspecter CI/Docker sur le nouveau HEAD ; corriger tout échec reproductible, obtenir revue indépendante ; vérifier ruleset/protection `main` et audit publication, puis continuer les lots 0–13 sur une unité non revendiquée, sans fusion ni S1.
+- **ROLLBACK** : revert ciblé du commit de test et du présent checkpoint sur la branche PR #36 ; aucune opération serveur.
+
+---
+
+
 ## 2026-11-23 — PR #36 : validation du HEAD précédent et statut canonique réconcilié
 
 - RECONCILIATION : dépôt PUBLIC ; PR #1 fusionnée ; PR #36 OPEN/Draft ; PR concurrentes #22/#25/#26/#35 et autres PR ouvertes non modifiées. Lecture de `AGENTS.md`, du contrat `docs/15_AUTONOMOUS_AGENT_EXECUTION.md` et du checkpoint précédent. Aucun accès S1 ni action sur `main`.
