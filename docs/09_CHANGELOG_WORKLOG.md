@@ -1,5 +1,20 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-23 — Raccordement vérifiable des treize dimensions aux autorités existantes
+
+- **MANDAT REPRIS** : préserver l'ensemble de la procédure SadiaAF sans confusion avec AfricaFunds application consommatrice ni MCP/UAES/Workers : 13 dimensions du suivi, 14 lots 0–13, six chantiers officiels de données, recettes financières, PR/CI, S1, exécution autonome réelle.
+- **ACTION CONCRÈTE** : ajout additif de la **section 13** à docs/15_AUTONOMOUS_AGENT_EXECUTION.md, paragraphes 13.1–13.13, commit d78f6e82cf180f0128fb8ddaa40e1d35f0f3dcfc. Aucun nouveau registre, scheduler, dépôt, issue, PR ou autorité. La cartographie renvoie aux documents canoniques existants AGENTS, docs/05, 06, 08, 09, 10, 13, 14, 15.
+- **COUVERTURE** : identité et ruleset #27937019 ; déblocages ; PR #37 / lot 11 ; corrections ; PR #36 ; inventaire de 14 PR #22 et #25–#37 ; six chantiers issues #5 et #13–#17 avec sources officielles, droits, backfill, provenance, fonds/VL, courbes, calculs ; repositionnement de chaque lot ; staging/production S1 ; ordre de 10 opérations ; exécuteur horaire et manque de runtime 24/7 ; non-régression ; point de reprise.
+- **LECTURE ET VÉRIFICATION** : docs/13 et docs/14 pour définition des lots et recettes, docs/05 roadmap, docs/08 ADR-016, docs/09 dernier checkpoint, docs/15 mécanisme et limites ; issues #3 CLOSED, #5, #9, #13–#17 OPEN ; ruleset GitHub actif, main SHA 73256f48d81d38ce8ff6f51be9e024b25cf5dadb, PR #37 OPEN/READY avant commit documentaire ; CI #714 et Docker #578 SUCCESS sur HEAD précédent bc71e107925b91632ee19413c664240d601c303d. Après la modification, nouvelle CI exacte à revérifier.
+- **AUTOMATISATION DÉJÀ PRÉSENTE** : Automation_a523352a7c448191a41080097ce8b01f active, cadence horaire, mandat réconcilié ADR-016. Ce n'est PAS la preuve d'un codeur autonome en continu 24h/24. Aucun runtime S1 activé ni fusion effectuée dans cette intervention.
+- **ALERTE ARCHIVAGE** : documentation existante = décisions, preuves et checkpoints, pas transcription littérale exhaustive et horodatée de chaque message ChatGPT. Ne pas certifier la mémoire verbatim sans source d'export vérifiable.
+- **BLOCK_REASON** : PR #37 modifie des fichiers de gouvernance sensibles, non fusionnée et sans recette d'enrôlement natif ; permissions/token et policy pull_request_target non certifiés en situation réelle ; six chantiers et recettes lots à terminer ; S1 soumis aux gates. La signature cryptographique de commits n'est pas attestée.
+- **NEXT_ACTION** : vérifier CI/Docker sur HEAD de ce checkpoint ; qualifier workflow/token/sécurité ; intégrer PR #37 uniquement avec autorisation propre aux changements de gouvernance ; tester une PR pilote ordinaire avec auto-merge natif ; reprendre PR #36 et les autres PR propriétaires ; poursuivre les six chantiers et quatorze lots selon dépendances/recettes. Aucun DONE sans preuves, aucun S1 sans staging/autorisation, aucune dépense ni orchestrateur parallèle.
+- **ROLLBACK** : revert ciblé de l'ajout documentaire si erreur, sans modifier main ni ruleset conforme.
+
+---
+
+
 ## 2026-11-23 — PR #37 : sécurisation des fusions ordinaires et correction du runner tests PostgreSQL
 
 - **AUTORITÉS LUES** : `AGENTS.md`, 16 documents maîtres du parcours d'arrivée, `docs/15_AUTONOMOUS_AGENT_EXECUTION.md`, dernier `NEXT_ACTION` de la PR #37, `main`, statut PR, ruleset #27937019 et CI exacte. Projet SadiaAF autonome distinct de l'application AfricaFunds et des autres projets MCP/UAES/Workers.
