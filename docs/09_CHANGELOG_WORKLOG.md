@@ -1,5 +1,16 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-23 — PR #36 : diagnostic transversal CI #668 / Docker #535 (lots 4/11, issue #8)
+
+- RECONCILIATION : instructions AGENTS.md et docs/15_AUTONOMOUS_AGENT_EXECUTION.md, checkpoint 2026-11-06 et journal courant relus sur GitHub ; PR ouvertes et issues ouvertes recherchées. PR #36 demeure Draft ; comparaison main → branche : 60 commits ahead, 0 behind, base main 73256f48d81d38ce8ff6f51be9e024b25cf5dadb avant ce commit. Aucun claim concurrent modifié.
+- TEST_EVIDENCE : sur HEAD précédent 3777a2d1adcf4b9a951827101d70f1630c161209, [CI #668 / run 45140247876](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45140247876) completed/failure (job validate 137576162705) ; [Docker #535 / run 45140247999](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45140247999) completed/failure (job 137576162683). Pour chacun, le connecteur retourne steps=null et logs_url=null. Workflow CI sur main examiné : job ubuntu-latest avec étapes checkout/npm/tests/PostgreSQL ; aucune de ces étapes n'est observable sur les runs en échec. Les deux workflows distincts échouent sans étapes accessibles : indice d'un blocage pré-exécution, **pas preuve de cause racine**. Tests locaux NOT_RUN.
+- ACTION : rapprochement des deux nouveaux runs/jobs, lecture du workflow CI de référence et qualification de l'absence d'étapes. Ne pas modifier le code métier ni relancer aveuglément. Escalade via issue #8, sans registre ou orchestrateur secondaire.
+- BLOCK_REASON : GitHub Actions renvoie failure pour deux workflows distincts sans étapes/logs accessibles ; vérifier annotations de check-runs, allocation runner, activation Actions, quotas et facturation avec accès administrateur. Aucune cause technique certaine ; CI exact-HEAD et revue indépendante #36 non satisfaites. Les recettes de données officielles #13–#17 restent non attestées.
+- NEXT_ACTION : obtenir l'erreur pré-job depuis l'interface GitHub Actions ou les annotations check-run des runs 45140247876 et 45140247999 ; corriger seulement le défaut prouvé et valider sur SHA exact. Si le blocage persiste, choisir un correctif indépendant dans les lots 0–13 après contrôle des claims, sans créer de nouvelle autorité ; conserver Draft et ne pas fusionner/déployer S1.
+- ROLLBACK : revert de cette seule entrée documentaire sur la branche Draft ; aucun changement main, secret, source officielle ou runtime.
+
+---
+
 ## 2026-11-23 — PR #36 : CI #667 / Docker #534 échoués, investigation pré-étapes (lots 4/11)
 
 - RECONCILIATION : dépôt GitHub Patricked-code ; PR #1 merged=true ; PR #36 OPEN/Draft, HEAD initial `3644eba3d5485c8e255bd958619b59cbee436bc7`. AGENTS.md, docs/15_AUTONOMOUS_AGENT_EXECUTION.md, journal et checkpoint docs/CONTINUITY_CHECKPOINT_2026-11-06.md relus ; PR et issues ouvertes consultées. Visibilité du dépôt retournée `private` par get_repo le 23/11 (différente du snapshot du 07/11), sans changement de visibilité.
