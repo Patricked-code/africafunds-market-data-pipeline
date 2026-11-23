@@ -1,5 +1,17 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-23 — PR #36 : CI #667 / Docker #534 échoués, investigation pré-étapes (lots 4/11)
+
+- RECONCILIATION : dépôt GitHub Patricked-code ; PR #1 merged=true ; PR #36 OPEN/Draft, HEAD initial `3644eba3d5485c8e255bd958619b59cbee436bc7`. AGENTS.md, docs/15_AUTONOMOUS_AGENT_EXECUTION.md, journal et checkpoint docs/CONTINUITY_CHECKPOINT_2026-11-06.md relus ; PR et issues ouvertes consultées. Visibilité du dépôt retournée `private` par get_repo le 23/11 (différente du snapshot du 07/11), sans changement de visibilité.
+- TEST_EVIDENCE : [CI #667 / run 45132502465](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45132502465) `completed/failure`, job validate `137550985998` ; [Docker #534 / run 45132502435](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45132502435) `completed/failure`, job `137550985779`. Jobs retournés sans steps ni logs_url ; récupération des logs non exploitable via le connecteur. Statuts commit combinés = [] (ne signifie pas réussite). Reviews #36 = []. Aucun test local exécuté.
+- ACTION : lecture GitHub des runs/jobs et vérification de l'absence de revue ; pas de relance aveugle ni de modification métier car aucune cause racine n'est prouvée. Suivi technique à consigner dans l'issue #8, sans créer d'orchestrateur ni registre secondaire.
+- BLOCK_REASON : deux workflows exact-HEAD échouent sans étapes/logs accessibles ; cause racine inconnue ; revue indépendante et gates de fusion manquants. Les recettes officielles #13/#14/#15/#17 restent non certifiées.
+- NEXT_ACTION : inspecter dans l'interface GitHub les annotations et éventuels messages d'échec d'allocation du runner, les réglages Actions, quotas et facturation ; obtenir un diagnostic reproductible avant tout changement workflow/code. Corriger le défaut démontré, valider CI et Docker sur le SHA exact, obtenir revue indépendante #36. Reprendre en parallèle une tâche des lots 0–13 dont le claim est libre et les contrats/licences vérifiés.
+- ROLLBACK : revert documentaire ciblé de cette entrée sur branche Draft ; aucun changement main, secrets, sources, migrations ou S1.
+
+---
+
+
 ## 2026-11-23 — PR #36 : nouvel échec pré-étapes, diagnostic GitHub Actions confirmé (lots 4/11)
 
 - RECONCILIATION : AGENTS.md, docs/15_AUTONOMOUS_AGENT_EXECUTION.md, journal actuel et checkpoint docs/CONTINUITY_CHECKPOINT_2026-11-06.md consultés via le connecteur Patricked-code ; recherche des PR/issues ouvertes et reviews #36 (reviews=[]). Travail limité à la branche Draft #36, sans modification des branches concurrentes.
