@@ -121,6 +121,18 @@ test('HTML index -> CSV child -> SHA archive -> PostgreSQL -> SUCCESS; failed ch
       [endpointCode],
     );
     assert.equal(artifactsAfterRecovery.rows[0]?.count, '2');
+    // Recovery must preserve the original parent-child archive linkage and
+    // bytes, not merely the total artifact count. A count-only check misses
+    // silent replacement of an archived observation after a failed retry.
+    const recoveredArchive = await pool.query<{ sha256: string; archive_path: string; parent_artifact_id: string | null }>(
+      'SELECT sha256, archive_path, parent_artifact_id FROM source.raw_artifacts WHERE endpoint_code=$1 AND parent_artifact_id IS NOT NULL',
+      [endpointCode],
+    );
+    assert.equal(recoveredArchive.rowCount, 1);
+    assert.equal(recoveredArchive.rows[0]?.parent_artifact_id, child.parent_artifact_id);
+    assert.equal(recoveredArchive.rows[0]?.sha256.trim(), child.sha256.trim());
+    assert.equal(recoveredArchive.rows[0]?.archive_path, child.archive_path);
+    assert.equal((await readFile(join(process.env.RAW_ARCHIVE_DIR!, recoveredArchive.rows[0]!.archive_path))).toString(), csv);
     // Recovery must not rewrite the failed attempt into a false SUCCESS.
     const history = await pool.query<{ status: string; count: string }>(
       "SELECT status, count(*)::text AS count FROM ops.ingestion_runs WHERE scope->>'endpointCode'=$1 GROUP BY status",
