@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { evaluateEnrollment, isExplicitRevocation, normalizeActiveRulesetPolicy, isSensitiveChangePath, checkPullRequestFileScope, resolveTrustedPrSignal } from '../scripts/ci/governed-native-automerge.mjs';
+import { evaluateEnrollment, isExplicitRevocation, normalizeActiveRulesetPolicy, isSensitiveChangePath, checkPullRequestFileScope, resolveTrustedPrSignal, evaluateRequiredScopeGate } from '../scripts/ci/governed-native-automerge.mjs';
 
 function fixture() {
   return {
@@ -327,4 +327,39 @@ test('unknown PR comment, issue-only comment, and non-SHA-bound signal are rejec
   f.comment.body = '/sadiaaf-automerge abc123abc123abc123abc123abc123abc123abcd';
   delete f.issue.pull_request;
   assert.equal(resolveTrustedPrSignal(f, f.repository.full_name), null);
+});
+
+test('required HEAD guard denies sensitive changes while labeled for auto-merge', () => {
+  const pr = {changed_files:1, labels:[{name:'automerge-eligible'}], auto_merge:null};
+  assert.match(evaluateRequiredScopeGate({
+    pullRequest:pr, files:[{filename:'sql/migrations/009.sql',status:'added'}]
+  }), /sensitive PR/);
+});
+test('required HEAD guard denies sensitive changes while native auto-merge remains enrolled after label removal', () => {
+  const pr = {changed_files:1, labels:[], auto_merge:{enabled_at:'2026-11-24T00:00:00Z'}};
+  assert.match(evaluateRequiredScopeGate({
+    pullRequest:pr, files:[{filename:'.github/workflows/ci.yml',status:'modified'}]
+  }), /sensitive PR/);
+});
+test('required HEAD guard allows an authorized manually integrated sensitive PR not enrolled in auto-merge', () => {
+  const pr = {changed_files:1, labels:[], auto_merge:null};
+  assert.equal(evaluateRequiredScopeGate({
+    pullRequest:pr, files:[{filename:'.github/workflows/ci.yml',status:'modified'}]
+  }), null);
+});
+test('required HEAD guard allows ordinary PR with label to pass', () => {
+  const pr = {changed_files:1, labels:[{name:'automerge-eligible'}], auto_merge:null};
+  assert.equal(evaluateRequiredScopeGate({
+    pullRequest:pr, files:[{filename:'src/parsers/csv.ts',status:'modified'}]
+  }), null);
+});
+test('required HEAD guard rejects incomplete file inventories even without label', () => {
+  const pr = {changed_files:2, labels:[], auto_merge:null};
+  assert.equal(typeof evaluateRequiredScopeGate({
+    pullRequest:pr, files:[{filename:'docs/06_CURRENT_STATUS_AND_GAPS.md',status:'modified'}]
+  }), 'string');
+});
+test('required HEAD guard rejects missing PR data or changed-file metadata', () => {
+  assert.equal(typeof evaluateRequiredScopeGate({pullRequest:null,files:[]}), 'string');
+  assert.equal(typeof evaluateRequiredScopeGate({pullRequest:{},files:[]}), 'string');
 });
