@@ -1,5 +1,20 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-23 — PR #37 : correctif rulesets après échec GitHub CLI 404
+
+- **INCIDENT UTILISATEUR :** le script administrateur GitHub V1, exécuté par `gh` sous le compte confirmé `Patricked-code`, a échoué au `PUT /branches/main/protection` avec le message exact `Branch protection has been disabled on this repository. (HTTP 404)`. Le `else` isolé affiché ultérieurement par PowerShell est sans impact sur GitHub.
+- **PREUVE LECTURE GITHUB APRÈS L'ÉCHEC :** `main=73256f48d81d38ce8ff6f51be9e024b25cf5dadb`, `protected=false`, `GET /rulesets=[]`, `allow_auto_merge=false`. Pas de fusion ou de déploiement effectué.
+- **SOURCE OFFICIELLE/TECHNIQUE :** GitHub documente l'API POST `/repos/{owner}/{repo}/rulesets`, disponible sur les repos publics GitHub Free. Le ticket ossf/allstar#562 reproduit précisément le HTTP 404 sur l'API classique ; la réponse du support GitHub recommande les rulesets.
+- **REMÉDIATION HORS GIT :** un nouvel outil local Windows SadiaAF GitHub V2 prépare un ruleset ACTIF ciblant uniquement `refs/heads/main`, PR obligatoire, 1 revue indépendante, dismissal stale reviews, approbation du dernier push, résolution des fils, CI `validate` et Docker/PostgreSQL stricts, interdiction force push/suppression, `bypass_actors=[]`, puis `allow_auto_merge=true` uniquement après relecture attestée. Outil non exécuté sur l'ordinateur utilisateur ni sur les API GitHub en écriture ; attestation d'activation ABSENTE.
+- **CORRECTION SUR LA BRANCHE PR #37 :** adaptation du vérificateur d'enrôlement pour considérer une protection par ruleset active, tout en conservant la vérification classique en fallback, avec scénarios de non-régression fail-closed supplémentaires.
+- **IMPORTANT — BLOCAGE DE VISIBILITÉ :** l'API GitHub omet `bypass_actors` lors de la lecture du ruleset sans permission d'administration adéquate. Le `GITHUB_TOKEN` ordinaire du workflow ne peut donc PAS supposer qu'un champ absent signifie liste vide. Le code conserve intentionnellement `SKIP` si le bypass ne peut pas être attesté. Pour activer complètement l'enrôlement autonome, prévoir une vérification de gouvernance attestée avec un acteur adéquatement habilité, en évitant de donner un PAT administrateur au workflow.
+- **TESTS :** les nouveaux tests rulesets ont été ajoutés ; CI exacte du nouveau SHA à obtenir, pas de PASS anticipé.
+- **BLOCK_REASON :** protection principale non activée, auto-merge désactivé, absence de permission d'administration de ruleset dans le token workflow, revue indépendante automatisée non attestée, PR #37 Draft.
+- **NEXT_ACTION :** contrôler CI exact-SHA de PR #37 ; lancer le script V2 à partir du poste utilisateur sous `gh` Patricked-code ; vérifier l'ID du ruleset actif et l'option auto-merge via lecture GitHub ; ensuite finaliser le contrôle d'absence de bypass par mécanisme autorisé et une revue indépendante, sans abaisser les gates, sans fusion ni S1.
+
+---
+
+
 ## 2026-11-23 — Lot 11 : préparation de la fusion automatique native sous gates stricts
 
 - **MANDAT** : réduire l'intervention humaine répétitive pour chaque développement, sans abandonner la mission des 14 lots ni affaiblir les reviews, CI, protections, licences, coûts ou gates S1.
