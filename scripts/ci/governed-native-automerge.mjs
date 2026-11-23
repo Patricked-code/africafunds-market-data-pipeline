@@ -82,6 +82,54 @@ export function evaluateEnrollment({ repository, branch, protection, pullRequest
   return null;
 }
 
+
+/**
+ * Auto-merge is a routine-code path, NEVER an authorization for changes to
+ * GitHub governance, secrets, data-source licensing, SQL, or deployments.
+ * A missing/truncated PR file list fails closed.
+ */
+export function isSensitiveChangePath(path) {
+  if (typeof path !== 'string' || path.length < 1 || path.includes('\\') ||
+      path.startsWith('/') || path.split('/').includes('..')) return true;
+  return /^(?:\.github\/|deploy\/|sql\/|config\/|scripts\/ci\/|src\/(?:auth\/|identity\/|security\/|config\/)|AGENTS\.md$|Dockerfile(?:\..*)?$|docker-compose(?:\..*)?\.ya?ml$|package(?:-lock)?\.json$|docs\/(?:08_DECISION_LOG|10_DEPLOYMENT_GATES|15_AUTONOMOUS_AGENT_EXECUTION)\.md$)/i.test(path) ||
+    /(^|[\/._-])(?:secret|credential|private.?key|token)(?:$|[\/._-])/i.test(path) ||
+    /^\.env(?:$|\.)/.test(path);
+}
+
+export function checkPullRequestFileScope({ files, changedFiles }) {
+  if (!Number.isSafeInteger(changedFiles) || changedFiles < 1 || changedFiles > 500 ||
+      !Array.isArray(files) || files.length !== changedFiles) {
+    return 'changed-file inventory missing, empty, truncated, or exceeds safe limit';
+  }
+  const seen = new Set();
+  for (const entry of files) {
+    if (!entry || !['added','modified','removed','renamed','copied','changed','unchanged'].includes(entry.status) ||
+        typeof entry.filename !== 'string' || seen.has(entry.filename)) {
+      return 'invalid or duplicate changed-file inventory entry';
+    }
+    seen.add(entry.filename);
+    if (isSensitiveChangePath(entry.filename) ||
+        (entry.status === 'renamed' &&
+         (typeof entry.previous_filename !== 'string' ||
+          isSensitiveChangePath(entry.previous_filename)))) {
+      return 'sensitive or unverified file path requires separate authorization';
+    }
+  }
+  return null;
+}
+
+async function readAllPrFiles(api, number, changedFiles, token) {
+  if (!Number.isSafeInteger(changedFiles) || changedFiles < 1 || changedFiles > 500) return null;
+  const files = [];
+  for (let page = 1; page <= Math.ceil(changedFiles / 100); page += 1) {
+    const batch = await githubRequest(api + '/pulls/' + number + '/files?per_page=100&page=' + page, token);
+    if (!Array.isArray(batch) || batch.length < 1) return null;
+    files.push(...batch);
+    if (files.length > changedFiles) return null;
+  }
+  return files;
+}
+
 export function isExplicitRevocation(event) {
   return event?.action === 'converted_to_draft' ||
     (event?.action === 'unlabeled' && event?.label?.name === INTENT_LABEL);
@@ -166,7 +214,14 @@ export async function enrollNativeAutoMerge({ repositoryName, token, event }) {
     });
     protection = result.data?.repository?.ref?.branchProtectionRule;
   }
-  const problem = evaluateEnrollment({
+  // A readiness label cannot authorize security-sensitive changes.
+  // Fetch the complete GitHub PR diff inventory; no labels or PR body
+  // can override a missing inventory or the protected path policy.
+  const prFiles = await readAllPrFiles(api, pullRequest.number, pullRequest.changed_files, token);
+  const fileScopeBlock = checkPullRequestFileScope({
+    files: prFiles, changedFiles: pullRequest.changed_files
+  });
+  const problem = fileScopeBlock || evaluateEnrollment({
     repository, branch, protection, pullRequest,
     eventSha: prFromEvent.head?.sha
   });
