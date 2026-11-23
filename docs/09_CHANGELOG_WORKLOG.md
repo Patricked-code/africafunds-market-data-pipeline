@@ -1,5 +1,16 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-24 — PR #37 : compatibilité CI des PR empilées, quatrième fil de revue
+
+- **PREUVE AVANT NOUVEAU CORRECTIF** : PR #37 HEAD dc01a6d823ea99df55a6e807a33ef80d00a43b2e ; CI #730 run 45287547194 et Docker #594 run 45287547070 completed/success, dont le nouveau required HEAD guard en mode lecture seule sur ce SHA.
+- **QUATRIÈME CONSTAT P2** : un fil de revue a identifié que le HEAD guard échouait sur les stacked PR ciblant une branche de fonctionnalité alors que la CI existante accepte ces PR. Le guard d'auto-merge ne doit s'appliquer qu'aux PR ciblant main sans rendre les PR empilées invalides.
+- **CORRECTION** : commit 8be106618e22a2c3b9978ed8ad8a22eba7788fc7 : si la PR est open et son SHA courant correspond à l'événement, mais sa base diffère de main, le contrôle retourne NOT_APPLICABLE_STACKED_PR. Cela ne rend PAS la PR éligible à l'auto-merge main. Commit 5d8de682b8b834bcbd389eaea98aeddcaeb26681 : test avec faux événement GitHub PR empilée et vérification d'un seul GET, sans évaluation main ni inventaire de fichiers.
+- **REVUES** : trois fils précédents ont reçu des réponses techniques et leurs correctifs ; résolution en attente de confirmation finale CI, quatrième fil à traiter après validation. Aucun commentaire automatique n'est traité comme approbation ou autorité de fusion.
+- **BLOCK_REASON** : PR #37 non fusionnée, quatre fils à vérifier/résoudre, CI/Docker du HEAD à venir, runtime GraphQL et pilote non certifiés. Les dix autres chantiers de finalisation et les six travaux de données restent dans les mêmes lots et documents canoniques.
+- **NEXT_ACTION** : contrôler nouvelle CI et Docker du HEAD après ce checkpoint, répondre/résoudre chacun des quatre fils si les correctifs ont passé, refaire preflight SHA/main/ruleset/checks, fusionner PR #37 sous autorisation propriétaire, puis enregistrer main et faire la recette runtime auto-merge (PR pilote non sensible). Aucune modification S1 ni seconde automatisation.
+
+---
+
 ## 2026-11-24 — PR #37 : fusion refusée par ruleset, corrections des trois fils de revue
 
 - **AUTORISATION** : propriétaire autorise la fusion de la PR #37 sous protections, CI et gouvernance, la continuité automatique pour PR ordinaires et la poursuite des 14 lots/6 chantiers. Aucun droit de bypass ni de production S1.
