@@ -1,5 +1,17 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-23 — PR #36 : garde de non-persistance après deux échecs non stricts (lots 4/11)
+
+- RECONCILIATION : PR #1 merged, PR #36 OPEN/Draft, base main 73256f48d81d38ce8ff6f51be9e024b25cf5dadb, HEAD initial 75584e21ab628f8d70a925b6ae88f1ecf5db8867 ; AGENTS.md, docs/15_AUTONOMOUS_AGENT_EXECUTION.md, journal et checkpoint 2026-11-06 relus via GitHub ; PR/issues ouvertes consultées ; dépôt private. Aucune modification de PR concurrente.
+- TEST_EVIDENCE : sur HEAD initial 75584e21ab628f8d70a925b6ae88f1ecf5db8867, CI [45185583886](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45185583886) et Docker [45185583785](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45185583785) = completed/failure. Job validate 137730201647 : steps=null, logs_url=null. Cause non déterminée, aucun test applicatif attesté.
+- ACTION_CODE : commit [74338738d594fdb639081e5edd993a849bb4e56a](https://github.com/Patricked-code/africafunds-market-data-pipeline/commit/74338738d594fdb639081e5edd993a849bb4e56a) sur test/integration/ingestion-html-csv.test.ts : après deux tentatives HTTP 404 non strictes, assert zéro raw record et deux audits FAILED conservant error_message NULL. Assertions ajoutées sans modifier le moteur, la base, les sources officielles ou les secrets.
+- VALIDATION : code committé, tests NOT_RUN localement ; CI sur ce commit et le HEAD documentaire suivant NON ATTESTÉ. Aucune recette métier réelle ni HISTORY_COMPLETE revendiquée.
+- BLOCK_REASON : GitHub Actions CI/Docker échouent sans étapes exploitables ; diagnostic d'allocation runner/quota/facturation ou annotations administratives manquant ; revue indépendante #36 absente et gates de fusion non satisfaits.
+- NEXT_ACTION : vérifier CI/Docker sur le nouveau HEAD exact, rechercher les annotations check-run/erreurs pré-job sans relance aveugle ; corriger uniquement une cause démontrée, valider le test PostgreSQL et obtenir revue indépendante. Si Actions reste bloqué, poursuivre un lot indépendant après claim ; ne pas fusionner, ne pas déployer S1.
+- ROLLBACK : revert ciblé du commit test 74338738 et de cette entrée sur la branche Draft, sans modifier main.
+
+---
+
 ## 2026-11-23 — PR #36 : réexécution FAILED non stricte, deux audits distincts (lots 4/11)
 
 - RECONCILIATION : AGENTS.md, docs/15_AUTONOMOUS_AGENT_EXECUTION.md, journal courant et checkpoint 2026-11-06 relus via GitHub ; PR/issues ouvertes recherchées ; PR #36 OPEN/Draft. PR #1 documentaire fusionnée d'après réconciliation précédente, sans réouverture. Aucun travail sur les PR concurrentes.
