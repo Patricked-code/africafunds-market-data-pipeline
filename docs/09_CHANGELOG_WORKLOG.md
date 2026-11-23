@@ -1,5 +1,19 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-23 — Reprise vérifiée PR #37 : CI relancée verte et gate administratif encore bloquant
+
+- **RÉCONCILIATION LIVE** : `main=73256f48d81d38ce8ff6f51be9e024b25cf5dadb`, `protected=true`, ruleset ACTIF [27937019](https://github.com/Patricked-code/africafunds-market-data-pipeline/rules/27937019), `allow_auto_merge=true` ; le snapshot ancien `protected=false` / `rulesets=[]` / `allow_auto_merge=false` est OBSOLÈTE. 14 PR Draft ouvertes (#22, #25–#37), aucune fusion sur ce passage ; les issues #3, #5–#9, #13–#17 et #20 demeurent ouvertes.
+- **HEAD PR #37** : `4f1288166285f659dd2430ff10ac1af5547d647c` (Draft). [CI #706](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45270757095) **SUCCESS après rerun** des jobs échoués ; première tentative FAILURE dans les tests PostgreSQL `backfill-claim` et `backfill-window`, ce qui reste un signal de non-déterminisme à analyser dans issue #5 sans déclarer la cause résolue. [Docker #570](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45270757081) **SUCCESS** sur le même SHA. Les 45 tests de politique auto-merge ont réussi sur la première tentative CI ; la réussite globale de la CI après rejeu est attestée par GitHub.
+- **RULESET ACTUEL** : PR obligatoire, `required_approving_review_count=1`, `require_last_push_approval=true`, `require_extra_approval_for_unattributed_changes=true`, `required_reviewers=[]`, `require_code_owner_review=false`, `bypass_actors=[]`, `current_user_can_bypass=never` ; checks stricts `validate` et `Build, boot, migrate and verify persistent PostgreSQL` ; suppression/force-push interdits.
+- **DÉCISION ADR-016** : le propriétaire a demandé la suppression des revues indépendantes obligatoires pour les PR ordinaires ; ce changement est codé/testé dans #37 mais **non appliqué** au ruleset administratif. Le mandat historique demandant >=1 approbation est remplacé uniquement sur ce point pour les PR ordinaires, pas sur les changements sensibles ni sur les gates S1.
+- **SÉCURITÉ WORKFLOW** : `.github/workflows/governed-native-automerge.yml` est seulement présent dans la PR Draft et ne constitue pas une activation. Le script ne doit jamais se substituer aux protections natives ; l'évaluation de `current_user_can_bypass` sous le jeton réel GitHub Actions reste à attester.
+- **BLOCK_REASON** : seul l'administrateur GitHub peut modifier le ruleset 27937019 pour retirer les approbations ; la PR #37 reste Draft ; aucun test réel d'auto-merge natif n'a été effectué. La première tentative de CI a révélé des échecs d'intégration backfill non expliqués malgré le rerun vert.
+- **NEXT_ACTION** : mettre à jour le **même** ruleset via admin GitHub avec `required_approving_review_count=0`, `require_last_push_approval=false`, `require_extra_approval_for_unattributed_changes=false`, tout en conservant checks stricts et protections. Contrôler les champs API, vérifier le token GitHub Actions sans privilège de bypass, qualifier la PR #37 puis tester l'enrôlement sur une PR pilote non sensible. Analyser indépendamment les échecs initiaux backfill (issue #5) avant de qualifier la CI comme stable. Reprendre les lots 0–13 sans collision de PR ni S1.
+- **ROLLBACK** : PR #37 non fusionnée, changements réversibles ; aucune action serveur, secret ou dépense.
+
+---
+
+
 ## 2026-11-23 — ADR-016 : retirer l'approbation indépendante pour les PR ordinaires, maintenir les checks
 
 - **INTENTION EXPLICITE** : le propriétaire demande de supprimer l'exigence de revues indépendantes récurrentes sur les développements SadiaAF, pour avancer avec une intégration automatique des unités admissibles ; pas de suppression des exigences S1 ou d'autorisations réservées.
