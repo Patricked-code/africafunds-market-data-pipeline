@@ -286,6 +286,18 @@ test('HTML index -> CSV child -> SHA archive -> PostgreSQL -> SUCCESS; failed ch
       assert.equal(attempt.status, 'FAILED');
       assert.deepEqual([attempt.summary.endpoints, attempt.summary.success, attempt.summary.failed], [1, 0, 1]);
     }
+    // Both failed attempts must remain free of financial observations, not only archives.
+    const allFailedRecords = await pool.query<{ count: string }>(
+      'SELECT count(*)::text AS count FROM market.raw_records WHERE endpoint_code=$1',
+      [failingEndpointCode],
+    );
+    assert.equal(allFailedRecords.rows[0]?.count, '0');
+    const failedAuditRows = await pool.query<{ ingestion_run_id: string; error_message: string | null }>(
+      "SELECT ingestion_run_id, error_message FROM ops.ingestion_runs WHERE scope->>'endpointCode'=$1",
+      [failingEndpointCode],
+    );
+    assert.equal(failedAuditRows.rowCount, 2);
+    assert.ok(failedAuditRows.rows.every((row) => row.error_message === null));
     const allFailedArtifacts = await pool.query<{ count: string }>(
       'SELECT count(*)::text AS count FROM source.raw_artifacts WHERE endpoint_code=$1',
       [failingEndpointCode],
