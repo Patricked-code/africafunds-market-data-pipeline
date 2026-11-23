@@ -36,6 +36,11 @@ export function evaluateEnrollment({ repository, branch, protection, pullRequest
   return null;
 }
 
+export function isExplicitRevocation(event) {
+  return event?.action === 'converted_to_draft' ||
+    (event?.action === 'unlabeled' && event?.label?.name === INTENT_LABEL);
+}
+
 async function githubRequest(url, token, { method = 'GET', body } = {}) {
   const response = await fetch(url, {
     method,
@@ -55,6 +60,16 @@ async function githubRequest(url, token, { method = 'GET', body } = {}) {
   return payload;
 }
 
+async function disableIfEnrolled(pullRequest, token) {
+  if (!pullRequest.auto_merge) return false;
+  const query = 'mutation($id: ID!) { disablePullRequestAutoMerge(input: {pullRequestId: $id}) { pullRequest { number } } }';
+  await githubRequest('https://api.github.com/graphql', token, {
+    method: 'POST', body: { query, variables: { id: pullRequest.node_id } }
+  });
+  console.log('DISABLED: native auto-merge for PR #' + pullRequest.number);
+  return true;
+}
+
 export async function enrollNativeAutoMerge({ repositoryName, token, event }) {
   const prFromEvent = event?.pull_request;
   if (!prFromEvent || !Number.isInteger(prFromEvent.number)) {
@@ -71,7 +86,14 @@ export async function enrollNativeAutoMerge({ repositoryName, token, event }) {
     githubRequest(api + '/branches/main', token),
     githubRequest(api + '/pulls/' + prFromEvent.number, token)
   ]);
+  if (isExplicitRevocation(event)) {
+    await disableIfEnrolled(pullRequest, token);
+    return 'REVOKED';
+  }
   if (repository.allow_auto_merge !== true || branch.protected !== true) {
+    if (pullRequest.labels?.some(label => label.name === INTENT_LABEL)) {
+      await disableIfEnrolled(pullRequest, token);
+    }
     console.log('SKIP: repository auto-merge or main protection is not enabled');
     return 'SKIPPED';
   }
@@ -87,6 +109,9 @@ export async function enrollNativeAutoMerge({ repositoryName, token, event }) {
     eventSha: prFromEvent.head?.sha
   });
   if (problem) {
+    if (pullRequest.labels?.some(label => label.name === INTENT_LABEL)) {
+      await disableIfEnrolled(pullRequest, token);
+    }
     console.log('SKIP: ' + problem);
     return 'SKIPPED';
   }
