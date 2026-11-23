@@ -159,6 +159,33 @@ export function checkPullRequestFileScope({ files, changedFiles }) {
   return null;
 }
 
+/**
+ * A *required* validate job runs on every PR revision. It rejects any
+ * sensitive or unverified diff while the PR is labeled for auto-merge or
+ * currently enrolled. This closes the post-enrollment writer-push race:
+ * GitHub must see this job succeed on the newly pushed SHA.
+ * Sensitive PRs WITHOUT auto-merge remain eligible for an explicitly
+ * authorized, manual GitHub merge under the other required gates.
+ */
+export function evaluateRequiredScopeGate({ pullRequest, files }) {
+  if (!pullRequest || !Number.isSafeInteger(pullRequest.changed_files)) {
+    return 'missing live PR head/file metadata';
+  }
+  const scopeProblem = checkPullRequestFileScope({
+    files, changedFiles: pullRequest.changed_files
+  });
+  if (!scopeProblem) return null;
+  if (scopeProblem !== 'sensitive or unverified file path requires separate authorization') {
+    return scopeProblem;
+  }
+  const label = Array.isArray(pullRequest.labels) &&
+    pullRequest.labels.some(item => item.name === INTENT_LABEL);
+  if (label || pullRequest.auto_merge) {
+    return 'sensitive PR is labeled or enrolled for automatic merging';
+  }
+  return null;
+}
+
 async function readAllPrFiles(api, number, changedFiles, token) {
   if (!Number.isSafeInteger(changedFiles) || changedFiles < 1 || changedFiles > 500) return null;
   const files = [];
@@ -246,15 +273,8 @@ export async function enrollNativeAutoMerge({ repositoryName, token, event }) {
       break;
     }
   }
-  if (!protection) {
-    // Legacy classic branch protection is still supported.
-    const [owner, name] = repositoryName.split('/');
-    const query = 'query($owner: String!, $name: String!) { repository(owner: $owner, name: $name) { ref(qualifiedName: "refs/heads/main") { branchProtectionRule { requiresApprovingReviews requiredApprovingReviewCount requiresStatusChecks requiredStatusCheckContexts requiresStrictStatusChecks dismissesStaleReviews requiresConversationResolution isAdminEnforced } } } }';
-    const result = await githubRequest('https://api.github.com/graphql', token, {
-      method: 'POST', body: { query, variables: { owner, name } }
-    });
-    protection = result.data?.repository?.ref?.branchProtectionRule;
-  }
+  // Only an explicitly verified, active, exact-main ruleset is supported.
+  // No unnormalized classic-protection fallback may grant eligibility.
   // A readiness label cannot authorize security-sensitive changes.
   // Fetch the complete GitHub PR diff inventory; no labels or PR body
   // can override a missing inventory or the protected path policy.
