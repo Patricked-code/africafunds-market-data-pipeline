@@ -1,5 +1,18 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-23 — PR #36 : test d'intégration d'index HTML vide sans faux SUCCESS (lot 4/11)
+
+- **RECONCILIATION** : dépôt PUBLIC, PR #36 OPEN/Draft, HEAD avant changement `52ebe446611bb9793c46091d7de3c0f076f48bac` ; PR concurrentes #22 et #25–#35 non modifiées. Lecture AGENTS.md, des 16 documents obligatoires et du checkpoint, du contrat d'exécution autonome, de l'issue #14 et du code réel `src/jobs/ingest.ts`.
+- **PREUVES EXACT-SHA** : sur HEAD précédent `52ebe446611bb9793c46091d7de3c0f076f48bac`, [CI #684](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45239359720) et [Docker #551](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45239359843) `completed/success`. Les preuves n'attestent pas les commits suivants.
+- **ACTION CODE/TEST** : commit [35db05809aa1f2b0aa7398915cf852a5d32a701b](https://github.com/Patricked-code/africafunds-market-data-pipeline/commit/35db05809aa1f2b0aa7398915cf852a5d32a701b) sur la même branche, test d'intégration réel dans `test/integration/ingestion-html-csv.test.ts` : remplacer une page HTML d'index par une page HTTP 200 sans table ni lien enfant, vérifier le rejet strict, l'audit PostgreSQL `FAILED`, les compteurs `success=0/failed=1/rows=0` et la conservation des deux observations historiques. Pas de changement du moteur, du schéma, de la source officielle ou du serveur.
+- **TESTS** : locaux NOT_RUN ; CI/Docker exact SHA après commit de code et présent checkpoint à contrôler. Aucun PASS anticipé sur ce nouveau code.
+- **BLOCK_REASON** : revue indépendante et protection effective de main non attestées ; audit historique/secrets public et licences des sources réelles incomplets ; PR #36 Draft ; CI exact nouveau HEAD non encore vérifiée.
+- **NEXT_ACTION** : inspecter les runs CI/Docker du nouveau HEAD, corriger tout échec reproductible sur la branche sous claim ; obtenir revue indépendante, contrôler ruleset/main et audit public ; poursuivre les unités indépendantes des lots 0–13 sans fusion ni S1.
+- **ROLLBACK** : revert ciblé du commit test et du checkpoint sur branche PR #36 ; aucun impact sur main/S1.
+
+---
+
+
 ## 2026-11-23 — PR #36 : invariant de conservation d'archive après reprise (lot 4/11)
 
 - **RECONCILIATION** : dépôt `Patricked-code/africafunds-market-data-pipeline` public, PR #36 OPEN/Draft ; 13 PR ouvertes #22 et #25–#36 (hors #23/#24), aucune branche concurrente modifiée. Lecture `AGENTS.md`, présent journal et `docs/15_AUTONOMOUS_AGENT_EXECUTION.md` ; issue #3 ancienne description « privé » désormais obsolète et à réconcilier avant modification des protections.
