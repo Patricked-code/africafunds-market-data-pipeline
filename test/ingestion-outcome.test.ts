@@ -86,3 +86,23 @@ test('discovery-only collection remains auditable with zero financial rows', () 
   accountForEndpointResult(summary, { artifacts: 1, rows: 0, links: 2 }, 'discover');
   assert.deepEqual(summary, { success: 1, artifacts: 1, rows: 0, links: 2 });
 });
+
+test('failed child leaves archived evidence visible without counting financial success', () => {
+  const summary = { success: 0, artifacts: 0, rows: 0, links: 0 };
+  assert.throws(
+    () => accountForEndpointResult(summary, { artifacts: 2, rows: 5, links: 2, failedChildren: 1 }, 'ingest'),
+    /failedChildren=1/,
+  );
+  assert.deepEqual(summary, { success: 0, artifacts: 2, rows: 5, links: 2 });
+});
+test('discovery mode accepts empty observations but rejects a failed child', () => {
+  const clean = { success: 0, artifacts: 0, rows: 0, links: 0 };
+  accountForEndpointResult(clean, { artifacts: 1, rows: 0, links: 2, failedChildren: 0 }, 'discover');
+  assert.deepEqual(clean, { success: 1, artifacts: 1, rows: 0, links: 2 });
+  const failed = { success: 0, artifacts: 0, rows: 0, links: 0 };
+  assert.throws(
+    () => accountForEndpointResult(failed, { artifacts: 1, rows: 0, links: 2, failedChildren: 1 }, 'discover'),
+    /failedChildren=1/,
+  );
+  assert.deepEqual(failed, { success: 0, artifacts: 1, rows: 0, links: 2 });
+});

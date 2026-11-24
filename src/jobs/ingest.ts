@@ -1,5 +1,6 @@
 import { Buffer } from 'node:buffer';
 import { accountForEndpointResult, assertCollectorImplemented, assertIngestionSucceeded, ingestionRunStatus } from './ingestionOutcome.js';
+import { assertEndpointsSelected } from './ingestionCompleteness.js';
 import { fetchWithRetry } from '../http/fetcher.js';
 import { archiveRaw } from '../archive/rawStore.js';
 import { discoverLinks, parseHtmlTables } from '../parsers/html.js';
@@ -94,7 +95,7 @@ async function parseAndPersist(endpoint: SourceEndpoint, artifactId: string, bod
   return 0;
 }
 
-async function ingestEndpoint(endpoint: SourceEndpoint, mode: 'ingest' | 'discover'): Promise<{ artifacts: number; rows: number; links: number }> {
+async function ingestEndpoint(endpoint: SourceEndpoint, mode: 'ingest' | 'discover'): Promise<{ artifacts: number; rows: number; links: number; failedChildren: number }> {
   // Discovery-only URLs must never be archived or counted as successfully ingested data.
   assertCollectorImplemented(endpoint);
   await withTransaction((client) => upsertEndpoint(client, endpoint));
@@ -103,6 +104,7 @@ async function ingestEndpoint(endpoint: SourceEndpoint, mode: 'ingest' | 'discov
   let rows = await parseAndPersist(endpoint, pageArtifactId, page.body, contentType(page.headers));
   let artifacts = 1;
   let linksCount = 0;
+  let failedChildren = 0;
 
   const shouldDiscover = endpoint.collector.includes('LINK_INDEX') || endpoint.collector === 'HTML_TABLE_CSV' || mode === 'discover';
   if (shouldDiscover && contentType(page.headers).includes('html')) {
@@ -117,11 +119,12 @@ async function ingestEndpoint(endpoint: SourceEndpoint, mode: 'ingest' | 'discov
         artifacts += 1;
         rows += await parseAndPersist(endpoint, childId, child.body, contentType(child.headers));
       } catch (error) {
+        failedChildren += 1;
         logger.warn({ endpoint: endpoint.id, url: link.url, error }, 'Téléchargement lié impossible');
       }
     }
   }
-  return { artifacts, rows, links: linksCount };
+  return { artifacts, rows, links: linksCount, failedChildren };
 }
 
 export async function runIngestion(input: { market?: string; family?: string; endpointCode?: string; mode?: 'ingest' | 'discover'; failOnEndpointError?: boolean } = {}): Promise<void> {
@@ -134,6 +137,8 @@ export async function runIngestion(input: { market?: string; family?: string; en
   const runId = await startRun({ jobType: mode.toUpperCase(), scope: input });
   const summary = { endpoints: endpoints.length, success: 0, failed: 0, artifacts: 0, rows: 0, links: 0 };
   try {
+    // Preserve a FAILED audit record instead of a false SUCCESS on zero selection.
+    assertEndpointsSelected(endpoints.length);
     for (const endpoint of endpoints) {
       try {
         const result = await ingestEndpoint(endpoint, mode);
@@ -146,8 +151,6 @@ export async function runIngestion(input: { market?: string; family?: string; en
         logger.error({ endpoint: endpoint.id, error }, 'Échec de source');
       }
     }
-    // Validate before the terminal write: strict backfill failures must not first be persisted as PARTIAL.
-    if (input.failOnEndpointError) assertIngestionSucceeded(summary);
   } catch (error) {
     await writeTerminalOnce(() => finishRun(runId, 'FAILED', summary, error));
     throw error;
@@ -155,4 +158,8 @@ export async function runIngestion(input: { market?: string; family?: string; en
   // A terminal persistence failure must propagate directly: never attempt a second terminal
   // write for the same run when finishRun itself throws.
   await writeTerminalOnce(() => finishRun(runId, ingestionRunStatus(summary), summary));
+  // A strict caller must receive an error on partial failure, while the
+  // single terminal audit retains the actual PARTIAL/FAILED endpoint outcome.
+  // The exception deliberately occurs outside the terminal-write catch.
+  if (input.failOnEndpointError) assertIngestionSucceeded(summary);
 }

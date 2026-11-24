@@ -1,3 +1,5 @@
+import { assertUsableIngestion } from './ingestionCompleteness.js';
+
 /** Counters must represent a consistent, non-empty set of attempted endpoints. */
 function validIngestionCounters(summary: { endpoints: number; success: number; failed: number }): boolean {
   const { endpoints, success, failed } = summary;
@@ -42,12 +44,18 @@ export function assertStructuredIngestionRows(rows: number, mode: 'ingest' | 'di
  */
 export function accountForEndpointResult(
   summary: { success: number; artifacts: number; rows: number; links: number },
-  result: { artifacts: number; rows: number; links: number },
+  result: { artifacts: number; rows: number; links: number; failedChildren?: number },
   mode: 'ingest' | 'discover',
 ): void {
   summary.artifacts += result.artifacts;
   summary.rows += result.rows;
   summary.links += result.links;
   assertStructuredIngestionRows(result.rows, mode);
+  const failedChildren = result.failedChildren ?? 0;
+  if (mode === 'ingest') {
+    assertUsableIngestion({ rows: result.rows, failedChildren });
+  } else if (!Number.isSafeInteger(failedChildren) || failedChildren !== 0) {
+    throw new Error(`Ingestion incomplete: failedChildren=${failedChildren}`);
+  }
   summary.success += 1;
 }
