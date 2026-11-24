@@ -1,5 +1,12 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-24 — Lot 11 / issue #9 : raccordement GitHub du programme directeur
+- **CONTINUITY_ID** : SADIAAF-CONTINUITY-20261124-01 ; PR #42, parent 60c929fa83e4563a860b326548ef848ca44ad01e ; traces issue #9 7122328349 et 7122339314. CI #760 et Docker #623 SUCCESS sur a0ae4f0b ; main 50e35e70 protégée, ruleset 27937019 actif, auto_merge=true.
+- **CODE** : adaptateur githubDirector.ts (CI/merge, lecture live, clé canonique, vérification répétée et raccordement à runDirectorWake), préflight ruleset dédié, cinq scénarios de test. Aucune installation de ref ou exécuteur externe. Ref 404, seul ruleset main ; événements automation indisponibles (404). Aucun S1, secret, coût ni changement des branches métier.
+- **BLOCK_REASON** : validation du nouveau commit, protection/initialisation de ref, transport de confiance, exécuteur réel et passerelle mutation, recette réelle et journalisation exhaustive non attestés.
+- **NEXT_ACTION** : vérifier CI #761 et Docker #624 sur 60c929fa, publier l'extension sans force uniquement après vérification HEAD et contrôles ; recetter exact SHA, qualifier configuration administrative dédiée et exécuteur déjà disponible, deux cycles réels et reprise sans tick.
+
+
 ## 2026-11-24 — Lot 11 / issue #9 : admission événementielle du programme directeur
 - **CONTINUITY_ID** : SADIAAF-CONTINUITY-20261124-01 ; PR #42, admission issue #9 commentaire 7122228856, parent a0ae4f0bc8805f562eeb557d038f4d78d6de7d15.
 - **CODE** : runDirectorWake, reçus intention/résultat et déduplication sur ClaimStore existant ; signal non vérifié refusé, signal interrompu non rejoué, quatre tests ciblés. Aucun transport/exécuteur réel ni bootstrap live ajouté. Plafond conservateur des reçus, stratégie de conservation/index à certifier avant activation.
