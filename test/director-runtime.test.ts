@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import {createExistingPrExecutor,supportedExistingPrAdmissions,runExistingPrDirector,runAcceptedExistingPrDirector,eventFromAcceptedWake,type DirectorRuntimeConfig} from "../src/coordination/directorRuntime.js";
+import {createExistingPrExecutor,supportedExistingPrAdmissions,supportedDirectorAdmissions,runExistingPrDirector,runAcceptedExistingPrDirector,eventFromAcceptedWake,type DirectorRuntimeConfig} from "../src/coordination/directorRuntime.js";
 import {emptyState,transition,type ClaimedWorkContext} from "../src/coordination/agentClaims.js";
 import type {CanonicalWorkAdmission} from "../src/coordination/githubSelector.js";
 import type {CodingResult} from "../src/coordination/modelCoder.js";
@@ -67,4 +67,31 @@ test("deferred worker cannot access credentials without proven coordination isol
  async verifyCoordinationIsolation(){return false;},async verifyWriterIsolation(){return false;},async verifyAdmissionHistory(){return true;},async verifyCandidatePolicy(){return false;},async authenticateDelivery(){throw Error("deferred entrypoint must not synthesize delivery");}};
  await assert.rejects(runAcceptedExistingPrDirector(config),/COORDINATION_ISOLATION_REQUIRED/);
  assert.equal(issued,0);
+});
+
+test("new-work lifecycle validates before branch creation then builds, publishes and opens exact draft",async()=>{
+ const calls:string[]=[];
+ const execute=createExistingPrExecutor({async prepare(){calls.push("prepare");return result;},
+ async build(){calls.push("build");return prepared;},async publish(){calls.push("publish");return {head:next};},
+ lifecycle:{async createBranch(){calls.push("branch");return {head};},async createDraftPr(_ctx,p){assert.equal(p,prepared);calls.push("draft");return {head:next,prNumber:43};}}});
+ const out=await execute(context);assert.deepEqual(calls,["prepare","branch","build","publish","draft"]);
+ assert.deepEqual(out.trace.evidence,["ci:1","ci:2","commit:"+next,"pr:43"]);
+});
+test("blocked model never creates a branch; uncertain branch never builds",async()=>{
+ const lifecycle={async createBranch(){throw Error("unexpected branch");},async createDraftPr(){throw Error("unexpected draft");}};
+ const execute=createExistingPrExecutor({async prepare(){return {outcome:"blocked",reason:"RED",red,attempts:3};},
+ async build(){throw Error("unexpected build");},async publish(){throw Error("unexpected publish");},lifecycle});
+ assert.equal((await execute(context)).outcome,"blocked");
+ const invalid=createExistingPrExecutor({async prepare(){return result;},async build(){throw Error("unexpected build");},
+ async publish(){throw Error("unexpected publish");},lifecycle:{...lifecycle,async createBranch(){return {head:next};}}});
+ await assert.rejects(invalid(context),/BRANCH_UNCONFIRMED/);
+});
+test("draft creation is not called on uncertain publication",async()=>{
+ const execute=createExistingPrExecutor({async prepare(){return result;},async build(){return prepared;},
+ async publish(){return {head};},lifecycle:{async createBranch(){return {head};},async createDraftPr(){throw Error("unexpected draft");}}});
+ await assert.rejects(execute(context),/PUBLICATION_UNCONFIRMED/);
+});
+test("director admits new and existing work only within supported contract",()=>{
+ const fresh={...admission,pr:null};
+ assert.deepEqual(supportedDirectorAdmissions([fresh,admission,{...fresh,acceptance:"unknown"}]),[fresh,admission]);
 });

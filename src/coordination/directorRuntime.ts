@@ -12,6 +12,7 @@ import {createGitHubValidationEvidence} from "./githubValidationEvidence.js";
 import {createGitHubCommitBuilder} from "./githubCommitBuilder.js";
 import {createGitHubPublicationPort} from "./githubPublication.js";
 import {publishClaimedCommit,type PreparedMutation} from "./mutationGateway.js";
+import {createGitHubNewWork} from "./githubNewWork.js";
 
 type Validated=Extract<CodingResult,{outcome:"validated"}>;
 const positive=z.number().int().positive().safe();
@@ -24,6 +25,12 @@ export interface ExistingPrExecutorPorts {
  prepare(context:ClaimedWorkContext):Promise<CodingResult>;
  build(context:ClaimedWorkContext,result:Validated):Promise<PreparedMutation>;
  publish(context:ClaimedWorkContext,candidate:PreparedMutation,result:Validated):Promise<{head:string}>;
+ // Present only for an explicitly admitted new branch. The existing
+ // lifecycle ports persist intents and fence all writes.
+ lifecycle?:{
+  createBranch(context:ClaimedWorkContext):Promise<{head:string}>;
+  createDraftPr(context:ClaimedWorkContext,candidate:PreparedMutation):Promise<{head:string;prNumber:number}>;
+ };
 }
 export function createExistingPrExecutor(ports:ExistingPrExecutorPorts){
  return async(context:ClaimedWorkContext):Promise<WorkPassResult>=>{
@@ -31,17 +38,27 @@ export function createExistingPrExecutor(ports:ExistingPrExecutorPorts){
   if(result.outcome==="blocked")return {outcome:"blocked",trace:{
    head:context.claim.trace.head,nextAction:"Reconcile rejected model candidate before renewed admission",
    evidence:[result.red.evidence]}};
+  if(ports.lifecycle){
+   const branch=await ports.lifecycle.createBranch(context);
+   if(branch.head!==result.head)throw Error("DIRECTOR_BRANCH_UNCONFIRMED");
+  }
   const candidate=await ports.build(context,result);
   const published=await ports.publish(context,candidate,result);
   if(published.head!==candidate.candidateHead)throw Error("DIRECTOR_PUBLICATION_UNCONFIRMED");
+  const opened=ports.lifecycle?await ports.lifecycle.createDraftPr(context,candidate):null;
+  if(opened&&(opened.head!==published.head||!positive.safeParse(opened.prNumber).success))throw Error("DIRECTOR_DRAFT_PR_UNCONFIRMED");
   return {outcome:"completed",trace:{head:published.head,nextAction:"Reconcile exact PR CI and governed integration",
-   evidence:[...new Set([result.red.evidence,result.green.evidence,"commit:"+published.head])]}};
+   evidence:[...new Set([result.red.evidence,result.green.evidence,"commit:"+published.head,...(opened?["pr:"+opened.prNumber]:[])])]}};
  };
 }
 export function supportedExistingPrAdmissions(admissions:readonly CanonicalWorkAdmission[]){
  // Explicit bounded first recipe, not a claim of general coding coverage.
  return admissions.filter(a=>a.pr!==null&&a.acceptance===DATES_ACCEPTANCE&&
   a.scopes.length===1&&a.scopes[0]==="file:src/utils/dates.ts");
+}
+export function supportedDirectorAdmissions(admissions:readonly CanonicalWorkAdmission[]){
+ return admissions.filter(a=>a.acceptance===DATES_ACCEPTANCE&&a.scopes.length===1&&
+  a.scopes[0]==="file:src/utils/dates.ts");
 }
 export interface DirectorRuntimeConfig {
  identity:ReturnType<typeof createGitHubAppIdentity>;
@@ -61,9 +78,9 @@ export interface DirectorRuntimeConfig {
  verifyCandidatePolicy(candidate:PreparedMutation,result:Validated):Promise<boolean>;
  authenticateDelivery(event:GitHubDirectorEvent):Promise<boolean>;
 }
-// Connect the existing modules for one authenticated wake on already-admitted
-// existing PRs. No scheduler, branch creation, PR creation, admin mutation,
-// model credential delivery, or implicit recovery. Not a complete activation.
+// Connect existing modules for one authenticated wake. New branch and draft
+// PR use the governed lifecycle, only for admitted supported tasks.
+// No scheduler, ready/merge action, admin mutation or implicit recovery.
 export function eventFromAcceptedWake(signal:WakeSignal):GitHubDirectorEvent{
  const number=(s:string)=>positive.parse(Number(s));
  if(signal.kind==="ci-completed"){
@@ -116,7 +133,7 @@ async function runDirector(config:DirectorRuntimeConfig,event:GitHubDirectorEven
  const load=createCanonicalAdmissionLoader(readGitHub);
  const admissions=async(main:string)=>{
   if(await config.verifyAdmissionHistory()!==true)throw Error("DIRECTOR_ADMISSION_HISTORY_REQUIRED");
-  return supportedExistingPrAdmissions(await load(main));
+  return supportedDirectorAdmissions(await load(main));
  };
  const readAdmission=async(workId:string)=>{
   const main=mainSchema.parse(await readGitHub("/branches/main")).commit.sha;
@@ -129,10 +146,14 @@ async function runDirector(config:DirectorRuntimeConfig,event:GitHubDirectorEven
  const model=createLocalModelCoder(); // loopback only; no GitHub credentials
  const execute=async(context:ClaimedWorkContext)=>{
   const initial=await readAdmission(context.claim.workId);
-  if(!initial||initial.pr===null)throw Error("DIRECTOR_EXISTING_PR_REQUIRED");
-  const checkCurrentPr=async()=>{
+  if(!initial)throw Error("DIRECTOR_ADMISSION_REQUIRED");
+  const checkAdmission=async()=>{
    const current=await readAdmission(initial.workId);
    if(JSON.stringify(current)!==JSON.stringify(initial))throw Error("DIRECTOR_ADMISSION_CHANGED");
+  };
+  const checkCurrentPr=async()=>{
+   await checkAdmission();
+   if(initial.pr===null)return;
    const pr=prSchema.parse(await readGitHub("/pulls/"+initial.pr));
    if(pr.number!==initial.pr||pr.head.ref!==initial.branch||pr.head.sha!==initial.head)
     throw Error("DIRECTOR_PR_HEAD_CHANGED");
@@ -150,11 +171,40 @@ async function runDirector(config:DirectorRuntimeConfig,event:GitHubDirectorEven
   const builder=createGitHubCommitBuilder({token:writer.token,fetcher:writeFetch,readAdmission,readSource,
    verifyEvidence:evidence.verifyEvidence,verifyPrepared:publication.verifyPrepared});
   const identity={workId:context.claim.workId,actor:context.claim.actor,session:context.claim.session,generation:context.claim.generation};
+  const authenticate=async(i:typeof identity)=>i.actor===actor&&i.session===config.session&&i.workId===identity.workId&&i.generation===identity.generation;
+  let built:PreparedMutation|undefined;
+  let lifecycle:ExistingPrExecutorPorts["lifecycle"];
+  if(initial.pr===null){
+   const prCredential=await config.identity.issue("pull-request");
+   if(prCredential.actor!==actor||[readCredential.token,writer.token,evidenceCredential.token].includes(prCredential.token))
+    throw Error("DIRECTOR_LIFECYCLE_IDENTITY_MISMATCH");
+   const newWork=createGitHubNewWork({store,now:config.now,branchToken:writer.token,prToken:prCredential.token,
+    fetcher:scopedFetch(Math.min(writer.expiresAt,prCredential.expiresAt)),authenticate,readAdmission,
+    verifyWriterIsolation:b=>config.verifyWriterIsolation(b,actor),
+    async verifyPublishedCandidate(c){
+     if(!built||c.workId!==identity.workId||c.generation!==identity.generation||c.trace.head!==built.candidateHead)return false;
+     await checkAdmission();
+     return await publication.readHead(c.branch)===built.candidateHead&&
+      await evidence.verifyEvidence(result)===true&&await config.verifyCandidatePolicy(built,result)===true;
+    },
+    async verifyQuiescence(){return false;}});
+   lifecycle={
+    async createBranch(ctx){await ctx.heartbeat();await checkAdmission();return newWork.createBranch(identity);},
+    async createDraftPr(ctx,candidate){
+     await ctx.heartbeat();await checkAdmission();
+     if((await ctx.assertCurrent()).trace.head!==candidate.candidateHead)throw Error("DIRECTOR_LIFECYCLE_HEAD_CHANGED");
+     const opened=await newWork.createDraftPr(identity);
+     return {head:opened.head,prNumber:positive.parse("prNumber" in opened?opened.prNumber:undefined)};
+    }
+   };
+  }
   return createExistingPrExecutor({
-   async prepare(){return result;},build:builder,
+   async prepare(){return result;},
+   async build(ctx,r){built=await builder(ctx,r);return built;},
+   ...(lifecycle?{lifecycle}:{}),
    async publish(_ctx,candidate){
     return publishClaimedCommit({...publication,store,now:config.now,
-     async authenticate(i){return i.actor===actor&&i.session===config.session&&i.workId===identity.workId&&i.generation===identity.generation;},
+     authenticate,
      async verifyQuiescence(){return false;}},identity,candidate);
    }
   })(context);

@@ -3,6 +3,10 @@
 import importlib.util
 from pathlib import Path
 import unittest
+from unittest.mock import patch
+import tempfile
+import hashlib
+from types import SimpleNamespace
 spec=importlib.util.spec_from_file_location("pilot",Path(__file__).with_name("director-model-pilot.py"))
 pilot=importlib.util.module_from_spec(spec)
 spec.loader.exec_module(pilot)
@@ -49,5 +53,32 @@ class DiagnosticTest(unittest.TestCase):
             pilot.compose_guard("different source",'if (true) throw new Error("x");')
         with self.assertRaises(RuntimeError):
             pilot.compose_guard(pilot.RETURN_ANCHOR+"\n"+pilot.RETURN_ANCHOR,'if (true) throw new Error("x");')
+    def test_download_resumes_partial_then_verifies_hash(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            dest=Path(tmp)/"asset"
+            content=b"verified asset"
+            calls=[]
+            def run(command, **kwargs):
+                calls.append(command)
+                if len(calls)==1:
+                    dest.write_bytes(content[:4])
+                    return SimpleNamespace(returncode=28)
+                self.assertIn("--continue-at", command)
+                dest.write_bytes(content)
+                return SimpleNamespace(returncode=0)
+            with patch.object(pilot.subprocess,"run",side_effect=run):
+                pilot.download("https://example.invalid/asset",dest,hashlib.sha256(content).hexdigest(),pilot.time.monotonic()+60)
+            self.assertEqual(len(calls),2)
+    def test_download_rejects_wrong_hash_and_exhausted_budget(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            dest=Path(tmp)/"asset"
+            def run(command, **kwargs):
+                dest.write_bytes(b"corrupt")
+                return SimpleNamespace(returncode=0)
+            with patch.object(pilot.subprocess,"run",side_effect=run):
+                with self.assertRaisesRegex(RuntimeError,"HASH_MISMATCH"):
+                    pilot.download("https://example.invalid/asset",dest,"0"*64,pilot.time.monotonic()+60)
+                with self.assertRaisesRegex(RuntimeError,"BUDGET_EXHAUSTED"):
+                    pilot.download("https://example.invalid/asset",dest,"0"*64,pilot.time.monotonic()-1)
 if __name__=="__main__":
     unittest.main()

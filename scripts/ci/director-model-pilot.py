@@ -86,13 +86,40 @@ def sha256(path):
     with open(path, "rb") as stream:
         return hashlib.file_digest(stream, "sha256").hexdigest()
 
-def download(url, destination, expected):
-    subprocess.run(["curl", "--fail", "--silent", "--show-error", "--location",
-                    "--proto", "=https", "--proto-redir", "=https", "--retry", "1",
-                    "--connect-timeout", "20", "--max-time", "480", "-o",
-                    str(destination), url], check=True, timeout=500)
-    if sha256(destination) != expected:
-        raise RuntimeError("PINNED_ASSET_HASH_MISMATCH")
+def download(url, destination, expected, deadline):
+    # Retain partial bytes across bounded transfers. Never execute or unpack
+    # any asset until the complete pinned SHA256 matches.
+    for attempt in range(1, 7):
+        remaining = int(deadline - time.monotonic())
+        if remaining < 5:
+            break
+        if destination.exists() and sha256(destination) == expected:
+            return
+        seconds = min(240, remaining - 2)
+        resume = destination.exists() and destination.stat().st_size > 0
+        command = ["curl", "--fail", "--silent", "--show-error", "--location",
+                   "--proto", "=https", "--proto-redir", "=https",
+                   "--connect-timeout", "20", "--max-time", str(seconds)]
+        if resume:
+            command += ["--continue-at", "-"]
+        command += ["-o", str(destination), url]
+        try:
+            result = subprocess.run(command, check=False, timeout=seconds + 1)
+        except subprocess.TimeoutExpired:
+            print("ASSET_TRANSFER_TIMEOUT attempt="+str(attempt), flush=True)
+            continue
+        if destination.exists() and sha256(destination) == expected:
+            return
+        if result.returncode == 0:
+            raise RuntimeError("PINNED_ASSET_HASH_MISMATCH")
+        if result.returncode in (33, 36) and resume:
+            # Server rejected resume. Restart only within the same deadline.
+            destination.unlink(missing_ok=True)
+        elif result.returncode not in (18, 28, 33, 36, 52, 55, 56):
+            raise RuntimeError("PINNED_ASSET_TRANSFER_FAILED:"+str(result.returncode))
+        print("ASSET_TRANSFER_INCOMPLETE attempt="+str(attempt)+
+              " bytes="+str(destination.stat().st_size if destination.exists() else 0), flush=True)
+    raise RuntimeError("PINNED_ASSET_DOWNLOAD_BUDGET_EXHAUSTED")
 
 def check_candidate(work):
     cmd = ["docker", "run", "--rm", "--network", "none", "--read-only",
@@ -185,7 +212,8 @@ def main():
             raise RuntimeError("REAL_RED_NOT_REPRODUCED")
         print("RED_CONFIRMED: real existing calendar rollover",flush=True)
         archive=root/"llama.tar.gz"
-        download(ENGINE,archive,ENGINE_SHA)
+        asset_deadline=time.monotonic()+1200
+        download(ENGINE,archive,ENGINE_SHA,asset_deadline)
         subprocess.run(["tar","-xzf",str(archive),"-C",str(root)],check=True,timeout=60)
         binaries=list(root.rglob("llama-server"))
         if len(binaries)!=1:
@@ -193,7 +221,7 @@ def main():
         binary=binaries[0]
         for filename,digest in PARTS:
             download("https://huggingface.co/"+MODEL+"/resolve/"+MODEL_REV+"/"+filename,
-                     root/filename,digest)
+                     root/filename,digest,asset_deadline)
         print("PINNED_ENGINE_AND_MODEL_SHA256_VERIFIED",flush=True)
         # Do not propagate a GitHub/API token, secrets, or arbitrary env to model.
         env={"PATH":os.defpath,"HOME":str(root),"LD_LIBRARY_PATH":str(binary.parent)}

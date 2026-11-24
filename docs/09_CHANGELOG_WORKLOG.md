@@ -1,5 +1,11 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-24 — LOT B B01/B03/B04 : reprise modèle et raccordement lifecycle
+- CONTINUITY_ID SADIAAF-CONTINUITY-20261124-01 ; mandat 7124316324, ACK A 7124426410, admissions B 7124445666/7124508437 ; parent cec3cf28ae891ba86454605270e9b83c7ca7e8f0. Réconciliation des trois fichiers pilote du commit préparé c64ad36 sur HEAD partenaire : pilote22 timeout GGUF 2464014695/3993201376, RED 4 cas et 9 offline PASS, aucune inférence. Reprise partielle curl bornée, 6 tentatives, délai commun 1200s, SHA256 obligatoire, 2 tests offline, plafond job 40 min, 18 tests/code métier inchangés.
+- B04 : directorRuntime réutilise createGitHubNewWork du LOT A, admission pr:null et claim, candidat validé AVANT branche, jeton pull-request distinct, branche puis build/mutation puis vérification preuve et création draft avec PR exacte ; 4 tests de contrat, maintien ancien executor et restrictions contrat dates. Aucun ready/merge, aucun changement fichiers A. Préparer seulement avant gates parent, aucune activation réelle ni preuve de succès avant CI/recette. B02/B05 et politiques réelles restent à finaliser. Aucun S1, coût nouveau, secret, bypass ou faux DONE.
+- NEXT_ACTION : vérifier CI/Docker parent et publier non-force si stable, vraie recette pilote, B02 généralisation et B05 renouvellement ; coordonner A05 lifecycle ready/merge, A02–A04 protections/identité et A06 récupération. Rapprochement final obligatoire.
+
+
 ## 2026-11-24 — MISSION 13 / LOT A — A01 correction de compilation
 - CONTINUITY_ID SADIAAF-CONTINUITY-20261124-01 ; diagnostic LOT B 7124461646, admission 7124472378 ; parent 6013248042bf5149f1166d466ad2eca66683e3a6. CI788/Docker651 FAILURE sur TS2352 du fixture main dans test/github-writer-audit.test.ts. Paramètres de règle typés unknown (données externes), conversion abusive supprimée ; aucune assertion supprimée ni protection affaiblie. Revalidation exacte CI/Docker nécessaire. A06 commit 6013248042bf5149f1166d466ad2eca66683e3a6 publié, tests à confirmer. LOT B intact, c64ad36 préparé à réconcilier sur HEAD vivant. NEXT_ACTION : contrôler nouvelle recette puis poursuivre A05/A06, A02–A04 activation toujours bloquée. Aucun A-READY anticipé.
 
