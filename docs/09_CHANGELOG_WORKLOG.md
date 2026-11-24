@@ -1,5 +1,12 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-24 — Lot 11 / P0 : qualification d'un véritable modèle de programmation indépendant
+- **CONTINUITY_ID** : SADIAAF-CONTINUITY-20261124-01 ; issue #9 admission 7122877433. Parent 45e3bb06556736122de04f252ab59e12ce7833a5 CI764/Docker627 SUCCESS. GitHub Models retiré au 30/07/2026. Dépôt public : runner GitHub standard Ubuntu 24.04, pas de runner payant, clé de modèle ni API facturée.
+- **TRAVAIL** : workflow pilote borné à PR42, permissions lecture seule, aucun cron/scheduler ni écriture, script lance llama.cpp CPU b12658 et Qwen2.5-Coder-7B-Instruct-GGUF (Apache-2.0) avec SHA256 publiés vérifiés avant exécution. Tâche réelle : RED date ISO invalide dans dates.ts, modèle propose une fonction, GREEN vérifié dans Docker sans réseau ni secret, deux tentatives max ; sortie candidate uniquement dans logs, aucune publication du code généré ni mutation main. Aucun S1.
+- **BLOCK_REASON** : recette réelle du modèle non attestée avant exécution, puis transport d'écriture/claim protégé, sélection canonique, capacité de programmer tous les lots et reprise événementielle permanente restent à certifier. Pilote borné != exécuteur 24/7.
+- **NEXT_ACTION** : vérifier runs CI/Docker/pilote exact SHA, examiner preuve modèle/RED/GREEN, corriger le pilote si nécessaire ; raccorder modèle qualifié au programme directeur, authentification et passerelle sécurisée, démontrer deux tâches réelles autonomes, reprise/concurrence ; poursuivre les 14 lots sans reconstruire. Pas de nouveau coût ni secret.
+
+
 ## 2026-11-24 — Lot 11 / issue #9 : P0 exécuteur indépendant, transport GitHub
 - **CONTINUITY_ID** : SADIAAF-CONTINUITY-20261124-01 ; admission 7122770954. Parent PR42 8ab297d44f5d9b50cbdeb59cafb809fc9234dfed ; CI762/Docker625 SUCCESS, zéro fil ouvert. Main ef861ea26b26b82ec7cac987d9404a3707b2439f après PR32.
 - **TRAVAIL** : réconciliation non destructive à deux parents, préservation des historiques de main et PR42 ; GET ref singulier corrigé (PATCH pluriel), transport HTTP GitHub natif borné au dépôt et chemins coordination, délai, redirections interdites, écritures désactivées par défaut et préflight ruleset dédié. Aucun secret, appel live de runtime ni exécuteur de modèle activé. Tests du nouveau SHA non encore attestés.
