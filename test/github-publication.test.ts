@@ -12,7 +12,7 @@ function fixture(){
     calls.push({url,method,...(typeof init?.body==="string"?{body:init.body}:{})});
     assert.equal(init?.redirect,"error");
     assert.ok(url.startsWith("https://api.github.com/repos/Patricked-code/africafunds-market-data-pipeline"));
-    const response=(x:unknown,headers?:HeadersInit)=>new Response(JSON.stringify(x),{status:200,headers});
+    const response=(x:unknown,headers?:HeadersInit)=>new Response(JSON.stringify(x),{status:200,...(headers===undefined?{}:{headers})});
     if(url.includes("/commits/"))return response({sha:next,parents:[{sha:parent}],files:paths},
       paginated?{link:'<https://example.invalid>; rel="next"'}:undefined);
     if(url.includes("/git/ref")){

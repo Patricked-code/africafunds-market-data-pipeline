@@ -1,5 +1,7 @@
 # 09 — Journal de travail et continuité
 
+- 2026-11-24 / MISSION 13 : correction préventive du helper de test publication compatible exactOptionalPropertyTypes ; aucun changement runtime. CI exacte à vérifier (parent b661de1aa5ada5c16ab7c2e5994046c83ea29d05).
+
 ## 2026-11-24 — MISSION 13 / P0 : transport REST de publication préparée
 - CONTINUITY_ID SADIAAF-CONTINUITY-20261124-01 ; admission issue #9 [7123717165](https://github.com/Patricked-code/africafunds-market-data-pipeline/issues/9#issuecomment-7123717165), parent 42739cd3eb5e2a1d4b99b5a61ec5482c6c373c4d. Raccordement additif de mutationGateway au transport REST dédié, sans modifier githubTransport/selector/chargeur.
 - githubPublication.ts borne les endpoints au dépôt canonique, vérifie ID, parent unique, chemins exhaustifs y compris renames (refus pagination/troncature), preuves indépendantes et isolation écrivains via ports fiables. Publication de commit préparé sur ref de travail existante, non-force, HEAD exact, aucune relance après ambiguïté, aucune mutation main/coordination/administration. Le gateway refuse le dispatch si bail expiré avant envoi. 6 tests ajoutés. Pas de token ni configuration réelle.
