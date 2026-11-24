@@ -1,5 +1,10 @@
 # 06 — État réel et écarts
 
+## 2026-11-24 — LOT B B05/B07 : réconciliation de la preuve de promotion
+- CONTINUITY_ID SADIAAF-CONTINUITY-20261124-01 ; admission 7124973032 ; parent ba0c6e1850b026f88234f39d333fc60b311fbcf9. Réconciliation additive du candidat b9e64f9d3513ba52cf61a173cc83a4b643221fab : promotionEvidence.ts et quatre tests, reconstruction indépendante des contenus et preuves RED/GREEN, contrôle admission renouvelée et relecture finale. Contrat WorkReceipt/asPromotionReceipt A publié sur parent, raccordement directeur restant à réaliser. Pilote30 FAILURE (syntaxe/périmètre du prédicat), aucun GREEN réel. Aucun changement des fichiers techniques A, aucun S1, coût, secret, bypass, fusion ou B-READY.
+- NEXT_ACTION : vérifier CI/Docker exacts, raccorder production du reçu et phase promotion avec génération explicite, corriger pilote, recette croisée.
+
+
 ## 2026-11-24 — MISSION 13 / LOT A — complément contrat publication B05/B07
 - CONTINUITY_ID SADIAAF-CONTINUITY-20261124-01 ; demande B 7124895087, admission A 7124887112 ; parent préparé 118533c8e1c95993e09a407e1a96451927885195. WorkPassResult.publication?:WorkPublicationProof (issue,mainSha,acceptance,paths,red,green) stocké atomiquement dans WorkReceipt et lié aux preuves originales, SHA/PR/scope et suite ; asPromotionReceipt(receipt) fournit exactement la structure B promotionReceiptSchema. Refus preuve discordante avant release, ancien résultat sans preuve conservé mais non admissible à promotion. Deux tests nouveaux. A06 absence de promotion observe base main actuelle protégée (re-claim base=head). Aucun fichier B, aucune nouvelle autorité.
 - PARTIAL : B doit renseigner publication seulement après publication prouvée ; reconstruction indépendante et admission renouvelée obligatoires. Aucun statut DONE, aucune activation distante. NEXT_ACTION : publication groupée après gates parent, B raccordement, A02–A04 et A07–A10. Aucun S1/coût/secret/bypass/A-READY.
