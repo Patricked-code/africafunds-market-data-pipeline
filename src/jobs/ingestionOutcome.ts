@@ -33,3 +33,21 @@ export function assertStructuredIngestionRows(rows: number, mode: 'ingest' | 'di
     throw new Error(`NO_STRUCTURED_ROWS: financial ingestion extracted ${rows} rows`);
   }
 }
+
+/**
+ * Collection may succeed even when it has not yielded usable financial rows.
+ * Keep the actually archived artifacts and discovered links in the run audit
+ * BEFORE rejecting the endpoint as a financial ingestion success.
+ * This is intentionally non-transactional with persisted raw archives.
+ */
+export function accountForEndpointResult(
+  summary: { success: number; artifacts: number; rows: number; links: number },
+  result: { artifacts: number; rows: number; links: number },
+  mode: 'ingest' | 'discover',
+): void {
+  summary.artifacts += result.artifacts;
+  summary.rows += result.rows;
+  summary.links += result.links;
+  assertStructuredIngestionRows(result.rows, mode);
+  summary.success += 1;
+}
