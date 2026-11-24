@@ -1,5 +1,13 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-24 — Lots 5–7 / PR #34 : réconciliation des calculs de rendement et indices
+- **CONTINUITY_ID** : SADIAAF-CONTINUITY-20261124-01 ; branche d'origine `7c9f5cfc65dfb7b3e8162c9a4eb62fecaeeb18ec`, parent main protégé `5236d3895a81efd3c48b03f2040041dcf6be7e7c`.
+- **CODE/TEST EXACTS** : `src/calc/indices.ts` et `test/indices-finite-output.test.ts` repris tels quels de la PR historique ; contrôle des valeurs finies en entrée/sortie, overflow de moyenne/pondérations, indices positifs, sous-flux de taux FX et pertes nominales au-delà de 100 %. L'exactitude des méthodes financières et des courbes n'est PAS validée par ces tests synthétiques seuls.
+- **GIT / MEMOIRE** : commit à deux parents sans force, arbre du main courant + blobs de PR #34, documents docs/06 et docs/09 actuels préservés avec ce checkpoint ; anciennes versions documentaires sont conservées dans le parent PR.
+- **BLOCK_REASON** : CI validate et Docker exact SHA encore à obtenir, réactions de revue à examiner, licences/données officielles et recettes méthodologiques par marché non attestées.
+- **NEXT_ACTION** : qualifier PR READY sous ruleset, lancer/enrôler auto-merge natif après périmètre et tests, corriger les anomalies, puis PR #32 obligations/Total Return. Reprendre qualité et sources officielles sans collision, aucun S1 ni coûts ajoutés.
+
+
 ## 2026-11-24 — Lot 4/11 : réconciliation PR #33, fiabilité des réponses HTTP avant archivage
 - **CONTINUITY_ID** : SADIAAF-CONTINUITY-20261124-01. Branche source historique PR #33 `6b428474483d8086e26c995f970d88425c190a45`, base main `4b1612458f53124e4de8a5d1e74ba11ded4cee54`. Retenir les deux blobs de code/test de la PR #33 tels quels sans reconstruction.
 - **MÉCANISME GIT** : merge à deux parents (branche historique comme premier parent, main comme second), branche mise à jour sans force sous expected_SHA. Documents docs/06 et docs/09 du main courant conservés avec checkpoint ; anciens journaux intégraux disponibles dans parent original.
