@@ -1,4 +1,5 @@
 import { z } from "zod";
+import {createHash} from "node:crypto";
 
 export const CONTINUITY_ID = "SADIAAF-CONTINUITY-20261124-01";
 const id = z.string().regex(/^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$/);
@@ -51,8 +52,12 @@ const wakeReceiptSchema = z.object({
 }).strict();
 export type WakeSignal = z.infer<typeof wakeSignalSchema>;
 type WakeReceipt = z.infer<typeof wakeReceiptSchema>;
+const admissionCheckpointSchema=z.object({count:z.number().int().min(0).max(2000),digest:z.string().regex(/^[a-f0-9]{64}$/)}).strict();
+type AdmissionCheckpoint=z.infer<typeof admissionCheckpointSchema>;
+const emptyAdmissionCheckpoint=()=>({count:0,digest:createHash("sha256").update(JSON.stringify({continuity:CONTINUITY_ID,records:[]})).digest("hex")});
+const equalCheckpoint=(a:AdmissionCheckpoint,b:AdmissionCheckpoint)=>a.count===b.count&&a.digest===b.digest;
 const event = z.object({
-  revision: stamp.positive(), kind: z.enum(["claim","heartbeat","checkpoint","release","recover","wake-accepted","wake-intent","wake-result","wake-reconciled","mutation-intent","mutation-result","lifecycle-intent","lifecycle-result","lifecycle-absent"]),
+  revision: stamp.positive(), kind: z.enum(["claim","heartbeat","checkpoint","release","recover","wake-accepted","wake-intent","wake-result","wake-reconciled","mutation-intent","mutation-result","lifecycle-intent","lifecycle-result","lifecycle-absent","admission-history-init","admission-history-advance"]),
   at: stamp, workId: id, actor: id, session: id, generation: stamp.positive(),
   previousGeneration: stamp.positive().optional(), wakeKey:id.optional(), trace,
 }).strict();
@@ -60,10 +65,13 @@ export const stateSchema = z.object({
   continuity: z.literal(CONTINUITY_ID), revision: stamp, updatedAt: stamp,
   claims: z.array(claim), lastEvent: event.nullable(),
   wakeReceipts:z.array(wakeReceiptSchema).max(4096).optional(),
+  admissionHistory:admissionCheckpointSchema.optional(),
 }).strict().superRefine((s,ctx) => {
   const fail = (message: string) => ctx.addIssue({code:"custom",message});
   if ((s.revision === 0) !== (s.lastEvent === null) ||
       (s.lastEvent && (s.lastEvent.revision !== s.revision || s.lastEvent.at !== s.updatedAt))) fail("invalid event revision");
+  if(s.admissionHistory?.count===0&&!equalCheckpoint(s.admissionHistory,emptyAdmissionCheckpoint()))fail("invalid empty admission history");
+  if(s.lastEvent?.kind.startsWith("admission-history-")&&!s.admissionHistory)fail("missing admission checkpoint");
   const keys = new Set<string>();
   for (const r of s.wakeReceipts ?? []) {
     if (keys.has(r.signal.key) || r.startedAt > s.updatedAt || r.intentRevision > s.revision ||
@@ -242,6 +250,7 @@ export class GitHubClaimStore implements ClaimStore {
     const current = await this.read();
     if (current.version !== version || next.revision !== current.state.revision+1 || next.updatedAt < current.state.updatedAt)
       throw new Error("CLAIM_CAS_CONFLICT");
+    assertAdmissionHistorySuccessor(current.state,next);
     const tree = shaResponse.parse(await this.request("POST","/git/trees",{
       tree:[{path:statePath,mode:"100644",type:"blob",content:JSON.stringify(next)+"\n"}]
     })).sha;
@@ -485,4 +494,69 @@ export async function reconcileDirectorWake(raw:WakeSignal,reason:WakeReconcilia
    trace:{head:signal.head,nextAction:"Reconcile new canonical admission; never replay closed wake",evidence:resolution.evidence}}});
  await ports.store.compareAndSwap(current.version,next);
  return {status:"reconciled" as const,key:signal.key};
+}
+
+// One checkpoint in the existing protected coordination state, not a second
+// authorization register. B verifies the prefix against the canonical issue.
+function assertAdmissionHistorySuccessor(previous:State,next:State){
+ const a=previous.admissionHistory,b=next.admissionHistory,k=next.lastEvent?.kind;
+ if(!a&&!b){if(k?.startsWith("admission-history-"))throw Error("ADMISSION_HISTORY_TRANSITION_INVALID");return;}
+ if(!a&&b){
+  if(previous.revision!==0||previous.claims.length!==0||(previous.wakeReceipts??[]).length!==0||
+     k!=="admission-history-init"||!equalCheckpoint(b,emptyAdmissionCheckpoint()))
+   throw Error("ADMISSION_HISTORY_BOOTSTRAP_REQUIRED");
+  return;
+ }
+ if(!a||!b||b.count<a.count||(b.count===a.count&&b.digest!==a.digest))
+  throw Error("ADMISSION_HISTORY_REGRESSION");
+ if(b.count>a.count&&(k!=="admission-history-advance"||b.digest===a.digest))
+  throw Error("ADMISSION_HISTORY_TRANSITION_INVALID");
+ if(b.count===a.count&&k?.startsWith("admission-history-"))throw Error("ADMISSION_HISTORY_TRANSITION_INVALID");
+}
+export interface AdmissionHistoryStoreConfig{
+ store:ClaimStore;actor:string;session:string;now():number;
+ // Trusted supervisor only. Never grant this port to generated model output.
+ authenticate():Promise<boolean>;
+ verifyEmptyHistory(evidence:readonly string[]):Promise<boolean>;
+ verifyPrefixAdvance(expected:Readonly<AdmissionCheckpoint>,next:Readonly<AdmissionCheckpoint>):Promise<boolean>;
+}
+export function createAdmissionHistoryPort(config:AdmissionHistoryStoreConfig){
+ id.parse(config.actor);id.parse(config.session);
+ const evidenceSchema=z.array(z.string().regex(/^(commit:[a-f0-9]{40}|(?:pr|issue|ci):[1-9][0-9]{0,19})$/)).min(1).max(30);
+ async function auth(){if(await config.authenticate()!==true)throw Error("ADMISSION_HISTORY_UNAUTHENTICATED");}
+ async function persist(snapshot:{version:string;state:State},checkpoint:AdmissionCheckpoint,kind:"admission-history-init"|"admission-history-advance",evidence:string[]){
+  const s=stateSchema.parse(snapshot.state),now=stamp.parse(config.now());
+  if(now<s.updatedAt)throw Error("CLOCK_REGRESSION");
+  const revision=stamp.positive().parse(s.revision+1);
+  const head=sha.parse(snapshot.version);
+  const next=stateSchema.parse({...s,admissionHistory:checkpoint,revision,updatedAt:now,
+   lastEvent:{kind,revision,at:now,workId:"admission-history",actor:config.actor,session:config.session,generation:revision,
+    trace:{head,nextAction:"Verify canonical authorization prefix before selection",evidence}}});
+  assertAdmissionHistorySuccessor(s,next);
+  await config.store.compareAndSwap(snapshot.version,next);
+  const observed=stateSchema.parse((await config.store.read()).state).admissionHistory;
+  return !!observed&&equalCheckpoint(observed,checkpoint);
+ }
+ return {
+  async initializeEmpty(rawEvidence:readonly string[]){
+   const evidence=evidenceSchema.parse(rawEvidence);await auth();
+   const snapshot=await config.store.read(),s=stateSchema.parse(snapshot.state);
+   if(s.admissionHistory||s.revision!==0||s.claims.length||(s.wakeReceipts??[]).length)throw Error("ADMISSION_HISTORY_BOOTSTRAP_REQUIRED");
+   if(await config.verifyEmptyHistory([...evidence])!==true)throw Error("ADMISSION_HISTORY_EMPTY_PROOF_REQUIRED");
+   return persist(snapshot,emptyAdmissionCheckpoint(),"admission-history-init",evidence);
+  },
+  async readCheckpoint():Promise<unknown>{
+   await auth();const checkpoint=stateSchema.parse((await config.store.read()).state).admissionHistory;
+   if(!checkpoint)throw Error("ADMISSION_HISTORY_NOT_INITIALIZED");
+   return checkpoint;
+  },
+  async advanceCheckpoint(rawExpected:AdmissionCheckpoint,rawNext:AdmissionCheckpoint):Promise<boolean>{
+   const expected=admissionCheckpointSchema.parse(rawExpected),next=admissionCheckpointSchema.parse(rawNext);await auth();
+   const snapshot=await config.store.read(),current=stateSchema.parse(snapshot.state).admissionHistory;
+   if(!current)throw Error("ADMISSION_HISTORY_NOT_INITIALIZED");
+   if(!equalCheckpoint(current,expected)||next.count<=expected.count||next.digest===expected.digest)return false;
+   if(await config.verifyPrefixAdvance({...expected},{...next})!==true)throw Error("ADMISSION_HISTORY_PREFIX_PROOF_DENIED");
+   return persist(snapshot,next,"admission-history-advance",["issue:9"]);
+  }
+ };
 }
