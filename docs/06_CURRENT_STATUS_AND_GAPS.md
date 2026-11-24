@@ -1,5 +1,12 @@
 # 06 — État réel et écarts
 
+## 2026-11-24 — Lot 11 / issue #9 : admission événementielle du programme directeur
+- **CONTINUITY_ID** : SADIAAF-CONTINUITY-20261124-01 ; PR #42, admission issue #9 commentaire 7122228856, parent a0ae4f0bc8805f562eeb557d038f4d78d6de7d15.
+- **CODE** : runDirectorWake, reçus intention/résultat et déduplication sur ClaimStore existant ; signal non vérifié refusé, signal interrompu non rejoué, quatre tests ciblés. Aucun transport/exécuteur réel ni bootstrap live ajouté. Plafond conservateur des reçus, stratégie de conservation/index à certifier avant activation.
+- **BLOCK_REASON** : validation exact SHA à effectuer ; raccordement du transport authentifié et de l'exécuteur, protection ref, passerelle mutation/fencing, réconciliation après interruption et traces d'opérations exhaustives non certifiés.
+- **NEXT_ACTION** : contrôler CI/Docker, corriger et réattester, qualifier le raccordement réel sans nouvel orchestrateur ni coût, réaliser deux unités de code successives sans tick et recette de reprise/anti-collision. Les lots métier indépendants restent inchangés ; aucun S1.
+
+
 ## 2026-11-24 — Lot 11 / PR #42 : passage de travail borné et reprise réelle programmée
 - **CONTINUITY_ID** : SADIAAF-CONTINUITY-20261124-01. Base main 50e35e703c55a0e3f22fefe862bdc9bbe657bf13, ancien HEAD #42 b15a4823e33fc6498d3e213a1802535db0d2393d ; CI #759 et Docker #622 SUCCESS sur cet ancien SHA, pas sur ce changement.
 - **TRAVAIL** : extension du module de coordination existant `runClaimedWorkPass`, avec sélection canonique réitérée, claim, pré-dispatch fencing, callback d'exécution, heartbeat/checkpoint/release, limite et refus des répétitions. Cinq tests supplémentaires, dont deux unités successives sans second déclenchement, interruption, expiration et preuve manquante. Il s'agit d'un port d'intégration borné, pas d'un nouvel ordonnanceur ni d'une invocation réelle de modèle. Tests nouveaux NON_RUN avant CI.

@@ -1,5 +1,12 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-24 — Lot 11 / issue #9 : admission événementielle du programme directeur
+- **CONTINUITY_ID** : SADIAAF-CONTINUITY-20261124-01 ; PR #42, admission issue #9 commentaire 7122228856, parent a0ae4f0bc8805f562eeb557d038f4d78d6de7d15.
+- **CODE** : runDirectorWake, reçus intention/résultat et déduplication sur ClaimStore existant ; signal non vérifié refusé, signal interrompu non rejoué, quatre tests ciblés. Aucun transport/exécuteur réel ni bootstrap live ajouté. Plafond conservateur des reçus, stratégie de conservation/index à certifier avant activation.
+- **BLOCK_REASON** : validation exact SHA à effectuer ; raccordement du transport authentifié et de l'exécuteur, protection ref, passerelle mutation/fencing, réconciliation après interruption et traces d'opérations exhaustives non certifiés.
+- **NEXT_ACTION** : contrôler CI/Docker, corriger et réattester, qualifier le raccordement réel sans nouvel orchestrateur ni coût, réaliser deux unités de code successives sans tick et recette de reprise/anti-collision. Les lots métier indépendants restent inchangés ; aucun S1.
+
+
 ## 2026-11-24 — Lot 11 / issue #9 / PR #42 : passage borné de l'agent codeur
 - **CONTINUITY_ID** : SADIAAF-CONTINUITY-20261124-01 ; admission PR42 commentaire 7122200385. Ancien HEAD b15a4823e33fc6498d3e213a1802535db0d2393d, CI #759 45326467362 et Docker #622 45326467414 SUCCESS sur ce SHA ; main 50e35e703c55a0e3f22fefe862bdc9bbe657bf13 protégé. Pas de modification des autres PR.
 - **OPÉRATION RÉELLE** : automation existante Automation_a523352a7c448191a41080097ce8b01f active et dernier run completed 04:35:44 UTC ; mise à jour du mandat confirmée, cadence horaire préservée, exigence d'enchaîner des unités admissibles dans une même session. Aucun nouveau scheduler.

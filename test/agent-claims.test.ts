@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import {runClaimedWorkPass,applyCommand,assertFence,emptyState,transition,GitHubClaimStore,type ClaimStore,type State,type Command,type GitHubRequest} from "../src/coordination/agentClaims.js";
+import {runDirectorWake,runClaimedWorkPass,applyCommand,assertFence,emptyState,transition,GitHubClaimStore,type ClaimStore,type State,type Command,type GitHubRequest} from "../src/coordination/agentClaims.js";
 const base = "a".repeat(40);
 const trace = {head:base,nextAction:"Run targeted tests",evidence:["issue:9"]};
 const first = {kind:"claim",workId:"issue-9",actor:"agent-a",session:"session-a",lot:11,
@@ -190,4 +190,49 @@ test("missing proof retains claim rather than marking work finished",async()=>{
     async execute(){return {outcome:"completed",trace:{...trace,evidence:[]}};}
   }),/WORK_PASS_EVIDENCE_REQUIRED/);
   assert.equal((await store.read()).state.claims[0]?.workId,"one");
+});
+
+const signal={key:"ci:123:1",kind:"ci-completed" as const,head:base,evidence:"ci:123"};
+test("director wake persists intent before dispatch and result before duplicate acknowledgement",async()=>{
+  const store=memoryStore();let selected=0;let now=1000;
+  const ports={store,actor:"agent-a",session:"wake-a",now:()=>now++,leaseMs:1000,maxUnits:2,
+    async verifySignal(){return true;},
+    async selectNext(finished:readonly string[]){
+      selected++;
+      assert.equal((await store.read()).state.wakeReceipts?.[0]?.outcome,"pending");
+      return finished.length?null:workCandidate("one");
+    },
+    async execute(){return {outcome:"completed" as const,trace};}};
+  assert.deepEqual(await runDirectorWake(signal,ports),{status:"executed",stop:"no-work",finished:["one"]});
+  assert.equal((await store.read()).state.wakeReceipts?.[0]?.outcome,"no-work");
+  assert.deepEqual(await runDirectorWake(signal,ports),{status:"duplicate",finished:["one"]});
+  assert.equal(selected,2);
+  await assert.rejects(runDirectorWake({...signal,head:"b".repeat(40)},ports),/WAKE_KEY_CONFLICT/);
+});
+test("unverified wake cannot read tasks or dispatch an executor",async()=>{
+  const store=memoryStore();let selections=0;
+  await assert.rejects(runDirectorWake(signal,{store,actor:"agent-a",session:"wake-a",now:()=>1000,leaseMs:1000,maxUnits:1,
+    async verifySignal(){return false;},
+    async selectNext(){selections++;return null;},
+    async execute(){throw Error("unexpected");}}),/UNVERIFIED_WAKE_SIGNAL/);
+  assert.equal(selections,0);assert.equal((await store.read()).state.revision,0);
+});
+test("interrupted director wake remains pending and cannot dispatch on replay",async()=>{
+  const store=memoryStore();let executions=0;
+  const ports={store,actor:"agent-a",session:"wake-a",now:()=>1000,leaseMs:1000,maxUnits:1,
+    async verifySignal(){return true;},async selectNext(){return workCandidate("one");},
+    async execute(){executions++;throw Error("INTERRUPTED");}};
+  await assert.rejects(runDirectorWake(signal,ports),/INTERRUPTED/);
+  assert.equal((await store.read()).state.wakeReceipts?.[0]?.outcome,"pending");
+  assert.deepEqual(await runDirectorWake(signal,ports),{status:"reconciliation-required",finished:[]});
+  assert.equal(executions,1);assert.equal((await store.read()).state.claims.length,1);
+});
+test("two concurrent deliveries of same wake cannot both dispatch",async()=>{
+  const store=memoryStore();let selections=0;
+  const ports={store,actor:"agent-a",session:"wake-a",now:()=>1000,leaseMs:1000,maxUnits:1,
+    async verifySignal(){return true;},async selectNext(){selections++;return null;},
+    async execute(){throw Error("unexpected");}};
+  const results=await Promise.allSettled([runDirectorWake(signal,ports),runDirectorWake(signal,ports)]);
+  assert.equal(selections,1);
+  assert.equal(results.filter(r=>r.status==="fulfilled"&&r.value.status==="executed").length,1);
 });
