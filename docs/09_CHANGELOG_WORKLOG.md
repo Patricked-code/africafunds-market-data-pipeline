@@ -1,5 +1,13 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-24 — Lot 4/11 : réconciliation PR #33, fiabilité des réponses HTTP avant archivage
+- **CONTINUITY_ID** : SADIAAF-CONTINUITY-20261124-01. Branche source historique PR #33 `6b428474483d8086e26c995f970d88425c190a45`, base main `4b1612458f53124e4de8a5d1e74ba11ded4cee54`. Retenir les deux blobs de code/test de la PR #33 tels quels sans reconstruction.
+- **MÉCANISME GIT** : merge à deux parents (branche historique comme premier parent, main comme second), branche mise à jour sans force sous expected_SHA. Documents docs/06 et docs/09 du main courant conservés avec checkpoint ; anciens journaux intégraux disponibles dans parent original.
+- **COUVERTURE DU CORRECTIF** : libération des streams de réponses HTTP rejetées, limites de corps et annulation/abort, retry sans fuite et sans corrompre des archives brutes. Ce correctif ne qualifie aucun endpoint externe officiel ni ne modifie les règles d'accès.
+- **BLOCK_REASON** : suite CI validate + Docker/PostgreSQL du nouveau HEAD requise, réponse éventuelle à toute revue métier, aucune source licenciée vérifiée ni S1.
+- **NEXT_ACTION** : sortir Draft et label automerge-eligible seulement après vérification du périmètre sûr, tester sur SHA exact et fusionner via GitHub native, puis reprendre les PR de qualité et calculs financiers sur main actuel, sans collision.
+
+
 ## 2026-11-24 — Convergence PR #36 après PR #26 : ingestion, archives, index HTML et audit réel
 - **CONTINUITY_ID** : SADIAAF-CONTINUITY-20261124-01. Branche originale PR #36 `fix/ingestion-false-success-20261122`, premier parent `df0129b625798147eb1dc3f283fcbd7fd19fac99`, second parent `main=02a162437a564b8b5e3bc5f8b612a11bec4b76f2`. Aucun force push ni perte de l'historique des deux parents.
 - **CONSERVATION DE L'EXISTANT** : blob source `src/jobs/ingestionCompleteness.ts` et les trois tests #36 repris IDENTIQUES de la branche d'origine. Les contrôles #26 de `src/jobs/runStore.ts`, `terminalWrite.ts`, `ingestionOutcome.ts` et `ingest.ts` sont conservés dans le main courant, avec fusion minimale documentée du conflit de code. Aucun autre PR/SQL/registre source/S1 touché.
