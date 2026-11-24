@@ -6,6 +6,7 @@ const readRef="/git/ref/heads/coordination/sadiaaf-agent-state";
 const writeRef="/git/refs/heads/coordination/sadiaaf-agent-state";
 const sha=z.string().regex(/^[a-f0-9]{40}$/);
 const readPath=/^\/(?:actions\/runs\/[1-9][0-9]*|pulls\/[1-9][0-9]*|rulesets\/[1-9][0-9]*|compare\/[a-f0-9]{40}\.\.\.main|contents\/agent-claims\.json\?ref=[a-f0-9]{40})$/;
+const selectorReadPath=/^\/(?:branches\/main|issues\/[1-9][0-9]*|git\/ref\/heads\/work\/sadiaaf-issue-[1-9][0-9]*-[a-z0-9-]+)$/;
 const treeBody=z.object({tree:z.array(z.object({path:z.literal("agent-claims.json"),mode:z.literal("100644"),type:z.literal("blob"),content:z.string().max(8000000)}).strict()).length(1)}).strict();
 const commitBody=z.object({message:z.string().regex(/^coordination: [a-z-]+ [A-Za-z0-9][A-Za-z0-9._:-]{0,127}$/),tree:sha,parents:z.array(sha).length(1)}).strict();
 const updateBody=z.object({sha,force:z.literal(false)}).strict();
@@ -26,7 +27,7 @@ export function createGitHubRequest(config:GitHubTransportConfig):GitHubRequest 
   const fetcher=config.fetcher??fetch;
   const send:GitHubRequest=async(method,path,body)=>{
     if(method==="GET"){
-      if((path!==readRef&&!readPath.test(path))||body!==undefined)throw Error("GITHUB_PATH_NOT_ALLOWED");
+      if((path!==readRef&&!readPath.test(path)&&!selectorReadPath.test(path))||body!==undefined)throw Error("GITHUB_PATH_NOT_ALLOWED");
     }else{
       if(rule===undefined)throw Error("GITHUB_COORDINATION_WRITES_DISABLED");
       if(method==="POST"&&path==="/git/trees"){
