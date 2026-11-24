@@ -6,11 +6,11 @@ const ref="refs/heads/"+branch,appId=123,head="a".repeat(40);
 function fixture(){
  const rule=(id:number,include:string,types:string[],actors:unknown[])=>({id,target:"branch",source_type:"Repository",source:repository,enforcement:"active",
   conditions:{ref_name:{include:[include],exclude:[]}},bypass_actors:actors,
-  rules:types.map(type=>({type,...(type==="update"?{parameters:{update_allows_fetch_and_merge:false}}:{})}))});
+  rules:types.map((type):{type:string;parameters?:unknown}=>({type,...(type==="update"?{parameters:{update_allows_fetch_and_merge:false}}:{})}))});
  const access=rule(1,ref,["creation","update"],[{actor_id:appId,actor_type:"Integration",bypass_mode:"always"}]);
  const safety=rule(2,ref,["deletion","non_fast_forward"],[]);
  const main=rule(3,"refs/heads/main",["pull_request","deletion","non_fast_forward","required_status_checks"],[]);
- main.rules=main.rules.map(x=>x.type==="required_status_checks"?{...x,parameters:{strict_required_status_checks_policy:true,do_not_enforce_on_create:false,required_status_checks:[{context:"validate"},{context:"Build, boot, migrate and verify persistent PostgreSQL"}]}} as typeof x:x);
+ main.rules=main.rules.map(x=>x.type==="required_status_checks"?{...x,parameters:{strict_required_status_checks_policy:true,do_not_enforce_on_create:false,required_status_checks:[{context:"validate"},{context:"Build, boot, migrate and verify persistent PostgreSQL"}]}}:x);
  let missing=false,drift=false,reads=0,extra=false;
  const read=async(path:string):Promise<unknown>=>{
   if(path==="")return {id:1315731572,full_name:repository,private:false};
