@@ -37,14 +37,14 @@ const wakeSignalSchema = z.object({
 const wakeReceiptSchema = z.object({
   signal: wakeSignalSchema, actor:id, session:id, startedAt:stamp,
   intentRevision:stamp.positive(),
-  outcome:z.enum(["pending","no-work","limit"]),
+  outcome:z.enum(["accepted","pending","no-work","limit"]),
   finished:z.array(id).max(10),
   completedAt:stamp.optional()
 }).strict();
 export type WakeSignal = z.infer<typeof wakeSignalSchema>;
 type WakeReceipt = z.infer<typeof wakeReceiptSchema>;
 const event = z.object({
-  revision: stamp.positive(), kind: z.enum(["claim","heartbeat","checkpoint","release","recover","wake-intent","wake-result","mutation-intent","mutation-result"]),
+  revision: stamp.positive(), kind: z.enum(["claim","heartbeat","checkpoint","release","recover","wake-accepted","wake-intent","wake-result","mutation-intent","mutation-result"]),
   at: stamp, workId: id, actor: id, session: id, generation: stamp.positive(),
   previousGeneration: stamp.positive().optional(), wakeKey:id.optional(), trace,
 }).strict();
@@ -60,8 +60,8 @@ export const stateSchema = z.object({
   for (const r of s.wakeReceipts ?? []) {
     if (keys.has(r.signal.key) || r.startedAt > s.updatedAt || r.intentRevision > s.revision ||
         new Set(r.finished).size !== r.finished.length ||
-        (r.outcome === "pending" && (r.completedAt !== undefined || r.finished.length !== 0)) ||
-        (r.outcome !== "pending" && (r.completedAt === undefined || r.completedAt < r.startedAt || r.completedAt > s.updatedAt)))
+        ((r.outcome === "pending" || r.outcome === "accepted") && (r.completedAt !== undefined || r.finished.length !== 0)) ||
+        (r.outcome !== "pending" && r.outcome !== "accepted" && (r.completedAt === undefined || r.completedAt < r.startedAt || r.completedAt > s.updatedAt)))
       fail("invalid wake receipt");
     keys.add(r.signal.key);
   }
@@ -313,21 +313,24 @@ type WakeResult =
   | {status:"duplicate"|"reconciliation-required"; finished:string[]}
   | {status:"executed"; stop:"no-work"|"limit"; finished:string[]};
 
-function wakeState(s:State, r:WakeReceipt, kind:"wake-intent"|"wake-result", now:number):State {
+function wakeState(s:State, r:WakeReceipt, kind:"wake-accepted"|"wake-intent"|"wake-result", now:number):State {
   stamp.parse(now);
   if (now < s.updatedAt) throw new Error("CLOCK_REGRESSION");
   const revision=stamp.positive().parse(s.revision+1);
   const receipts=s.wakeReceipts??[];
   const existing=receipts.find(x=>x.signal.key===r.signal.key);
-  if (kind==="wake-intent") {
+  if (kind==="wake-accepted" || (kind==="wake-intent" && !existing)) {
     if (existing || receipts.length>=4096) throw new Error("WAKE_ADMISSION_CLOSED");
+  } else if (kind==="wake-intent") {
+    if (!existing || existing.outcome!=="accepted" || !sameWake(existing.signal,r.signal) ||
+        r.outcome!=="pending" || r.intentRevision!==revision) throw new Error("DEFERRED_WAKE_NOT_ADMISSIBLE");
   } else if (!existing || existing.outcome!=="pending" || existing.intentRevision!==r.intentRevision ||
     existing.actor!==r.actor || existing.session!==r.session) throw new Error("WAKE_RESULT_NOT_ADMISSIBLE");
   return stateSchema.parse({...s,revision,updatedAt:now,
     wakeReceipts:[...receipts.filter(x=>x.signal.key!==r.signal.key),r],
     lastEvent:{revision,kind,at:now,workId:"director",actor:r.actor,session:r.session,
       generation:r.intentRevision,wakeKey:r.signal.key,
-      trace:{head:r.signal.head,nextAction:kind==="wake-intent"?"Execute reconciled bounded pass":"Reconcile next admissible work",
+      trace:{head:r.signal.head,nextAction:kind==="wake-accepted"?"Dispatch durable accepted wake":kind==="wake-intent"?"Execute reconciled bounded pass":"Reconcile next admissible work",
         evidence:[r.signal.evidence]}}});
 }
 export async function runDirectorWake(raw:WakeSignal, ports:DirectorWakePorts):Promise<WakeResult> {
@@ -340,7 +343,7 @@ export async function runDirectorWake(raw:WakeSignal, ports:DirectorWakePorts):P
   if (previous) {
     if (previous.signal.kind!==signal.kind || previous.signal.head!==signal.head || previous.signal.evidence!==signal.evidence)
       throw new Error("WAKE_KEY_CONFLICT");
-    return {status:previous.outcome==="pending"?"reconciliation-required":"duplicate",finished:[...previous.finished]};
+    return {status:previous.outcome==="pending"||previous.outcome==="accepted"?"reconciliation-required":"duplicate",finished:[...previous.finished]};
   }
   const startedAt=ports.now();
   const receipt:WakeReceipt={signal,actor:ports.actor,session:ports.session,startedAt,
@@ -359,3 +362,50 @@ export async function runDirectorWake(raw:WakeSignal, ports:DirectorWakePorts):P
 // receipt. Reconcile GitHub, claims and operation proofs before any recovery.
 // The bounded receipt window fails closed at capacity; production requires a
 // verified history/index strategy before activation. No silent pruning.
+
+function sameWake(a:WakeSignal,b:WakeSignal){
+ return a.key===b.key&&a.kind===b.kind&&a.head===b.head&&a.evidence===b.evidence;
+}
+export interface DeferredWakeAdmissionPorts {
+ store:ClaimStore; actor:string; session:string; now():number;
+ verifySignal(signal:WakeSignal):Promise<boolean>;
+}
+// Admission and dispatch share the EXISTING durable receipt registry. An
+// accepted receipt has never authorized execution; pending requires explicit
+// reconciliation after failure. No second queue or in-memory fire-and-forget.
+export async function admitDeferredDirectorWake(raw:WakeSignal,ports:DeferredWakeAdmissionPorts){
+ const signal=wakeSignalSchema.parse(raw);id.parse(ports.actor);id.parse(ports.session);
+ if(await ports.verifySignal(signal)!==true)throw Error("UNVERIFIED_WAKE_SIGNAL");
+ const current=await ports.store.read(),s=stateSchema.parse(current.state);
+ const prior=s.wakeReceipts?.find(r=>r.signal.key===signal.key);
+ if(prior){
+  if(!sameWake(prior.signal,signal))throw Error("WAKE_KEY_CONFLICT");
+  return {status:prior.outcome==="pending"?"reconciliation-required" as const:"duplicate" as const,key:signal.key};
+ }
+ const now=ports.now();
+ const receipt:WakeReceipt={signal,actor:ports.actor,session:ports.session,startedAt:now,intentRevision:s.revision+1,outcome:"accepted",finished:[]};
+ await ports.store.compareAndSwap(current.version,wakeState(s,receipt,"wake-accepted",now));
+ return {status:"accepted" as const,key:signal.key};
+}
+export function listAcceptedDirectorWakes(state:State):WakeSignal[]{
+ return (stateSchema.parse(state).wakeReceipts??[]).filter(r=>r.outcome==="accepted")
+  .sort((a,b)=>a.intentRevision-b.intentRevision).map(r=>r.signal);
+}
+export async function runDeferredDirectorWake(raw:WakeSignal,ports:DirectorWakePorts):Promise<WakeResult>{
+ const signal=wakeSignalSchema.parse(raw);id.parse(ports.actor);id.parse(ports.session);
+ if(await ports.verifySignal(signal)!==true)throw Error("UNVERIFIED_WAKE_SIGNAL");
+ const current=await ports.store.read(),s=stateSchema.parse(current.state);
+ const prior=s.wakeReceipts?.find(r=>r.signal.key===signal.key);
+ if(!prior||!sameWake(prior.signal,signal))throw Error("DEFERRED_WAKE_NOT_ADMITTED");
+ if(prior.outcome!=="accepted")return {status:prior.outcome==="pending"?"reconciliation-required":"duplicate",finished:[...prior.finished]};
+ const startedAt=ports.now();
+ const receipt:WakeReceipt={signal,actor:ports.actor,session:ports.session,startedAt,intentRevision:s.revision+1,outcome:"pending",finished:[]};
+ // A different worker can claim only the accepted receipt. Losing CAS never
+ // authorizes selection or execution. Never retry an uncertain intent.
+ await ports.store.compareAndSwap(current.version,wakeState(s,receipt,"wake-intent",startedAt));
+ const result=await runClaimedWorkPass(ports);
+ const after=await ports.store.read(),completedAt=ports.now();
+ await ports.store.compareAndSwap(after.version,wakeState(stateSchema.parse(after.state),
+  {...receipt,outcome:result.stop,finished:result.finished,completedAt},"wake-result",completedAt));
+ return {status:"executed",...result};
+}
