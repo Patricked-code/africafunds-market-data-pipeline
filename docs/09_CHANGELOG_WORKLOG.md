@@ -1,5 +1,14 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-24 — Lot 11 / issue #9 / PR #42 : passage borné de l'agent codeur
+- **CONTINUITY_ID** : SADIAAF-CONTINUITY-20261124-01 ; admission PR42 commentaire 7122200385. Ancien HEAD b15a4823e33fc6498d3e213a1802535db0d2393d, CI #759 45326467362 et Docker #622 45326467414 SUCCESS sur ce SHA ; main 50e35e703c55a0e3f22fefe862bdc9bbe657bf13 protégé. Pas de modification des autres PR.
+- **OPÉRATION RÉELLE** : automation existante Automation_a523352a7c448191a41080097ce8b01f active et dernier run completed 04:35:44 UTC ; mise à jour du mandat confirmée, cadence horaire préservée, exigence d'enchaîner des unités admissibles dans une même session. Aucun nouveau scheduler.
+- **CODE** : `runClaimedWorkPass` dans le module existant, borné à 1–10 unités, sélection live via port de confiance, claim CAS, fencing avant dispatch, heartbeat et checkpoints, libération après résultat avec références de preuve ; une interruption ou un résultat non attesté conserve le claim à réconcilier. Un blocage documenté autorise une autre tâche indépendante. Pas de file locale persistante, aucune invocation modèle simulée comme réelle.
+- **TESTS** : cinq groupes supplémentaires, dont deux tâches (première bloquée puis seconde) sélectionnées dans le même passage, interruption, expiration, limite/répétition, preuve manquante. Tests nouveaux NOT_RUN au moment du commit, RED/GREEN séparés non attestés. Le test est un double d'exécuteur, pas une recette E2E de ChatGPT.
+- **BLOCK_REASON** : ref coordination/sadiaaf-agent-state non trouvée, seul ruleset main visible ; bootstrap soumis à protection préalable. Outil de découverte des événements automation retourne 404 ; aucune interface de réveil GitHub→agent réel attestée. Le port nécessite un exécuteur authentifié, horloge fiable, mutation gateway avec fencing et sélection canonique réelle. Pas de preuve 24/7.
+- **NEXT_ACTION** : vérifier CI et Docker exact SHA, traiter défauts ; qualifier bootstrap/protection et identité, raccorder le port à l'exécuteur existant sous gates, démontrer deux cycles réels sans second tick et crash/recovery ; continuer lots indépendants. PR42 reste Draft sensible sans label automerge-eligible ; aucune dépense, Codex/Copilot, secret ou S1.
+
+
 ## 2026-11-24 — Lot 11 / issue #9 : coordination inter-agents (socle en validation)
 - **CONTINUITY_ID** : SADIAAF-CONTINUITY-20261124-01 ; admission publiée dans issue #9 commentaire 7121998305 ; base 50e35e703c55a0e3f22fefe862bdc9bbe657bf13. Branche dédiée `feat/sadiaaf-agent-coordination-20261124`, aucune modification des PR #22/#25/#29/#31/#32.
 - **IMPLEMENTATION** : machine d'état claim/heartbeat/checkpoint/release/recover, exclusion tâche/branche/périmètre explicite, bail et génération de fencing, adaptateur GitHub Git Data CAS non-force sur ref opérationnelle dédiée. Tests unitaires et contention simulée ; pas d'initialisation live ni de preuve de contrôle universel.

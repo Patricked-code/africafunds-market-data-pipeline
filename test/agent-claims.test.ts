@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import {applyCommand,assertFence,emptyState,transition,GitHubClaimStore,type ClaimStore,type State,type Command,type GitHubRequest} from "../src/coordination/agentClaims.js";
+import {runClaimedWorkPass,applyCommand,assertFence,emptyState,transition,GitHubClaimStore,type ClaimStore,type State,type Command,type GitHubRequest} from "../src/coordination/agentClaims.js";
 const base = "a".repeat(40);
 const trace = {head:base,nextAction:"Run targeted tests",evidence:["issue:9"]};
 const first = {kind:"claim",workId:"issue-9",actor:"agent-a",session:"session-a",lot:11,
@@ -115,4 +115,79 @@ test("native Git fast-forward race admits exactly one sibling and preserves winn
     await assert.rejects(git(dir,"push",remote,loser+":"+ref));
     assert.equal(await git(dir,"--git-dir="+remote,"rev-parse",ref),winner);
   }finally{await rm(dir,{recursive:true,force:true});}
+});
+
+
+function memoryStore():ClaimStore {
+  let state = emptyState(); let version = "0";
+  return {
+    async read(){return {version,state:structuredClone(state)};},
+    async compareAndSwap(expected,next){
+      if(expected!==version) throw Error("CAS_CONFLICT");
+      state=structuredClone(next);version=String(next.revision);return version;
+    }
+  };
+}
+function workCandidate(workId:string) {
+  return {workId,lot:11,branch:"feat/"+workId,base,scopes:["file:src/"+workId],trace};
+}
+test("one admitted pass selects and runs two units without a second trigger",async()=>{
+  const store=memoryStore();
+  const selected:string[][]=[];
+  const executed:string[]=[];
+  let now=1000;
+  const result=await runClaimedWorkPass({
+    store,actor:"agent-a",session:"pass-a",now:()=>now++,leaseMs:1000,maxUnits:3,
+    async selectNext(finished){
+      selected.push([...finished]);
+      return finished.length===0?workCandidate("one"):finished.length===1?workCandidate("two"):null;
+    },
+    async execute(ctx){
+      assert.equal((await ctx.assertCurrent()).workId,ctx.claim.workId);
+      await ctx.heartbeat();
+      executed.push(ctx.claim.workId);
+      return {outcome:ctx.claim.workId==="one"?"blocked":"completed",
+        trace:{...trace,nextAction:ctx.claim.workId==="one"?"Wait for CI":"Reconcile next task",evidence:["issue:9"]}};
+    }
+  });
+  assert.deepEqual(result,{stop:"no-work",finished:["one","two"]});
+  assert.deepEqual(selected,[[],["one"],["one","two"]]);
+  assert.deepEqual(executed,["one","two"]);
+  assert.equal((await store.read()).state.claims.length,0);
+});
+test("interrupted or unconfirmed executor retains the claim and does not select another unit",async()=>{
+  const store=memoryStore();let selections=0;
+  await assert.rejects(runClaimedWorkPass({
+    store,actor:"agent-a",session:"pass-a",now:()=>1000,leaseMs:1000,maxUnits:2,
+    async selectNext(){selections++;return workCandidate("one");},
+    async execute(){throw Error("EXECUTOR_INTERRUPTED");}
+  }),/EXECUTOR_INTERRUPTED/);
+  assert.equal(selections,1);
+  assert.equal((await store.read()).state.claims[0]?.workId,"one");
+});
+test("expired execution cannot checkpoint or release a newer or expired claim",async()=>{
+  const store=memoryStore();let now=1000;
+  await assert.rejects(runClaimedWorkPass({
+    store,actor:"agent-a",session:"pass-a",now:()=>now,leaseMs:1000,maxUnits:1,
+    async selectNext(){return workCandidate("one");},
+    async execute(){now=2000;return {outcome:"completed",trace};}
+  }),/STALE_OR_EXPIRED_CLAIM/);
+  assert.equal((await store.read()).state.claims[0]?.workId,"one");
+});
+test("bounded pass rejects repeated work and stops when limit is reached",async()=>{
+  const store=memoryStore();
+  const options={store,actor:"agent-a",session:"pass-a",now:()=>1000,leaseMs:1000,maxUnits:1,
+    async selectNext(){return workCandidate("one");},
+    async execute(){return {outcome:"completed" as const,trace};}};
+  assert.deepEqual(await runClaimedWorkPass(options),{stop:"limit",finished:["one"]});
+  await assert.rejects(runClaimedWorkPass({...options,maxUnits:2}),/WORK_ALREADY_ATTEMPTED_IN_PASS/);
+});
+test("missing proof retains claim rather than marking work finished",async()=>{
+  const store=memoryStore();
+  await assert.rejects(runClaimedWorkPass({
+    store,actor:"agent-a",session:"pass-a",now:()=>1000,leaseMs:1000,maxUnits:1,
+    async selectNext(){return workCandidate("one");},
+    async execute(){return {outcome:"completed",trace:{...trace,evidence:[]}};}
+  }),/WORK_PASS_EVIDENCE_REQUIRED/);
+  assert.equal((await store.read()).state.claims[0]?.workId,"one");
 });

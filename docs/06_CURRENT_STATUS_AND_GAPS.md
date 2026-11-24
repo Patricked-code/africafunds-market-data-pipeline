@@ -1,5 +1,12 @@
 # 06 — État réel et écarts
 
+## 2026-11-24 — Lot 11 / PR #42 : passage de travail borné et reprise réelle programmée
+- **CONTINUITY_ID** : SADIAAF-CONTINUITY-20261124-01. Base main 50e35e703c55a0e3f22fefe862bdc9bbe657bf13, ancien HEAD #42 b15a4823e33fc6498d3e213a1802535db0d2393d ; CI #759 et Docker #622 SUCCESS sur cet ancien SHA, pas sur ce changement.
+- **TRAVAIL** : extension du module de coordination existant `runClaimedWorkPass`, avec sélection canonique réitérée, claim, pré-dispatch fencing, callback d'exécution, heartbeat/checkpoint/release, limite et refus des répétitions. Cinq tests supplémentaires, dont deux unités successives sans second déclenchement, interruption, expiration et preuve manquante. Il s'agit d'un port d'intégration borné, pas d'un nouvel ordonnanceur ni d'une invocation réelle de modèle. Tests nouveaux NON_RUN avant CI.
+- **RUNTIME** : automation horaire existante vérifiée active (dernière exécution enregistrée 04:35 UTC), mandat renforcé avec succès pour enchaîner le travail admissible pendant une même session, cadence inchangée. Découverte des sources d'événements indisponible (404) ; ref coordination absente (404 GitHub), seul ruleset main retourné. Aucun bootstrap non protégé ni exécuteur événementiel attesté.
+- **NEXT_ACTION** : vérifier CI/Docker exact SHA et tests ; qualifier protection ref, identité/horloge et passerelle de mutation ; raccorder le port à l'exécuteur réel autorisé et tester deux cycles réels, crash/reprise et déduplication événementielle. Conserver PR Draft sensible, aucun S1 ni coût nouveau. Lot 11 PARTIAL.
+
+
 ## 2026-11-24 — Lot 11 / issue #9 : coordination inter-agents (socle en validation)
 - **CONTINUITY_ID** : SADIAAF-CONTINUITY-20261124-01 ; admission publiée dans issue #9 commentaire 7121998305 ; base 50e35e703c55a0e3f22fefe862bdc9bbe657bf13. Branche dédiée `feat/sadiaaf-agent-coordination-20261124`, aucune modification des PR #22/#25/#29/#31/#32.
 - **IMPLEMENTATION** : machine d'état claim/heartbeat/checkpoint/release/recover, exclusion tâche/branche/périmètre explicite, bail et génération de fencing, adaptateur GitHub Git Data CAS non-force sur ref opérationnelle dédiée. Tests unitaires et contention simulée ; pas d'initialisation live ni de preuve de contrôle universel.

@@ -159,3 +159,80 @@ export class GitHubClaimStore implements ClaimStore {
     return commit;
   }
 }
+
+
+/**
+ * One bounded pass of the EXISTING development loop, not a scheduler, task
+ * queue, or model client. A trusted caller must bind the authenticated actor,
+ * trusted clock, protected ClaimStore, live canonical selector and actual
+ * coding executor. Selection is repeated after each completed/blocked unit.
+ * A failed/ambiguous execution deliberately retains the claim for reconciliation.
+ */
+export type WorkCandidate = Omit<Admission,"actor"|"session">;
+export type WorkPassResult = {outcome:"completed"|"blocked"; trace:Trace};
+export interface ClaimedWorkContext {
+  claim:Claim;
+  assertCurrent():Promise<Claim>;
+  heartbeat():Promise<void>;
+  checkpoint(value:Trace):Promise<void>;
+}
+export interface WorkPassPorts {
+  store:ClaimStore;
+  actor:string;
+  session:string;
+  now():number;
+  leaseMs:number;
+  maxUnits:number;
+  selectNext(finished:readonly string[]):Promise<WorkCandidate|null>;
+  execute(context:ClaimedWorkContext):Promise<WorkPassResult>;
+}
+export async function runClaimedWorkPass(ports:WorkPassPorts):Promise<{
+  stop:"no-work"|"limit"; finished:string[];
+}> {
+  id.parse(ports.actor);
+  id.parse(ports.session);
+  if (!Number.isSafeInteger(ports.maxUnits) || ports.maxUnits < 1 || ports.maxUnits > 10)
+    throw new Error("INVALID_WORK_PASS_LIMIT");
+  lease(stamp.parse(ports.now()),ports.leaseMs);
+  const finished:string[] = [];
+  for (let i=0;i<ports.maxUnits;i++) {
+    // The trusted selector must reconcile GitHub, actual dependencies, owners,
+    // branch heads and authorization anew on every call. No local task list.
+    const candidate = await ports.selectNext([...finished]);
+    if (!candidate) return {stop:"no-work",finished};
+    if (finished.includes(candidate.workId)) throw new Error("WORK_ALREADY_ATTEMPTED_IN_PASS");
+    const admission = await applyCommand(ports.store,{
+      ...candidate,kind:"claim",actor:ports.actor,session:ports.session,leaseMs:ports.leaseMs
+    },ports.now());
+    const acquired = admission.state.claims.find(c=>c.workId===candidate.workId);
+    if (!acquired) throw new Error("CLAIM_NOT_CONFIRMED");
+    const owner:Identity = {workId:acquired.workId,actor:acquired.actor,
+      session:acquired.session,generation:acquired.generation};
+    const assertCurrent = async()=>assertFence((await ports.store.read()).state,owner,ports.now());
+    const context:ClaimedWorkContext = {
+      claim:acquired,
+      assertCurrent,
+      async heartbeat(){
+        await applyCommand(ports.store,{kind:"heartbeat",...owner,leaseMs:ports.leaseMs},ports.now());
+      },
+      async checkpoint(value){
+        await applyCommand(ports.store,{kind:"checkpoint",...owner,trace:value},ports.now());
+      }
+    };
+    // This is only a pre-dispatch check. The real executor's mutation gateway
+    // must enforce fencing at EACH write. Do not interpret this callback as
+    // atomic authorization of an external GitHub mutation.
+    await assertCurrent();
+    const result = await ports.execute(context);
+    if (result.outcome!=="completed" && result.outcome!=="blocked")
+      throw new Error("INVALID_WORK_PASS_RESULT");
+    const proof = trace.parse(result.trace);
+    if (proof.evidence.length===0) throw new Error("WORK_PASS_EVIDENCE_REQUIRED");
+    await context.checkpoint(proof);
+    await applyCommand(ports.store,{kind:"release",...owner,trace:proof},ports.now());
+    // 'completed' means this bounded unit has returned, not that a whole
+    // lot, PR, CI, source or production release has been certified DONE.
+    finished.push(candidate.workId);
+  }
+  return {stop:"limit",finished};
+}
