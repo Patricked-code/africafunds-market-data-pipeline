@@ -1,4 +1,5 @@
 import {z} from "zod";
+import {createHash} from "node:crypto";
 import {CONTINUITY_ID} from "./agentClaims.js";
 import {canonicalWorkAdmissionSchema,type CanonicalWorkAdmission} from "./githubSelector.js";
 import type {GitHubDirectorRead} from "./githubDirector.js";
@@ -19,6 +20,32 @@ const authorization=z.discriminatedUnion("kind",[
   z.object({kind:z.literal("revoke"),continuity:z.literal(CONTINUITY_ID),workId}).strict(),
 ]);
 type RecordEntry={commentId:number;body:string;createdAt:string;updatedAt:string};
+const checkpointSchema=z.object({count:z.number().int().min(0).max(2000),digest:z.string().regex(/^[a-f0-9]{64}$/)}).strict();
+export type AdmissionHistoryCheckpoint=z.infer<typeof checkpointSchema>;
+export interface AdmissionHistoryPort{
+ // Trusted existing canonical storage, not a second task list. Bootstrap
+ // must be explicitly attested; a missing checkpoint is never empty history.
+ readCheckpoint():Promise<unknown>;
+ advanceCheckpoint(expected:AdmissionHistoryCheckpoint,next:AdmissionHistoryCheckpoint):Promise<boolean>;
+}
+function historyCheckpoint(entries:readonly RecordEntry[]):AdmissionHistoryCheckpoint{
+ return {count:entries.length,digest:createHash("sha256").update(JSON.stringify({
+  continuity:CONTINUITY_ID,records:entries
+ })).digest("hex")};
+}
+export function emptyAdmissionHistoryCheckpoint():AdmissionHistoryCheckpoint{
+ return historyCheckpoint([]);
+}
+async function verifyHistory(entries:readonly RecordEntry[],history:AdmissionHistoryPort){
+ const old=checkpointSchema.parse(await history.readCheckpoint());
+ if(old.count>entries.length||historyCheckpoint(entries.slice(0,old.count)).digest!==old.digest)
+  throw Error("ADMISSION_HISTORY_DIVERGED");
+ const next=historyCheckpoint(entries);
+ if(next.count!==old.count&&await history.advanceCheckpoint(old,next)!==true)
+  throw Error("ADMISSION_HISTORY_CAS_CONFLICT");
+ const observed=checkpointSchema.parse(await history.readCheckpoint());
+ if(observed.count!==next.count||observed.digest!==next.digest)throw Error("ADMISSION_HISTORY_UNCONFIRMED");
+}
 async function snapshot(read:GitHubDirectorRead):Promise<RecordEntry[]>{
   const out:RecordEntry[]=[];
   const seen=new Set<number>();
@@ -37,12 +64,24 @@ async function snapshot(read:GitHubDirectorRead):Promise<RecordEntry[]>{
   }
   throw Error("ADMISSION_HISTORY_LIMIT_REACHED");
 }
+// Independent live verification used by the protected store before CAS.
+// A checkpoint is an exact prefix of the freshly read canonical history.
+export async function verifyAdmissionHistoryAdvance(read:GitHubDirectorRead,rawExpected:AdmissionHistoryCheckpoint,rawNext:AdmissionHistoryCheckpoint):Promise<boolean>{
+ const expected=checkpointSchema.parse(rawExpected),next=checkpointSchema.parse(rawNext);
+ if(next.count<=expected.count)return false;
+ const first=await snapshot(read),second=await snapshot(read);
+ if(JSON.stringify(first)!==JSON.stringify(second))return false;
+ if(first.length!==next.count)return false;
+ // Never anchor malformed owner-issued authorization records.
+ for(const c of first)authorization.parse(JSON.parse(c.body.slice(MARKER.length+1)));
+ return historyCheckpoint(first.slice(0,expected.count)).digest===expected.digest&&historyCheckpoint(first).digest===next.digest;
+}
 // Read the existing canonical issue, never a second queue. Owner identity is
 // GitHub provenance, not proof that an actual human typed a comment: all
 // credentials sharing that identity must remain outside model control.
 // Deletion of a record is not detectable by this stateless reader. Runtime
 // activation requires trusted writer/revocation policy and durable evidence.
-export function createCanonicalAdmissionLoader(read:GitHubDirectorRead){
+export function createCanonicalAdmissionLoader(read:GitHubDirectorRead,history?:AdmissionHistoryPort){
   return async(mainSha:string):Promise<CanonicalWorkAdmission[]>=>{
     sha.parse(mainSha);
     const first=await snapshot(read),second=await snapshot(read);
@@ -56,6 +95,10 @@ export function createCanonicalAdmissionLoader(read:GitHubDirectorRead){
       if(record.kind==="revoke")active.delete(record.workId);
       else active.set(record.admission.workId,record.admission);
     }
+    // Persist only after every record has passed the strict schema. A live
+    // director must supply a trusted history port; optional mode is read-only
+    // inspection and never authorizes runtime execution.
+    if(history)await verifyHistory(first,history);
     // Never revive an older admission after a newer stale admission/revocation.
     const result=[...active.values()].filter(a=>a.mainSha===mainSha);
     if(result.length>100)throw Error("ADMISSION_LIMIT_REACHED");

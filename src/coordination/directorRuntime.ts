@@ -1,7 +1,7 @@
 import {z} from "zod";
-import {GitHubClaimStore,listAcceptedDirectorWakes,runDeferredDirectorWake,type WakeSignal,type ClaimStore,type ClaimedWorkContext,type WorkPassResult} from "./agentClaims.js";
+import {GitHubClaimStore,createAdmissionHistoryPort,listAcceptedDirectorWakes,runDeferredDirectorWake,type WakeSignal,type ClaimStore,type ClaimedWorkContext,type WorkPassResult} from "./agentClaims.js";
 import {createGitHubRequest} from "./githubTransport.js";
-import {createCanonicalAdmissionLoader} from "./githubAdmissions.js";
+import {createCanonicalAdmissionLoader,verifyAdmissionHistoryAdvance} from "./githubAdmissions.js";
 import {createGitHubWorkSelector,type CanonicalWorkAdmission} from "./githubSelector.js";
 import {runGitHubDirectorWake,deriveGitHubWake,type GitHubDirectorEvent} from "./githubDirector.js";
 import type {createGitHubAppIdentity} from "./githubIdentity.js";
@@ -130,7 +130,11 @@ async function runDirector(config:DirectorRuntimeConfig,event:GitHubDirectorEven
   if(await config.verifyCoordinationIsolation(actor)!==true)throw Error("DIRECTOR_COORDINATION_ISOLATION_REQUIRED");
   return remote.compareAndSwap(version,state);
  }};
- const load=createCanonicalAdmissionLoader(readGitHub);
+ const history=createAdmissionHistoryPort({store,actor,session:config.session,now:config.now,
+  async authenticate(){return await config.verifyCoordinationIsolation(actor)===true&&await config.verifyAdmissionHistory()===true;},
+  async verifyEmptyHistory(){return false;}, // explicit supervisor-only initialization, never bootstrap on wake
+  verifyPrefixAdvance:(expected,next)=>verifyAdmissionHistoryAdvance(readGitHub,expected,next)});
+ const load=createCanonicalAdmissionLoader(readGitHub,history);
  const admissions=async(main:string)=>{
   if(await config.verifyAdmissionHistory()!==true)throw Error("DIRECTOR_ADMISSION_HISTORY_REQUIRED");
   return supportedDirectorAdmissions(await load(main));

@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import {createCanonicalAdmissionLoader} from "../src/coordination/githubAdmissions.js";
+import {createCanonicalAdmissionLoader,emptyAdmissionHistoryCheckpoint,verifyAdmissionHistoryAdvance,type AdmissionHistoryPort} from "../src/coordination/githubAdmissions.js";
 import {createGitHubWorkSelector,type CanonicalWorkAdmission} from "../src/coordination/githubSelector.js";
 import {CONTINUITY_ID,emptyState} from "../src/coordination/agentClaims.js";
 const main="a".repeat(40),other="b".repeat(40),date="2026-11-24T06:00:00Z";
@@ -42,4 +42,45 @@ test("existing selector consumes actual loader output without second task list",
  const select=createGitHubWorkSelector({readGitHub:read,readCanonicalAdmissions:createCanonicalAdmissionLoader(read),store:{async read(){return {version:"1",state:emptyState()};},async compareAndSwap(){throw Error("unexpected write");}},actor:"agent-a",session:"session-a",now:()=>1000,leaseMs:1000});
  assert.equal((await select([]))?.workId,item.workId);
  assert.equal(await select([item.workId]),null);
+});
+
+function historyFixture(){
+ let current=emptyAdmissionHistoryCheckpoint();
+ const history:AdmissionHistoryPort={async readCheckpoint(){return current;},async advanceCheckpoint(expected,next){
+  assert.deepEqual(expected,current);current=next;return true;
+ }};
+ return history;
+}
+test("anchored history prevents deleted revocation from reviving old authorization",async()=>{
+ let entries=[entry(1,admit()),entry(2,revoke)];
+ const load=createCanonicalAdmissionLoader(async()=>entries,historyFixture());
+ assert.deepEqual(await load(main),[]);
+ entries=[entry(1,admit())];await assert.rejects(load(main),/HISTORY_DIVERGED/);
+});
+test("history permits only appended exact records and refuses rewritten prefix",async()=>{
+ let entries=[entry(1,admit())];
+ const load=createCanonicalAdmissionLoader(async()=>entries,historyFixture());
+ assert.deepEqual(await load(main),[item]);
+ entries=[...entries,entry(2,revoke)];assert.deepEqual(await load(main),[]);
+ entries=[entry(1,admit({...item,priority:5})),entry(2,revoke)];
+ await assert.rejects(load(main),/HISTORY_DIVERGED/);
+});
+test("missing history or failed CAS cannot authorize live selection",async()=>{
+ const read=async()=>[entry(1,admit())];
+ await assert.rejects(createCanonicalAdmissionLoader(read,{async readCheckpoint(){return null;},async advanceCheckpoint(){throw Error("unexpected");}})(main));
+ await assert.rejects(createCanonicalAdmissionLoader(read,{async readCheckpoint(){return emptyAdmissionHistoryCheckpoint();},async advanceCheckpoint(){return false;}})(main),/CAS_CONFLICT/);
+});
+
+test("independent prefix verification binds both checkpoint counts and exact live bytes",async()=>{
+ let entries=[entry(1,admit())];
+ const history=historyFixture(),read=async()=>entries;
+ const load=createCanonicalAdmissionLoader(read,history);
+ const empty=emptyAdmissionHistoryCheckpoint();await load(main);
+ const first=await history.readCheckpoint() as ReturnType<typeof emptyAdmissionHistoryCheckpoint>;
+ assert.equal(await verifyAdmissionHistoryAdvance(read,empty,first),true);
+ entries=[entry(1,admit()),entry(2,revoke)];await load(main);
+ const next=await history.readCheckpoint() as ReturnType<typeof emptyAdmissionHistoryCheckpoint>;
+ assert.equal(await verifyAdmissionHistoryAdvance(read,first,next),true);
+ assert.equal(await verifyAdmissionHistoryAdvance(read,{...first,digest:"0".repeat(64)},next),false);
+ entries=[entry(1,admit())];assert.equal(await verifyAdmissionHistoryAdvance(read,first,next),false);
 });

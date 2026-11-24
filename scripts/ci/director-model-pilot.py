@@ -179,18 +179,34 @@ def compose_guard(original, guard):
         raise RuntimeError("EDIT_SCOPE_CHANGED")
     return candidate
 
+def parse_model_response(raw):
+    if not isinstance(raw,str) or len(raw)>8000:
+        raise ValueError("MODEL_RESPONSE_LIMIT")
+    try:
+        obj=json.loads(raw)
+    except json.JSONDecodeError as exc:
+        raise ValueError("MODEL_JSON_INVALID") from exc
+    if not isinstance(obj,dict) or set(obj)!={"guard"} or not isinstance(obj["guard"],str):
+        raise ValueError("MODEL_JSON_SCHEMA_INVALID")
+    return parse_guard(obj["guard"])
+
 def generate(prompt, attempt=1):
     request = urllib.request.Request("http://127.0.0.1:18081/v1/chat/completions",
         data=json.dumps({"model": "local", "messages": [{"role":"system","content":
-          "Return only the requested TypeScript guard statements. No function wrapper, return statement, tool calls or explanation."},
-          {"role":"user","content":prompt}], "temperature":0.0 if attempt == 1 else 0.25, "max_tokens":1000}).encode(),
+          "Return a JSON object with exactly one string field named guard containing only TypeScript guard statements. No function wrapper, return statement, tool calls or explanation."},
+          {"role":"user","content":prompt}], "temperature":0.0 if attempt == 1 else 0.25, "max_tokens":1200, "response_format":{"type":"json_object"}}).encode(),
         headers={"Content-Type":"application/json"})
     with urllib.request.urlopen(request, timeout=300) as response:
         result=json.load(response)
     choice=result["choices"][0]
-    if choice.get("finish_reason") == "length":
-        raise ValueError("MODEL_OUTPUT_TRUNCATED")
-    return parse_guard(choice["message"]["content"])
+    raw=choice["message"]["content"]
+    if isinstance(raw,str):
+        # Bounded encoded output for diagnosing rejected protocol responses.
+        # Model has only the public source and allowed test identifiers.
+        print("MODEL_RAW_OUTPUT_BASE64="+base64.b64encode(raw[:8000].encode()).decode(),flush=True)
+    if choice.get("finish_reason") != "stop":
+        raise ValueError("MODEL_OUTPUT_NOT_COMPLETE")
+    return parse_model_response(raw)
 
 def main():
     source=SOURCE.read_text()
@@ -252,16 +268,16 @@ def main():
                         "'2026-11-24T23:45:00-02:00' must keep the existing UTC result '2026-11-25'. "
                         "Do not reject non-midnight Date objects. No new functions, return, imports or "
                         "dependencies. No logging, filesystem, network or process access. "
-                        "Return only the inserted statements. Original function:\n"+before)
+                        "Return JSON with a single guard string containing the inserted statements. Original function:\n"+before)
                 original_prompt=prompt
                 seen_candidates=set()
                 for attempt in range(1,4):
                     try:
                         guard=generate(prompt,attempt)
                         candidate=compose_guard(before,guard)
-                    except (ValueError,KeyError):
-                        print("MODEL_OUTPUT_FORMAT_REJECTED",attempt,flush=True)
-                        prompt=original_prompt+"\nReturn only the guard statements to insert, no prose or wrapper."
+                    except (ValueError,KeyError) as error:
+                        print("MODEL_OUTPUT_FORMAT_REJECTED",attempt,type(error).__name__,str(error)[:120],flush=True)
+                        prompt=original_prompt+"\nReturn one JSON object with exactly the guard string. No prose or function wrapper."
                         continue
                     digest=hashlib.sha256(candidate.encode()).hexdigest()
                     repeat=digest in seen_candidates

@@ -6,6 +6,7 @@ import unittest
 from unittest.mock import patch
 import tempfile
 import hashlib
+import json
 from types import SimpleNamespace
 spec=importlib.util.spec_from_file_location("pilot",Path(__file__).with_name("director-model-pilot.py"))
 pilot=importlib.util.module_from_spec(spec)
@@ -80,5 +81,11 @@ class DiagnosticTest(unittest.TestCase):
                     pilot.download("https://example.invalid/asset",dest,"0"*64,pilot.time.monotonic()+60)
                 with self.assertRaisesRegex(RuntimeError,"BUDGET_EXHAUSTED"):
                     pilot.download("https://example.invalid/asset",dest,"0"*64,pilot.time.monotonic()-1)
+    def test_structured_model_response(self):
+        guard='if (true) throw new Error("test");'
+        self.assertEqual(pilot.parse_model_response(json.dumps({"guard":guard})),guard)
+        for invalid in [guard,json.dumps({"guard":guard,"extra":"x"}),json.dumps({"guard":3}),json.dumps({"guard":"return 1;"})]:
+            with self.assertRaises(ValueError):
+                pilot.parse_model_response(invalid)
 if __name__=="__main__":
     unittest.main()
