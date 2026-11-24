@@ -9,7 +9,7 @@ const branch=z.string().min(1).max(200).regex(/^[A-Za-z0-9._/-]+$/)
   .refine(x=>x!=="main"&&!x.includes("..")&&!x.startsWith("coordination/"));
 const fileScope=z.string().max(300).regex(/^file:[A-Za-z0-9_.\/-]+$/)
   .refine(x=>!x.slice(5).split("/").some(p=>p==="."||p===".."||p===""));
-const admission=z.object({
+export const canonicalWorkAdmissionSchema=z.object({
   continuity:z.literal(CONTINUITY_ID),
   workId:z.string().regex(/^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$/),
   issue:num,lot:z.number().int().min(0).max(13),priority:z.number().int().min(0).max(1000),
@@ -27,7 +27,7 @@ const admission=z.object({
        !/^work\/sadiaaf-issue-[1-9][0-9]*-[a-z0-9-]+$/.test(x.branch))))
     ctx.addIssue({code:"custom",message:"INVALID_ADMISSION_SCOPE_OR_DEPENDENCY"});
 });
-export type CanonicalWorkAdmission=z.infer<typeof admission>;
+export type CanonicalWorkAdmission=z.infer<typeof canonicalWorkAdmissionSchema>;
 const mainSchema=z.object({name:z.literal("main"),protected:z.literal(true),commit:z.object({sha})});
 const issueSchema=z.object({number:num,state:z.enum(["open","closed"]),pull_request:z.unknown().optional()});
 const prSchema=z.object({
@@ -53,7 +53,7 @@ export interface Selection {
 }
 export async function inspectGitHubSelection(ports:GitHubSelectorPorts,finished:readonly string[]):Promise<Selection>{
   const main=mainSchema.parse(await ports.readGitHub("/branches/main")).commit.sha;
-  const admissions=z.array(admission).max(100).parse(await ports.readCanonicalAdmissions(main));
+  const admissions=z.array(canonicalWorkAdmissionSchema).max(100).parse(await ports.readCanonicalAdmissions(main));
   if(new Set(admissions.map(a=>a.workId)).size!==admissions.length)throw Error("DUPLICATE_CANONICAL_WORK");
   const blocked:Selection["blocked"]=[];
   for(const a of [...admissions].sort((x,y)=>x.priority-y.priority||(x.workId<y.workId?-1:x.workId>y.workId?1:0))){
