@@ -1,6 +1,6 @@
 import { Buffer } from 'node:buffer';
-import { assertIngestionSucceeded } from './ingestionOutcome.js';
-import { assertEndpointsSelected, assertUsableIngestion } from './ingestionCompleteness.js';
+import { accountForEndpointResult, assertCollectorImplemented, assertIngestionSucceeded, ingestionRunStatus } from './ingestionOutcome.js';
+import { assertEndpointsSelected } from './ingestionCompleteness.js';
 import { fetchWithRetry } from '../http/fetcher.js';
 import { archiveRaw } from '../archive/rawStore.js';
 import { discoverLinks, parseHtmlTables } from '../parsers/html.js';
@@ -11,6 +11,7 @@ import { listEndpoints, type SourceEndpoint } from '../config/registry.js';
 import { logger } from '../config/logger.js';
 import { pool, withTransaction } from '../db/pool.js';
 import { finishRun, startRun, upsertEndpoint } from './runStore.js';
+import { writeTerminalOnce } from './terminalWrite.js';
 
 function contentType(headers: Record<string, string>): string {
   return headers['content-type']?.toLowerCase() ?? 'application/octet-stream';
@@ -91,10 +92,12 @@ async function parseAndPersist(endpoint: SourceEndpoint, artifactId: string, bod
     return sheets.reduce((sum, sheet) => sum + sheet.rows.length, 0);
   }
   await persistRows(endpoint, artifactId, null, []);
-  throw new Error(`Unsupported ingestion content type: ${type}`);
+  return 0;
 }
 
-async function ingestEndpoint(endpoint: SourceEndpoint, mode: 'ingest' | 'discover'): Promise<{ artifacts: number; rows: number; links: number }> {
+async function ingestEndpoint(endpoint: SourceEndpoint, mode: 'ingest' | 'discover'): Promise<{ artifacts: number; rows: number; links: number; failedChildren: number }> {
+  // Discovery-only URLs must never be archived or counted as successfully ingested data.
+  assertCollectorImplemented(endpoint);
   await withTransaction((client) => upsertEndpoint(client, endpoint));
   const page = await fetchWithRetry(endpoint.url);
   const pageArtifactId = await saveArtifact(endpoint, page);
@@ -121,8 +124,7 @@ async function ingestEndpoint(endpoint: SourceEndpoint, mode: 'ingest' | 'discov
       }
     }
   }
-  assertUsableIngestion({ rows, failedChildren });
-  return { artifacts, rows, links: linksCount };
+  return { artifacts, rows, links: linksCount, failedChildren };
 }
 
 export async function runIngestion(input: { market?: string; family?: string; endpointCode?: string; mode?: 'ingest' | 'discover'; failOnEndpointError?: boolean } = {}): Promise<void> {
@@ -132,17 +134,17 @@ export async function runIngestion(input: { market?: string; family?: string; en
     ...(input.family !== undefined ? { family: input.family } : {}),
   }))
     .filter((endpoint) => !input.endpointCode || endpoint.id === input.endpointCode);
-  assertEndpointsSelected(endpoints.length);
   const runId = await startRun({ jobType: mode.toUpperCase(), scope: input });
   const summary = { endpoints: endpoints.length, success: 0, failed: 0, artifacts: 0, rows: 0, links: 0 };
   try {
+    // Preserve a FAILED audit record instead of a false SUCCESS on zero selection.
+    assertEndpointsSelected(endpoints.length);
     for (const endpoint of endpoints) {
       try {
         const result = await ingestEndpoint(endpoint, mode);
-        summary.success += 1;
-        summary.artifacts += result.artifacts;
-        summary.rows += result.rows;
-        summary.links += result.links;
+        // Preserve real archive/link counters even if no financial rows qualify.
+        // Keep success=0 when ingest mode rejects the endpoint.
+        accountForEndpointResult(summary, result, mode);
         logger.info({ endpoint: endpoint.id, ...result }, 'Source ingérée');
       } catch (error) {
         summary.failed += 1;
@@ -150,11 +152,14 @@ export async function runIngestion(input: { market?: string; family?: string; en
       }
     }
   } catch (error) {
-    await finishRun(runId, 'FAILED', summary, error);
+    await writeTerminalOnce(() => finishRun(runId, 'FAILED', summary, error));
     throw error;
   }
-  // Persist the actual endpoint outcome before strict-mode signalling to callers.
-  // Otherwise a PARTIAL run would be overwritten as FAILED by the catch above.
-  await finishRun(runId, summary.failed === 0 ? 'SUCCESS' : summary.success ? 'PARTIAL' : 'FAILED', summary);
+  // A terminal persistence failure must propagate directly: never attempt a second terminal
+  // write for the same run when finishRun itself throws.
+  await writeTerminalOnce(() => finishRun(runId, ingestionRunStatus(summary), summary));
+  // A strict caller must receive an error on partial failure, while the
+  // single terminal audit retains the actual PARTIAL/FAILED endpoint outcome.
+  // The exception deliberately occurs outside the terminal-write catch.
   if (input.failOnEndpointError) assertIngestionSucceeded(summary);
 }

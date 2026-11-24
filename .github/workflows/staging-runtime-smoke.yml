@@ -1,18 +1,7 @@
 name: SadiaAF — isolated Docker runtime and PostgreSQL persistence smoke
 
 on:
-  pull_request:
-    paths:
-      - 'Dockerfile'
-      - '.dockerignore'
-      - 'docker-compose.yml'
-      - '.github/workflows/staging-runtime-smoke.yml'
-      - 'src/**'
-      - 'config/**'
-      - 'sql/**'
-      - 'web/**'
-      - 'package.json'
-      - 'package-lock.json'
+  pull_request:  # Always create a required check, even for docs-only PRs
   push:
     branches: [main]
     paths:

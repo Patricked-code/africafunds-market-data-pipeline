@@ -1,493 +1,263 @@
 # 09 — Journal de travail et continuité
 
-## 2026-11-23 — PR #36 : test d'intégration d'index HTML vide sans faux SUCCESS (lot 4/11)
+## 2026-11-24 — Convergence PR #36 après PR #26 : ingestion, archives, index HTML et audit réel
+- **CONTINUITY_ID** : SADIAAF-CONTINUITY-20261124-01. Branche originale PR #36 `fix/ingestion-false-success-20261122`, premier parent `df0129b625798147eb1dc3f283fcbd7fd19fac99`, second parent `main=02a162437a564b8b5e3bc5f8b612a11bec4b76f2`. Aucun force push ni perte de l'historique des deux parents.
+- **CONSERVATION DE L'EXISTANT** : blob source `src/jobs/ingestionCompleteness.ts` et les trois tests #36 repris IDENTIQUES de la branche d'origine. Les contrôles #26 de `src/jobs/runStore.ts`, `terminalWrite.ts`, `ingestionOutcome.ts` et `ingest.ts` sont conservés dans le main courant, avec fusion minimale documentée du conflit de code. Aucun autre PR/SQL/registre source/S1 touché.
+- **SÉMANTIQUE COMBINÉE À TESTER** : `MANUAL_API_DISCOVERY` toujours BLOCKED_ADAPTER avant archivage ; zéro endpoint interdit avec audit FAILED ; zéro ligne en mode ingest n'est pas un succès ; index HTML avec CSV enfant valide peut réussir ; échec d'un téléchargement enfant refuse le succès de cet endpoint mais conserve les compteurs artifacts/rows/links réellement observés. Mode `discover` peut produire zéro ligne avec des liens et aucun enfant échoué, sans devenir une preuve de publication financière.
+- **STATUT TERMINAL** : préserver l'issue réelle des endpoints dans PostgreSQL (`SUCCESS`, `PARTIAL`, `FAILED`) avant d'émettre l'exception du mode strict vers l'appelant ; l'exception ne doit jamais déclencher une deuxième écriture terminale. L'appel strict reste refusé si des endpoints sont en échec ; aucun faux succès de backfill. Cette décision de convergence remplace la chronologie d'écriture stricte de PR #26 mais maintient la preuve d'échec pour l'appelant et le status audit réel.
+- **TESTS COMBINÉS** : garder les tests PR #26 et #36, ajouter deux tests des compteurs de collectes avec failedChildren ainsi que le cas discover ; CI et PostgreSQL du HEAD merge encore à exécuter. Aucun adaptateur officiel CBE/GOSDMX ni source/licence n'est certifié.
+- **AUTORITÉ DOCUMENTAIRE** : conserver les documents main actuels et y insérer ce checkpoint ; les anciennes versions intégrales de docs/06 et docs/09 de PR #36 demeurent accessibles par le premier parent Git, sans écraser les entrées courantes.
+- **BLOCK_REASON** : nouvelle combinaison non certifiée avant CI/Docker, éventuels commentaires GitHub à examiner et corriger ; lot 4 et chantiers #5/#13–#17 restent PARTIAL, lot 13 S1 non autorisé.
+- **NEXT_ACTION** : vérifier la liste exacte des fichiers et les checks `validate` / Docker PostgreSQL sur HEAD fusionné, résoudre chaque régression/test et fil de revue avant READY/label et fusion native. Réévaluer ensuite les PR #22/#25/#27–#34 dans l'ordre des dépendances, avec 14 lots/6 chantiers et recettes financières comme autorité, sans recréer l'existant.
 
-- **RECONCILIATION** : dépôt PUBLIC, PR #36 OPEN/Draft, HEAD avant changement `52ebe446611bb9793c46091d7de3c0f076f48bac` ; PR concurrentes #22 et #25–#35 non modifiées. Lecture AGENTS.md, des 16 documents obligatoires et du checkpoint, du contrat d'exécution autonome, de l'issue #14 et du code réel `src/jobs/ingest.ts`.
-- **PREUVES EXACT-SHA** : sur HEAD précédent `52ebe446611bb9793c46091d7de3c0f076f48bac`, [CI #684](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45239359720) et [Docker #551](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45239359843) `completed/success`. Les preuves n'attestent pas les commits suivants.
-- **ACTION CODE/TEST** : commit [35db05809aa1f2b0aa7398915cf852a5d32a701b](https://github.com/Patricked-code/africafunds-market-data-pipeline/commit/35db05809aa1f2b0aa7398915cf852a5d32a701b) sur la même branche, test d'intégration réel dans `test/integration/ingestion-html-csv.test.ts` : remplacer une page HTML d'index par une page HTTP 200 sans table ni lien enfant, vérifier le rejet strict, l'audit PostgreSQL `FAILED`, les compteurs `success=0/failed=1/rows=0` et la conservation des deux observations historiques. Pas de changement du moteur, du schéma, de la source officielle ou du serveur.
-- **TESTS** : locaux NOT_RUN ; CI/Docker exact SHA après commit de code et présent checkpoint à contrôler. Aucun PASS anticipé sur ce nouveau code.
-- **BLOCK_REASON** : revue indépendante et protection effective de main non attestées ; audit historique/secrets public et licences des sources réelles incomplets ; PR #36 Draft ; CI exact nouveau HEAD non encore vérifiée.
-- **NEXT_ACTION** : inspecter les runs CI/Docker du nouveau HEAD, corriger tout échec reproductible sur la branche sous claim ; obtenir revue indépendante, contrôler ruleset/main et audit public ; poursuivre les unités indépendantes des lots 0–13 sans fusion ni S1.
-- **ROLLBACK** : revert ciblé du commit test et du checkpoint sur branche PR #36 ; aucun impact sur main/S1.
+
+## 2026-11-24 — Convergence PR #26 : contrôles d'ingestion et écritures terminales préservés
+- **CONTINUITY_ID** : SADIAAF-CONTINUITY-20261124-01 ; ancienne PR #26 HEAD `bc632405eb8964250c4d88fb56adff846d652a9d`, branche `fix/manual-api-discovery-fail-closed-20261109`, rapprochée du `main=bf42e246a083221d0bd64a5b28f349847215016f` après intégration CSV de PR #35.
+- **TRAVAIL PRÉSERVÉ** : 7 blobs CODE/TEST EXACTS de PR #26 (src/jobs/ingest.ts, ingestionOutcome.ts, runStore.ts, terminalWrite.ts, tests unitaires et intégration PostgreSQL) repris sans réécriture ; classement BLOCKED_ADAPTER pour MANUAL_API_DISCOVERY, NO_STRUCTURED_ROWS en mode ingest, compteurs et statuts terminales, fencing et writeTerminalOnce.
+- **HISTORIQUE** : merge Git non destructif à deux parents (premier PR #26, second main) ; état des docs/06 et docs/09 du main courant maintenu avec checkpoint. Le contenu ancien des docs modifiés par PR #26 reste récupérable par son parent Git original ; aucun force push/suppression, aucune réinitialisation des branches d'autres PR.
+- **DEPENDANCE SUIVANTE** : PR #36 a des modifications concurrentes à src/jobs/ingest.ts : ne pas la merger par écrasement du fichier. Fusionner les contrôles NO_STRUCTURED_ROWS, BLOCKED_ADAPTER, runStore/terminalWrite de #26 et les gardes failedChildren/rows/endpoint de #36 avec tests de comportement discover vs ingest. La PR #36 doit être réconciliée seulement après réussite/intégration de #26.
+- **BLOCK_REASON** : CI/Docker sur HEAD du présent merge non encore certifiées ; aucune qualification des six adaptateurs officiels, aucune conformité des sources/licences/recette S1 attestée.
+- **NEXT_ACTION** : contrôler les checks validate et Docker/PostgreSQL du nouveau HEAD, fichiers diff et reviews, passer PR #26 READY et mettre label automerge-eligible si admissible, déclencher native auto-merge SHA-bound, puis traiter la PR #36 sans collision. Poursuivre les 14 lots et six chantiers selon tests financiers/sources réelles.
+
+
+## 2026-11-24 — Lot 4 / PR #35 : réconciliation du parseur CSV existant sans réécriture
+- **CONTINUITY_ID** : SADIAAF-CONTINUITY-20261124-01. Reprise non destructive de la PR #35 depuis ancien SHA `dadf871051f2b478eb875125d4dd55b46e2d25ca` vers `main=eb74c0a1d42d8dafa4fa67bbf8aa185b571763fa`.
+- **SOURCE EXACTE** : le blob `src/parsers/csv.ts` (`79f02ea9b636327f7d188a2b93fb71770af7efc3`) et les tests `test/csv-document-parser-regression.test.ts` (`6a66d0a590b4582e96c73252f333d42aeb7587f2`) proviennent IDENTIQUES de la PR #35 ; aucun parseur ni test existant n'est reconstruit, la base de code `main` reste inchangée hors ces deux fichiers.
+- **RÉSOLUTION DES DOCUMENTS** : conserver la version récente complète des journaux de `main`, y ajouter ce checkpoint ; les versions historiques complètes de docs/06 et docs/09 de la branche d'origine sont conservées par son premier parent Git (`dadf871051f2b478eb875125d4dd55b46e2d25ca`), sans substitution à l'autorité documentaire actuelle. Aucun historique n'est supprimé ni force-push.
+- **MÉCANISME** : merge commit à deux parents (PR #35 puis `main`) sur l'arbre de `main`, avec les deux blobs source/test d'origine. Mise à jour du ref uniquement si HEAD d'origine conservé (compare-and-swap / non-force).
+- **GARDE-FOUS** : PR ordinaire, fichiers `src/parsers/csv.ts`, nouveau test, docs/06/09 uniquement, sans modifications d'ingestion #26/#36, ni base de données, secret, dépendance, workflow ou S1. Aucun adaptateur officiel qualifié par cette modification.
+- **BLOCK_REASON** : à cette écriture, nouveau SHA du merge non encore créé/testé. CI `validate` et Docker/PostgreSQL exact SHA, discussions et règles GitHub à vérifier avant label `automerge-eligible` et sortie Draft.
+- **NEXT_ACTION** : valider les deux checks sur le nouveau HEAD, qualifier la PR #35 et laisser GitHub fusionner en natif sous ruleset #27937019 ; ensuite recharger `main` et réconcilier la PR #36 (et la PR #26 recouvrant `src/jobs/ingest.ts`) par ordre de dépendances, conserver les six chantiers de données/14 lots, puis staging/production uniquement après gates.
+
+
+## 2026-11-24 — Lot 4 / PR #41 : reprise effective et correction de deux défauts JSON
+
+- **CONTINUITY_ID** : SADIAAF-CONTINUITY-20261124-01 ; GitHub unique autorité logicielle. Base main ff23886d78f42a17656df88ab4a65d682b957833, ruleset #27937019 actif sans bypass. PR #37–#40 fusionnées ; CI #738 SUCCESS sur main. PR #41 READY, native auto_merge enrôlé par github-actions[bot], deux fils ouverts. CI #740 et Docker #603 SUCCESS exclusivement pour HEAD précédent 070411cb2ff7cdc2416ce5e49fdad5fc92736034.
+- **CLAIM** : commentaire PR #41 7118350665, branche existante feat/sadiaaf-json-source-admission-20261124 ; claim documentaire, pas de verrou inter-agent atomique. Publication prévue en fast-forward avec contrôle du parent exact ; autres PR inchangées.
+- **DÉFAUTS** : JSON.parse peut arrondir 1.0000000000000001 ou 9007199254740990.5 vers un entier sûr, ou 1e-400 vers zéro ; clés répétées (y compris alias Unicode et enveloppes) peuvent être écrasées. Correctif minimal dans src/parsers/json.ts : inspection lexicale originale, examen exact de la significande et de l'exposant sans expansion de grands exposants, rejet des doublons dans chaque objet après décodage de la clé. Le JSON.parse complet valide toujours la grammaire, puis les contrôles de ligne existants s'appliquent. Aucune dépendance ajoutée, ingestion et SQL inchangés.
+- **TESTS** : quatre groupes supplémentaires dans test/json-document-admission.test.ts : arrondis et underflow, entiers sûrs et chaînes, doublons et échappements, indépendance des objets et chaînes contenant du JSON. Tests non exécutés à cet instant ; RED/GREEN séparés non attestés. Attendre les checks du nouveau HEAD avant de conclure. Aucun appel Codex/Copilot, source externe, secret, dépense ou S1.
+- **BLOCK_REASON** : WAITING_CI sur nouveau commit et deux discussions non résolues jusqu'à validation réelle. Les six adaptateurs, contrats, licences, données témoins et publication restent PARTIAL/non certifiés ; séquencement auto-merge clean-status à consolider séparément.
+- **NEXT_ACTION** : contrôler CI validate et Docker/PostgreSQL exact SHA, traiter les échecs, répondre aux deux fils et les résoudre uniquement après preuve, observer la fusion native sans bypass. Ensuite PR #36 et PRs #22/#25–#35 selon dépendances, issue #9, six chantiers et 14 lots. Aucune production S1 sans gates et autorisation.
+- **ROLLBACK** : revert ciblé du commit candidat sur sa branche avant intégration, aucun changement runtime.
+
+
+## 2026-11-24 — PR #41 : séquencement auto-merge sur validation trop rapide
+
+- **PREUVE CI** : HEAD précédent 922bfa7e784158c2b2dbfecbeba196948b129e8b : CI #739 SUCCESS et Docker #602 SUCCESS. Les tests JSON sont passés, aucun problème de code avéré sur cette révision.
+- **ANOMALIE RUNTIME** : workflows de gouvernance auto-merge #19 run 45293229133 et #20 run 45293258389 ont échoué malgré les checks verts, avec message GitHub GraphQL API HTTP 200 `Pull request Pull request is in clean status`. La mutation d'enrôlement demandée après que la PR est immédiatement fusionnable n'a pas abouti ; PR #41 n'est toujours pas fusionnée. Ne pas déclarer auto-merge PASS.
+- **RECETTE COMPLÉMENTAIRE NON DESTRUCTIVE** : créer ce seul checkpoint documentaire sur la branche de PR #41 afin de produire un nouveau SHA, puis transmettre immédiatement la commande propriétaire SHA-bound `/sadiaaf-automerge <SHA>` via commentaire de cette PR, avant conclusion des nouveaux checks. Le workflow en confiance sur main doit vérifier le SHA, le diff, le ruleset et le label `automerge-eligible`, enrôler sous GitHub natif puis laisser les checks obligatoires terminer avant fusion. Ce n'est ni un bypass, ni un direct merge ni une nouvelle automatisation.
+- **LIMITES / BLOCK_REASON** : si le GITHUB_TOKEN refuse l'enrôlement ou si GitHub renvoie encore clean, consigner les logs et traiter dans un correctif de workflow gouverné séparé ; ne pas forcer la fusion. Aucun endpoint/licence/adaptateur officiel qualifié par ce test.
+- **NEXT_ACTION** : constater événement `issue_comment`, workflow auto-merge succès, PR auto_merge puis merged=true et SHA main, ou consigner BLOCK_REASON. Reprendre ensuite les 14 lots et les 6 chantiers sans collision, et séparer la recette d'un agent codeur 24/7.
+
+---
+
+## 2026-11-24 — Reprise du programme des 14 lots : composant JSON sûr, chantier officiel #14
+
+- **LECTURES** : AGENTS.md ; documents maîtres 00/01/11/02/12/03/04/13/14/05/06/07/08/09/10/15 ; issues #5/#13–#17 et PR ouvertes #22/#25–#36 ; arbre `src/parsers`, ingestion actuelle, contrat des adaptateurs et test existant.
+- **BASE** : main ff23886d78f42a17656df88ab4a65d682b957833 protégée et CI #738 success. Anciennes PR fonctionnelles conservées (y compris #35 CSV, #36 ingestion) ; aucune modification de leur branche et aucun nouveau registre/orchestrateur.
+- **CHANTIER ET TRAVAIL** : issue #14, lot 4 ; branche feat/sadiaaf-json-source-admission-20261124 depuis main. Ajout isolé `src/parsers/json.ts` (commit e5fd4c8238cbf87e20b42b6c7885cf49db496814) et `test/json-document-admission.test.ts` (commit 4a9fc6a436598f3dc2103e82c26fefd8e2571a66), tests de la forme JSON admise, sécurité, tableaux ambigus, taille/colonnes, nombre unsafe et décimal potentiellement arrondi.
+- **PRINCIPES DE PRÉCISION** : des nombres décimaux JSON ne sont pas implicitement fiables pour la finance sous JSON.parse. Le nouveau parseur les refuse jusqu'à l'approbation d'un contrat lossless ; la chaîne actuelle ingest n'est pas modifiée. Aucun mapping d'une source officielle n'est inventé. Aucune disponibilité, licence ou donnée historique n'est attestée.
+- **DOCUMENTATION** : docs/06 nouveau statut PARTIAL et NEXT_ACTION ; présent worklog. Critères des lots et six chantiers sont conservés dans docs/13, docs/14 et docs/15 section 13.
+- **TESTS** : NON ENCORE CERTIFIÉS sur le HEAD du checkpoint à cet instant ; CI/Docker exact SHA seront interrogés après PR. Ne pas déclarer DONE ni HISTORY_COMPLETE.
+- **BLOCK_REASON** : qualification officielle des six adaptateurs, formats JSON/XML-SDMX/PDF, schémas témoins, mapping des dates et des champs, droits et licences ; PRs ingestion concurrentes toujours Draft.
+- **NEXT_ACTION** : ouvrir une PR ordinaire sur main, contrôler fichiers modifiés et collision, CI validate/Docker exact-SHA, qualification automerge-eligible si fail-closed et absence d'anomalies ; observer fusion native et checkpoint main, puis poursuivre les contrats source et tests d'adaptateurs #14, backfill #5 et autres lots selon dépendances.
+- **ROLLBACK** : revert de la PR ou des deux nouveaux fichiers avant toute intégration ; aucun état métier ou serveur n'est modifié.
+
+---
+
+## 2026-11-24 — Lot 11 : corriger un workflow_run tardif après auto-fusion native
+
+- **RECETTE PR #38** : Docker #599 SUCCESS a déclenché workflow auto-merge #5 SUCCESS ; GitHub a enrôlé PR #38 sous github-actions[bot], CI #735 SUCCESS, GitHub a fusionné PR #38 en squash ffdf04a6fcb534fa1c807cafb867d9de998320d2. La PR #39 a ensuite réussi CI #736, Docker #600 et workflow auto-merge #9, fusion native avec SHA 8b8953c753a0b2360f15418bf902c04d89778fc7.
+- **INCIDENT POST-FUSION** : le workflow auto-merge #6 run 45289156531 a reçu un second événement workflow_run après la fusion de PR #38. GitHub REST pouvait encore présenter auto_merge activé alors que la PR était fermée ; le script a tenté GraphQL disablePullRequestAutoMerge et GitHub a répondu HTTP 200 avec erreur 'Can\'t disable auto-merge for this pull request.' Le job a échoué, sans effet négatif sur la fusion ni sur main. Cause directement confirmée par logs du job 138093162680.
+- **CORRECTIF TECHNIQUE** : branche fix/sadiaaf-automerge-post-merge-idempotency-20261124, commit a78d2a8f43b9560e76b5f74033d2da8998da13ff ; isTerminalPullRequest retourne true si état autre que open ou merged=true ; toute exécution tardive se termine SKIPPED sans mutation, AVANT toute tentative de révocation. Tests de non-régression sur open/closed/merged et données absentes, commit a7163a6e17cd9d1a0fba132ac36c7d4752a8ee0f.
+- **GOUVERNANCE** : chemin scripts/ci/** sensible ; cette PR ne reçoit PAS de label automerge-eligible et ne doit pas être fusionnée automatiquement. Fusion gouvernée en squash admise par le mandat propriétaire uniquement après CI validate et Docker/PostgreSQL exact SHA, aucune conversation non résolue, ruleset #27937019 actif, absence de collision ou de changement main incompatible. Aucun Codeur Codex/Copilot utilisé ; aucun S1.
+- **BLOCK_REASON** : correction committée mais non encore certifiée par CI sur le dernier SHA ; test runtime de non-régression après fusion à obtenir sur événement tardif de PR.
+- **NEXT_ACTION** : ouvrir la PR correction, contrôler CI/Docker exact SHA ; corriger échecs, vérifier protections/absence de conversations et intégrer sous gates gouvernées. À la reprise vérifier les deux auto-fusions #38/#39 et poursuivre l'issue #9, PR #36, six chantiers #5/#13–#17 et lots 0–13 sans collision ; autonomie codeur 24h/24 toujours non attestée.
+
+---
+
+## 2026-11-24 — RECETTE PILOTE AUTO-MERGE RÉUSSIE : premier cycle de GitHub natif
+
+- **PR #37 intégrée, preuve de branche** : GitHub `merged=true` sur PR #37 après CI #733 et Docker #597 `SUCCESS`, les quatre conversations résolues, fusion SQUASH `ed78d253fbce9b5f94b9ef4d9a38803c6b63d417`, ruleset #27937019 maintenu actif.
+- **PR pilote #38** : `docs/09_CHANGELOG_WORKLOG.md` seul fichier modifié, HEAD `7abe646d48032e8c5f4612b5970e03d9a121ec62`, PR interne READY avec label `automerge-eligible` posé après vérification de l'inventaire des fichiers.
+- **Preuves du mécanisme autonome** : [Docker #599](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45288844292) `completed/success` a déclenché [workflow GitHub auto-merge #5](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45289103419) `completed/success` via `workflow_run` sur `main`. Lecture API avant fusion : `auto_merge.merge_method=squash`, `enabled_by=github-actions[bot]`. Après [CI #735](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45288844297) `SUCCESS` : PR #38 `merged=true`, commit SQUASH `ffdf04a6fcb534fa1c807cafb867d9de998320d2`, `main` protégée avancée sur ce SHA. Aucun merge manuel de PR #38.
+- **SECOND CYCLE DE VALIDATION NON SENSIBLE (ce présent changement)** : mise à jour additive de `docs/09_CHANGELOG_WORKLOG.md` et `docs/06_CURRENT_STATUS_AND_GAPS.md` pour distinguer tests de fusion native réellement obtenus de la cible « agent codeur 24h/24 ». Cette branche documentaire doit être examinée, labellisée `automerge-eligible` seulement si le diff est vérifié, puis soumise aux checks stricts et à un nouvel enrôlement natif GitHub. Aucun changement métier, SQL, workflow, secrets ou S1.
+- **STATUT RÉEL** : la première fusion GitHub native entièrement gouvernée est réussie. Cela ne prouve pas encore l'auto-sélection, le codage autonome, le claim/lease/reprise crash de plusieurs unités de développement ni l'absence de tous les problèmes financiers des 11 marchés.
+- **BLOCK_REASON** : maturité codeur autonome permanent et preuves multi-agent/anti-collision non attestées ; 14 lots et 6 chantiers officiels non finalisés ; production S1 bloquée par les gates indépendants.
+- **NEXT_ACTION** : valider et intégrer la seconde PR documentaire par le mécanisme natif sans merge manuel ; rapporter ses preuves dans issue #9 ; reprendre la qualification ciblée des PR métier existantes (notamment #36), corriger les incompatibilités sans collision, achever les six chantiers de données (#5/#13-#17), sécurité, méthodologies/recettes financières puis staging et production S1 uniquement sous gates.
+
+---
+
+## 2026-11-24 — PR pilote — recette effective de l'auto-merge natif (lot 11)
+
+- **OBJET** : essai non sensible et traçable d'intégration native GitHub à partir du mécanisme désormais installé dans main. Cette PR ne modifie que le journal canonique docs/09_CHANGELOG_WORKLOG.md et n'a aucun impact sur la collecte, les données, la facturation, les secrets ou S1.
+- **BASE ATTESTÉE** : main SHA ed78d253fbce9b5f94b9ef4d9a38803c6b63d417, issu de la fusion squash gouvernée de PR #37 (HEAD validé 2177c6577bc52b14e48414e876a08a66854eeaf6 ; CI #733 run 45288079821 SUCCESS ; Docker #597 run 45288079751 SUCCESS ; 4/4 fils de revue résolus). GitHub main protected, ruleset #27937019 ACTIF, 0 approbation requise, checks validate + Docker/PostgreSQL obligatoires stricts, auto-merge autorisé.
+- **WORKFLOW RÉEL INTÉGRÉ** : .github/workflows/governed-native-automerge.yml dans main, déclencheurs workflow_run success CI/Docker et commentaire SHA-bound par collaborateur autorisé ; script fail-closed refuse chemins sensibles, forks, SHA obsolètes, diff incomplet et main non protégée. Les jetons/événements réels n'étaient pas encore démontrés avant ce pilote.
+- **TEST À EFFECTUER** : créer une PR READY à partir de cette branche, ne poser le label automerge-eligible qu'après qualification exhaustive du seul fichier modifié ; exiger CI et Docker sur le SHA exact et observer un run de workflow_run de la branche main, puis l'inscription native de la PR, sa fusion par GitHub et le checkpoint importé dans main. Si non déclenché, un commentaire de PR strict /sadiaaf-automerge SHA par OWNER/COLLABORATOR peut demander un recheck, sans bypass.
+- **BLOCK_REASON À CE CHECKPOINT** : PR pilote pas encore créée à l'instant de l'écriture, CI/Docker et premier run du workflow de confiance non encore attestés. Ne pas proclamer DONE tant qu'aucune fusion native n'est observée.
+- **NEXT_ACTION** : ouvrir cette PR de lot 11, vérifier le SHA et l'inventaire complet des fichiers, qualifier et appliquer le label sans collision, laisser GitHub exécuter les checks et la fusion native. Contrôler le commit main post-merge, mettre à jour issue #9 et l'automatisation horaire existante ; poursuivre ensuite les lots 0–13 et les six chantiers de données sans second orchestrateur.
+- **LIMITES** : le test vérifie la fusion d'une PR documentaire, pas l'exécution d'un agent codeur permanent ni la qualité financière des 11 marchés ; S1 demeure séparé.
+
+---
+
+## 2026-11-24 — PR #37 : compatibilité CI des PR empilées, quatrième fil de revue
+
+- **PREUVE AVANT NOUVEAU CORRECTIF** : PR #37 HEAD dc01a6d823ea99df55a6e807a33ef80d00a43b2e ; CI #730 run 45287547194 et Docker #594 run 45287547070 completed/success, dont le nouveau required HEAD guard en mode lecture seule sur ce SHA.
+- **QUATRIÈME CONSTAT P2** : un fil de revue a identifié que le HEAD guard échouait sur les stacked PR ciblant une branche de fonctionnalité alors que la CI existante accepte ces PR. Le guard d'auto-merge ne doit s'appliquer qu'aux PR ciblant main sans rendre les PR empilées invalides.
+- **CORRECTION** : commit 8be106618e22a2c3b9978ed8ad8a22eba7788fc7 : si la PR est open et son SHA courant correspond à l'événement, mais sa base diffère de main, le contrôle retourne NOT_APPLICABLE_STACKED_PR. Cela ne rend PAS la PR éligible à l'auto-merge main. Commit 5d8de682b8b834bcbd389eaea98aeddcaeb26681 : test avec faux événement GitHub PR empilée et vérification d'un seul GET, sans évaluation main ni inventaire de fichiers.
+- **REVUES** : trois fils précédents ont reçu des réponses techniques et leurs correctifs ; résolution en attente de confirmation finale CI, quatrième fil à traiter après validation. Aucun commentaire automatique n'est traité comme approbation ou autorité de fusion.
+- **BLOCK_REASON** : PR #37 non fusionnée, quatre fils à vérifier/résoudre, CI/Docker du HEAD à venir, runtime GraphQL et pilote non certifiés. Les dix autres chantiers de finalisation et les six travaux de données restent dans les mêmes lots et documents canoniques.
+- **NEXT_ACTION** : contrôler nouvelle CI et Docker du HEAD après ce checkpoint, répondre/résoudre chacun des quatre fils si les correctifs ont passé, refaire preflight SHA/main/ruleset/checks, fusionner PR #37 sous autorisation propriétaire, puis enregistrer main et faire la recette runtime auto-merge (PR pilote non sensible). Aucune modification S1 ni seconde automatisation.
+
+---
+
+## 2026-11-24 — PR #37 : fusion refusée par ruleset, corrections des trois fils de revue
+
+- **AUTORISATION** : propriétaire autorise la fusion de la PR #37 sous protections, CI et gouvernance, la continuité automatique pour PR ordinaires et la poursuite des 14 lots/6 chantiers. Aucun droit de bypass ni de production S1.
+- **CONTRÔLE AVANT FUSION** : PR #37 READY, HEAD a32acd3d716351628d4a5e09fbc84ea46730112e, base main 73256f48d81d38ce8ff6f51be9e024b25cf5dadb. CI #722 run 45286300100 SUCCESS, Docker #586 run 45286300113 SUCCESS, checks validate et Build, boot, migrate and verify persistent PostgreSQL SUCCESS sur le même SHA. Ruleset #27937019 actif, 0 approbation requise, sans bypass.
+- **TENTATIVE GOUVERNÉE** : merge REST squash avec expected_head_sha a32acd3d... demandé. GitHub a retourné 405 Repository rule violations: A conversation must be resolved before this pull request can be merged. Aucun merge ni changement main effectué ; gate respecté.
+- **TROIS FILS BLOQUANTS IDENTIFIÉS** : (1) jeton du workflow privilégié a besoin des droits GraphQL contents:write + pull-requests:write ; (2) fallback GraphQL classique non normalisé faisait SKIP malgré protection classique correcte ; (3) après native auto-merge, un writer pouvait pousser un chemin sensible et laisser un auto-merge actif avant revocation asynchrone. Les fils sont des remarques de l'intégration existante chatgpt-codex-connector, mais aucune capacité Codex/Copilot n'a été appelée par cette mission.
+- **CORRECTIONS DE CODE** : commit 4cc005f8e2f2df8a375c5ed102a75d49340b858c : contents:write limité au workflow-run TRUSTED main ; commit 9140d3722b50a033f275840fd47f3a00f46fd49a : suppression du fallback non normalisé, nouvelle fonction evaluateRequiredScopeGate ; commit f268537ab62b3d1651dc2365195ba8945c1033ec : script CI de validation head lecture seule ; commit 30b4c7ca51e03b21a21dc2cb87116976826bf070 : étape dans job status requis validate avec pull-requests:read ; commit 47a682424c0d8822e3a0e06c3b807d220c653c9e : tests refus des chemins sensibles si label ou auto_merge actif, et acceptation d'une PR sensible non enrôlée.
+- **DOCUMENTATION** : ADR-018 dans docs/08 commit fdc1bf63c8bc85e9740813d150711d8512f9aeb4 ; section 13.13.2 dans docs/15 commit c685b272abd4841930b4d3ad2dc87ea7e339e6c0. Les décisions ADR-016/017, 13 dimensions, 14 lots et 6 chantiers restent préservés.
+- **SÉCURITÉ / LIMITE** : le check requis examine le SHA courant et bloque les changements sensibles étiquetés ou déjà enrôlés. Il ne prouve pas une protection absolue contre un collaborateur malveillant qui modifie volontairement les workflows dans sa PR ; les ACL et la gouvernance de ce cas restent nécessaires. Aucun statut DONE avant recette et retour positif de CI.
+- **BLOCK_REASON** : les trois fils sont encore unresolved à ce checkpoint. La CI et Docker sur ce nouveau commit devront réussir, puis les réponses doivent justifier les corrections et les fils être résolus sans contournement. Après cela la fusion squash gouvernée peut être redemandée en vérifiant le HEAD et tous les checks.
+- **NEXT_ACTION** : contrôler CI et Docker du HEAD suivant (produit par cette écriture), corriger tests si rouges, répondre aux trois fils, les marquer résolus si fond des corrections attesté, vérifier main/ruleset/checks et merger la PR #37 en squash avec expected_head_sha. Après merger : attester workflow_run et permissions GITHUB_TOKEN via pilote de PR documentaire non sensible, démontrer native auto-merge, checkpoint, reprendre #36 et les six chantiers, suivre les lots 0–13 et S1 uniquement selon gates autorisés.
+- **ROLLBACK** : PR #37 non fusionnée pendant ces corrections ; revert des commits sur branche en cas de défaut sans modifier main, ruleset ou autres PR.
+
+---
+
+## 2026-11-24 — PR #37 : autorisation propriétaire obtenue et migration du déclencheur natif de fusion
+
+- **AUTORISATION EXPLICITE** : le propriétaire autorise à poursuivre tous les travaux admissibles et la fusion gouvernée de PR #37 sous validations réelles, avec zéro dépense nouvelle et aucun S1 sans ses propres gates. Les treize dimensions de continuité, six chantiers et quatorze lots doivent être conservés et suivis dans les documents du dépôt.
+- **PRÉFLIGHT LIVE** : main=73256f48d81d38ce8ff6f51be9e024b25cf5dadb protégée, ruleset 27937019 actif, approvals ordinaires 0, checks obligatoires stricts validate + Build, boot, migrate and verify persistent PostgreSQL, aucun bypass, allow_auto_merge=true. PR #37 READY/non fusionnée. CI #716 et Docker #580 SUCCESS sur son HEAD précédent d82fbae4e93dc4ccee4de9a6790481d663299368.
+- **RISQUE EXTERNE VÉRIFIÉ** : GitHub Changelog du 02/11/2026 https://github.blog/changelog/2026-11-02-pull_request_target-blocked-by-default-december-2/ annonce blocage par défaut du déclencheur pull_request_target sur dépôts publics le 02/12/2026. Ne pas promouvoir un workflow voué à cesser de fonctionner sans changement de politique admin.
+- **CORRECTION TECHNIQUE** : PR #37 commits 3824aa8430818ff92bca723f76da37f10ce51075 (script), 645a21abdc7018701d1a4240f19d8a6b62a7dacb (workflow), 87282234787cb0b06ec12eb1a67305e499dbab1b (tests) ; remplacement de pull_request_target par workflow_run completed sur CI/Docker existants, origine interne et SHA du run exigés. Les payloads des runs existants #716/#580 ont été vérifiés : event pull_request, pull_requests contient PR #37, sha HEAD exact, head_repository SadiaAF.
+- **REPRISE OU RÉVOCATION EXPLICITE** : signal SHA-bound via commentaire de PR par identité propriétaire/collaborateur, /sadiaaf-automerge SHA ou /sadiaaf-revoke-automerge SHA ; label automerge-eligible obligatoire pour enrôler, diff sensible interdit. Le retrait du label seul ne réveille pas ce workflow : l'agent propriétaire doit émettre la commande de révocation avant son retrait ou utiliser Disable auto-merge dans GitHub. Cette limite est documentée, pas cachée.
+- **DOCUMENTATION** : ADR-017 ajoutée dans docs/08_DECISION_LOG.md (commit c8b0593141dacd5e2ec4e1940e6c9296e2726bf5), contrat docs/15 complété sous 13.13.1 (commit 7301d4f7e8250d237a734f1145caf957915c4c0d), sans nouvelle architecture ni registre.
+- **TESTS** : CI #721 run 45286170633 et Docker #585 run 45286170784 en attente au moment du premier contrôle. Ne pas annoncer PASS sur les modifications de workflow_run sans résultat exact-SHA.
+- **OBSERVATION CONNECTEUR** : un commentaire de type review COMMENTED sur PR #37 a été posté par chatgpt-codex-connector[bot]. Cette mission ne l'a ni demandé ni utilisé ; ne jamais substituer ce bot au mandat explicitement sans Codex/Copilot.
+- **BLOCK_REASON** : PR #37 pas encore intégrée ; checks du nouveau SHA et vérification runtime GITHUB_TOKEN/workflow_run non attestés. La fusion directe via REST de la PR sensible est désormais autorisée par le propriétaire seulement si les protections/CI/mergeability du SHA exact le permettent. La reprise après fusion, le pilote de PR ordinaire et le cycle agent 24 h/24 ne sont pas encore certifiés.
+- **NEXT_ACTION** : vérifier les nouveaux workflows CI/Docker exact SHA ; si rouges lire les logs et corriger. Si verts, vérifier main inchangée, règles, intégrité du diff et statut de fusion puis fusionner PR #37 sous gates autorisées (squash) sans bypass. Contrôler post-fusion main, workflow réellement installé, l'événement workflow_run et les droits token. Déclencher ensuite la recette sur une PR pilote non sensible et reprendre les lots 0–13 selon NEXT_ACTION, en évitant les collisions. Aucun S1, secret, service payant ni second orchestrateur.
+
+---
+
+## 2026-11-23 — Raccordement vérifiable des treize dimensions aux autorités existantes
+
+- **MANDAT REPRIS** : préserver l'ensemble de la procédure SadiaAF sans confusion avec AfricaFunds application consommatrice ni MCP/UAES/Workers : 13 dimensions du suivi, 14 lots 0–13, six chantiers officiels de données, recettes financières, PR/CI, S1, exécution autonome réelle.
+- **ACTION CONCRÈTE** : ajout additif de la **section 13** à docs/15_AUTONOMOUS_AGENT_EXECUTION.md, paragraphes 13.1–13.13, commit d78f6e82cf180f0128fb8ddaa40e1d35f0f3dcfc. Aucun nouveau registre, scheduler, dépôt, issue, PR ou autorité. La cartographie renvoie aux documents canoniques existants AGENTS, docs/05, 06, 08, 09, 10, 13, 14, 15.
+- **COUVERTURE** : identité et ruleset #27937019 ; déblocages ; PR #37 / lot 11 ; corrections ; PR #36 ; inventaire de 14 PR #22 et #25–#37 ; six chantiers issues #5 et #13–#17 avec sources officielles, droits, backfill, provenance, fonds/VL, courbes, calculs ; repositionnement de chaque lot ; staging/production S1 ; ordre de 10 opérations ; exécuteur horaire et manque de runtime 24/7 ; non-régression ; point de reprise.
+- **LECTURE ET VÉRIFICATION** : docs/13 et docs/14 pour définition des lots et recettes, docs/05 roadmap, docs/08 ADR-016, docs/09 dernier checkpoint, docs/15 mécanisme et limites ; issues #3 CLOSED, #5, #9, #13–#17 OPEN ; ruleset GitHub actif, main SHA 73256f48d81d38ce8ff6f51be9e024b25cf5dadb, PR #37 OPEN/READY avant commit documentaire ; CI #714 et Docker #578 SUCCESS sur HEAD précédent bc71e107925b91632ee19413c664240d601c303d. Après la modification, nouvelle CI exacte à revérifier.
+- **AUTOMATISATION DÉJÀ PRÉSENTE** : Automation_a523352a7c448191a41080097ce8b01f active, cadence horaire, mandat réconcilié ADR-016. Ce n'est PAS la preuve d'un codeur autonome en continu 24h/24. Aucun runtime S1 activé ni fusion effectuée dans cette intervention.
+- **ALERTE ARCHIVAGE** : documentation existante = décisions, preuves et checkpoints, pas transcription littérale exhaustive et horodatée de chaque message ChatGPT. Ne pas certifier la mémoire verbatim sans source d'export vérifiable.
+- **BLOCK_REASON** : PR #37 modifie des fichiers de gouvernance sensibles, non fusionnée et sans recette d'enrôlement natif ; permissions/token et policy pull_request_target non certifiés en situation réelle ; six chantiers et recettes lots à terminer ; S1 soumis aux gates. La signature cryptographique de commits n'est pas attestée.
+- **NEXT_ACTION** : vérifier CI/Docker sur HEAD de ce checkpoint ; qualifier workflow/token/sécurité ; intégrer PR #37 uniquement avec autorisation propre aux changements de gouvernance ; tester une PR pilote ordinaire avec auto-merge natif ; reprendre PR #36 et les autres PR propriétaires ; poursuivre les six chantiers et quatorze lots selon dépendances/recettes. Aucun DONE sans preuves, aucun S1 sans staging/autorisation, aucune dépense ni orchestrateur parallèle.
+- **ROLLBACK** : revert ciblé de l'ajout documentaire si erreur, sans modifier main ni ruleset conforme.
 
 ---
 
 
-## 2026-11-23 — PR #36 : invariant de conservation d'archive après reprise (lot 4/11)
+## 2026-11-23 — PR #37 : sécurisation des fusions ordinaires et correction du runner tests PostgreSQL
 
-- **RECONCILIATION** : dépôt `Patricked-code/africafunds-market-data-pipeline` public, PR #36 OPEN/Draft ; 13 PR ouvertes #22 et #25–#36 (hors #23/#24), aucune branche concurrente modifiée. Lecture `AGENTS.md`, présent journal et `docs/15_AUTONOMOUS_AGENT_EXECUTION.md` ; issue #3 ancienne description « privé » désormais obsolète et à réconcilier avant modification des protections.
-- **PREUVES EXACT-SHA** : PR #36 SHA précédent `fb19b76696a7de7072e6ab7c1969361cb321af11` : [CI #682](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45230209948) et [Docker #549](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45230209760) `completed/success`. Ne pas attribuer ces succès au nouveau code.
-- **TRAVAIL FONCTIONNEL / TEST** : commit `867120dbb916a708a164f2e85a4266f4ac77da59` sur branche PR #36, test d'intégration `test/integration/ingestion-html-csv.test.ts` enrichi : après une ingestion réussie, un téléchargement enfant échoué et une reprise saine, vérifier l'unicité du lien archive parent-enfant, la conservation du SHA-256, du chemin d'archive et des octets CSV, au-delà des simples compteurs. Aucune modification du moteur, des sources officielles ou des schémas.
-- **TESTS** : locaux NOT_RUN ; CI/Docker exact nouveau HEAD à contrôler après ce checkpoint, aucun PASS déclaré sur ce nouveau SHA.
-- **BLOCK_REASON** : CI exacte et revue indépendante sur HEAD final non attestées ; protection réelle `main`, audit secrets/historique public et contrats/licences non certifiés ; PR #36 toujours Draft.
-- **NEXT_ACTION** : inspecter CI/Docker sur le nouveau HEAD ; corriger tout échec reproductible, obtenir revue indépendante ; vérifier ruleset/protection `main` et audit publication, puis continuer les lots 0–13 sur une unité non revendiquée, sans fusion ni S1.
-- **ROLLBACK** : revert ciblé du commit de test et du présent checkpoint sur la branche PR #36 ; aucune opération serveur.
-
----
-
-
-## 2026-11-23 — PR #36 : validation du HEAD précédent et statut canonique réconcilié
-
-- RECONCILIATION : dépôt PUBLIC ; PR #1 fusionnée ; PR #36 OPEN/Draft ; PR concurrentes #22/#25/#26/#35 et autres PR ouvertes non modifiées. Lecture de `AGENTS.md`, du contrat `docs/15_AUTONOMOUS_AGENT_EXECUTION.md` et du checkpoint précédent. Aucun accès S1 ni action sur `main`.
-- PREUVES EXACT-SHA : SHA documentaire `1b477720ce2edda6db0e51bec7f872711265102e` : [CI #680](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45217938883) `completed/success` et [Docker/PostgreSQL #547](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45217939128) `completed/success`. Ces résultats ne valident pas automatiquement les commits ultérieurs.
-- ACTION : mise à jour additive du statut `docs/06_CURRENT_STATUS_AND_GAPS.md` dans commit `edffbaa0a0120c7a0d53f8819770f239cd56ab46` sur branche PR #36 pour remplacer l'ancien état « CI non attestée » ; journal présent ajouté ensuite, sans changement de code, tests, schéma, secret ou serveur. Tests locaux NOT_RUN.
-- LIMITES : PR #36 toujours Draft, revue indépendante absente au dernier contrôle ; protections main et audit de l'historique public non attestés ; six adaptateurs dynamiques, index HTML sans observations et droits des données réelles non certifiés. Aucune fusion ni S1.
-- BLOCK_REASON : revue indépendante et règles de protection de main non vérifiées ; audit publication incomplet ; CI du nouveau HEAD après commits documentaires à vérifier.
-- NEXT_ACTION : vérifier CI/Docker exact SHA de ce checkpoint, poursuivre audit secrets/protections main et revue PR #36 ; sélectionner correction fonctionnelle non revendiquée dans les lots 0–13 et produire tests RED/GREEN avec preuves, sans collisions. Ne pas fusionner sans gates.
-- ROLLBACK : revert ciblé des commits documentaires de PR #36.
-
----
-
-## 2026-11-23 — PR #36 : reprise des runners gratuits et CI exacte validée (lots 4/11)
-
-- RECONCILIATION : dépôt `Patricked-code/africafunds-market-data-pipeline` désormais PUBLIC (changement du propriétaire, sans action de cet agent). PR #36 OPEN/Draft, branche `fix/ingestion-false-success-20261122`, HEAD de code contrôlé `08890d744d1c88158bfcacdbf84d1cba6c12dc9c`, base `main` `73256f48d81d38ce8ff6f51be9e024b25cf5dadb`. PR concurrentes #22/#25/#26/#35 préservées. AGENTS.md, documents de cadrage obligatoires, contrat d'autonomie et worklog consultés.
-- PREUVE CI : [CI #679 run 45206967495](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45206967495) relancé après publication, job `validate` ID `137825519902` = `completed/success` ; [Docker/PostgreSQL #546 run 45206967481](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45206967481), job `137825555802` = `completed/success`. Ces preuves concernent **uniquement** le HEAD `08890d744d1c88158bfcacdbf84d1cba6c12dc9c` avant le présent commit documentaire ; aucun PASS ne doit être transféré automatiquement à un HEAD différent.
-- AUDIT PUBLICATION PARTIEL : recherche initiale de quatre termes sensibles dans le code indexé sans résultat ; absence de secret NON CERTIFIÉE : historique complet, branches, archives, artefacts, licences, scanning et droits de redistribution restent à auditer. L'issue #3 décrit historiquement une `main` non protégée et un blocage GitHub Free sur dépôt privé ; les règles effectives actuelles du dépôt public ne sont pas encore attestées.
-- REVUE : `list_pull_request_reviews` de PR #36 = `[]`, PR toujours Draft ; aucun avis indépendant ni gate de fusion attesté. Les tests synthétiques CI/Docker ne prouvent pas la couverture réelle des six adaptateurs, des 44 endpoints, ni des historiques officiels.
-- ACTION : checkpoint documentaire additif sur branche PR #36, sans modification de moteur, migration, source, secret, visibilité, serveur S1 ou `main` ; aucun merge. Tests locaux NOT_RUN ; la CI du nouveau HEAD documentaire doit être contrôlée séparément.
-- BLOCK_REASON : revue indépendante absente, protections main et audit de publication incomplets, validation exacte du HEAD après ce checkpoint encore à obtenir, classification des index HTML sans observation et licences officielles à qualifier.
-- NEXT_ACTION : vérifier les nouveaux runs CI/Docker sur le SHA de ce checkpoint, demander une revue indépendante de PR #36, vérifier protections de `main` et scanner l'historique public ; poursuivre les tâches admissibles indépendantes des lots 0–13 sans collision de PR. Ne pas fusionner ni déployer S1 sans gates.
-- ROLLBACK : revert du présent commit documentaire sur la branche PR #36 uniquement.
-
----
-
-## 2026-11-23 — PR #36 : absence de faux audit SUCCESS sur deux échecs non stricts (lots 4/11)
-
-- RECONCILIATION : dépôt private, PR #1 merged ; PR #36 OPEN/Draft, base main `73256f48d81d38ce8ff6f51be9e024b25cf5dadb`, HEAD initial `4714904c83177cbc0d218b3181eb3154cdc18552`. AGENTS.md, docs/15_AUTONOMOUS_AGENT_EXECUTION.md, journal actuel et checkpoint 2026-11-06 consultés ; PR et issues ouvertes recherchées. PR #22/#25/#26/#35 et autres branches concurrentes non modifiées.
-- TEST_EVIDENCE : sur HEAD initial, [CI run 45195289642](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45195289642) = completed/failure, job validate 137763988912 sans steps/logs_url ; [Docker run 45195289725](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45195289725) = completed/failure, job 137763988826 sans steps/logs_url. Cause racine non déterminée, aucun test applicatif PASS attesté.
-- ACTION_CODE : commit [93043b93c4a9d2c228a4cb12ce9d7b6c17faaa3a](https://github.com/Patricked-code/africafunds-market-data-pipeline/commit/93043b93c4a9d2c228a4cb12ce9d7b6c17faaa3a) dans test/integration/ingestion-html-csv.test.ts : après deux ingestions synthétiques HTTP 404 en mode non strict, assertion SQL explicite qu'aucun audit `ops.ingestion_runs` du endpoint échoué ne porte `SUCCESS`. Test additif, sans modification du moteur ni des données officielles.
-- VALIDATION : commit créé ; tests locaux NOT_RUN ; CI sur le nouveau HEAD NON ATTESTÉ ; revue indépendante absente. Ne pas déduire un échec de ce test des runs antérieurs.
-- BLOCK_REASON : GitHub Actions CI et Docker en failure sans étapes ni journaux accessibles ; diagnostic pré-job administratif/check-run indisponible ; revue et gates de fusion manquants. Couverture des sources, adaptateurs, historiques et recette #13–#17 non certifiée.
-- NEXT_ACTION : vérifier CI/Docker sur le HEAD exact issu de cette entrée ; obtenir annotations/check-run et message d'allocation runner/quota/facturation depuis GitHub Actions, corriger uniquement la cause prouvée, exécuter les tests PostgreSQL et demander revue indépendante. Poursuivre une tâche indépendante uniquement après claim/réconciliation ; ne pas fusionner, ne pas déployer S1.
-- ROLLBACK : revert ciblé du commit test 93043b93 et de cette entrée sur la branche Draft ; aucun changement main, secret, source officielle ou runtime.
-
----
-
-## 2026-11-23 — PR #36 : garde de non-persistance après deux échecs non stricts (lots 4/11)
-
-- RECONCILIATION : PR #1 merged, PR #36 OPEN/Draft, base main 73256f48d81d38ce8ff6f51be9e024b25cf5dadb, HEAD initial 75584e21ab628f8d70a925b6ae88f1ecf5db8867 ; AGENTS.md, docs/15_AUTONOMOUS_AGENT_EXECUTION.md, journal et checkpoint 2026-11-06 relus via GitHub ; PR/issues ouvertes consultées ; dépôt private. Aucune modification de PR concurrente.
-- TEST_EVIDENCE : sur HEAD initial 75584e21ab628f8d70a925b6ae88f1ecf5db8867, CI [45185583886](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45185583886) et Docker [45185583785](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45185583785) = completed/failure. Job validate 137730201647 : steps=null, logs_url=null. Cause non déterminée, aucun test applicatif attesté.
-- ACTION_CODE : commit [74338738d594fdb639081e5edd993a849bb4e56a](https://github.com/Patricked-code/africafunds-market-data-pipeline/commit/74338738d594fdb639081e5edd993a849bb4e56a) sur test/integration/ingestion-html-csv.test.ts : après deux tentatives HTTP 404 non strictes, assert zéro raw record et deux audits FAILED conservant error_message NULL. Assertions ajoutées sans modifier le moteur, la base, les sources officielles ou les secrets.
-- VALIDATION : code committé, tests NOT_RUN localement ; CI sur ce commit et le HEAD documentaire suivant NON ATTESTÉ. Aucune recette métier réelle ni HISTORY_COMPLETE revendiquée.
-- BLOCK_REASON : GitHub Actions CI/Docker échouent sans étapes exploitables ; diagnostic d'allocation runner/quota/facturation ou annotations administratives manquant ; revue indépendante #36 absente et gates de fusion non satisfaits.
-- NEXT_ACTION : vérifier CI/Docker sur le nouveau HEAD exact, rechercher les annotations check-run/erreurs pré-job sans relance aveugle ; corriger uniquement une cause démontrée, valider le test PostgreSQL et obtenir revue indépendante. Si Actions reste bloqué, poursuivre un lot indépendant après claim ; ne pas fusionner, ne pas déployer S1.
-- ROLLBACK : revert ciblé du commit test 74338738 et de cette entrée sur la branche Draft, sans modifier main.
-
----
-
-## 2026-11-23 — PR #36 : réexécution FAILED non stricte, deux audits distincts (lots 4/11)
-
-- RECONCILIATION : AGENTS.md, docs/15_AUTONOMOUS_AGENT_EXECUTION.md, journal courant et checkpoint 2026-11-06 relus via GitHub ; PR/issues ouvertes recherchées ; PR #36 OPEN/Draft. PR #1 documentaire fusionnée d'après réconciliation précédente, sans réouverture. Aucun travail sur les PR concurrentes.
-- TEST_EVIDENCE : sur HEAD précédent `c4420a5d5390f00cdd87c532e031c78d890c6171`, [CI #673 / 45176352842](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45176352842) et [Docker #540 / 45176353722](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45176353722) = completed/failure ; jobs 137698497708 et 137698500318, steps/logs_url null. Aucune exécution de test applicatif prouvée, cause racine non établie.
-- ACTION_CODE : commit [af21b5855c4f5a86ffc1fcc88e290802fcfbcd62](https://github.com/Patricked-code/africafunds-market-data-pipeline/commit/af21b5855c4f5a86ffc1fcc88e290802fcfbcd62) sur test/integration/ingestion-html-csv.test.ts : seconde ingestion HTTP 404 synthétique en mode non strict, vérification de deux UUID distincts, deux statuts FAILED et compteurs [1,0,1] pour chaque tentative. Préserve la vérification d'absence d'archive et le nettoyage ciblé existants. Aucun changement du moteur, des sources officielles, du schéma, des secrets ou de main.
-- VALIDATION : test ajouté, NOT_RUN localement ; CI du nouveau HEAD non attestée. Ce test reste une hypothèse vérifiable, pas une recette PASS.
-- BLOCK_REASON : GitHub Actions CI/Docker en échec avant étapes accessibles, origine inconnue ; revue indépendante et gates de fusion non attestés. Couverture des marchés et historique réel #13–#17 non certifiés.
-- NEXT_ACTION : contrôler les runs sur le HEAD documentaire issu de cette entrée ; obtenir annotations/check-runs et diagnostic administratif Actions (runner/quota/facturation), corriger seulement la cause démontrée, exécuter les tests PostgreSQL et obtenir revue indépendante. En parallèle choisir une tâche indépendante des lots 0–13 après claim vérifié. Aucune fusion, aucun S1.
-- ROLLBACK : revert ciblé du commit test af21b585 et de cette entrée sur la branche Draft.
-
----
-
-## 2026-11-23 — PR #36 : identité audit FAILED non strict et CI toujours bloquée (lots 4/11)
-
-- RECONCILIATION : PR #36 OPEN/Draft, HEAD précédent bf8bc3d13caecbc521bdaa84862c9537b9bd3fb8 ; AGENTS.md, docs/15_AUTONOMOUS_AGENT_EXECUTION.md, checkpoint historique et journal relus ; PR/issues ouvertes recherchées ; dépôt privé. PR #1 déjà fusionnée.
-- TEST_EVIDENCE : sur HEAD bf8bc3d13caecbc521bdaa84862c9537b9bd3fb8, CI [45167071560](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45167071560) et Docker [45167071619](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45167071619) = completed/failure ; jobs 137666666756 et 137666667224 sans steps/logs_url. Aucune commande de test attestée.
-- ACTION_CODE : ajout sur la branche de PR #36 d'assertions PostgreSQL vérifiant l'identité UUID, la persistance du statut FAILED et error_message NULL du run non strict entièrement échoué ; le test existant contrôle déjà les compteurs 1/0/1 et l'absence d'archives. Code métier inchangé, tests ajoutés NOT_RUN.
-- BLOCK_REASON : échec pré-étapes observable de deux workflows ; cause non déterminée ; validation CI du nouveau HEAD et revue indépendante manquantes.
-- NEXT_ACTION : obtenir annotations et message d'allocation des jobs via Actions et réglages administratifs ; vérifier quota/facturation/runner sans attribuer de cause sans preuve. Revalider CI/Docker et le test PostgreSQL sur HEAD exact après déblocage ; revue indépendante avant toute fusion. Continuer un lot indépendant seulement après claim. Aucun S1.
-- ROLLBACK : revert ciblé du test et de cette entrée sur branche Draft ; main, secrets et sources officielles inchangés.
+- **AUTORITÉS LUES** : `AGENTS.md`, 16 documents maîtres du parcours d'arrivée, `docs/15_AUTONOMOUS_AGENT_EXECUTION.md`, dernier `NEXT_ACTION` de la PR #37, `main`, statut PR, ruleset #27937019 et CI exacte. Projet SadiaAF autonome distinct de l'application AfricaFunds et des autres projets MCP/UAES/Workers.
+- **BASE ET GOUVERNANCE** : `main=73256f48d81d38ce8ff6f51be9e024b25cf5dadb` (au contrôle), public, ruleset actif ciblant `main`, sans bypass, required approvals 0 (ADR-016), `validate` + Docker/PostgreSQL obligatoires strictement, PR et résolution des fils exigées, suppression et force-push bloqués. `allow_auto_merge=true`.
+- **CHECKPOINT PRÉCÉDENT** : PR #37 HEAD `7fdebb49b0a74737b96ed03714ca5f57f001dd7e` ; [CI #708](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45278444813) SUCCESS ; [Docker #572](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45278444654) SUCCESS. La PR est restée Draft et `auto_merge=null`.
+- **SÉCURITÉ CODE / PR #37** : commit `96b336518dbe0bd05e6a05da8095c4c05111331f` ajoute exclusion des chemins de gouvernance, workflows GitHub, secrets, configuration, SQL, déploiement, dépendances et blocage des inventaires de diff absents/tronqués/dupliqués, avec inspection des renommages ancien/nouveau chemin. Commit `9677a5ccb5b7dfc2a331814098c55ee39a07e603` ajoute des tests explicites. Le workflow n'exécute pas le code non fiable des PR.
+- **TEST RED/GREEN EN COURS** : [CI #710](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45279986908) FAILURE 80/81 tests de politique ; défaillance sur le chemin `scripts/credentials-init.sh` (pluriel). Commit correctif `022ade7eb238bc59a9b4c52ed6fc2539ac089544` reconnaît singulier/pluriel secrets/credentials/tokens. Aucun PASS généralisé extrapolé.
+- **RACE CI INTEGRATION** : lecture de `test/integration/backfill-claim.test.ts`, `test/integration/backfill-window.test.ts`, `src/jobs/backfillClaim.ts` et `src/jobs/backfill.ts` : les tests sélectionnent des jobs PENDING sur la même base en limitant la revendication à 1, alors que l'exécuteur Node pouvait lancer les fichiers en parallèle. Hypothèse de contention enregistrée dans [issue #5](https://github.com/Patricked-code/africafunds-market-data-pipeline/issues/5#issuecomment-7115864174). Commit `c76bd26406a7bb4325d8f31f829a18b6052390ef` change seulement `test:integration` pour sérialiser les fichiers avec `--test-concurrency=1` ; les transactions concurrentes à l'intérieur des tests restent réellement concurrentes. Aucune écriture sur la branche PR #22.
+- **DOCUMENTATION** : `docs/06_CURRENT_STATUS_AND_GAPS.md` actualisé (commit `be30f5315699366735ffdef7f2db0a5f55556e9f`). Ce nouveau checkpoint modifie le SHA et doit à son tour obtenir les checks CI du SHA exact.
+- **STATUT REEL** : CI #712 et Docker #576 déclenchés sur `c76bd264`, statut encore non conclu lors du dernier contrôle ; aucune fusion de la PR #37, aucun déploiement S1, aucun secret, aucune nouvelle automatisation/scheduler, aucune dépense engagée. Ne pas présenter les tests d'un ancien SHA comme validation du nouveau.
+- **BLOCK_REASON** : PR #37 toujours Draft, non intégrée, pilote auto-merge natif non réalisé ; accès ruleset/permissions et contexte d'événement `pull_request_target` sous GITHUB_TOKEN réel non validés ; CI exacte des commits de ce checkpoint non encore certifiée ; règles pour PR sensibles doivent rester respectées.
+- **NEXT_ACTION** : réconcilier CI #712/Docker #576 et les runs du nouveau HEAD de la PR #37 ; diagnostiquer toute régression, exécuter suffisamment de répétitions CI pour conclure sur le non-déterminisme ; vérifier le token GitHub Actions et le périmètre des PR admissibles ; qualifier la PR #37 pour sortir Draft sous gates, sans fusion de gouvernance implicite ; démontrer une PR pilote autorisée s'inscrivant dans le native auto-merge et reprendre les lots 0–13 sans collision. S1 uniquement après préflight, staging, sauvegarde et autorisation de production.
+- **ROLLBACK** : revert ciblé des commits PR #37 si nécessaire, sans toucher au ruleset actif, à main, à PR #22 ou au runtime S1.
 
 ---
 
 
-## 2026-11-23 — PR #36 : CI #671 et Docker #538 échoués, suivi issue #8 (lots 4/11)
+## 2026-11-23 — Réconciliation de la décision review-free, ruleset vérifié, intégration toujours à terminer
 
-- RECONCILIATION : PR #1 merged ; AGENTS.md, docs/15_AUTONOMOUS_AGENT_EXECUTION.md, présent journal et docs/CONTINUITY_CHECKPOINT_2026-11-06.md consultés ; recherche des PR/issues ouvertes ; dépôt privé selon get_repo. Branche Draft #36 conservée.
-- TEST_EVIDENCE : sur commit `369bc6dbffd7ebe10a1e818d43febab025c81695`, [CI #671 / 45158263775](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45158263775) et [Docker #538 / 45158263830](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45158263830) `completed/failure`. Jobs 137636683518 et 137636683973 retournés `steps=null`, `logs_url=null`. Aucun test local exécuté ; nouveau test PostgreSQL non validé.
-- ACTION : escalade factuelle dans [issue #8 commentaire 7099903998](https://github.com/Patricked-code/africafunds-market-data-pipeline/issues/8#issuecomment-7099903998), sans relance aveugle, sans modification du code ni autre branche.
-- BLOCK_REASON : CI et Docker en échec sans trace d'étapes accessible ; cause inconnue, revue indépendante et gates de fusion non attestés. Ne pas attribuer les échecs au code sans preuve.
-- NEXT_ACTION : obtenir annotations/check-runs et message d'allocation runner depuis Actions et paramètres admin/quota/facturation ; corriger seulement le défaut démontré et revalider SHA exact. Puis poursuivre lot indépendant après contrôle des claims ; aucune fusion ni S1.
-- ROLLBACK : revert de cette entrée documentaire uniquement sur branche Draft.
-
----
-
-
-## 2026-11-23 — PR #36 : régression non-strict FAILED et investigation CI #669 / Docker #536 (lots 4/11)
-
-- RECONCILIATION : PR #1 merged ; AGENTS.md, contrat docs/15, checkpoint 2026-11-06 et présent journal relus sur main/branche #36. PR/issues ouvertes consultées ; branche #36 Draft, HEAD de départ c4d52f4537947d521500aff2642a690a0f617874. Dépôt retourné private ; aucune modification de visibilité.
-- TEST_EVIDENCE : sur ce HEAD, [CI #669 / run 45148504260](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45148504260) completed/failure, job validate 137603643177 ; [Docker #536 / run 45148504150](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45148504150) completed/failure, job 137603643133. Jobs sans steps/logs_url accessibles. Cause racine inconnue ; aucun test local exécuté.
-- ACTION_CODE : commit 3a8cd3519445a0410b4a6753ed379811e07ad125 sur test/integration/ingestion-html-csv.test.ts : scénario PostgreSQL synthétique d'un endpoint HTTP 404 seul en mode non strict ; la promesse doit se résoudre mais ops.ingestion_runs doit rester FAILED avec compteurs [1,0,1], sans archive ; nettoyage ciblé du run supplémentaire par endpointCode. Aucun changement moteur, source officielle, schéma ou secret.
-- VALIDATION : assertions écrites, NOT_RUN localement ; CI du nouveau HEAD non attestée. L'échec pré-job sur le HEAD antérieur ne constitue pas un échec de ces nouvelles assertions.
-- BLOCK_REASON : GitHub Actions CI/Docker échouent avant étapes observables ; vérifier annotations check-run, paramètres Actions, allocation runners, quotas/facturation par accès administrateur. Revue indépendante #36 absente ; recettes sources et marchés #13–#17 non certifiées.
-- NEXT_ACTION : vérifier les runs sur le HEAD du présent checkpoint, obtenir diagnostic pré-job sans relance aveugle, corriger la cause prouvée et faire exécuter le nouveau test PostgreSQL ; demander revue indépendante avant tout merge. En parallèle poursuivre un travail indépendant admissible après contrôle des claims. Aucun S1.
-- ROLLBACK : revert ciblé du test 3a8cd351 et de cette entrée documentaire sur la branche Draft ; préserver main et les PR concurrentes.
-
----
-
-## 2026-11-23 — PR #36 : diagnostic transversal CI #668 / Docker #535 (lots 4/11, issue #8)
-
-- RECONCILIATION : instructions AGENTS.md et docs/15_AUTONOMOUS_AGENT_EXECUTION.md, checkpoint 2026-11-06 et journal courant relus sur GitHub ; PR ouvertes et issues ouvertes recherchées. PR #36 demeure Draft ; comparaison main → branche : 60 commits ahead, 0 behind, base main 73256f48d81d38ce8ff6f51be9e024b25cf5dadb avant ce commit. Aucun claim concurrent modifié.
-- TEST_EVIDENCE : sur HEAD précédent 3777a2d1adcf4b9a951827101d70f1630c161209, [CI #668 / run 45140247876](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45140247876) completed/failure (job validate 137576162705) ; [Docker #535 / run 45140247999](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45140247999) completed/failure (job 137576162683). Pour chacun, le connecteur retourne steps=null et logs_url=null. Workflow CI sur main examiné : job ubuntu-latest avec étapes checkout/npm/tests/PostgreSQL ; aucune de ces étapes n'est observable sur les runs en échec. Les deux workflows distincts échouent sans étapes accessibles : indice d'un blocage pré-exécution, **pas preuve de cause racine**. Tests locaux NOT_RUN.
-- ACTION : rapprochement des deux nouveaux runs/jobs, lecture du workflow CI de référence et qualification de l'absence d'étapes. Ne pas modifier le code métier ni relancer aveuglément. Escalade via issue #8, sans registre ou orchestrateur secondaire.
-- BLOCK_REASON : GitHub Actions renvoie failure pour deux workflows distincts sans étapes/logs accessibles ; vérifier annotations de check-runs, allocation runner, activation Actions, quotas et facturation avec accès administrateur. Aucune cause technique certaine ; CI exact-HEAD et revue indépendante #36 non satisfaites. Les recettes de données officielles #13–#17 restent non attestées.
-- NEXT_ACTION : obtenir l'erreur pré-job depuis l'interface GitHub Actions ou les annotations check-run des runs 45140247876 et 45140247999 ; corriger seulement le défaut prouvé et valider sur SHA exact. Si le blocage persiste, choisir un correctif indépendant dans les lots 0–13 après contrôle des claims, sans créer de nouvelle autorité ; conserver Draft et ne pas fusionner/déployer S1.
-- ROLLBACK : revert de cette seule entrée documentaire sur la branche Draft ; aucun changement main, secret, source officielle ou runtime.
-
----
-
-## 2026-11-23 — PR #36 : CI #667 / Docker #534 échoués, investigation pré-étapes (lots 4/11)
-
-- RECONCILIATION : dépôt GitHub Patricked-code ; PR #1 merged=true ; PR #36 OPEN/Draft, HEAD initial `3644eba3d5485c8e255bd958619b59cbee436bc7`. AGENTS.md, docs/15_AUTONOMOUS_AGENT_EXECUTION.md, journal et checkpoint docs/CONTINUITY_CHECKPOINT_2026-11-06.md relus ; PR et issues ouvertes consultées. Visibilité du dépôt retournée `private` par get_repo le 23/11 (différente du snapshot du 07/11), sans changement de visibilité.
-- TEST_EVIDENCE : [CI #667 / run 45132502465](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45132502465) `completed/failure`, job validate `137550985998` ; [Docker #534 / run 45132502435](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45132502435) `completed/failure`, job `137550985779`. Jobs retournés sans steps ni logs_url ; récupération des logs non exploitable via le connecteur. Statuts commit combinés = [] (ne signifie pas réussite). Reviews #36 = []. Aucun test local exécuté.
-- ACTION : lecture GitHub des runs/jobs et vérification de l'absence de revue ; pas de relance aveugle ni de modification métier car aucune cause racine n'est prouvée. Suivi technique à consigner dans l'issue #8, sans créer d'orchestrateur ni registre secondaire.
-- BLOCK_REASON : deux workflows exact-HEAD échouent sans étapes/logs accessibles ; cause racine inconnue ; revue indépendante et gates de fusion manquants. Les recettes officielles #13/#14/#15/#17 restent non certifiées.
-- NEXT_ACTION : inspecter dans l'interface GitHub les annotations et éventuels messages d'échec d'allocation du runner, les réglages Actions, quotas et facturation ; obtenir un diagnostic reproductible avant tout changement workflow/code. Corriger le défaut démontré, valider CI et Docker sur le SHA exact, obtenir revue indépendante #36. Reprendre en parallèle une tâche des lots 0–13 dont le claim est libre et les contrats/licences vérifiés.
-- ROLLBACK : revert documentaire ciblé de cette entrée sur branche Draft ; aucun changement main, secrets, sources, migrations ou S1.
+- **LECTURE CANONIQUE** : `AGENTS.md`, `docs/15_AUTONOMOUS_AGENT_EXECUTION.md`, dernier checkpoint, ADR-015 et ADR-016 ; conserver le programme 14 lots 0–13, distinction SadiaAF plateforme / AfricaFunds consommateur, aucune autorité ou scheduler parallèle.
+- **GITHUB LIVE** : dépôt PUBLIC `Patricked-code/africafunds-market-data-pipeline`, `main=73256f48d81d38ce8ff6f51be9e024b25cf5dadb`, `protected=true`. `GET /rulesets/27937019` : `active` sur `refs/heads/main`, aucun exclude ni bypass ; PR obligatoire, `required_approving_review_count=0`, `require_last_push_approval=false`, `required_reviewers=[]`, `require_code_owner_review=false`, `require_extra_approval_for_unattributed_changes=false` ; fils résolus, checks STRICTS `validate` et `Build, boot, migrate and verify persistent PostgreSQL`, suppression et force push interdits. `allow_auto_merge=true`. **Le NEXT_ACTION antérieur demandant encore de modifier le ruleset est RÉSOLU et OBSOLÈTE**.
+- **PREUVES PR #37** : HEAD avant le présent commit `e9efdd6699e149ac7192bef5e5b550df40ae3459` ; CI #707 run [45272075629](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45272075629) SUCCESS, Docker #571 run [45272076838](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45272076838) SUCCESS. `mergeable_state=clean`, mais PR OPEN/Draft et `auto_merge=null` ; **workflow non fusionné ni prouvé en production**. Ces runs ne prouvent pas le SHA introduit par cette entrée documentaire.
+- **PR #36** : OPEN/Draft, HEAD `df0129b625798147eb1dc3f283fcbd7fd19fac99`, CI #686 run [45250138007](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45250138007) SUCCESS, Docker #553 run [45250138131](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45250138131) SUCCESS, mais non intégrée. 14 PR ouvertes : #22, #25–#37 ; ne pas modifier les branches revendiquées simultanément.
+- **GATES TECHNIQUES RESTANTS** : valider l'accès aux règles via le `GITHUB_TOKEN` réel, le déclencheur `pull_request_target` / protection contre code non fiable, et tester sur une PR pilote le circuit de label `automerge-eligible`, la sortie Draft, les contrôles exact-SHA et l'inscription puis fusion native sous protections, sans bypass. Pas d'auto-merge provoqué par le présent checkpoint.
+- **RISQUE QUALITÉ** : sur ancien HEAD `4f128816`, CI #706 a dû relancer les tests PostgreSQL `backfill-claim` et `backfill-window` avant SUCCESS ; la cause de la non-détermination n'est pas certifiée résolue, issue #5 / PR #22 distinctes.
+- **AUTOMATISATION HORAIRE** : l'automatisation existante `Continuité AfricaFunds Data Pipeline` reste activée, une fois par heure ; son prompt a été amendé additivement pour faire primer l'ADR-016 sur les anciennes exigences de revue indépendante. Ceci n'atteste pas un agent codeur continu 24h/24.
+- **PRODUCTION S1** : aucun déploiement autorisé ou exécuté ici ; `docs/10_DEPLOYMENT_GATES.md` garde les contrôles d'authentification, RBAC, sources/licences, staging, sauvegarde, restauration, rollback et validation humaine explicite. Les preuves de S1 de 2026-11-07 sont historiques, pas une vérification live.
+- **BLOCK_REASON ACTUEL** : workflow PR #37 non intégré, non démontré en runtime ; token / événements et recettes de fusion native non prouvés ; tous les lots SadiaAF ne sont pas achevés ; prérequis de production non attestés.
+- **NEXT_ACTION** : vérifier les runs exacts du nouveau HEAD ; qualifier la sécurité du workflow et ses permissions sous token Actions, puis rendre PR #37 prête uniquement si admissible, sans fusion non autorisée ; exécuter un pilote non sensible de GitHub auto-merge et consigner les refus/réussites ; investiguer les CI intermittentes du backfill indépendamment de la PR #37 ; reprendre la correction prioritaire non revendiquée dans les lots 0–13 ; ne pas déclencher S1.
+- **ROLLBACK** : revert de ce seul checkpoint sur la PR #37 si erroné, sans modifier le ruleset sain ni les autres PR.
 
 ---
 
 
-## 2026-11-23 — PR #36 : nouvel échec pré-étapes, diagnostic GitHub Actions confirmé (lots 4/11)
+## 2026-11-23 — Reprise vérifiée PR #37 : CI relancée verte et gate administratif encore bloquant
 
-- RECONCILIATION : AGENTS.md, docs/15_AUTONOMOUS_AGENT_EXECUTION.md, journal actuel et checkpoint docs/CONTINUITY_CHECKPOINT_2026-11-06.md consultés via le connecteur Patricked-code ; recherche des PR/issues ouvertes et reviews #36 (reviews=[]). Travail limité à la branche Draft #36, sans modification des branches concurrentes.
-- TEST_EVIDENCE : commit précédent 7228e26b0e25dd25b955cbf4624198a6b4ace038 ; [CI #666 run 45125135566](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45125135566) completed/failure, job validate 137527626753 ; [Docker #533 run 45125135560](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45125135560) completed/failure, job 137527626853. Les deux jobs retournent steps=[] et logs 404 BlobNotFound. Aucune commande de test observable ; ne pas conclure à un échec applicatif ni à une cause infrastructure spécifique.
-- ACTION : lecture des runs, jobs, étapes et logs exacts, sans relance aveugle ; aucune modification métier ni exécution locale. La revue indépendante reste absente. Échecs successifs similaires aux runs 45112614755, 45112614698, 45119240423 et 45119240387.
-- BLOCK_REASON : CI et Docker échouent avant toute étape accessible, journaux indisponibles ; cause racine non démontrée. Impossible de certifier la branche #36 ou de fusionner ; sources officielles et recettes réelles non attestées.
-- NEXT_ACTION : consulter les annotations/check-runs et la page Actions des runs 45125135566/45125135560 ; vérifier les paramètres d'activation Actions, disponibilité des runners et éventuelles restrictions de facturation/quotas par une autorité ayant accès aux réglages. Corriger uniquement la cause prouvée, puis valider le nouveau HEAD. En parallèle, reprendre une tâche indépendante des lots 0–13 après contrôle des claims, sans toucher aux branches possédées.
-- ROLLBACK : revert documentaire ciblé de cette entrée sur la branche Draft ; aucun secret, main, source officielle ni S1 modifié.
-
----
-
-
-## 2026-11-23 — PR #36 : diagnostic CI élargi, échec avant étapes observables (lots 4/11)
-
-- RECONCILIATION : AGENTS.md, docs/15_AUTONOMOUS_AGENT_EXECUTION.md, présent journal et docs/CONTINUITY_CHECKPOINT_2026-11-06.md relus via GitHub ; recherche des PR ouvertes (dont #36 Draft et branches concurrentes). Aucune modification de code ni des autres branches.
-- TEST_EVIDENCE : sur le SHA a4404fb25908127c4e3b3e16cfbbb04f72181b38, nouvelles exécutions [CI 45119240423](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45119240423) et [Docker 45119240387](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45119240387) = completed/failure. Jobs respectifs 137508961137 (validate) et 137508960548 (Docker). Pour ces deux jobs et ceux des tentatives précédentes (137508814763 et 137508829477), l'API des steps renvoie [] ; téléchargement des logs = HTTP 404 BlobNotFound. Aucun échec de commande applicative identifié ; ne pas conclure à une régression ni à une panne de runner sans preuve.
-- ACTION : contrôles additionnels GitHub Actions (nouveaux runs, jobs, steps, logs) ; aucune relance aveugle supplémentaire, car les relances antérieures ont reproduit l'échec et les logs restent absents. Aucun test local exécuté.
-- BLOCK_REASON : CI et Docker échouent sur le SHA documentaire ci-dessus, sans steps ni logs récupérables via connecteur ; diagnostic de cause racine impossible à ce stade ; revue indépendante de #36 et gates de fusion non attestés ; couverture officielle des sources et recettes financières non certifiée.
-- NEXT_ACTION : vérifier la page GitHub Actions et les annotations/check-runs des runs 45119240423 et 45119240387 ; examiner l'état du runner, les permissions et la facturation Actions si les jobs échouent avant toute étape ; dès qu'un log exploitable est disponible, isoler la cause démontrée et corriger code/workflow sur branche dédiée, puis CI exact-HEAD. Pendant le blocage, sélectionner un chantier indépendant des lots 0–13 après vérification des claims et contrats/licences ; aucune fusion ni S1.
-- ROLLBACK : revert documentaire ciblé sur la branche Draft ; aucun secret, main ou production modifié.
+- **RÉCONCILIATION LIVE** : `main=73256f48d81d38ce8ff6f51be9e024b25cf5dadb`, `protected=true`, ruleset ACTIF [27937019](https://github.com/Patricked-code/africafunds-market-data-pipeline/rules/27937019), `allow_auto_merge=true` ; le snapshot ancien `protected=false` / `rulesets=[]` / `allow_auto_merge=false` est OBSOLÈTE. 14 PR Draft ouvertes (#22, #25–#37), aucune fusion sur ce passage ; les issues #3, #5–#9, #13–#17 et #20 demeurent ouvertes.
+- **HEAD PR #37** : `4f1288166285f659dd2430ff10ac1af5547d647c` (Draft). [CI #706](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45270757095) **SUCCESS après rerun** des jobs échoués ; première tentative FAILURE dans les tests PostgreSQL `backfill-claim` et `backfill-window`, ce qui reste un signal de non-déterminisme à analyser dans issue #5 sans déclarer la cause résolue. [Docker #570](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45270757081) **SUCCESS** sur le même SHA. Les 45 tests de politique auto-merge ont réussi sur la première tentative CI ; la réussite globale de la CI après rejeu est attestée par GitHub.
+- **RULESET ACTUEL** : PR obligatoire, `required_approving_review_count=1`, `require_last_push_approval=true`, `require_extra_approval_for_unattributed_changes=true`, `required_reviewers=[]`, `require_code_owner_review=false`, `bypass_actors=[]`, `current_user_can_bypass=never` ; checks stricts `validate` et `Build, boot, migrate and verify persistent PostgreSQL` ; suppression/force-push interdits.
+- **DÉCISION ADR-016** : le propriétaire a demandé la suppression des revues indépendantes obligatoires pour les PR ordinaires ; ce changement est codé/testé dans #37 mais **non appliqué** au ruleset administratif. Le mandat historique demandant >=1 approbation est remplacé uniquement sur ce point pour les PR ordinaires, pas sur les changements sensibles ni sur les gates S1.
+- **SÉCURITÉ WORKFLOW** : `.github/workflows/governed-native-automerge.yml` est seulement présent dans la PR Draft et ne constitue pas une activation. Le script ne doit jamais se substituer aux protections natives ; l'évaluation de `current_user_can_bypass` sous le jeton réel GitHub Actions reste à attester.
+- **BLOCK_REASON** : seul l'administrateur GitHub peut modifier le ruleset 27937019 pour retirer les approbations ; la PR #37 reste Draft ; aucun test réel d'auto-merge natif n'a été effectué. La première tentative de CI a révélé des échecs d'intégration backfill non expliqués malgré le rerun vert.
+- **NEXT_ACTION** : mettre à jour le **même** ruleset via admin GitHub avec `required_approving_review_count=0`, `require_last_push_approval=false`, `require_extra_approval_for_unattributed_changes=false`, tout en conservant checks stricts et protections. Contrôler les champs API, vérifier le token GitHub Actions sans privilège de bypass, qualifier la PR #37 puis tester l'enrôlement sur une PR pilote non sensible. Analyser indépendamment les échecs initiaux backfill (issue #5) avant de qualifier la CI comme stable. Reprendre les lots 0–13 sans collision de PR ni S1.
+- **ROLLBACK** : PR #37 non fusionnée, changements réversibles ; aucune action serveur, secret ou dépense.
 
 ---
 
 
-## 2026-11-23 — PR #36 : échec CI exact-HEAD détecté, relances gouvernées (lots 4/11)
+## 2026-11-23 — ADR-016 : retirer l'approbation indépendante pour les PR ordinaires, maintenir les checks
 
-- RECONCILIATION : AGENTS.md, docs/15_AUTONOMOUS_AGENT_EXECUTION.md, worklog courant et docs/CONTINUITY_CHECKPOINT_2026-11-06.md relus ; PR #1 fermée (fusion mentionnée au journal), PR #36 ouverte Draft. Recherche des issues/PR ouvertes ; aucune branche concurrente modifiée.
-- TEST_EVIDENCE : sur le HEAD documentaire antérieur e7262eaa4dc035e7056f90156e329188a02d0ec6, [CI run 45112614755](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45112614755) et [Docker/PostgreSQL run 45112614698](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45112614698) ont retourné completed/failure (première tentative). Jobs 137488152930 et 137488152679 en échec ; téléchargement des logs via connecteur : GitHub 404 BlobNotFound, et liste des steps vide. Cause technique non démontrée ; ne pas attribuer ces échecs au code sans logs.
-- ACTION : relance ciblée des jobs échoués via GitHub Actions pour les deux runs, API success=true pour chaque demande. Contrôle après relance : les nouveaux jobs CI 137508814763 et Docker 137508829477 sont eux aussi completed/failure. Les logs ne sont pas exploitables via le connecteur lors de cette reprise ; cause non diagnostiquée. Aucun succès déclaré. Aucun code, secret, main ni S1 modifié.
-- BLOCK_REASON : CI/Docker exact-HEAD en échec lors de la première tentative et logs indisponibles (BlobNotFound) ; seconde tentative également en échec, logs non exploitables ; revue indépendante #36 toujours non attestée ; compatibilité HTML index-only et qualifications officielles #13/#14/#15/#17 non certifiées.
-- NEXT_ACTION : inspecter les logs et annotations des tentatives 1 et 2 des runs 45112614755 et 45112614698 par GitHub Actions dès disponibilité, déterminer si échec d'infrastructure ou régression ; si échec reproductible, isoler et corriger le défaut sur branche de PR #36 avec tests, sans micro-tests redondants. Vérifier la revue indépendante et les claims avant de reprendre les tâches indépendantes des lots 0–13. Aucune fusion ni déploiement S1.
-- ROLLBACK : entrée documentaire réversible sur branche Draft ; relances GitHub Actions sans mutation de production.
-
----
-
-
-## 2026-11-23 — PR #36 : validation CI exact-HEAD et passage en attente de revue (lots 4/11)
-
-- RECONCILIATION : HEAD branche `fix/ingestion-false-success-20261122` = `808b30a6c6e865a764eeaa66e6cc5e1ec417527d` (comparaison GitHub identical). Lecture de AGENTS.md, docs/15_AUTONOMOUS_AGENT_EXECUTION.md, présent journal, checkpoint docs/CONTINUITY_CHECKPOINT_2026-11-06.md, tests et moteur d'ingestion ; recherche des PR/issues ouvertes ; reviews #36 = []. Aucun claim concurrent transféré.
-- TEST_EVIDENCE exact-HEAD : [CI #662, run 45107139798](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45107139798) et [Docker/PostgreSQL #529, run 45107139876](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45107139876) : `completed/success` sur `808b30a6`. Ces runs valident les assertions précédentes, pas une recette officielle ni le présent commit documentaire.
-- CONTRÔLE FONCTIONNEL : la branche contient les tests synthétiques strict/non-strict, trois runs PARTIAL distincts et compteurs 2/1/1 ; le code `src/jobs/ingest.ts` termine PARTIAL avant de signaler l'erreur stricte. Aucune nouvelle modification métier lors de ce contrôle ; éviter de multiplier les micro-tests sans lacune de recette démontrée.
-- BLOCK_REASON : revue indépendante #36 absente ; compatibilité des index HTML légitimes sans ligne et qualifications de sources officielles #13/#14, normalisation #15 et recette financière #17 non certifiées. Gates de fusion non démontrés ; pas de S1.
-- NEXT_ACTION : obtenir une revue indépendante du code et des scénarios HTML index-only de PR #36 ; traiter les observations de revue et revalider la CI exact-HEAD après toute correction. Puis qualifier un contrat officiel/fixture autorisée et coordonner les claims #26/#27 avant toute implémentation d'adaptateur ou recette financière. Aucune fusion sans gates, aucune déclaration HISTORY_COMPLETE.
-- ROLLBACK : entrée documentaire réversible sur branche Draft ; aucune migration, source officielle, secret, main ni S1 modifié.
+- **INTENTION EXPLICITE** : le propriétaire demande de supprimer l'exigence de revues indépendantes récurrentes sur les développements SadiaAF, pour avancer avec une intégration automatique des unités admissibles ; pas de suppression des exigences S1 ou d'autorisations réservées.
+- **PRÉFLIGHT ACTUEL** : repo PUBLIC, `allow_auto_merge=true`, ruleset [#27937019](https://github.com/Patricked-code/africafunds-market-data-pipeline/rules/27937019) ACTIF sur `main`, mais `required_approving_review_count=1`, `require_last_push_approval=true`, `require_extra_approval_for_unattributed_changes=true` ; `validate` et `Build, boot, migrate and verify persistent PostgreSQL` requis, strict, `bypass_actors=[]`, suppression/force-push interdits. Aucun changement des paramètres administratifs par le connecteur GitHub disponible.
+- **CODE (PR #37)** : adaptation de `scripts/ci/governed-native-automerge.mjs` pour exiger une PR et un ruleset actif sans approbation obligatoire (`required_approving_review_count=0`), sans exigences des derniers commits, reviewers, CODEOWNERS ni approbation supplémentaire ; préservation des checks stricts et des refus de fusion directe ; `test/governed-native-automerge.test.mjs` enrichi avec scénarios qui rejettent toute revue obligatoire résiduelle et toute configuration non attestée.
+- **DOCUMENTATION** : ADR-016 ACCEPTED et contrat agents §12 modifiés additivement ; aucune autre PR de lots 0–13 modifiée.
+- **RISQUE** : un code incorrect non détecté par les tests peut être fusionné sans seconde lecture ; les opérations sensibles restent soumises à autorisation distincte et les PR doivent être explicitement qualifiées `automerge-eligible`.
+- **TESTS** : GitHub Actions a été déclenché sur la branche, mais les checks de ce dernier SHA ne sont pas encore certifiés à ce checkpoint.
+- **BLOCK_REASON** : le ruleset actuel exige encore 1 approbation ; le connecteur GitHub n'expose pas les mutations administratives nécessaires ; PR #37 encore Draft et workflow non intégré à main ; la lecture de bypass_actor par GITHUB_TOKEN du workflow n'est pas attestée.
+- **NEXT_ACTION** : le propriétaire, via GitHub CLI déjà connecté à `Patricked-code`, modifie UNIQUEMENT ruleset `27937019` (compteur 0, approbation dernier push désactivée, approbations supplémentaires/CODEOWNERS désactivées) sans supprimer PR/CI/Docker/non-fast-forward/deletion. Vérifier API GET exact et l'état des checks sur le SHA actuel ; qualifier workflow d'enrôlement et sa permission, rendre PR #37 Ready si admissible, intégrer selon règles GitHub sans bypass, tester l'auto-merge réel sur PR pilote ; reprendre les travaux des lots 0–13.
+- **ROLLBACK** : sur le ruleset, rétablir le nombre d'approbations initial et `require_last_push_approval=true` si nécessaire ; pour le code, revert des changements ciblés sur la PR. Aucune action S1.
 
 ---
 
 
-## 2026-11-23 — PR #36 : contrôle des compteurs pour chaque tentative PARTIAL (lots 4/11)
+## 2026-11-23 — Administration GitHub V2 validée : main protégée et auto-merge autorisé
 
-- RECONCILIATION : PR #1 merged=true ; PR #36 OPEN/Draft sur HEAD initial `c12a579de337799af81f2e338d34b9ff05495330` ; AGENTS.md, docs/15_AUTONOMOUS_AGENT_EXECUTION.md, journal canonique et checkpoint du 06/11 relus ; recherche PR/issues et reviews #36 (aucune revue enregistrée). Les branches concurrentes restent intactes.
-- TEST_EVIDENCE HEAD initial : [CI 45100890397](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45100890397) et [Docker 45100890400](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45100890400) : completed/success pour `c12a579de337799af81f2e338d34b9ff05495330` seulement.
-- CODE/TEST : commit `c4c2c60201d182d61b85e140b83c6fb6848f933c` ; `test/integration/ingestion-html-csv.test.ts` vérifie maintenant, sur les trois UUID distincts de tentatives mixtes (strict, strict répété, non strict), le statut PARTIAL, les compteurs persistés endpoints=2/success=1/failed=1 et error_message=NULL. Cela prévient un faux PARTIAL dont les compteurs masqueraient l'échec du sibling HTTP 404. Fixtures synthétiques uniquement ; aucun appel réseau officiel.
-- TEST_EVIDENCE nouveau code : tests locaux NOT_RUN ; CI/Docker du HEAD après cette entrée NOT_YET_ATTESTED ; ne pas attribuer les succès antérieurs au nouveau code.
-- BLOCK_REASON : CI exact-HEAD du nouveau test et revue indépendante #36 non attestées ; contrats/licences #13/#14, normalisation #15 et recette officielle #17 incomplètes ; aucune autorisation S1.
-- NEXT_ACTION : contrôler CI/Docker du HEAD final, diagnostiquer/corriger tout échec, demander une revue indépendante de PR #36 ; puis sélectionner une tâche fonctionnelle indépendante des lots 0–13 après réconciliation des claims. Ne pas fusionner ni déclarer HISTORY_COMPLETE sans données réelles.
-- ROLLBACK : revert ciblé du commit `c4c2c602` et de l'entrée documentaire sur la branche Draft ; aucune migration, secret, source officielle, main ou S1 modifié.
-
----
-
-
-## 2026-11-23 — PR #36 : conserver les trois tentatives PARTIAL distinctes (lots 4/11)
-
-- RECONCILIATION : AGENTS.md, docs/15_AUTONOMOUS_AGENT_EXECUTION.md, journal et docs/CONTINUITY_CHECKPOINT_2026-11-06.md relus sur GitHub ; recherches des 12 issues ouvertes et PR concurrentes ; aucun changement main, S1, secrets ou branches concurrentes.
-- TEST_EVIDENCE HEAD précédent : `98d8a824c84690728058fb21bbcbe6a707a58482` ; [CI 45095619909](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45095619909) et [Docker 45095619921](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45095619921) retournés completed/success pour ce commit seulement.
-- CODE/TEST : commit [d96283af](https://github.com/Patricked-code/africafunds-market-data-pipeline/commit/d96283afc4c727cf6ce2dfca74e2878a9d0c7de1) ; `test/integration/ingestion-html-csv.test.ts` conserve désormais la deuxième tentative stricte PARTIAL jusqu'à la fin du scénario et vérifie trois identifiants de runs distincts (strict, strict répété, non strict), trois lignes PARTIAL et nettoyage par UUID. Auparavant, le deuxième run était supprimé avant l'assertion finale, limitant la vérification à deux runs. Fixtures synthétiques, aucun appel officiel.
-- TEST_EVIDENCE nouveau HEAD : tests locaux NOT_RUN ; CI/Docker exact-HEAD après les commits de cette entrée NOT_YET_ATTESTED. Ne pas transférer les succès précédents.
-- BLOCK_REASON : validation CI exact-HEAD et revue indépendante #36 non attestées ; qualifications officielles #13/#14, normalisation #15 et recettes de données réelles #17 non certifiées.
-- NEXT_ACTION : vérifier les nouveaux runs CI/Docker sur HEAD final de #36 ; corriger toute anomalie ; obtenir revue indépendante, sans fusion implicite. Ensuite sélectionner un travail indépendant des lots 0–13 après réconciliation des claims et contrats des sources.
-- ROLLBACK : revert ciblé du commit de test et de cette entrée sur branche Draft ; aucune migration ni opération production.
-
----
-
-## 2026-11-23 — Reprise PR #36 : isolation des runs PARTIAL strict/non-strict
-
-- Branche : `fix/ingestion-false-success-20261122` ; PR #36 Draft ; lot 4/11, issue #14, sans toucher aux PR concurrentes #22/#25/#26/#35.
-- Réconciliation : précédent HEAD `df08a352c9ac1d59acd8d7400575910101e39e63` ; CI run [45089238131](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45089238131) SUCCESS et Docker run [45089237903](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45089237903) SUCCESS, **uniquement pour ce HEAD précédent**. Aucune revue indépendante retournée pour PR #36.
-- Code/test : commit [11456cf9](https://github.com/Patricked-code/africafunds-market-data-pipeline/commit/11456cf91814ccba689803067e412fc2c920001c) ; ajout d'assertions PostgreSQL confirmant deux identifiants distincts de runs, tous deux `PARTIAL`, entre l'exécution stricte et la non stricte ; fixtures synthétiques, aucun HTTP externe.
-- Limites : nouveau test **non encore attesté CI exact-HEAD** ; aucune donnée réelle ni qualification officielle de sources ; revue et gates de fusion manquants.
-- BLOCK_REASON : CI/Docker du nouveau HEAD et revue indépendante non attestés ; issues #13/#14/#15/#17 restent partiellement ouvertes ; aucune preuve d'un déploiement S1 ou de couverture historique complète.
-- NEXT_ACTION : vérifier CI et Docker sur le HEAD final du présent journal, diagnostiquer/corriger tout échec ; solliciter revue indépendante de PR #36 ; sélectionner ensuite une tâche indépendante parmi les lots 0–13 après réconciliation des PR et claims.
-- Rollback : revert des commits de test et journal sur branche PR #36 ; aucune migration ni modification production.
-
----
-
-## 2026-11-23 — PR #36 : isolation des endpoints après PARTIAL non strict (lots 4/11)
-
-- **RECONCILIATION** : lecture AGENTS.md, docs/15_AUTONOMOUS_AGENT_EXECUTION.md, journal courant et docs/CONTINUITY_CHECKPOINT_2026-11-06.md ; PR #1 CLOSED (fusion à confirmer par métadonnées de merge), PR #36 OPEN/Draft, recherches PR/issues ouvertes. Branche de travail #36 uniquement.
-- **TEST_EVIDENCE HEAD précédent** : commit `1a3f0a9972b11d37ef0435ea5cf357a782a5d1e7` ; [CI run 45084230455](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45084230455) et [Docker run 45084230461](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45084230461) : completed/success, exact HEAD précédent uniquement.
-- **CODE/TEST** : commit `ac7be693f12cfc622828f20e101948513653a279` ; assertions PostgreSQL supplémentaires après la troisième ingestion non stricte : zéro raw_records et zéro raw_artifacts pour le sibling HTTP 404, exactement deux archives pour le sibling sain, et statut PARTIAL du premier run strict inchangé. Fixtures synthétiques et suppression bornée, sans source officielle interrogée.
-- **TEST_EVIDENCE nouveau HEAD** : tests locaux NOT_RUN ; CI/Docker du nouveau HEAD NOT_YET_ATTESTED, à contrôler sur le SHA exact après cette entrée.
-- **BLOCK_REASON** : CI exact-HEAD et revue indépendante #36 non attestées pour les nouvelles assertions ; qualification officielle #13/#14, normalisation #15 et recette réelle #17 incomplètes. Aucun merge ni déploiement S1 autorisé.
-- **NEXT_ACTION** : vérifier CI/Docker exact-HEAD de #36, corriger toute régression et obtenir une revue indépendante ; réconcilier les claims des PR concurrentes puis reprendre une tâche indépendante des lots 0–13. Ne pas déclarer HISTORY_COMPLETE sans données réelles.
-- **ROLLBACK** : revert ciblé du commit `ac7be693` et de cette entrée documentaire sur la branche Draft ; aucun schéma, secret, main, source officielle ou S1 modifié.
+- **OPÉRATION EFFECTUÉE PAR L'UTILISATEUR** : lancement via GitHub CLI authentifié `Patricked-code` de la configuration GitHub ruleset V2 sous confirmation explicite `CONFIGURER` ; script a retourné `SUCCESS` avec ruleset ID `27937019`.
+- **ATTESTATION INDÉPENDANTE DU SCRIPT — API GITHUB CONNECTÉE** : `GET /branches/main` → `protected=true`, HEAD `73256f48d81d38ce8ff6f51be9e024b25cf5dadb` ; `GET /rulesets/27937019` → `active`, `refs/heads/main`, aucun exclude, `bypass_actors=[]`, `current_user_can_bypass=never` ; règles `deletion`, `non_fast_forward`, `pull_request` (1 approbation, dismissal stale, approval last push, résolution des conversations), status checks stricts `validate` et `Build, boot, migrate and verify persistent PostgreSQL` ; `get_repo` → `allow_auto_merge=true`.
+- **CI SUR HEAD COURANT PR #37** : `fe99e1cae4de5ccc7990b898171d093ae121451f` → [CI #700 run 45266448179](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45266448179) SUCCESS et [Docker #564 run 45266448234](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45266448234) SUCCESS ; la présente entrée documentaire provoquera un NOUVEAU SHA non couvert par ces attestations.
+- **ÉTAT DE LA PR #37** : OPEN/Draft, `reviews=[]`, aucune fusion ; pas de déploiement S1 ; source canonique de preuves dans [commentaire de PR #37](https://github.com/Patricked-code/africafunds-market-data-pipeline/pull/37#issuecomment-7114214485).
+- **BLOCK_REASON ACTUALISÉ** : administration initiale RÉSOLUE. Restent la revue indépendante réellement habilitée, la sortie de Draft, les checks du futur SHA, la vérification en runtime GitHub Actions de l'accès `bypass_actors` par `GITHUB_TOKEN` (potentiellement absent sans admin), et la compatibilité du déclencheur `pull_request_target` avec la politique de sécurité des dépôts publics. Aucun reviewer/exécuteur autonome en production attesté.
+- **NEXT_ACTION** : contrôler les checks exact SHA de ce checkpoint ; corriger/tester la stratégie d'événement et d'attestation des rulesets sans ajouter de PAT administrateur ni de bypass ; obtenir revue indépendante de PR #37 ; fusion uniquement selon les règles désormais en vigueur ; tester l'inscription native auto-merge sur une PR pilote, puis reprendre les lots 0–13 sans collision.
+- **ROLLBACK** : aucun réglage GitHub à défaire pour ce checkpoint ; les protections main doivent être conservées. La PR #37 reste indépendante et réversible par ses commits, sans action S1.
 
 ---
 
 
-## 2026-11-23 — PR #36 : comportement PARTIAL non strict après répétitions (lots 4/11)
+## 2026-11-23 — PR #37 : correctif rulesets après échec GitHub CLI 404
 
-- **RECONCILIATION** : AGENTS.md, docs/15_AUTONOMOUS_AGENT_EXECUTION.md, docs/09_CHANGELOG_WORKLOG.md et checkpoint docs/CONTINUITY_CHECKPOINT_2026-11-06.md relus ; 13 PR ouvertes dont #36 Draft, 12 issues ouvertes retrouvées. Branches concurrentes non modifiées ; aucune fusion ni S1.
-- **TEST_EVIDENCE HEAD précédent** : commit `778155a07e9e2b54be823c0419818f197aae6163` ; [CI run 45078954063](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45078954063) et [Docker run 45078954056](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45078954056) : completed/success, exact-HEAD précédent uniquement. Reviews #36 : aucune.
-- **CODE/TEST** : commit `d275612b4b9b706ba1a2a12a0e5fbbf8cc9c0724` étend `test/integration/ingestion-html-csv.test.ts` avec un troisième run multi-endpoints sans `failOnEndpointError` : promesse résolue, statut PostgreSQL `PARTIAL`, compteurs 2/1/1, `error_message=NULL` et absence de duplication des deux observations du sibling sain. Nettoyage borné au nouvel UUID de run. Fixtures synthétiques uniquement.
-- **TEST_EVIDENCE nouveau HEAD** : tests locaux NOT_RUN ; CI/Docker exact-HEAD NOT_YET_ATTESTED après ce commit documentaire. Ne pas transférer les succès précédents.
-- **BLOCK_REASON** : validation CI exact-HEAD du test non strict et revue indépendante #36 absentes ; qualifications officielles #13/#14, historiques #5 et recette réelle #17 non terminées. Aucune autorisation de fusion ou de déploiement S1.
-- **NEXT_ACTION** : vérifier CI/Docker sur le nouveau HEAD et corriger toute régression ; demander revue indépendante #36, sans fusion implicite. Puis traiter une tâche indépendante des lots 0–13 après vérification des claims et contrats officiels, sans toucher aux PR concurrentes.
-- **ROLLBACK** : revert ciblé du commit `d275612b` et de cette entrée documentaire sur la branche Draft ; aucun schéma, source officielle, secret, main ou S1 modifié.
-
----
-
-## 2026-11-22 — PR #36 : preuve CI et contrôle d'historique PARTIAL réitéré (lots 4/11)
-
-- **RECONCILIATION** : AGENTS.md, docs/15_AUTONOMOUS_AGENT_EXECUTION.md, journal et checkpoint docs/CONTINUITY_CHECKPOINT_2026-11-06.md consultés ; PR #36 OPEN/Draft, revues = [] ; recherche des PR/issues ouvertes ; branche initiale exactement b2fa95bcd01bbf132279a4d726117d027282c330 (comparaison GitHub identical). Aucune branche concurrente modifiée.
-- **TEST_EVIDENCE** : commit initial b2fa95bcd01bbf132279a4d726117d027282c330 ; [CI run 45072540364](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45072540364) completed/success, job 137362527783 (typecheck, tests unitaires, migrations, intégration PostgreSQL, backfill) ; [Docker run 45072540400](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45072540400) completed/success, job 137362585727. Ces preuves ne certifient pas le nouveau commit.
-- **CODE/TEST** : commit 00b82a6eaca31bdda85ea407c18c679309f44899 : assertions additives dans test/integration/ingestion-html-csv.test.ts. Après deux exécutions mixtes, vérifier deux lignes PARTIAL correspondant aux deux ingestion_run_id capturés, exactement deux archives saines conservées et zéro archive du sibling HTTP 404. Requête limitée aux UUID des runs synthétiques ; aucun endpoint officiel appelé.
-- **TEST_EVIDENCE nouveau code** : NOT_RUN localement ; CI exact-HEAD NOT_YET_ATTESTED, à contrôler après le commit documentaire.
-- **BLOCK_REASON** : revue indépendante #36 absente ; validation exact-HEAD des nouvelles assertions en attente ; contrats/licences #13/#14, normalisation #15 et recettes réelles #17 non certifiés.
-- **NEXT_ACTION** : vérifier CI et Docker exact-HEAD après cette entrée ; corriger tout échec. Puis demander une revue indépendante de #36, sans fusion implicite ; sélectionner une tâche indépendante des lots 0–13 après vérification des claims. Ne pas déployer S1 ni déclarer HISTORY_COMPLETE.
-- **ROLLBACK** : revert ciblé du commit 00b82a6e et de cette entrée sur la branche Draft ; aucune migration, secret, donnée réelle ni production touchés.
-
----
-
-## 2026-11-22 — PR #36 : réexécution PARTIAL sans doublon (lots 4/11)
-
-- **RECONCILIATION** : PR #1 MERGED ; PR #36 OPEN/DRAFT, base main `73256f48d81d38ce8ff6f51be9e024b25cf5dadb`, HEAD de départ `0fdae0a7bc8d9f485c0ce18917acedb7bb63ee41`. AGENTS.md, docs/15_AUTONOMOUS_AGENT_EXECUTION.md, présent journal et checkpoint historique 2026-11-06 relus ; 13 PR et 12 issues ouvertes recherchées ; reviews #36 = []. Aucun travail sur les branches concurrentes.
-- **TEST_EVIDENCE précédent HEAD** : [CI run 45067707429](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45067707429) et [Docker run 45067707535](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45067707535) : completed/success pour `0fdae0a7bc8d9f485c0ce18917acedb7bb63ee41`, pas pour le nouveau code.
-- **CODE/TEST** : commit `cc5c11ca7773ff23a718d8ac42e61fe301cdf9d6` ; extension additive de `test/integration/ingestion-html-csv.test.ts` pour réexécuter le marché synthétique avec un sibling sain et un sibling HTTP 404. Attendus : second run PARTIAL, summary 2/1/1, deux observations saines conservées, zéro observation du sibling rejeté. Nettoyage de l'ID de run supplémentaire ; aucune source réelle interrogée.
-- **TEST_EVIDENCE nouveau code** : NOT_YET_ATTESTED ; tests locaux NOT_RUN ; attendre et inspecter CI/Docker sur le nouveau HEAD. Le succès des anciens runs n'est pas transférable.
-- **BLOCK_REASON** : validation CI exact-HEAD et revue indépendante #36 absentes pour ce nouveau test ; qualifications officielles #13/#14, historique #5 et recettes #17 incomplètes ; aucune autorisation de merge ou de déploiement S1.
-- **NEXT_ACTION** : contrôler CI/Docker exact-HEAD et corriger toute régression ; obtenir revue indépendante de #36. Puis reprendre une tâche libre des issues #13/#14/#15 après réconciliation/claim, sans toucher aux PR occupées ; ne certifier aucune donnée officielle sans preuve.
-- **ROLLBACK** : revert ciblé du commit de test et de cette entrée sur la branche Draft ; aucune migration, secret, donnée officielle ou production modifiée.
-
----
-
-## 2026-11-22 — PR #36 : non-persistance du sibling HTTP 404 en exécution PARTIAL (lots 4/11)
-
-- **RECONCILIATION** : lecture AGENTS.md, docs/15_AUTONOMOUS_AGENT_EXECUTION.md, docs/09_CHANGELOG_WORKLOG.md et docs/CONTINUITY_CHECKPOINT_2026-11-06.md ; recherche des 13 PR et 12 issues ouvertes ; reviews #36 = []. PR #1 précédemment fusionnée selon historique documentaire ; aucune branche concurrente modifiée.
-- **TEST_EVIDENCE HEAD précédent** : commit `300609f6250a493f0f523ecec96516c4a93a4846`, [CI run 45061311295](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45061311295) completed/success et [Docker run 45061311186](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45061311186) completed/success. Ces succès ne s'appliquent pas au nouveau commit.
-- **CODE/TEST** : commit `b17330da123342b97e35b0ea3de11a1019075664` complète la recette PostgreSQL multi-endpoints : lorsque le sibling renvoie HTTP 404, aucune ligne dans `source.raw_artifacts` ni `market.raw_records` ne doit être persistée pour cet endpoint, tandis que les deux observations du sibling sain restent présentes. Le test conserve les assertions PARTIAL, le rejet strict et le nettoyage borné. Fixture synthétique, aucun accès réseau officiel.
-- **TEST_EVIDENCE nouveau code** : NOT_YET_ATTESTED ; tests locaux NOT_RUN ; vérifier CI/Docker exact-HEAD après cette écriture.
-- **BLOCK_REASON** : CI exact-HEAD du test additionnel et revue indépendante #36 non attestées ; sources officielles #13/#14, historique #5 et recettes métier #17 toujours incomplets. Aucun merge ni déploiement S1 admissible.
-- **NEXT_ACTION** : contrôler CI/Docker du HEAD de #36 et corriger tout échec ; demander revue indépendante après validation. Puis qualifier les travaux libres des issues #13/#14/#15 sans collision avec les branches concurrentes, ni contournement de robots/licences.
-- **ROLLBACK** : revert ciblé du commit de test et de cette entrée sur la branche Draft ; aucune migration, secret, source officielle ou production modifiée.
+- **INCIDENT UTILISATEUR :** le script administrateur GitHub V1, exécuté par `gh` sous le compte confirmé `Patricked-code`, a échoué au `PUT /branches/main/protection` avec le message exact `Branch protection has been disabled on this repository. (HTTP 404)`. Le `else` isolé affiché ultérieurement par PowerShell est sans impact sur GitHub.
+- **PREUVE LECTURE GITHUB APRÈS L'ÉCHEC :** `main=73256f48d81d38ce8ff6f51be9e024b25cf5dadb`, `protected=false`, `GET /rulesets=[]`, `allow_auto_merge=false`. Pas de fusion ou de déploiement effectué.
+- **SOURCE OFFICIELLE/TECHNIQUE :** GitHub documente l'API POST `/repos/{owner}/{repo}/rulesets`, disponible sur les repos publics GitHub Free. Le ticket ossf/allstar#562 reproduit précisément le HTTP 404 sur l'API classique ; la réponse du support GitHub recommande les rulesets.
+- **REMÉDIATION HORS GIT :** un nouvel outil local Windows SadiaAF GitHub V2 prépare un ruleset ACTIF ciblant uniquement `refs/heads/main`, PR obligatoire, 1 revue indépendante, dismissal stale reviews, approbation du dernier push, résolution des fils, CI `validate` et Docker/PostgreSQL stricts, interdiction force push/suppression, `bypass_actors=[]`, puis `allow_auto_merge=true` uniquement après relecture attestée. Outil non exécuté sur l'ordinateur utilisateur ni sur les API GitHub en écriture ; attestation d'activation ABSENTE.
+- **CORRECTION SUR LA BRANCHE PR #37 :** adaptation du vérificateur d'enrôlement pour considérer une protection par ruleset active, tout en conservant la vérification classique en fallback, avec scénarios de non-régression fail-closed supplémentaires.
+- **IMPORTANT — BLOCAGE DE VISIBILITÉ :** l'API GitHub omet `bypass_actors` lors de la lecture du ruleset sans permission d'administration adéquate. Le `GITHUB_TOKEN` ordinaire du workflow ne peut donc PAS supposer qu'un champ absent signifie liste vide. Le code conserve intentionnellement `SKIP` si le bypass ne peut pas être attesté. Pour activer complètement l'enrôlement autonome, prévoir une vérification de gouvernance attestée avec un acteur adéquatement habilité, en évitant de donner un PAT administrateur au workflow.
+- **TESTS :** les nouveaux tests rulesets ont été ajoutés ; CI exacte du nouveau SHA à obtenir, pas de PASS anticipé.
+- **BLOCK_REASON :** protection principale non activée, auto-merge désactivé, absence de permission d'administration de ruleset dans le token workflow, revue indépendante automatisée non attestée, PR #37 Draft.
+- **NEXT_ACTION :** contrôler CI exact-SHA de PR #37 ; lancer le script V2 à partir du poste utilisateur sous `gh` Patricked-code ; vérifier l'ID du ruleset actif et l'option auto-merge via lecture GitHub ; ensuite finaliser le contrôle d'absence de bypass par mécanisme autorisé et une revue indépendante, sans abaisser les gates, sans fusion ni S1.
 
 ---
 
 
-## 2026-11-22 — PR #36 : recette multi-endpoints PARTIAL en mode strict (lots 4/11)
+## 2026-11-23 — Lot 11 : préparation de la fusion automatique native sous gates stricts
 
-- **RECONCILIATION** : lecture AGENTS.md, docs/15_AUTONOMOUS_AGENT_EXECUTION.md, journal canonique et checkpoint docs/CONTINUITY_CHECKPOINT_2026-11-06.md ; recherche des 13 PR et 12 issues ouvertes. Branche de travail #36 uniquement, aucun changement main, #22 ou autre PR.
-- **TEST_EVIDENCE exact HEAD antérieur** : commit 819ed02a22a86233c53787530a20952a937a67e2 ; [Docker run 45056423703](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45056423703) et [CI run 45056423717](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45056423717) retournés completed/success. Ne pas attribuer ces réussites aux nouveaux commits.
-- **CODE/TEST** : commits bac749abf94aa6fb760cff2d760cce6f035bfee9 et 79dff969ba5be4e28f990e506f81f4f17da79f01 ; extension additive de test/integration/ingestion-html-csv.test.ts : deux endpoints synthétiques dans le même marché, un succès HTML→CSV, un HTTP 404, rejet strict attendu, mais statut persistant PARTIAL avec summary endpoints=2, success=1, failed=1 et error_message NULL. Nettoyage du run mixte par ingestion_run_id capturé, sans suppression générique des runs du marché. Fixtures sans accès réseau réel, PostgreSQL CI isolé.
-- **TEST_EVIDENCE nouveau code** : NOT_YET_ATTESTED ; tests locaux NOT_RUN ; vérifier CI et Docker du HEAD après ce checkpoint.
-- **BLOCK_REASON** : validation exact-HEAD du scénario multi-endpoints et revue indépendante #36 encore non attestées ; qualification officielle des sources #13/#14 et recettes métier #17 non terminées.
-- **NEXT_ACTION** : contrôler les nouveaux runs CI/Docker sur le HEAD de #36 ; diagnostiquer/corriger toute erreur de test ou de persistance ; solliciter revue indépendante avant fusion. Ensuite reprendre les lots libres #13/#14/#15 avec preuves et sans collision de branches, sans secrets ni S1.
-- **ROLLBACK** : revert ciblé des deux commits de test et de cette entrée sur la PR Draft ; aucune migration ni production modifiée.
-
----
-
-## 2026-11-22 — PR #36 : correction du test strict-mode après CI rouge (lots 4/11)
-
-- RECONCILIATION : PR #36 ouverte Draft ; PR #1 précédemment fusionnée ; AGENTS.md, docs/15_AUTONOMOUS_AGENT_EXECUTION.md et worklog relus ; PR/issues ouvertes recherchées. Aucune branche concurrente modifiée.
-- TEST_EVIDENCE : [CI #641 / run 45050783101](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45050783101) completed/failure, job 137295221369 : typecheck, tests unitaires, build et migrations réussis ; intégration PostgreSQL échouée à la ligne 84 (undefined versus null). [Docker #508 / run 45050783078](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45050783078) completed/success sur HEAD antérieur 80149af068c0a0751359ac8feeb9b3321ba5890d.
-- ROOT_CAUSE : assertion sur failed.rows[0].error_message mais requête SQL SELECT status, summary sans error_message ; la propriété était undefined. Ceci est une erreur de test, pas une preuve de double finalisation.
-- CODE/TEST : commit 9059646e1387d1670eed172770051b2c24265d49 ajoute error_message à la projection SQL du test. Aucun changement de code métier, schéma, secret, source, main ou S1.
-- TEST_EVIDENCE nouveau code : NOT_YET_ATTESTED ; tests locaux NOT_RUN ; contrôler les workflows exact-HEAD après ce checkpoint.
-- BLOCK_REASON : CI du correctif et revue indépendante non attestées ; qualification #13/#14 et recette métier #17 incomplètes.
-- NEXT_ACTION : vérifier CI et Docker du nouveau HEAD ; corriger si échec ; ajouter ensuite une recette multi-endpoints démontrant PARTIAL conservé en mode strict ; demander revue indépendante avant toute fusion. Continuer les lots libres après réconciliation, sans toucher aux PR concurrentes ni S1.
-- ROLLBACK : revert ciblé du commit de test et de cette entrée sur la branche Draft.
-
----
-
-
-## 2026-11-22 — PR #36 : strict-mode sans double finalisation (lots 4/11)
-
-- **RECONCILIATION** : PR #1 MERGED, PR #36 OPEN/DRAFT ; base main `73256f48d81d38ce8ff6f51be9e024b25cf5dadb`, HEAD initial `83f1712d163143465d762427cbafb84b794905d9` ; dépôt privé au contrôle GitHub. AGENTS.md, documents maîtres 00–15, checkpoint 2026-11-06 et dernier NEXT_ACTION relus ; PR/issues ouvertes recherchées ; revues #36 = []. Aucune branche concurrente modifiée.
-- **TEST_EVIDENCE HEAD précédent** : [CI #638 / run 45044625482](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45044625482) et [Docker #505 / run 45044625520](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45044625520) = completed/success, exclusivement sur `83f1712d163143465d762427cbafb84b794905d9`.
-- **RED (non exécuté isolément)** : commit `183164c42230741557eff0d9532d5629bb1420f7` ajoute une assertion de non-réécriture de `error_message` pour un run FAILED après signalement strict `failOnEndpointError`. Le code précédent finalisait une première fois puis réentrait dans catch pour finaliser une seconde fois.
-- **GREEN (non encore validé)** : commit `493023b71f624cdaabe2b743cd61aa0ca6ffef5f` déplace la finalisation normale après le catch des erreurs opérationnelles dans `src/jobs/ingest.ts`. Une erreur opérationnelle garde sa finalisation FAILED ; une erreur de signalement strict n'écrase plus un PARTIAL/FAILED déjà enregistré. Aucun changement de schéma, source, secret, API, main ou S1.
-- **TEST_EVIDENCE nouveau code** : NOT_YET_ATTESTED ; attendre les workflows CI et Docker sur le nouveau HEAD. Tests locaux NOT_RUN. La recette reste synthétique et ne certifie pas la collecte officielle.
-- **BLOCK_REASON** : CI exact-HEAD et revue indépendante #36 manquantes pour ces deux nouveaux commits ; qualification officielle #13/#14 et recette métier #17 incomplètes.
-- **NEXT_ACTION** : vérifier les workflows CI/Docker exact-HEAD, lire les logs et corriger toute régression ; ajouter si nécessaire une recette multi-endpoints SUCCESS/PARTIAL/FAILED pour certifier la conservation de PARTIAL, puis solliciter revue indépendante avant fusion. Poursuivre #13/#14/#15 sur tâches libres uniquement après claim/réconciliation ; aucun merge ni S1.
-- **ROLLBACK** : revert ciblé des deux commits code/test et de cette entrée sur la branche Draft ; aucune donnée réelle ni production modifiée.
-
----
-
-## 2026-11-22 — PR #36 : historique FAILED conservé après reprise (lots 4/11)
-
-- **RECONCILIATION** : PR #1 réellement MERGED ; PR #36 OPEN/DRAFT, HEAD de départ `5c2f28df44f0adc5dd16ecbdcc9af5be047d9f42`, base `73256f48d81d38ce8ff6f51be9e024b25cf5dadb`. AGENTS.md, docs/15_AUTONOMOUS_AGENT_EXECUTION.md, worklog et checkpoint 2026-11-06 relus ; recherche des 13 PR ouvertes et 12 issues ouvertes ; aucune branche concurrente modifiée.
-- **TEST_EVIDENCE exact HEAD précédent** : [CI run 45039498157](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45039498157) et [Docker run 45039498171](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45039498171) retournent `completed/success` pour le commit `5c2f28df44f0adc5dd16ecbdcc9af5be047d9f42`. La recherche des revues #36 retourne zéro revue. Les succès ne sont PAS transposés aux nouveaux commits.
-- **CODE/TEST** : commit `f6e1824e5e2526d1ef88534ac113260df08d8cbf` renforce `test/integration/ingestion-html-csv.test.ts` : après SUCCESS → FAILED (HTTP 404 enfant) → SUCCESS, le journal `ops.ingestion_runs` doit conserver exactement deux runs SUCCESS et un run FAILED, sans réécriture silencieuse du run échoué. Les assertions précédentes de non-duplication des observations et archives sont conservées. Fixture synthétique et PostgreSQL isolé, sans réseau externe ni changement de schéma.
-- **TEST_EVIDENCE nouveau code** : `NOT_YET_ATTESTED` ; contrôler CI/Docker du HEAD après ce journal, corriger tout échec avant toute revue/fusion.
-- **BLOCK_REASON** : nouveau test non encore validé sur son HEAD exact ; aucune revue indépendante #36 ; qualification officielle des sources #13 et adaptateurs #14 incomplète ; aucun HISTORY_COMPLETE ni déploiement S1 attesté.
-- **NEXT_ACTION** : vérifier CI/Docker exact HEAD de #36 et la conservation des statuts historiques ; corriger les erreurs éventuelles. Obtenir revue indépendante avant fusion. Poursuivre les qualifications #13/#14 et #15 sur branches libres uniquement après réconciliation/claim, sans toucher aux PR concurrentes ; ne pas fusionner ni déployer S1.
-- **ROLLBACK** : revert ciblé du commit de test et de cette entrée sur la branche Draft ; aucune donnée réelle, secret, main ou serveur modifié.
-
----
-
-
-## 2026-11-22 — PR #36 : retry après échec enfant et non-duplication (lots 4/11)
-
-- **RECONCILIATION** : PR #1 fusionnée ; PR #36 ouverte Draft ; HEAD vérifié avant modification `acff39845ee4bffd01062da39ad27cf7249c399d` ; AGENTS.md, docs/15_AUTONOMOUS_AGENT_EXECUTION.md, worklog et checkpoint du 06/11 relus ; PR/issues ouvertes recherchées ; aucune branche concurrente modifiée.
-- **TEST_EVIDENCE — GREEN sur HEAD précédent** : [CI #634 / run 45033460962](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45033460962) et [Docker #501 / run 45033460973](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45033460973) sont `completed/success` pour `acff39845ee4bffd01062da39ad27cf7249c399d`. Ces résultats ne certifient pas le nouveau commit.
-- **CODE/TEST** : commit `e336d6b7a93e1769fc9c3206824a9e8f0f530757` étend `test/integration/ingestion-html-csv.test.ts` : après SUCCESS puis FAILED sur HTTP 404, un troisième passage rétabli doit revenir à SUCCESS sans dupliquer les deux observations ni les deux archives brutes. Même moteur `runIngestion`, fixture synthétique et PostgreSQL isolé ; aucun nouveau schéma, source ou orchestrateur.
-- **TEST_EVIDENCE du nouveau code** : `NOT_YET_ATTESTED` ; contrôler les nouveaux workflows CI/Docker et corriger toute régression.
-- **BLOCK_REASON** : CI exact HEAD du nouveau test et revue indépendante non attestées ; contrats/licences et données officielles #13/#14 non qualifiés ; pas de preuve HISTORY_COMPLETE ni déploiement S1.
-- **NEXT_ACTION** : vérifier CI/Docker du HEAD après ce journal, notamment le troisième passage et les compteurs ; en cas d'échec, lire les logs et corriger la PR #36. Obtenir revue indépendante avant fusion ; poursuivre les sources officielles #13/#14 et normalisation #15 sans toucher aux PR occupées. Aucun déploiement S1.
-- **ROLLBACK** : revert ciblé du commit de test et de cette entrée sur branche Draft ; aucune modification de main ou production.
-
----
-
-
-## 2026-11-22 — PR #36 : recette intégrée GREEN et préservation des données après échec enfant (lots 4/11)
-
-- **RECONCILIATION** : PR #1 fusionnée ; PR #36 ouverte Draft, HEAD initial exact `dff333f5a3339f2943b1094a84d53d77d3fc3b20` ; AGENTS.md, documents maîtres dans l'ordre prescrit, docs/15_AUTONOMOUS_AGENT_EXECUTION.md, checkpoint 2026-11-06 et dernier NEXT_ACTION consultés ; PR concurrentes préservées.
-- **TEST_EVIDENCE — GREEN exact HEAD précédent** : [CI #632 / run 45028281579](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45028281579), job 137226001846, `completed/success`, typecheck, build, migrations, tests unitaires et intégration PostgreSQL ; les logs contiennent explicitement `ok 3 - HTML index -> CSV child -> SHA archive -> PostgreSQL -> SUCCESS; failed child -> FAILED`. [Docker #499 / run 45028281596](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45028281596), job 137226063028, `completed/success`. Ces preuves ne valent pas pour le commit nouveau.
-- **CODE/TEST** : commit `60a664d88a98220f8791e545a5ce7412f74375dc` ajoute à `test/integration/ingestion-html-csv.test.ts` des assertions de non-perte et non-duplication : après l'échec HTTP 404 du CSV enfant lors d'un second passage, les deux observations déjà persistées et les deux artefacts SHA identifiés restent présents. Le code existant déduplique les artefacts par `(endpoint_code, sha256)` ; aucune modification du moteur, des schémas ou des sources.
-- **TEST_EVIDENCE du nouveau code** : `NOT_RUN` au moment de ce checkpoint ; attendre CI et Docker sur le HEAD créé par la présente mise à jour.
-- **BLOCK_REASON** : nouvelle CI exact HEAD et revue indépendante non attestées ; contrats/licences et observations officielles #13/#14 non qualifiés ; historique complet et publication financière #17 non certifiés.
-- **NEXT_ACTION** : contrôler CI et Docker sur le nouveau HEAD et les assertions de non-duplication ; si rouge, lire les logs et corriger sur #36. Obtenir revue indépendante ; poursuivre #13/#14 avec droits officiels, sans modifier #22 ni les autres PR ; ne pas fusionner ni déployer S1.
-- **ROLLBACK** : revert ciblé du commit de test et de cette entrée sur la PR Draft ; aucun impact sur main, secrets ou production.
-
----
-
-
-## 2026-11-22 — PR #36 : correction TypeScript après CI rouge (lot 4/11)
-
-- **RECONCILIATION** : AGENTS.md, docs/15_AUTONOMOUS_AGENT_EXECUTION.md et dernier NEXT_ACTION relus ; PR et issues ouvertes recherchées. Branche #36 conservée, aucune modification de main ni de branche concurrente.
-- **TEST_EVIDENCE — FAILURE** : CI [45022944788](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45022944788), job 137209671703, échec TypeScript TS2307 lignes 25/37/39 du test d'intégration (imports relatifs incorrects), suivi de TS7006 ligne 66. Docker [45022944772](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45022944772), job 137209682285, échec de build sur les mêmes erreurs ; aucun PASS attribué à ces runs. Le log CI indique un checkout de c6af4683e2f4f274e0fd7cb255878e8fd6226f49 ; revérifier le HEAD pour chaque validation ultérieure.
-- **CODE** : commit [07aa15775703e7d15e351d35a6f4d476b9cc7c69](https://github.com/Patricked-code/africafunds-market-data-pipeline/commit/07aa15775703e7d15e351d35a6f4d476b9cc7c69) corrige les imports du fichier imbriqué test/integration/ingestion-html-csv.test.ts de ../src/ vers ../../src/. Le TS7006 est vraisemblablement une conséquence du module non résolu ; son élimination reste à prouver par CI, sans prétendre à un succès.
-- **BLOCK_REASON** : CI et Docker du nouveau HEAD non encore attestés ; possible erreur de schéma/runtime du test intégral à diagnostiquer ; revue indépendante absente ; contrats et échantillons officiels #13/#14 toujours à qualifier.
-- **NEXT_ACTION** : contrôler CI/Docker exact HEAD de #36, lire les logs en cas d'échec, corriger les erreurs de type, fixtures, schéma et runtime de la recette intégrée ; ensuite obtenir une revue indépendante avant toute fusion et poursuivre #13/#14. Aucune exécution S1 ni certification de données réelles.
-- **ROLLBACK** : revert ciblé du commit de correction des imports et de cette entrée sur la PR Draft ; aucune modification de production, migration, secret ou main.
-
----
-
-## 2026-11-22 — PR #36 : recette intégrée synthétique HTTP → archive → PostgreSQL (lot 4/11)
-
-- **RECONCILIATION** : PR #1 merged ; PR #36 open/draft ; lecture AGENTS.md, docs/15_AUTONOMOUS_AGENT_EXECUTION.md, checkpoint 2026-11-06 et worklog de branche ; recherche des PR/issues ouvertes. Aucun SHA historique réutilisé comme preuve actuelle.
-- **PREUVE CI antérieure** : commit documentaire `0312bba67301156daa55674dde08946d6888d1c7` : GitHub Actions runs [45018302589](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45018302589) et [45018302597](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45018302597), tous deux `completed/success`. Ces résultats ne couvrent PAS le nouveau test.
-- **CODE/TEST livré** : commit `4b4b59ca7d3a6d3556cd7bab261c2047864d775d` ; nouveau `test/integration/ingestion-html-csv.test.ts` ; exercice du vrai `runIngestion`, du fetch simulé strictement limité à deux URL `fixtures.invalid`, de l'index HTML, du CSV enfant, de l'archivage SHA-256 et du contenu de fichier, de `market.raw_records`, du statut `SUCCESS` et du statut `FAILED` pour enfant HTTP 404. Fixture et endpoint uniques ; nettoyage ciblé de la base isolée et des fichiers temporaires.
-- **TEST_EVIDENCE** : `NOT_RUN` pour le nouveau test au moment du commit ; CI/Docker exact-HEAD à contrôler. Aucune source officielle interrogée, aucune preuve de collecte historique ou de production.
-- **BLOCK_REASON** : réussite CI du nouveau HEAD non encore attestée ; revue indépendante manquante ; contrats/licences/échantillons officiels CBE/GOSDMX et qualifications #13 encore incomplets. Le test nécessite `DATABASE_URL` pointant vers la base de CI isolée et migrations/seed préalables.
-- **NEXT_ACTION** : contrôler CI et Docker exact-HEAD de #36 ; corriger toute erreur TypeScript ou d'intégration ; obtenir une revue indépendante avant fusion. Puis reprendre les qualifications officielles #13/#14 et les lots 0–13 sans intervenir sur les branches concurrentes (#22 notamment).
-- **ROLLBACK** : revert ciblé du nouveau fichier de test et de cette entrée sur la PR Draft ; aucune migration, donnée de production, secret ou serveur S1 modifié.
-
----
-
-
-## 2026-11-22 — PR #36 : CI et Docker du contrat HTML/CSV confirmés (lot 4/11)
-
-- **RECONCILIATION** : PR #1 `closed/merged` ; PR #36 `open/draft`, HEAD vérifié `09af8e4bce436a3a124f37c3f2d5eadcadbc359d`. Lecture de `AGENTS.md`, `docs/15_AUTONOMOUS_AGENT_EXECUTION.md`, du checkpoint `docs/CONTINUITY_CHECKPOINT_2026-11-06.md` et du présent journal ; recherche des issues ouvertes. Les SHA du 06/11 restent historiques.
-- **TEST_EVIDENCE exact HEAD** : CI #627 [run 45013353229](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45013353229) = `completed/success` ; Docker/PostgreSQL isolé #494 [run 45013353242](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45013353242) = `completed/success`. Ces deux runs sont associés au HEAD `09af8e4b` ; ils ne prouvent ni collecte réelle ni exécution S1.
-- **REVUE DE CODE** : le test `test/ingestion-html-csv-contract.test.ts` exerce découverte de liens, parseurs et garde de complétude avec fixtures synthétiques, mais n'exécute pas `runIngestion`, `fetchWithRetry`, `archiveRaw`, `persistRows` ni `finishRun`. Aucune recette HTTP→archive→PostgreSQL→statut final n'est donc attestée.
-- **BLOCK_REASON** : revue indépendante et recette intégrée manquantes ; contrats/licences/échantillons officiels CBE/GOSDMX non qualifiés. Le nouveau commit documentaire doit être revalidé séparément ; ne pas lui attribuer les runs précédents.
-- **NEXT_ACTION** : implémenter sur #36 un test d'intégration isolé qui exerce le véritable chemin HTTP/index HTML/CSV enfant/archive SHA-256/PostgreSQL/statut final, avec fixtures synthétiques, mocks réseau ou serveur local, sans requête aux sources officielles ; contrôler CI exact HEAD, demander revue indépendante ; poursuivre #13/#14 sans toucher #22 ni branches concurrentes.
-- **ROLLBACK** : revert ciblé de cette entrée sur la branche Draft ; aucune migration, donnée, secret ou production modifiés.
-
----
-
-
-## 2026-11-22 — PR #36 : contrat HTML → CSV enfant testé avec fixtures synthétiques (lot 4/11)
-
-- **RECONCILIATION** : lecture de `AGENTS.md`, `docs/15_AUTONOMOUS_AGENT_EXECUTION.md`, `docs/09_CHANGELOG_WORKLOG.md` et du checkpoint historique 2026-11-06 ; recherche des 13 PR et 12 issues ouvertes. PR #36 toujours Draft, aucune revue indépendante retournée. PR #22 et autres branches concurrentes non modifiées.
-- **TEST_EVIDENCE antérieure, exact HEAD** : commit `4b00492c07797107fe2950bc49f07834815bc61a` ; CI [45008109698](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45008109698) et Docker isolé [45008109652](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45008109652), tous deux `completed/success`. Ne pas attribuer ces résultats au nouveau code.
-- **TRAVAIL CONCRET** : commit `bd0f407e7293181a93a2b06cdd64f1371c28d313` ; ajout `test/ingestion-html-csv-contract.test.ts` (3 tests) : index HTML sans table → lien CSV relatif → observations parsées → garde de complétude ; échec d'un enfant malgré CSV valide ; CSV sans observations. Fixtures exclusivement synthétiques `fixtures.invalid`, sans réseau.
-- **LIMITES** : tests `NOT_RUN` au moment de l'écriture ; ce test contractuel n'exécute pas `fetchWithRetry`, l'archive SHA-256, PostgreSQL ni `runIngestion`. Il ne remplace pas la recette intégrée HTTP → DB → statut final et ne certifie aucun endpoint officiel, licence ou historique.
-- **BLOCK_REASON** : CI exact-HEAD du nouveau test et revue indépendante non attestées ; intégration HTTP/archives/DB/statut manquante ; contrats/échantillons officiels des six adaptateurs #14 non qualifiés.
-- **NEXT_ACTION** : contrôler les workflows CI/Docker du HEAD de cette branche après le présent commit ; corriger tout échec ; construire une recette isolée HTTP/index/CSV/DB/statut en réutilisant les tests d'intégration existants et sans réseau externe ; obtenir revue indépendante ; poursuivre #13/#14 sans toucher aux branches concurrentes.
-- **ROLLBACK** : revert ciblé du commit de test et de cette entrée sur la branche Draft, sans toucher `main`, données, secrets ou S1.
-
----
-
-## 2026-11-22 — PR #36 : refus des sélections vides de sources (lot 4/11)
-
-- **RECONCILIATION** : PR #1 fusionnée ; PR #36 OPEN/DRAFT sur `fix/ingestion-false-success-20261122`, HEAD de départ `55f9f0967723d8e5df9e5abb020829cd1cff825b` ; lecture AGENTS.md, docs/15_AUTONOMOUS_AGENT_EXECUTION.md, worklog et checkpoint 2026-11-06 ; recherche des PR/issues ouvertes. Les autres branches restent intactes.
-- **PREUVE CI antérieure** : les workflows GitHub Actions [45003884242](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45003884242) et [45003884201](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45003884201) sont `completed/success` pour le HEAD de départ `55f9f096`. Aucun résultat de ce type n'est attribué aux commits nouveaux.
-- **CODE** : commits `6bbfba67f6d82ee44149aaade3776b2b29b122cf` et `9dd83a09dc220c1e2a632344bf6b278d9e205552` : garde `assertEndpointsSelected` et appel avant `startRun`. Un filtre qui ne correspond à aucune source ne produit plus de faux `SUCCESS` ni de run vide. Contrat explicite : échec avant création du run, pas de statut `FAILED` persistant pour cette absence de sélection.
-- **TESTS** : commit `2530cc0fd5d30c257ff00633f2bbdd6dd623edaa` ajoute la couverture des comptes 0, négatifs, fractionnaires, NaN, infinis, hors entiers sûrs, et des comptes valides. **NOT_RUN** au moment de l'écriture ; la CI du nouveau HEAD reste à contrôler. Le test HTTP→HTML→CSV enfant→DB n'est pas encore livré.
-- **BLOCK_REASON** : CI exact-HEAD et revue indépendante non attestées ; absence de recette HTTP/CSV intégrée ; contrats/licences et échantillons officiels CBE/GOSDMX toujours non vérifiés. Aucun S1, aucun merge, aucun HISTORY_COMPLETE.
-- **NEXT_ACTION** : contrôler CI et Docker du nouveau HEAD ; corriger toute régression ; poursuivre un test d'intégration déterministe du parcours HTTP/index HTML/CSV enfant et de ses échecs, avec fixtures synthétiques et isolation de DB ; obtenir revue indépendante ; continuer issues #13/#14 sans toucher aux PR concurrentes.
-- **ROLLBACK** : revert ciblé des trois commits fonctionnels/tests et de cette entrée sur la branche Draft ; aucune donnée, migration, archive, secret ou production modifiés.
-
----
-
-## 2026-11-22 — PR #36 : vérification des gates CI du HEAD 129aba7a (reprise 09:39 Europe/Paris)
-
-- **RÉCONCILIATION** : PR #1 réellement MERGED ; PR #36 OPEN/DRAFT, HEAD exact `129aba7abb4957859fde63e2fcafb4fb891a1a0e` ; recherche GitHub actuelle des PR/issues ouvertes ; lecture AGENTS.md, docs/15_AUTONOMOUS_AGENT_EXECUTION.md, journal de branche et checkpoint historique 2026-11-06. Les autres branches, notamment #22, demeurent non modifiées.
-- **TEST_EVIDENCE — CI exact-HEAD** : [run 44998766549](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/44998766549), CI #621, `completed/success`, job `validate` #137135444994 `completed/success`. Étapes explicitement `success` : checkout exact PR revision, TypeScript, unit tests, build, PostgreSQL migrations/reapply, registry seed, integration tests, backfill claim/window gates, S1 read-only checks.
-- **TEST_EVIDENCE — Docker exact-HEAD** : [run 44998766503](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/44998766503), Docker #488, `completed/success`, job #137135500574 `completed/success`, stack Docker isolée et persistance PostgreSQL sur runner CI. Aucun runtime S1 ni collecte réelle certifié.
-- **REVUE** : `list_pull_request_reviews(#36)` retourne zéro revue ; la PR reste Draft. La validation de l'ancien HEAD ne doit pas être transposée à un commit ultérieur.
-- **ANALYSE CODE** : les tests de `test/ingestion-completeness.test.ts` valident la garde pure, mais pas le chemin réel `ingestEndpoint` avec faux HTTP/archives/DB. `src/jobs/ingest.ts` traite les index HTML et les enfants ; la qualification métier d'un index sans observations et la propagation des échecs demandent encore des fixtures et tests d'intégration. Aucun contrat institutionnel CBE/GOSDMX inféré.
-- **BLOCK_REASON** : revue indépendante non attestée ; test d'intégration HTTP→index HTML→CSV enfant→persistance→statut manquant ; contrats/licences/échantillons officiels des six adaptateurs #14 non vérifiés. Pas de merge, HISTORY_COMPLETE ou S1.
-- **NEXT_ACTION** : compléter un test d'intégration déterministe et isolé du parcours HTML/CSV et des échecs enfants (fixtures non officielles synthétiques, aucun réseau externe) sur la PR #36 après relecture de l'architecture des tests existants ; corriger toute régression, vérifier CI exact nouveau HEAD et obtenir revue indépendante. En parallèle poursuivre qualifications #13/#14 sans toucher aux PR concurrentes. Éviter les commits documentaires répétitifs pour le seul polling CI.
-- **ROLLBACK** : revert ciblé de cette entrée sur la branche #36 ; aucun code, donnée, schéma, secret ou serveur modifié pendant cette reprise.
-
----
-
-
-## 2026-11-22 — PR #36 : CI exact-HEAD confirmée et test de dépassement des entiers sûrs
-
-- **RÉCONCILIATION** : PR #1 fermée/fusionnée selon l'état GitHub antérieurement attesté ; PR #36 OPEN/DRAFT, branche `fix/ingestion-false-success-20261122`. Relecture AGENTS.md, protocole autonome, journal de branche, checkpoint historique et recherches des issues/PR ouvertes. Le checkpoint 2026-11-06 n'est pas un état courant.
-- **PREUVE CI EXACTE** : commit `c57e80c1dfecd8e15728b7a76df03b7c4d947a94`, workflow CI [44994654930](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/44994654930) `completed/success` ; workflow Docker/PostgreSQL isolé [44994654941](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/44994654941) `completed/success`. Ces preuves ne sont pas transposables aux nouveaux commits.
-- **TRAVAIL TEST** : commit `b2fb2c74f5c47a9d71715128ee09529a6acd5060` ajoute les tests de refus des compteurs supérieurs à `Number.MAX_SAFE_INTEGER` ou inférieurs à `Number.MIN_SAFE_INTEGER` pour `rows` et `failedChildren`. Le garde-fou existant `Number.isSafeInteger` est conservé sans changement de contrat. Tests ajoutés mais **NOT_RUN** pour ce nouveau commit à la rédaction.
-- **BLOCK_REASON** : CI exact-HEAD après ajout des tests et présent journal non encore attestée ; revue indépendante absente ; pas de preuve de contrats/licences et fixtures officielles pour les six adaptateurs #14 ; tests end-to-end de téléchargement HTML/index et classification des échecs encore incomplets.
-- **NEXT_ACTION** : vérifier CI et Docker sur le nouveau HEAD de PR #36, corriger tout échec sans fusion ; ajouter des tests d'intégration contrôlés du parcours index HTML/CSV et des téléchargements enfants, qualifier le statut des index sans observations, obtenir une revue indépendante ; poursuivre #13/#14 indépendamment des branches occupées. Ne pas revendiquer collecte réelle, HISTORY_COMPLETE, S1 ou runner permanent.
-- **ROLLBACK** : revert ciblé du commit de test et de ce journal sur PR #36 ; aucune migration, source, secret, branche concurrente ni serveur modifié.
-
----
-
-
-## 2026-11-22 — PR #36 : durcissement des compteurs de complétude
-
-- **RÉCONCILIATION** : PR #1 fusionnée ; PR #36 toujours Draft. Les runs GitHub Actions du HEAD précédent `2c4de4c3496328f90ec14776442f230a20e9f786` sont `completed/success` : Docker [44990092461](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/44990092461), job `137109088171` ; CI [44990092470](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/44990092470), job `137109041529`. Aucune transposition de ces résultats aux nouveaux commits.
-- **CODE** : commit `ef248379b6932f9f1b116656be4eb2bbb6c7a526` refuse les compteurs de lignes/échecs négatifs, fractionnaires, infinis, NaN ou non sûrs. Commit `00f54de17c072c252b2806e4654b94e0ae593551` ajoute la couverture de régression correspondante. La garde reste pure et le contrat public inchangé ; aucun accès source ni S1.
-- **TEST_EVIDENCE** : nouveaux tests écrits, **NOT_RUN** au moment de ce checkpoint ; attendre les runs CI du nouveau HEAD. La revue indépendante est absente.
-- **BLOCK_REASON** : CI exact-HEAD des nouveaux commits non attestée ; revue indépendante manquante ; qualification officielle des index documentaires et des six adaptateurs #14 non achevée.
-- **NEXT_ACTION** : vérifier les workflows CI et Docker exact-HEAD du commit de journal, examiner les erreurs et corriger si nécessaire ; poursuivre les tests d'intégration des index HTML/CSV et l'arbitrage de statut sans faux SUCCESS ; obtenir revue indépendante et maintenir PR #36 Draft jusqu'aux gates. Poursuivre #13/#14 indépendamment des branches concurrentes.
-- **ROLLBACK** : revert ciblé des commits `ef248379`, `00f54de1` et du présent checkpoint sur branche PR #36, sans changement de données ni schéma.
-
----
-
-## 2026-11-22 — PR #36 : CI exacte et couverture des index HTML (reprise gouvernée)
-
-- **PREUVES GITHUB** : sur HEAD initial de la PR #36 `103787e77b626bd0591538846f5820c81e8991ff`, workflow CI #614, run [44985642241](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/44985642241), job `validate` #137095482572 **completed/success** (TypeScript, tests unitaires, build, migrations PostgreSQL et réapplication, tests intégration, claims et fenêtres backfill). Workflow Docker isolé #481, run [44985642266](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/44985642266), job #137095482412 **completed/success** (boot et persistance PostgreSQL sur runner éphémère). Ces résultats ne valent **que pour ce SHA**, sans preuve de collecte officielle ou S1.
-- **TRAVAIL CODE/TEST ADDITIF** : commit `17ae2a83c9fd06d86056825ccdc4eb576df5d878` ajoute deux cas de non-régression à `test/ingestion-completeness.test.ts` : index HTML sans table locale mais fichiers enfants avec observations, et index sans observation enfant. Aucun changement de contrat d'ingestion, aucune écriture sur les branches concurrentes.
-- **LIMITES** : ces deux tests contrôlent la garde agrégée, pas le téléchargement réel ni la classification détaillée de chaque source ; CI sur le HEAD après ajout **non encore attestée**. La politique de classification `FAILED` versus `PARTIAL` pour les index légitimes et les documents sans observation demeure à arbitrer. Aucune revue indépendante attestée.
-- **BLOCK_REASON** : revue indépendante absente ; qualification institutionnelle des formats et des licences #14 non achevée ; CI exact-HEAD du nouveau test et des modifications documentaires à vérifier.
-- **NEXT_ACTION** : vérifier les runs `pull_request` et jobs du nouveau HEAD ; compléter si nécessaire les tests d'intégration index HTML/CSV avec fixtures autorisées et la distinction de statut sans faux SUCCESS ; obtenir revue indépendante, puis continuer les six adaptateurs officiels #14 et les qualifications #13. Préserver PR #22 et les autres branches occupées ; aucune fusion ni S1 sans gates.
-- **ROLLBACK** : revert ciblé des commits de cette branche, sans modification de schéma, données ni archives.
-
----
-
-## 2026-11-22 — Lot 4/11 : garde anti-faux SUCCESS ingestion (PR indépendante)
-
-- **BASE REVÉRIFIÉE** : main `73256f48d81d38ce8ff6f51be9e024b25cf5dadb` ; branche `fix/ingestion-false-success-20261122` dédiée, sans toucher aux PR #22, #25, #26 ou #35.
-- **CONSTAT CODE** : `src/jobs/ingest.ts` incrémentait le compteur d'endpoint réussi même si `parseAndPersist()` produisait zéro observation, et absorbait les échecs de liens enfants. Un archivage brut seul ne certifie pas une ingestion exploitable.
-- **PATCH** : garde pure `src/jobs/ingestionCompleteness.ts`, rejet de contenu non interprété après conservation de l'archive et de l'assessment, décompte des échecs enfants, refus de SUCCESS en l'absence de lignes ou si un enfant échoue ; quatre tests unitaires `test/ingestion-completeness.test.ts`. Aucun adaptateur PDF/JSON/SDMX inventé ; aucune modification de source/licence.
-- **LIMITES** : tests écrits, non exécutés localement ; CI exact-HEAD et revue indépendante à vérifier. Les cas d'index HTML sans observations et les réponses autorisées sans données doivent être qualifiés métier avant merge ; le contrat `PARTIAL`/échec reste à préciser selon la politique de run. Aucune collecte réelle, aucun S1, aucune certification des 44 sources.
-- **BLOCK_REASON** : absence de validation CI, revue indépendante et échantillons officiels des six adaptateurs ; PR #22 sous travail concurrent.
-- **NEXT_ACTION** : ouvrir PR Draft sur main, vérifier CI exact-HEAD et corriger les tests, demander revue ; traiter les faux SUCCESS et compatibilité des index HTML, puis poursuivre issue #14 avec formats et droits officiels. Pas de merge sans gates.
-- **ROLLBACK** : revert des commits ciblés de cette branche ; archives brutes et schéma PostgreSQL inchangés.
+- **MANDAT** : réduire l'intervention humaine répétitive pour chaque développement, sans abandonner la mission des 14 lots ni affaiblir les reviews, CI, protections, licences, coûts ou gates S1.
+- **RECONCILIATION LIVE** : `main=73256f48d81d38ce8ff6f51be9e024b25cf5dadb`, public, `protected=false` (GET branches/main), `rulesets=[]`, `allow_auto_merge=false`; PR #36 `df0129b625798147eb1dc3f283fcbd7fd19fac99` OPEN/Draft/`reviews=[]` ; PR #22, #25–#36 ouvertes, aucune branche occupée modifiée.
+- **AUTORITES** : lecture de `AGENTS.md`, des 16 documents obligatoires et du dernier checkpoint de PR #36, du contrat `docs/15_AUTONOMOUS_AGENT_EXECUTION.md`, et de l'issue #3/#9. PR #1 déjà intégrée dans main (document de reprise disponible).
+- **CHANGEMENTS** : branche dédiée `feat/sadiaaf-governed-native-automerge-20261123` depuis le SHA main ci-dessus ; ajout d'un script `scripts/ci/governed-native-automerge.mjs` qui vérifie les protections et conditions d'éligibilité puis sollicite exclusivement l'auto-merge NATIF ; ajout de 24 tests de non-régression/fail-closed, du workflow déclenché depuis la version fiable de main (aucun checkout de code de PR non fiable), et extension additive de la CI `validate` et du déclencheur Docker sur toute PR, y compris docs-only. ADR-015 et docs/15/06 actualisés ; ni scheduler métier ni sources ni moteur financier modifiés.
+- **GATES SÉCURITÉ** : aucune fusion directe, aucun bypass, aucune modification de paramètres admin ; protection effective main (review exigée, `validate` et Docker/PostgreSQL requis avec branche à jour, stale reviews dismissed, threads resolved, admin enforced) et option repo `allow_auto_merge=true` vérifiées avant toute tentative d'enrôlement ; seule une PR non Draft, même dépôt, label `automerge-eligible`, SHA actuel est candidate ; le retrait du label, le retour en Draft ou une perte de conformité des gates révoquent l'enrôlement existant lorsque l'événement peut être observé. GitHub doit ensuite appliquer les checks et approbations obligatoires.
+- **TESTS** : code et tests ajoutés ; validation CI PR du SHA exact non encore exécutée à la rédaction de cette entrée. Ne pas déclarer PASS ou DONE avant preuve.
+- **BLOCK_REASON** : main non protégée, allow-auto-merge désactivé ; aucun reviewer indépendant automatisé attesté ; permissions GitHub de lecture des paramètres admin retournent 403, donc aucun changement admin prétendu. PR #36 reste Draft, aucune revue indépendante.
+- **NEXT_ACTION** : vérifier PR #37 https://github.com/Patricked-code/africafunds-market-data-pipeline/pull/37 et sa CI/Docker sur le HEAD exact et tests de fail-closed ; faire configurer UNE FOIS les settings de protection réelle et Allow auto-merge via droits admin autorisés, contrôler que le workflow peut lire la politique GraphQL, obtenir une revue indépendante de la PR d'intégration ; tester via une PR pilote étiquetée et non Draft avec CI exact-SHA et reviewer indépendant. Aucune fusion ou S1 avant gates. En cas de blocage, poursuivre autres lots admissibles dans leur chantier propriétaire, sans collision.
+- **ROLLBACK** : revert des seuls fichiers workflow/script/test et entrées documentaires de la PR si refus ; jamais de changement de protection ou d'environnement à restaurer.
 
 ---
 
