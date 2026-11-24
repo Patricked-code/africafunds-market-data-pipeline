@@ -1,5 +1,16 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-24 — Lot 4 / PR #41 : reprise effective et correction de deux défauts JSON
+
+- **CONTINUITY_ID** : SADIAAF-CONTINUITY-20261124-01 ; GitHub unique autorité logicielle. Base main ff23886d78f42a17656df88ab4a65d682b957833, ruleset #27937019 actif sans bypass. PR #37–#40 fusionnées ; CI #738 SUCCESS sur main. PR #41 READY, native auto_merge enrôlé par github-actions[bot], deux fils ouverts. CI #740 et Docker #603 SUCCESS exclusivement pour HEAD précédent 070411cb2ff7cdc2416ce5e49fdad5fc92736034.
+- **CLAIM** : commentaire PR #41 7118350665, branche existante feat/sadiaaf-json-source-admission-20261124 ; claim documentaire, pas de verrou inter-agent atomique. Publication prévue en fast-forward avec contrôle du parent exact ; autres PR inchangées.
+- **DÉFAUTS** : JSON.parse peut arrondir 1.0000000000000001 ou 9007199254740990.5 vers un entier sûr, ou 1e-400 vers zéro ; clés répétées (y compris alias Unicode et enveloppes) peuvent être écrasées. Correctif minimal dans src/parsers/json.ts : inspection lexicale originale, examen exact de la significande et de l'exposant sans expansion de grands exposants, rejet des doublons dans chaque objet après décodage de la clé. Le JSON.parse complet valide toujours la grammaire, puis les contrôles de ligne existants s'appliquent. Aucune dépendance ajoutée, ingestion et SQL inchangés.
+- **TESTS** : quatre groupes supplémentaires dans test/json-document-admission.test.ts : arrondis et underflow, entiers sûrs et chaînes, doublons et échappements, indépendance des objets et chaînes contenant du JSON. Tests non exécutés à cet instant ; RED/GREEN séparés non attestés. Attendre les checks du nouveau HEAD avant de conclure. Aucun appel Codex/Copilot, source externe, secret, dépense ou S1.
+- **BLOCK_REASON** : WAITING_CI sur nouveau commit et deux discussions non résolues jusqu'à validation réelle. Les six adaptateurs, contrats, licences, données témoins et publication restent PARTIAL/non certifiés ; séquencement auto-merge clean-status à consolider séparément.
+- **NEXT_ACTION** : contrôler CI validate et Docker/PostgreSQL exact SHA, traiter les échecs, répondre aux deux fils et les résoudre uniquement après preuve, observer la fusion native sans bypass. Ensuite PR #36 et PRs #22/#25–#35 selon dépendances, issue #9, six chantiers et 14 lots. Aucune production S1 sans gates et autorisation.
+- **ROLLBACK** : revert ciblé du commit candidat sur sa branche avant intégration, aucun changement runtime.
+
+
 ## 2026-11-24 — PR #41 : séquencement auto-merge sur validation trop rapide
 
 - **PREUVE CI** : HEAD précédent 922bfa7e784158c2b2dbfecbeba196948b129e8b : CI #739 SUCCESS et Docker #602 SUCCESS. Les tests JSON sont passés, aucun problème de code avéré sur cette révision.

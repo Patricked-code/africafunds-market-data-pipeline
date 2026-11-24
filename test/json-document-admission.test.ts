@@ -50,3 +50,44 @@ test('rejects excessive row count, field count and document size', () => {
   assert.throws(() => parseFinancialJsonDocument(JSON.stringify([row])), /fields/);
   assert.throws(() => parseFinancialJsonDocument(' '.repeat(2_000_001)), /size/);
 });
+
+test('rejects original non-integral tokens even when they round to safe integers', () => {
+  for (const token of [
+    '1.0000000000000001', '1e-400', '-1e-400',
+    '9007199254740990.5', '-9007199254740990.5',
+    '0.999999999999999999999', '1e-999999999999999999999'
+  ]) {
+    assert.throws(() => parseFinancialJsonDocument('[{"rate":' + token + '}]'), /lossless/);
+  }
+});
+
+test('preserves exactly representable safe integers and decimal strings', () => {
+  const result = parseFinancialJsonDocument(
+    '[{"max":9007199254740991,"min":-9007199254740991,"exponent":1e3,"integralDecimal":1.0,"zero":0e-9999,"rate":"1.0000000000000001"}]'
+  );
+  assert.deepEqual({...result.rows[0]}, {
+    max:9007199254740991, min:-9007199254740991, exponent:1000,
+    integralDecimal:1, zero:0, rate:'1.0000000000000001'
+  });
+});
+
+test('rejects duplicate object keys including escaped equivalent names and envelopes', () => {
+  for (const input of [
+    '[{"rate":"2.5","rate":"9.5"}]',
+    '{"data":[{"code":"A"}],"data":[{"code":"B"}]}',
+    '[{"rate":1,"\\u0072ate":2}]',
+    '{"data":[],"\\u0064ata":[]}',
+    '{"data":[],"meta":{"version":1,"version":2}}',
+  ]) {
+    assert.throws(() => parseFinancialJsonDocument(input), /duplicate object key/);
+  }
+});
+
+test('does not confuse independent object keys or JSON-looking string contents with tokens', () => {
+  const rows = [
+    {rate:'1e-400', note:'{"rate":1.0000000000000001,"rate":2}', escape:'a\\"b'},
+    {rate:'9.5', note:'braces { } and quotes "', escape:'\\u0072ate'}
+  ];
+  const result = parseFinancialJsonDocument(JSON.stringify({data:rows, meta:{version:1.5}}));
+  assert.deepEqual(result.rows.map(row => ({...row})), rows);
+});

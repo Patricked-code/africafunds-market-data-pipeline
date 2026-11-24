@@ -1,5 +1,13 @@
 # 06 — État réel et écarts
 
+## 2026-11-24 — Lot 4 / PR #41 : durcissement des tokens JSON d'origine
+
+- **CONTINUITY_ID** : SADIAAF-CONTINUITY-20261124-01. PR #37–#40 intégrées ; main ff23886d78f42a17656df88ab4a65d682b957833 protégée. Deux fusions documentaires natives démontrées, autonomie codeur complète non attestée.
+- **CORRECTION CANDIDATE** : sur la branche existante PR #41, contrôle des représentations numériques avant admission par JSON.parse (refus d'un token mathématiquement non entier arrondi à un entier sûr, y compris sous-flux vers zéro), détection des clés objet dupliquées après décodage des échappements. Validation de lignes existante conservée, pas de nouvelle dépendance ni de modification ingestion. Quatre groupes de tests de régression ajoutés.
+- **PREUVES / LIMITES** : CI #740 et Docker #603 SUCCESS sur l'ancien HEAD 070411cb2ff7cdc2416ce5e49fdad5fc92736034 uniquement ; tests ajoutés non exécutés au moment du commit, RED/GREEN séparés non attestés. Deux discussions doivent rester ouvertes jusqu'à vérification des corrections et checks du nouveau SHA. Pas de source officielle ni licence certifiée ; FR-004 et issue #14 restent PARTIAL.
+- **NEXT_ACTION** : CI/Docker du nouveau SHA, correction si rouge, résolution argumentée des deux fils après preuve, fusion native si admissible ; poursuivre PR #36 et les autres travaux indépendants, issue #9 et six chantiers sans collision, aucun S1.
+
+
 ## 2026-11-24 — Lot 4 / chantier #14 : admission JSON structurée sans source officiellement qualifiée
 
 - **BASE RÉCONCILIÉE** : `main` protégée au commit ff23886d78f42a17656df88ab4a65d682b957833 ; CI #738 SUCCESS ; PR fonctionnelles #22 et #25–#36 ouvertes, dont #35 sur CSV et #36 sur ingestion, non modifiées. Programme 14 lots 0–13 et 6 chantiers issues #5/#13–#17 maintenu.
