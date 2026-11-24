@@ -1,5 +1,13 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-24 — Lots 2/11, chantier #15 : admission typée et provenance, PR #27
+- **CONTINUITY_ID** : SADIAAF-CONTINUITY-20261124-01. Branche d'origine `feat/quality-financial-observation-gate-20261109`, HEAD source `6b292b66c5201780b6583da6bf502a9817edfac1`, main actuel `ac6166ccff370f721110a7d68b965e95426eac9b`.
+- **REUTILISATION** : trois blobs code `financialObservation.ts`, `rawRecordProvenance.ts`, `withVerifiedRawRecord.ts` et quatre fichiers tests exactement identiques à la PR historique, actuellement ABSENTS du main précédent, ajoutés sans modifier les validateurs existants ni SQL. Protection contre l'admission financière sans provenance / source / marché / méthode documentée ; aucun historique de marché certifié par cette seule création de gate.
+- **HISTORIQUE** : merge Git à deux parents sans force, docs/06 et docs/09 autorité main conservés et checkpoint additif, ancienne version du journal disponible via commit PR historique. Pas de nouvelle file/roadmap, pas de changement S1.
+- **BLOCK_REASON** : CI unitaires/PostgreSQL et Docker du nouveau HEAD non certifiées, éventuelles remarques de revue ; qualification de sources et mappings officiels restent incomplètes.
+- **NEXT_ACTION** : qualifier PR READY sans chemins sensibles et sous SHA attendu, CI validate + Docker/PostgreSQL exacts, auto-merge native si réussite et aucun fil bloquant, puis PR #28 scoring qualité après relecture du main. Maintenir les six chantiers et 14 lots sans reconstruction.
+
+
 ## 2026-11-24 — Lots 5–7 / PR #34 : réconciliation des calculs de rendement et indices
 - **CONTINUITY_ID** : SADIAAF-CONTINUITY-20261124-01 ; branche d'origine `7c9f5cfc65dfb7b3e8162c9a4eb62fecaeeb18ec`, parent main protégé `5236d3895a81efd3c48b03f2040041dcf6be7e7c`.
 - **CODE/TEST EXACTS** : `src/calc/indices.ts` et `test/indices-finite-output.test.ts` repris tels quels de la PR historique ; contrôle des valeurs finies en entrée/sortie, overflow de moyenne/pondérations, indices positifs, sous-flux de taux FX et pertes nominales au-delà de 100 %. L'exactitude des méthodes financières et des courbes n'est PAS validée par ces tests synthétiques seuls.
