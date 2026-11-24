@@ -37,17 +37,22 @@ const wakeSignalSchema = z.object({
   head: sha,
   evidence: z.string().regex(/^(commit:[a-f0-9]{40}|(?:pr|issue|ci):[1-9][0-9]{0,19})$/)
 }).strict();
+const wakeReconciliationSchema=z.object({
+ actor:id,session:id,reason:z.enum(["stale-before-dispatch","interrupted-dispatch"]),
+ evidence:z.array(z.string().regex(/^(commit:[a-f0-9]{40}|(?:pr|issue|ci):[1-9][0-9]{0,19})$/)).min(1).max(30),
+}).strict();
 const wakeReceiptSchema = z.object({
   signal: wakeSignalSchema, actor:id, session:id, startedAt:stamp,
   intentRevision:stamp.positive(),
-  outcome:z.enum(["accepted","pending","no-work","limit"]),
+  outcome:z.enum(["accepted","pending","no-work","limit","reconciled"]),
   finished:z.array(id).max(10),
-  completedAt:stamp.optional()
+  completedAt:stamp.optional(),
+  reconciliation:wakeReconciliationSchema.optional()
 }).strict();
 export type WakeSignal = z.infer<typeof wakeSignalSchema>;
 type WakeReceipt = z.infer<typeof wakeReceiptSchema>;
 const event = z.object({
-  revision: stamp.positive(), kind: z.enum(["claim","heartbeat","checkpoint","release","recover","wake-accepted","wake-intent","wake-result","mutation-intent","mutation-result","lifecycle-intent","lifecycle-result"]),
+  revision: stamp.positive(), kind: z.enum(["claim","heartbeat","checkpoint","release","recover","wake-accepted","wake-intent","wake-result","wake-reconciled","mutation-intent","mutation-result","lifecycle-intent","lifecycle-result"]),
   at: stamp, workId: id, actor: id, session: id, generation: stamp.positive(),
   previousGeneration: stamp.positive().optional(), wakeKey:id.optional(), trace,
 }).strict();
@@ -63,6 +68,8 @@ export const stateSchema = z.object({
   for (const r of s.wakeReceipts ?? []) {
     if (keys.has(r.signal.key) || r.startedAt > s.updatedAt || r.intentRevision > s.revision ||
         new Set(r.finished).size !== r.finished.length ||
+        ((r.outcome==="reconciled") !== (r.reconciliation!==undefined)) ||
+        (r.reconciliation && new Set(r.reconciliation.evidence).size!==r.reconciliation.evidence.length) ||
         ((r.outcome === "pending" || r.outcome === "accepted") && (r.completedAt !== undefined || r.finished.length !== 0)) ||
         (r.outcome !== "pending" && r.outcome !== "accepted" && (r.completedAt === undefined || r.completedAt < r.startedAt || r.completedAt > s.updatedAt)))
       fail("invalid wake receipt");
@@ -432,4 +439,47 @@ export async function runDeferredDirectorWake(raw:WakeSignal,ports:DirectorWakeP
  await ports.store.compareAndSwap(after.version,wakeState(stateSchema.parse(after.state),
   {...receipt,outcome:result.stop,finished:result.finished,completedAt},"wake-result",completedAt));
  return {status:"executed",...result};
+}
+
+
+export type WakeReconciliation=z.infer<typeof wakeReconciliationSchema>;
+export interface WakeReconciliationPorts {
+ store:ClaimStore;actor:string;session:string;now():number;
+ // Administrative authorization and independently re-read durable evidence
+ // must be supplied by the trusted runtime, not by a generated candidate.
+ authenticate():Promise<boolean>;
+ verifyResolution(receipt:Readonly<WakeReceipt>,resolution:Readonly<WakeReconciliation>):Promise<boolean>;
+ // For a dispatched receipt, prove that the old process AND any external
+ // request are terminal. Expiry of a lease or a local timeout is insufficient.
+ verifyQuiescence(receipt:Readonly<WakeReceipt>):Promise<boolean>;
+}
+// Retain the original event, intent revision and owner. Close only after
+// reconciliation; never dispatch it again or delete its deduplication key.
+// A separate newly admitted canonical signal may advance the program.
+export async function reconcileDirectorWake(raw:WakeSignal,reason:WakeReconciliation["reason"],evidence:string[],ports:WakeReconciliationPorts){
+ const signal=wakeSignalSchema.parse(raw);
+ const resolution=wakeReconciliationSchema.parse({actor:ports.actor,session:ports.session,reason,evidence});
+ if(new Set(resolution.evidence).size!==resolution.evidence.length)throw Error("WAKE_RECONCILIATION_EVIDENCE_INVALID");
+ if(await ports.authenticate()!==true)throw Error("WAKE_RECONCILIATION_UNAUTHENTICATED");
+ const current=await ports.store.read(),s=stateSchema.parse(current.state);
+ const receipt=s.wakeReceipts?.find(r=>r.signal.key===signal.key);
+ if(!receipt||!sameWake(receipt.signal,signal))throw Error("WAKE_RECONCILIATION_NOT_ADMITTED");
+ if(receipt.outcome!=="accepted"&&receipt.outcome!=="pending")return {status:"already-terminal" as const,key:signal.key};
+ if((receipt.outcome==="accepted"&&reason!=="stale-before-dispatch")||
+    (receipt.outcome==="pending"&&reason!=="interrupted-dispatch"))throw Error("WAKE_RECONCILIATION_REASON_MISMATCH");
+ if(receipt.outcome==="pending"){
+  if(s.claims.some(c=>c.actor===receipt.actor&&c.session===receipt.session))throw Error("WAKE_CLAIMS_UNRESOLVED");
+  if(await ports.verifyQuiescence(structuredClone(receipt))!==true)throw Error("WAKE_STILL_UNCERTAIN");
+ }
+ if(await ports.verifyResolution(structuredClone(receipt),structuredClone(resolution))!==true)throw Error("WAKE_RECONCILIATION_PROOF_DENIED");
+ const now=stamp.parse(ports.now());if(now<s.updatedAt)throw Error("CLOCK_REGRESSION");
+ const revision=stamp.positive().parse(s.revision+1);
+ const closed:WakeReceipt={...receipt,outcome:"reconciled",completedAt:now,reconciliation:resolution};
+ const next=stateSchema.parse({...s,revision,updatedAt:now,
+  wakeReceipts:(s.wakeReceipts??[]).map(r=>r.signal.key===signal.key?closed:r),
+  lastEvent:{revision,kind:"wake-reconciled",at:now,workId:"director",actor:resolution.actor,session:resolution.session,
+   generation:receipt.intentRevision,wakeKey:signal.key,
+   trace:{head:signal.head,nextAction:"Reconcile new canonical admission; never replay closed wake",evidence:resolution.evidence}}});
+ await ports.store.compareAndSwap(current.version,next);
+ return {status:"reconciled" as const,key:signal.key};
 }

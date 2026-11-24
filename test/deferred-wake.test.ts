@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import {emptyState,stateSchema,admitDeferredDirectorWake,runDeferredDirectorWake,runDirectorWake,listAcceptedDirectorWakes,type ClaimStore,type State,type DirectorWakePorts,type WakeSignal} from "../src/coordination/agentClaims.js";
+import {emptyState,stateSchema,admitDeferredDirectorWake,runDeferredDirectorWake,runDirectorWake,listAcceptedDirectorWakes,reconcileDirectorWake,type ClaimStore,type State,type DirectorWakePorts,type WakeSignal} from "../src/coordination/agentClaims.js";
 const signal:WakeSignal={kind:"ci-completed",key:"ci:1:1",head:"a".repeat(40),evidence:"ci:1"};
 function fixture(){
  let state:State=emptyState(),version=0,selected=0,deny=false,crash=false;
@@ -35,4 +35,38 @@ test("unverified or not-admitted signal cannot execute",async()=>{
  await admitDeferredDirectorWake(signal,f.ports);f.deny();
  await assert.rejects(runDeferredDirectorWake(signal,f.ports),/UNVERIFIED/);
  assert.equal(f.count(),0);assert.equal(listAcceptedDirectorWakes((await f.store.read()).state).length,1);
+});
+
+test("stale accepted event is terminally reconciled without executing or losing original key",async()=>{
+ const f=fixture();await admitDeferredDirectorWake(signal,f.ports);
+ const recovery={store:f.store,actor:"recovery",session:"recovery-a",now:f.ports.now,
+  async authenticate(){return true;},async verifyResolution(){return true;},async verifyQuiescence(){throw Error("not dispatched");}};
+ assert.equal((await reconcileDirectorWake(signal,"stale-before-dispatch",["issue:9"],recovery)).status,"reconciled");
+ const state=(await f.store.read()).state,r=state.wakeReceipts?.[0];
+ assert.equal(r?.outcome,"reconciled");assert.deepEqual(r?.signal,signal);assert.equal(r?.intentRevision,1);
+ assert.equal(r?.reconciliation?.actor,"recovery");assert.equal(f.count(),0);
+ assert.equal((await runDeferredDirectorWake(signal,f.ports)).status,"duplicate");
+ assert.equal((await admitDeferredDirectorWake(signal,f.ports)).status,"duplicate");
+});
+test("interrupted receipt refuses uncertain recovery, then closes only with independent evidence",async()=>{
+ const f=fixture();await admitDeferredDirectorWake(signal,f.ports);f.crash();
+ await assert.rejects(runDeferredDirectorWake(signal,f.ports),/CRASH/);
+ let quiet=false,proof=false;
+ const recovery={store:f.store,actor:"recovery",session:"recovery-a",now:f.ports.now,
+  async authenticate(){return true;},async verifyResolution(){return proof;},async verifyQuiescence(){return quiet;}};
+ await assert.rejects(reconcileDirectorWake(signal,"interrupted-dispatch",["issue:9"],recovery),/STILL_UNCERTAIN/);
+ quiet=true;await assert.rejects(reconcileDirectorWake(signal,"interrupted-dispatch",["issue:9"],recovery),/PROOF_DENIED/);
+ proof=true;assert.equal((await reconcileDirectorWake(signal,"interrupted-dispatch",["issue:9"],recovery)).status,"reconciled");
+ assert.equal((await runDeferredDirectorWake(signal,f.ports)).status,"duplicate");assert.equal(f.count(),1);
+});
+test("parallel admission dispatch and recovery cannot both commit their intent",async()=>{
+ const f=fixture();await admitDeferredDirectorWake(signal,f.ports);
+ let release!:()=>void;let entered!:()=>void;
+ const gate=new Promise<void>(r=>{release=r;}),ready=new Promise<void>(r=>{entered=r;});
+ const recovery={store:f.store,actor:"recovery",session:"recovery-a",now:f.ports.now,
+  async authenticate(){return true;},async verifyResolution(){entered();await gate;return true;},async verifyQuiescence(){return false;}};
+ const attempt=reconcileDirectorWake(signal,"stale-before-dispatch",["issue:9"],recovery);
+ await ready;assert.equal((await runDeferredDirectorWake(signal,f.ports)).status,"executed");release();
+ await assert.rejects(attempt,/CAS_CONFLICT/);
+ assert.equal(f.count(),1);assert.equal((await f.store.read()).state.wakeReceipts?.[0]?.outcome,"no-work");
 });
