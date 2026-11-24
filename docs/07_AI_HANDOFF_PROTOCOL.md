@@ -1,5 +1,12 @@
 # 07 — Protocole de reprise par une IA
 
+## Reprise inter-conversations — MISSION 13
+
+L'identifiant **SADIAAF-CONTINUITY-20261124-01** permet de reprendre le chantier canonique [issue #9](https://github.com/Patricked-code/africafunds-market-data-pipeline/issues/9), et non uniquement la PR #42. Consulter [le checkpoint transversal](https://github.com/Patricked-code/africafunds-market-data-pipeline/issues/9#issuecomment-7123410131), la section 13 historique de docs/15, la table de filiation de docs/08 et docs/00. Appliquer le parcours complet d'AGENTS.md (y compris docs/11–15) avant toute intervention ; la liste abrégée ci-dessus n'y déroge pas. Vérifier les PR #1/#2/#4/#37–40 et leurs preuves, distinguer recettes de CI/auto-fusion, coordination, codeur et exploitation métier. Chercher anciens exécuteurs dans les branches/commits/workflows avant tout remplacement. 
+
+Le handoff transmet MISSION 13, CONTINUITY_ID, issue/PR/branche/SHA exact, dernier checkpoint, claims et conflits, preuves tests, BLOCK_REASON, NEXT_ACTION, décisions applicables, restrictions et opérations effectivement autorisées. Le destinataire relit GitHub LIVE, ne rejoue pas les acquis, laisse ses traces avant/pendant/après et préserve la filiation. Ne jamais présumer qu'une ancienne autorisation sensible ou un ancien SUCCESS s'applique au nouveau HEAD. La reprise horaire existante est un filet complémentaire, pas une preuve de permanence.
+
+
 ## Au démarrage
 
 Pour l'agent codeur Claude ou ChatGPT : suivre la boucle de travail et les contrôles de `docs/15_AUTONOMOUS_AGENT_EXECUTION.md` ; conserver les autorités et les lots existants.
