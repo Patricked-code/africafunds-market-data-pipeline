@@ -21,7 +21,7 @@ test("requires RED and matching independent GREEN, returns candidate only",async
 });
 test("rejects wrong validation subject and changed test suite",async()=>{
  const normal=ports();
- await assert.rejects(prepareCodingCandidate(ctx,{...normal,async validate(h,c){const p=await normal.validate(h,c) as Record<string,unknown>;return {...p,suite:c.length?"d".repeat(64):suite};}}),/EVIDENCE/);
+ await assert.rejects(prepareCodingCandidate(ctx,{...normal,async validate(h,c,acceptance){const p=await normal.validate(h,c,acceptance) as Record<string,unknown>;return {...p,suite:c.length?"d".repeat(64):suite};}}),/EVIDENCE/);
  await assert.rejects(prepareCodingCandidate(ctx,{...normal,async validate(){return {status:"fail",subject:"d".repeat(64),suite,evidence:"ci:1",diagnostics:["wrong"]};}}),/REAL_RED/);
 });
 test("bounded correction avoids repeating a rejected candidate",async()=>{
