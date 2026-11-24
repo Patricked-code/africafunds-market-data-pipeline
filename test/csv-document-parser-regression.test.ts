@@ -251,3 +251,23 @@ test('Delimited: invalid explicit delimiters are rejected without losing columns
     ['date', 'rate'], ['2026-01-02', '5.25'],
   ]);
 });
+
+test('Delimited: tab-only preamble cannot become a phantom TSV header', () => {
+  const rows = parseDelimited('\t\ndate\trate\n2026-01-02\t5.25\n');
+  assert.deepEqual(rows, [['date', 'rate'], ['2026-01-02', '5.25']]);
+  assert.deepEqual(rowsToObjects(rows), [{date: '2026-01-02', rate: '5.25'}]);
+});
+test('Delimited: multiple leading tab-only TSV lines are skipped without observations', () => {
+  assert.deepEqual(
+    parseDelimited('\t\t\r\n\t\n date\trate\n2026-01-02\t5.25\n'),
+    [['date', 'rate'], ['2026-01-02', '5.25']]
+  );
+  assert.deepEqual(parseDelimited('\t\n\t'), []);
+});
+test('Delimited: preserve explicit empty TSV data rows after a genuine header', () => {
+  const rows = parseDelimited('date\trate\n\t\n2026-01-02\t5.25\n\t');
+  assert.deepEqual(rows, [['date', 'rate'], ['', ''], ['2026-01-02', '5.25'], ['', '']]);
+  assert.deepEqual(rowsToObjects(rows), [
+    {date: '', rate: ''}, {date: '2026-01-02', rate: '5.25'}, {date: '', rate: ''}
+  ]);
+});
