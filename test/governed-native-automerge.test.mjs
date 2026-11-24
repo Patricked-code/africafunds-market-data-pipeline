@@ -423,3 +423,10 @@ test('both required workflows retain default PR events and explicitly validate r
     assert.doesNotMatch(source,/^  pull_request_target:/m);
   }
 });
+
+
+test('coordination infrastructure changes are sensitive even when no other governance file changed',()=>{
+ assert.equal(isSensitiveChangePath('src/coordination/githubIdentity.ts'),true);
+ assert.match(checkPullRequestFileScope({files:[{filename:'src/coordination/agentClaims.ts',status:'modified'}],changedFiles:1}),/sensitive/);
+ assert.equal(isSensitiveChangePath('src/utils/dates.ts'),false);
+});

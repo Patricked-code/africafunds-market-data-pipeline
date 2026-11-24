@@ -71,7 +71,7 @@ export function createGitHubNewWork(config:NewWorkConfig){
    trace:{head:o.head,nextAction:n===undefined?"Prepare admitted candidate":"Run CI on admitted draft PR",
     evidence:[...new Set([...c.trace.evidence.slice(0,27),"commit:"+o.head,...(n===undefined?[]:["pr:"+n])])]}},config.now());
  }
- async function start(identity:Owner,kind:PendingLifecycle["kind"]){
+ async function start(identity:Owner,kind:"branch"|"pr"){
   if(await config.authenticate(identity)!==true)throw Error("LIFECYCLE_UNAUTHENTICATED");
   const c=assertFence((await config.store.read()).state,identity,config.now()),a=await checkAdmission(c);
   if(kind==="branch"){
@@ -107,7 +107,7 @@ export function createGitHubNewWork(config:NewWorkConfig){
    if(new Set(evidence).size!==evidence.length)throw Error("LIFECYCLE_ABSENCE_EVIDENCE_INVALID");
    if(await config.authenticate(i)!==true)throw Error("LIFECYCLE_UNAUTHENTICATED");
    const snapshot=await config.store.read(),c=snapshot.state.claims.find(x=>same(x,i)),o=c?.pendingLifecycle;
-   if(!c||!o||await config.verifyQuiescence(i,o)!==true)throw Error("LIFECYCLE_STILL_UNCERTAIN");
+   if(!c||!o||(o.kind!=="branch"&&o.kind!=="pr")||await config.verifyQuiescence(i,o)!==true)throw Error("LIFECYCLE_STILL_UNCERTAIN");
    if(!config.verifyAbsentEffect)throw Error("LIFECYCLE_ABSENCE_PROOF_REQUIRED");
    const absent=async()=>{
     repo.parse(await request("GET","",bt));
@@ -131,7 +131,7 @@ export function createGitHubNewWork(config:NewWorkConfig){
   async reconcile(i:Owner){
    if(await config.authenticate(i)!==true)throw Error("LIFECYCLE_UNAUTHENTICATED");
    const c=(await config.store.read()).state.claims.find(x=>same(x,i)),o=c?.pendingLifecycle;
-   if(!c||!o||await config.verifyQuiescence(i,o)!==true)throw Error("LIFECYCLE_STILL_UNCERTAIN");
+   if(!c||!o||(o.kind!=="branch"&&o.kind!=="pr")||await config.verifyQuiescence(i,o)!==true)throw Error("LIFECYCLE_STILL_UNCERTAIN");
    if(await config.verifyWriterIsolation(c.branch)!==true||await getHead(c.branch)!==o.head)throw Error("LIFECYCLE_HEAD_UNCONFIRMED");
    const n=o.kind==="pr"?await readPr(c,o.issue):undefined;
    if(o.kind==="pr"&&n===null)throw Error("LIFECYCLE_PR_UNCONFIRMED");

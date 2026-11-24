@@ -20,7 +20,9 @@ const pendingMutationSchema = z.object({
     ctx.addIssue({code:"custom",message:"INVALID_MUTATION_INTENT"});
 });
 export type PendingMutation=z.infer<typeof pendingMutationSchema>;
-const lifecycleSchema=z.object({kind:z.enum(["branch","pr"]),head:sha,issue:stamp.positive()}).strict();
+const lifecycleSchema=z.object({kind:z.enum(["branch","pr","label","ready"]),head:sha,issue:stamp.positive(),prNumber:stamp.positive().optional()}).strict().superRefine((o,ctx)=>{
+ if((o.kind==="label"||o.kind==="ready")!==(o.prNumber!==undefined))ctx.addIssue({code:"custom",message:"LIFECYCLE_PR_ID_REQUIRED"});
+});
 export type PendingLifecycle=z.infer<typeof lifecycleSchema>;
 const claim = z.object({
   workId: id, actor: id, session: id, lot: z.number().int().min(0).max(13),
@@ -162,6 +164,7 @@ export function transition(input:State, command:Command, now:number):State {
        command.trace.head!==operation.head||!command.trace.evidence.includes("commit:"+operation.head)||
        (command.kind==="lifecycle-result"&&operation.kind==="pr"&&(!Number.isSafeInteger(command.prNumber)||command.prNumber!<=0||!command.trace.evidence.includes("pr:"+command.prNumber)))||
        (command.kind==="lifecycle-result"&&operation.kind==="branch"&&command.prNumber!==undefined)||
+       (command.kind==="lifecycle-result"&&(operation.kind==="label"||operation.kind==="ready")&&(command.prNumber!==operation.prNumber||!command.trace.evidence.includes("pr:"+operation.prNumber)))||
        (command.kind==="lifecycle-absent"&&!command.trace.evidence.some(e=>e.startsWith("issue:")||e.startsWith("ci:")||e.startsWith("pr:"))))
        throw Error("LIFECYCLE_RESULT_NOT_ADMISSIBLE");
       const {pendingLifecycle:_pending,...rest}=old;
