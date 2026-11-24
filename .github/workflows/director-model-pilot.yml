@@ -6,6 +6,7 @@ on:
     paths:
       - '.github/workflows/director-model-pilot.yml'
       - 'scripts/ci/director-model-pilot.py'
+      - 'scripts/ci/test-director-model-pilot.py'
 
 permissions:
   contents: read
@@ -24,5 +25,7 @@ jobs:
         with:
           ref: ${{ github.event.pull_request.head.sha }}
           persist-credentials: false
+      - name: Offline diagnostic protocol regression tests
+        run: python3 scripts/ci/test-director-model-pilot.py
       - name: Real independent coding inference and isolated RED GREEN
         run: python3 scripts/ci/director-model-pilot.py

@@ -24,27 +24,64 @@ ENGINE_SHA = "4829683e55fb9b2e800bc5d3db034efb0668e217c1c196ac76546ef6b4ce98ce"
 SOURCE = Path("src/utils/dates.ts")
 # Candidate execution never inherits the host environment or sees the repository.
 # Only a temporary directory with this public module and fixed tests is mounted.
+# Each trusted test has a stable identifier. Run all cases and report only
+# fixed identifiers, never arbitrary candidate output to the model.
 TEST = """import assert from 'node:assert/strict';
 import { toIsoDate, daysBetween, maturityBucket } from './dates.ts';
-assert.equal(toIsoDate('2024-02-29'),'2024-02-29');
-assert.equal(toIsoDate('2026-11-24'),'2026-11-24');
-assert.equal(toIsoDate('2026-11-24T23:45:00-02:00'),'2026-11-25');
-assert.equal(toIsoDate(new Date('2020-01-01T00:00:00Z')),'2020-01-01');
-assert.throws(()=>toIsoDate('not-a-date'));
-assert.throws(()=>toIsoDate(new Date(NaN)));
-assert.equal(daysBetween('2024-02-28','2024-03-01'),2);
-assert.equal(maturityBucket(365),'MONEY_MARKET');
-assert.equal(maturityBucket(366),'BOND_CT');
-if(process.argv[2]==='red'){
-  assert.equal(toIsoDate('2026-02-30'),'2026-03-02');
-  console.log('RED_CONFIRMED_CALENDAR_ROLLOVER');
-}else{
-  for(const value of ['2026-02-30','2025-02-29','2026-04-31','2026-13-01','2026-00-01','2026-01-00']){
-    assert.throws(()=>toIsoDate(value));
-  }
-  console.log('GREEN_CALENDAR_AND_COMPATIBILITY');
+const tests = [
+ ['valid-leap',()=>assert.equal(toIsoDate('2024-02-29'),'2024-02-29')],
+ ['valid-date',()=>assert.equal(toIsoDate('2026-11-24'),'2026-11-24')],
+ ['timezone',()=>assert.equal(toIsoDate('2026-11-24T23:45:00-02:00'),'2026-11-25')],
+ ['date-object',()=>assert.equal(toIsoDate(new Date('2020-01-01T00:00:00Z')),'2020-01-01')],
+ ['invalid-text',()=>assert.throws(()=>toIsoDate('not-a-date'))],
+ ['invalid-object',()=>assert.throws(()=>toIsoDate(new Date(NaN)))],
+ ['days-between',()=>assert.equal(daysBetween('2024-02-28','2024-03-01'),2)],
+ ['bucket-365',()=>assert.equal(maturityBucket(365),'MONEY_MARKET')],
+ ['bucket-366',()=>assert.equal(maturityBucket(366),'BOND_CT')],
+ ['invalid-feb30',()=>assert.throws(()=>toIsoDate('2026-02-30'))],
+ ['invalid-leap',()=>assert.throws(()=>toIsoDate('2025-02-29'))],
+ ['invalid-apr31',()=>assert.throws(()=>toIsoDate('2026-04-31'))],
+ ['invalid-month13',()=>assert.throws(()=>toIsoDate('2026-13-01'))],
+ ['invalid-month00',()=>assert.throws(()=>toIsoDate('2026-00-01'))],
+ ['invalid-day00',()=>assert.throws(()=>toIsoDate('2026-01-00'))],
+ ['century-leap',()=>assert.equal(toIsoDate('2000-02-29'),'2000-02-29')],
+ ['century-nonleap',()=>assert.throws(()=>toIsoDate('1900-02-29'))],
+ ['year-0001',()=>assert.equal(toIsoDate('0001-01-01'),'0001-01-01')],
+];
+let failed=0;
+for(const [id,fn] of tests){
+  try{fn();console.log('CASE_PASS:'+id);}
+  catch{failed++;console.log('CASE_FAIL:'+id);}
 }
+console.log('TRUSTED_TEST_END');
+process.exitCode=failed?1:0;
 """
+CASE_IDS = ("valid-leap","valid-date","timezone","date-object","invalid-text",
+    "invalid-object","days-between","bucket-365","bucket-366","invalid-feb30",
+    "invalid-leap","invalid-apr31","invalid-month13","invalid-month00",
+    "invalid-day00","century-leap","century-nonleap","year-0001")
+REQUIRED_BASELINE_FAILURES = {"invalid-feb30","invalid-leap","invalid-apr31","century-nonleap"}
+
+def classify_result(returncode, output):
+    # Require complete unique reports, reject early exits and contradictory output.
+    lines=output.splitlines()
+    if lines.count("TRUSTED_TEST_END") != 1:
+        return False, ["test-process-incomplete"]
+    cases={}
+    for line in lines:
+        match=re.fullmatch(r"CASE_(PASS|FAIL):([a-z0-9-]+)",line)
+        if match:
+            state, name=match.groups()
+            if name not in CASE_IDS or name in cases:
+                return False, ["test-process-invalid-report"]
+            cases[name]=state
+    if set(cases)!=set(CASE_IDS):
+        return False, ["test-process-incomplete"]
+    failed=[name for name in CASE_IDS if cases[name]=="FAIL"]
+    if returncode not in (0,1) or (returncode==0)!= (not failed):
+        return False, ["test-process-invalid-exit"]
+    return not failed, failed
+
 def sha256(path):
     with open(path, "rb") as stream:
         return hashlib.file_digest(stream, "sha256").hexdigest()
@@ -57,21 +94,23 @@ def download(url, destination, expected):
     if sha256(destination) != expected:
         raise RuntimeError("PINNED_ASSET_HASH_MISMATCH")
 
-def check_candidate(work, mode):
+def check_candidate(work):
     cmd = ["docker", "run", "--rm", "--network", "none", "--read-only",
            "--cap-drop", "ALL", "--security-opt", "no-new-privileges",
            "--pids-limit", "64", "--memory", "256m", "--cpus", "1",
            "--user", "65534:65534", "-v", str(work)+":/work:ro", "-w", "/work",
-           "node:22-bookworm-slim", "node", "--experimental-strip-types", "test.mjs", mode]
-    result = subprocess.run(cmd, capture_output=True, text=True, timeout=45)
-    marker = "RED_CONFIRMED_CALENDAR_ROLLOVER" if mode == "red" else "GREEN_CALENDAR_AND_COMPATIBILITY"
-    return result.returncode == 0 and marker in result.stdout.splitlines()
+           "node:22-bookworm-slim", "node", "--experimental-strip-types", "test.mjs"]
+    try:
+        result = subprocess.run(cmd, capture_output=True, text=True, timeout=45)
+    except subprocess.TimeoutExpired:
+        return False, ["test-process-timeout"]
+    return classify_result(result.returncode,result.stdout)
 
 def generate(prompt):
     request = urllib.request.Request("http://127.0.0.1:18081/v1/chat/completions",
         data=json.dumps({"model": "local", "messages": [{"role":"system","content":
           "Return only the requested TypeScript function. No tool calls, no explanation."},
-          {"role":"user","content":prompt}], "temperature":0.1, "max_tokens":650}).encode(),
+          {"role":"user","content":prompt}], "temperature":0.0, "max_tokens":1000}).encode(),
         headers={"Content-Type":"application/json"})
     with urllib.request.urlopen(request, timeout=300) as response:
         result=json.load(response)
@@ -100,7 +139,9 @@ def main():
         (work/"dates.ts").write_text(source)
         (work/"test.mjs").write_text(TEST)
         subprocess.run(["docker","pull","node:22-bookworm-slim"],check=True,timeout=180)
-        if not check_candidate(work,"red"):
+        baseline_ok, baseline_failures=check_candidate(work)
+        print("BASELINE_FAILURE_IDS="+json.dumps(baseline_failures),flush=True)
+        if baseline_ok or set(baseline_failures)!=REQUIRED_BASELINE_FAILURES:
             raise RuntimeError("REAL_RED_NOT_REPRODUCED")
         print("RED_CONFIRMED: real existing calendar rollover",flush=True)
         archive=root/"llama.tar.gz"
@@ -137,22 +178,36 @@ def main():
                         "days for exact YYYY-MM-DD strings instead of accepting JS Date rollover. "
                         "Preserve behavior for valid date-only strings, Date objects, timezone-qualified "
                         "timestamps and invalid inputs. Preserve the exported signature. Return ONLY "
-                        "the full replacement function, no imports, no new dependencies.\n"+before)
-                for attempt in range(1,3):
+                        "the full replacement function, no imports, no new dependencies. "
+                        "Requirements: exact YYYY-MM-DD strings must round-trip to the same calendar "
+                        "date in UTC; invalid dates must throw. Preserve years 0001-0099 and Gregorian "
+                        "leap-year rules; preserve timezone-qualified timestamp conversion. "
+                        "Do not use local time, mutate other functions, log or access process, network "
+                        "or filesystem. The tests are fixed.\n"+before)
+                original_prompt=prompt
+                for attempt in range(1,4):
                     try:
                         candidate=generate(prompt)
                     except (ValueError,KeyError):
                         print("MODEL_OUTPUT_FORMAT_REJECTED",attempt,flush=True)
+                        prompt=original_prompt+"\nReturn only the complete requested function, no prose."
                         continue
                     (work/"dates.ts").write_text(candidate+delimiter+after)
                     # Output is untrusted, never run it on host, never publish to Git.
-                    if check_candidate(work,"green"):
+                    passed, failures=check_candidate(work)
+                    print("CANDIDATE_ATTEMPT="+str(attempt)+" SHA256="+sha256(work/"dates.ts")+
+                          " FAILED_CASE_IDS="+json.dumps(failures),flush=True)
+                    if passed:
                         print("REAL_MODEL_GREEN attempt="+str(attempt),flush=True)
                         print("CANDIDATE_SHA256="+sha256(work/"dates.ts"),flush=True)
                         print("CANDIDATE_FUNCTION_BASE64="+base64.b64encode(candidate.encode()).decode(),flush=True)
                         return
                     print("MODEL_CANDIDATE_REJECTED_BY_TESTS",attempt,flush=True)
-                    prompt+="\nPrevious candidate failed fixed compatibility or invalid-calendar tests. Correct it."
+                    # Only allowlisted test identifiers and the previous generated
+                    # source as data; never feed arbitrary runtime logs/instructions.
+                    prompt=original_prompt+"\nPrevious proposal (code data):\n"+candidate+(
+                        "\nFixed validation failures: "+", ".join(failures)+
+                        ". Correct these cases while preserving all other cases.")
                 raise RuntimeError("MODEL_DID_NOT_PASS_REAL_TASK")
             finally:
                 process.terminate()
