@@ -1,5 +1,15 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-24 — Lot 4 / PR #35 : réconciliation du parseur CSV existant sans réécriture
+- **CONTINUITY_ID** : SADIAAF-CONTINUITY-20261124-01. Reprise non destructive de la PR #35 depuis ancien SHA `dadf871051f2b478eb875125d4dd55b46e2d25ca` vers `main=eb74c0a1d42d8dafa4fa67bbf8aa185b571763fa`.
+- **SOURCE EXACTE** : le blob `src/parsers/csv.ts` (`79f02ea9b636327f7d188a2b93fb71770af7efc3`) et les tests `test/csv-document-parser-regression.test.ts` (`6a66d0a590b4582e96c73252f333d42aeb7587f2`) proviennent IDENTIQUES de la PR #35 ; aucun parseur ni test existant n'est reconstruit, la base de code `main` reste inchangée hors ces deux fichiers.
+- **RÉSOLUTION DES DOCUMENTS** : conserver la version récente complète des journaux de `main`, y ajouter ce checkpoint ; les versions historiques complètes de docs/06 et docs/09 de la branche d'origine sont conservées par son premier parent Git (`dadf871051f2b478eb875125d4dd55b46e2d25ca`), sans substitution à l'autorité documentaire actuelle. Aucun historique n'est supprimé ni force-push.
+- **MÉCANISME** : merge commit à deux parents (PR #35 puis `main`) sur l'arbre de `main`, avec les deux blobs source/test d'origine. Mise à jour du ref uniquement si HEAD d'origine conservé (compare-and-swap / non-force).
+- **GARDE-FOUS** : PR ordinaire, fichiers `src/parsers/csv.ts`, nouveau test, docs/06/09 uniquement, sans modifications d'ingestion #26/#36, ni base de données, secret, dépendance, workflow ou S1. Aucun adaptateur officiel qualifié par cette modification.
+- **BLOCK_REASON** : à cette écriture, nouveau SHA du merge non encore créé/testé. CI `validate` et Docker/PostgreSQL exact SHA, discussions et règles GitHub à vérifier avant label `automerge-eligible` et sortie Draft.
+- **NEXT_ACTION** : valider les deux checks sur le nouveau HEAD, qualifier la PR #35 et laisser GitHub fusionner en natif sous ruleset #27937019 ; ensuite recharger `main` et réconcilier la PR #36 (et la PR #26 recouvrant `src/jobs/ingest.ts`) par ordre de dépendances, conserver les six chantiers de données/14 lots, puis staging/production uniquement après gates.
+
+
 ## 2026-11-24 — Lot 4 / PR #41 : reprise effective et correction de deux défauts JSON
 
 - **CONTINUITY_ID** : SADIAAF-CONTINUITY-20261124-01 ; GitHub unique autorité logicielle. Base main ff23886d78f42a17656df88ab4a65d682b957833, ruleset #27937019 actif sans bypass. PR #37–#40 fusionnées ; CI #738 SUCCESS sur main. PR #41 READY, native auto_merge enrôlé par github-actions[bot], deux fils ouverts. CI #740 et Docker #603 SUCCESS exclusivement pour HEAD précédent 070411cb2ff7cdc2416ce5e49fdad5fc92736034.
