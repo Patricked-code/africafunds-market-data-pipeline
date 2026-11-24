@@ -57,6 +57,10 @@ export async function publishClaimedCommit(ports:MutationGatewayPorts,identity:I
   // From here all uncertainty retains the intent. No release or recover can
   // race this publication, even if the lease expires. Reconcile explicitly.
   if(await ports.readHead(c.branch)!==m.expectedHead)throw Error("MUTATION_RECONCILIATION_REQUIRED");
+  const locked=(await ports.store.read()).state.claims.find(x=>sameOwner(x,identity));
+  if(!locked || locked.pendingMutation?.candidateHead!==m.candidateHead ||
+     locked.pendingMutation.expectedHead!==m.expectedHead || ports.now()>=locked.leaseUntil)
+    throw Error("MUTATION_DISPATCH_EXPIRED_OR_UNCONFIRMED");
   await ports.publishNonForce(candidate);
   if(await ports.readHead(c.branch)!==m.candidateHead)throw Error("MUTATION_RECONCILIATION_REQUIRED");
   await settle(ports,c,m,m.candidateHead);

@@ -72,3 +72,11 @@ test("head divergence and unauthorized reconciliation fail closed",async()=>{
   await assert.rejects(reconcileClaimedMutation(f.ports,identity),/UNAUTHENTICATED/);
   assert.ok((await f.store.read()).state.claims[0]?.pendingMutation);
 });
+
+test("lease expiration before dispatch retains intent and does not publish",async()=>{
+  const f=fixture();let reads=0;
+  f.ports.readHead=async()=>{if(++reads===2)f.setNow(2000);return base;};
+  await assert.rejects(publishClaimedCommit(f.ports,identity,proposal),/DISPATCH_EXPIRED/);
+  assert.equal(f.writes(),0);
+  assert.ok((await f.store.read()).state.claims[0]?.pendingMutation);
+});
