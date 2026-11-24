@@ -1,5 +1,11 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-24 — MISSION 13 / collaboration : adaptateur codeur du directeur
+- **CONTINUITY_ID** SADIAAF-CONTINUITY-20261124-01 ; session M13-CODER-20261124-01 admission 7123731676 ; parent a11cbda2d942b237e583b29199deeea21b5416e3. Première publication stoppée avant écriture sur changement HEAD concurrent ; reprise sur contributions publication b661de1 et correctif a11cbda. Périmètre distinct : modelCoder.ts et 5 tests, docs06/09/15. Adaptateur HTTP local sans credential, contexte/réponse bornés, admission/claim exacts, sources immuables via port fiable, JSON édition ancre unique/scopes exacts TS ordinaires, pas de tests/sensible modifiés, RED/GREEN même suite et empreinte exacte du sujet, heartbeat/relecture autorisation, tentatives bornées et détection répétitions. Candidat seulement, aucun code exécuté sur host ni publié par le modèle.
+- **LIMITES** : ports readAdmission/readSource/validate et commit builder doivent être liés au runtime fiable et sandbox réelle ; aucune fixture ne vaut preuve opérationnelle. Scope v1 corrections de fichiers ordinaires existants, pas encore agent général complet. Identité/ref/activation/reprise et preuve deux cycles restent à réaliser. Tests non attestés avant CI ; aucun S1, secret, coût ou bypass.
+- **NEXT_ACTION** : réconcilier CI/Docker et pilotes au SHA exact, relier les ports modèle/validation et gateway au directeur existant, certifier identité/coordination et cycles réels + interruption/concurrence. Pas de nouveau registre ni orchestrateur, pas de faux DONE.
+
+
 - 2026-11-24 / MISSION 13 : correction préventive du helper de test publication compatible exactOptionalPropertyTypes ; aucun changement runtime. CI exacte à vérifier (parent b661de1aa5ada5c16ab7c2e5994046c83ea29d05).
 
 ## 2026-11-24 — MISSION 13 / P0 : transport REST de publication préparée
