@@ -7,7 +7,8 @@ import {runGitHubDirectorWake,type GitHubDirectorEvent} from "./githubDirector.j
 import type {createGitHubAppIdentity} from "./githubIdentity.js";
 import {createGitHubSourceReader} from "./githubSource.js";
 import {createLocalModelCoder,prepareCodingCandidate,type CodingResult} from "./modelCoder.js";
-import {createDatesValidationPort,DATES_ACCEPTANCE,type ValidationRecord} from "./isolatedValidation.js";
+import {createDatesValidationPort,DATES_ACCEPTANCE,datesValidationSuite} from "./isolatedValidation.js";
+import {createGitHubValidationEvidence} from "./githubValidationEvidence.js";
 import {createGitHubCommitBuilder} from "./githubCommitBuilder.js";
 import {createGitHubPublicationPort} from "./githubPublication.js";
 import {publishClaimedCommit,type PreparedMutation} from "./mutationGateway.js";
@@ -55,9 +56,9 @@ export interface DirectorRuntimeConfig {
  verifyCoordinationIsolation(actor:string):Promise<boolean>;
  verifyWriterIsolation(branch:string,actor:string):Promise<boolean>;
  verifyAdmissionHistory():Promise<boolean>;
- verifyEvidence(result:Validated):Promise<boolean>;
+ evidenceAppId:number;
+ evidenceBotUserId:number;
  verifyCandidatePolicy(candidate:PreparedMutation,result:Validated):Promise<boolean>;
- persistEvidence(record:ValidationRecord):Promise<string>;
  authenticateDelivery(event:GitHubDirectorEvent):Promise<boolean>;
 }
 // Connect the existing modules for one authenticated wake on already-admitted
@@ -72,8 +73,10 @@ export async function runExistingPrDirector(event:GitHubDirectorEvent,config:Dir
  if(await config.authenticateDelivery(event)!==true)throw Error("UNAUTHENTICATED_DELIVERY");
  if(await config.verifyCoordinationIsolation(actor)!==true)throw Error("DIRECTOR_COORDINATION_ISOLATION_REQUIRED");
  if(await config.verifyAdmissionHistory()!==true)throw Error("DIRECTOR_ADMISSION_HISTORY_REQUIRED");
- const readCredential=await config.identity.issue("read"),writer=await config.identity.issue("publish");
- if(readCredential.actor!==actor||writer.actor!==actor)throw Error("DIRECTOR_IDENTITY_MISMATCH");
+ const readCredential=await config.identity.issue("read"),writer=await config.identity.issue("publish"),evidenceCredential=await config.identity.issue("evidence");
+ if(readCredential.actor!==actor||writer.actor!==actor||evidenceCredential.actor!==actor||
+  new Set([readCredential.token,writer.token,evidenceCredential.token]).size!==3||
+  !actor.startsWith("github-app:"+positive.parse(config.evidenceAppId)+":installation:"))throw Error("DIRECTOR_IDENTITY_MISMATCH");
  const network=config.fetcher??fetch;
  const scopedFetch=(expiresAt:number):typeof fetch=>async(input,init)=>{
   if(!Number.isSafeInteger(config.now())||config.now()+30000>=expiresAt)throw Error("DIRECTOR_CREDENTIAL_EXPIRED");
@@ -98,7 +101,9 @@ export async function runExistingPrDirector(event:GitHubDirectorEvent,config:Dir
   return (await admissions(main)).find(a=>a.workId===workId)??null;
  };
  const readSource=createGitHubSourceReader({token:readCredential.token,fetcher:readFetch});
- const validate=createDatesValidationPort({imageId:config.imageId,readSource,persistEvidence:config.persistEvidence});
+ const evidence=createGitHubValidationEvidence({token:evidenceCredential.token,appId:config.evidenceAppId,
+  botUserId:positive.parse(config.evidenceBotUserId),expectedSuite:datesValidationSuite(config.imageId),fetcher:scopedFetch(evidenceCredential.expiresAt)});
+ const validate=createDatesValidationPort({imageId:config.imageId,readSource,persistEvidence:evidence.persistEvidence});
  const model=createLocalModelCoder(); // loopback only; no GitHub credentials
  const execute=async(context:ClaimedWorkContext)=>{
   const initial=await readAdmission(context.claim.workId);
@@ -118,10 +123,10 @@ export async function runExistingPrDirector(event:GitHubDirectorEvent,config:Dir
    verifyWriterIsolation:b=>config.verifyWriterIsolation(b,actor),
    async verifyCandidatePolicy(candidate){
     await checkCurrentPr();
-    return await config.verifyEvidence(result)===true&&await config.verifyCandidatePolicy(candidate,result)===true;
+    return await evidence.verifyEvidence(result)===true&&await config.verifyCandidatePolicy(candidate,result)===true;
    }});
   const builder=createGitHubCommitBuilder({token:writer.token,fetcher:writeFetch,readAdmission,readSource,
-   verifyEvidence:config.verifyEvidence,verifyPrepared:publication.verifyPrepared});
+   verifyEvidence:evidence.verifyEvidence,verifyPrepared:publication.verifyPrepared});
   const identity={workId:context.claim.workId,actor:context.claim.actor,session:context.claim.session,generation:context.claim.generation};
   return createExistingPrExecutor({
    async prepare(){return result;},build:builder,

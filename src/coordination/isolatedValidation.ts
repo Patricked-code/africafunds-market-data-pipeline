@@ -94,9 +94,13 @@ export interface DatesValidationConfig{
  persistEvidence(record:ValidationRecord):Promise<string>;
  runner?:IsolatedRunner;
 }
+export function datesValidationSuite(imageId:string):string{
+ const image=imageSchema.parse(imageId);
+ return sha256(JSON.stringify({acceptance:DATES_ACCEPTANCE,image,driver,cases}));
+}
 export function createDatesValidationPort(config:DatesValidationConfig){
  const image=imageSchema.parse(config.imageId),run=config.runner??createDockerDatesRunner(image);
- const suite=sha256(JSON.stringify({acceptance:DATES_ACCEPTANCE,image,driver,cases}));
+ const suite=datesValidationSuite(image);
  return async(head:string,changes:readonly CodingChange[],acceptance:string):Promise<CodingProof>=>{
   if(!/^[a-f0-9]{40}$/.test(head)||acceptance!==DATES_ACCEPTANCE)throw Error("VALIDATION_CONTRACT_NOT_ADMITTED");
   if(changes.length>1||changes.some(c=>c.path!==sourcePath))throw Error("VALIDATION_SCOPE_MISMATCH");

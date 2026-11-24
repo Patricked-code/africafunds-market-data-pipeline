@@ -37,10 +37,18 @@ test("runtime does not issue credentials before delivery and isolation verificat
  const config:DirectorRuntimeConfig={identity:{actor:"fixture",async issue(){issued++;throw Error("unexpected");}},
   session:"session-a",coordinationRulesetId:1,imageId:"sha256:"+"f".repeat(64),now:()=>1000,leaseMs:10000,maxUnits:1,
   async verifyCoordinationIsolation(){return false;},async verifyWriterIsolation(){return false;},async verifyAdmissionHistory(){return false;},
-  async verifyEvidence(){return false;},async verifyCandidatePolicy(){return false;},async persistEvidence(){throw Error("unexpected");},
+  evidenceAppId:10,evidenceBotUserId:20,async verifyCandidatePolicy(){return false;},
   async authenticateDelivery(){return true;}};
  const event={kind:"pr-merged" as const,number:42,mergeSha:head};
  await assert.rejects(runExistingPrDirector(event,config),/COORDINATION_ISOLATION_REQUIRED/);
  await assert.rejects(runExistingPrDirector(event,{...config,async authenticateDelivery(){return false;}}),/UNAUTHENTICATED_DELIVERY/);
  assert.equal(issued,0);
+});
+
+test("runtime requires three separate scoped credentials and matching evidence App before any GitHub request",async()=>{
+ const issued:string[]=[];
+ const config:DirectorRuntimeConfig={identity:{actor:"github-app:10:installation:99",async issue(mode){issued.push(mode);return {actor:"github-app:10:installation:99",token:"same-token",expiresAt:1000000};}},session:"session-a",coordinationRulesetId:1,imageId:"sha256:"+"f".repeat(64),now:()=>1000,leaseMs:10000,maxUnits:1,evidenceAppId:10,evidenceBotUserId:20,
+ async verifyCoordinationIsolation(){return true;},async verifyWriterIsolation(){return false;},async verifyAdmissionHistory(){return true;},async verifyCandidatePolicy(){return false;},async authenticateDelivery(){return true;},fetcher:async()=>{throw Error("unexpected network");}};
+ await assert.rejects(runExistingPrDirector({kind:"pr-merged",number:42,mergeSha:head},config),/DIRECTOR_IDENTITY_MISMATCH/);
+ assert.deepEqual(issued,["read","publish","evidence"]);
 });
