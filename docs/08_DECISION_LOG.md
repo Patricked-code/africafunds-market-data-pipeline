@@ -108,6 +108,54 @@ Utiliser ce fichier pour les décisions durables. Ne pas supprimer les anciennes
 - Conséquences : l'issue #3 passe d'un projet de protection GitHub à un registre historique de décision et de risques, sans masquer que les contrôles serveur restent non enforced. Les gates de production S1 de l'ADR-002 restent pleinement applicables ; aucun déploiement implicite.
 - Remplace / remplacée par : supplanter uniquement les exigences antérieures de **réactivation obligatoire de la protection GitHub** ; ne remplace pas ADR-002 ni les tests, revues de différences et exigences métier.
 
+## ADR-015 — Auto-fusion native GitHub soumise aux protections vérifiées
+
+- **Date :** 2026-11-23
+- **Statut :** ACCEPTED pour la conception et la préparation du code ; activation runtime **BLOCKED** jusqu'à la configuration et aux vérifications GitHub.
+- **Contexte vérifié :** dépôt PUBLIC, branche main HEAD `73256f48d81d38ce8ff6f51be9e024b25cf5dadb` avec `protected=false`, `GET /rulesets=[]`, dépôt `allow_auto_merge=false`, PR #36 Draft sans revue. La prémisse historique « dépôt privé » de l'ADR-014 est désormais obsolète, mais l'historique reste conservé.
+- **Décision :** réutiliser les CI GitHub et **l'auto-merge natif GitHub**, sans merger par API directe, ni GitHub App de contournement, ni orchestrateur indépendant. Un workflow de confiance depuis main peut inscrire une PR interne, non Draft, portant le label `automerge-eligible` dans l'auto-merge **uniquement après vérification** d'une protection effective de main, d'au moins une revue requise, des approbations obsolètes invalidées, des fils résolus, des checks `validate` et `Build, boot, migrate and verify persistent PostgreSQL` exigés, d'une branche à jour et de l'application aux administrateurs.
+- **Revue indépendante :** aucun compte/agent de revue indépendant n'est attesté à cette date. Le mécanisme ne doit ni s'auto-approuver, ni inventer une revue, ni réduire le nombre de revues requises ; l'absence de relecteur reste BLOCKED.
+- **Portée :** autorisation de préparer les tests, le script de vérification et le workflow en PR dédiée issue #3/#9 ; **pas d'autorisation implicite de merger cette PR ni les PR fonctionnelles**, de modifier les paramètres admin à l'aveugle ou de déployer S1.
+- **Préconditions de fonctionnement :** configurer une fois les protections réelles et `Allow auto-merge` via administration GitHub ; fusionner la PR seulement après ses propres gates ; disposer d'une identité distincte pour les revues et d'une vérification de compatibilité GitHub_TOKEN/GraphQL. Aucun coût additionnel autorisé.
+- **Rétrocompatibilité :** ne pas modifier le scheduler métier, les 14 lots, les 44 sources, les bases ou le circuit de déploiement ; aucun secret ajouté.
+- **Vérification requise :** CI du SHA exact, vérification des événements de non-éligibilité (SKIP sans fusion), revue indépendante, preuve d'enrôlement puis fusion native d'une PR pilote après gates ; contrôle `main` et absence de bypass.
+- **Réversibilité :** désactiver le workflow ou le label, ou `Allow auto-merge` ; ne jamais relâcher les protections afin de provoquer une fusion.
+
+## ADR-016 — Auto-fusion des PR ordinaires sans revue indépendante obligatoire
+
+- **Date :** 2026-11-23.
+- **Statut :** ACCEPTED (décision explicite du propriétaire) ; déploiement de la politique GitHub et du workflow **IN_PROGRESS**, non certifié tant que les preuves n'existent pas.
+- **Contexte :** règles GitHub [#27937019](https://github.com/Patricked-code/africafunds-market-data-pipeline/rules/27937019) installées, mais compteur `required_approving_review_count=1`, dernier push soumis à approbation, et PR #37 Draft. Le propriétaire décide de ne plus demander une revue indépendante pour chaque développement ordinaire.
+- **Décision :** pour les PR ordinaires et non sensibles du programme SadiaAF, conserver PR, `main` protégée, checks stricts `validate` et `Build, boot, migrate and verify persistent PostgreSQL`, fils résolus, interdictions force-push/suppression et absence de bypass ; ne plus exiger de revue indépendante : `required_approving_review_count=0`, `require_last_push_approval=false`, `require_code_owner_review=false`, `required_reviewers=[]`, `require_extra_approval_for_unattributed_changes=false`. Conserver l'option `Allow auto-merge` native et l'éligibilité explicite de la PR, sans fusion directe ou approbation artificielle.
+- **Gates réservés :** aucune implication pour la production S1, les secrets, les droits des données sources, les migrations destructives ou les changements sensibles. Ces opérations conservent leurs autorisations spécifiques dans `docs/10_DEPLOYMENT_GATES.md` et les décisions applicables.
+- **Autorité :** la présente décision remplace uniquement l'exigence de revue indépendante universelle de l'ADR-015 pour les PR ordinaires. Les autres exigences et l'historique restent inchangés.
+- **Dépendance administrative :** modifier le ruleset existant **27937019**, sans en créer un second, via l'identité admin `Patricked-code`. Le connecteur GitHub courant ne possède pas la capacité d'écriture sur les réglages admin. Ne jamais prétendre le changement appliqué avant attestation REST.
+- **Recette :** règles `main` actives et vérifiées, CI/Docker au dernier SHA, PR non Draft et éligible, test de fusion native au travers de GitHub sans intervenant, vérification checkpoint et reprise du lot suivant.
+- **Risque accepté :** sans relecteur, un défaut non couvert par les tests peut être intégré ; conserver tests, checks, sécurité de provenance et filtrage des changements sensibles.
+
+## ADR-017 — Déclenchement de fusion par workflows GitHub fiables et SHA attesté
+
+- Date : 2026-11-24.
+- Statut : ACCEPTED pour la conception ; activation pratique à tester après intégration gouvernée de PR #37.
+- Source externe vérifiée : GitHub Changelog du 2026-11-02 annonce le blocage par défaut de pull_request_target sur les dépôts PUBLIC au 2026-12-02 en l'absence de politique d'exception explicite. Référence : https://github.blog/changelog/2026-11-02-pull_request_target-blocked-by-default-december-2/
+- Décision : ne pas dépendre du déclencheur pull_request_target. Déclencher le workflow d'enrôlement natif avec workflow_run completed depuis les workflows CI et Docker déjà présents, qui s'exécutent sur les PR. Le workflow privilégié doit exister dans main, exclusivement utiliser le checkout de main et n'exécuter ni PR head, ni archive, ni artefact téléchargé depuis la PR.
+- Contrôle de provenance : accepter uniquement un événement de workflow de pull_request, completed/success, provenant du dépôt SadiaAF, portant exactement l'un des deux noms de workflows de confiance ; exiger une unique PR rattachée, sa branche main et son SHA head identique au SHA de l'exécution et au SHA de la PR relue au moment d'agir.
+- Signal de reprise ou révocation : accepter uniquement les commandes exactes /sadiaaf-automerge SHA ou /sadiaaf-revoke-automerge SHA en commentaire de PR par OWNER/MEMBER/COLLABORATOR, jamais un commentaire anonyme, ni un SHA obsolète. Le label automerge-eligible reste une condition obligatoire et ne constitue pas une autorisation pour les chemins sensibles.
+- Révocation : un retrait de label, sans commande d'annulation, ne réveille pas immédiatement workflow_run. L'exécuteur propriétaire doit donc émettre la commande SHA-bound de révocation avant toute suppression de label sur une PR déjà enrôlée, ou désactiver l'auto-merge natif dans GitHub. Ne jamais promettre une révocation événementielle automatique non implémentée.
+- Gouvernance : seulement PR ordinaires sans chemins sensibles, CI et Docker statutaires stricts, protection main, approbations universelles à zéro selon ADR-016, pas de nouveau scheduler, secret, PAT admin, second orchestrateur, déploiement S1 ou dépense.
+- Condition de DONE : CI et Docker sur le HEAD exact de PR #37, fusion de cette PR de gouvernance sous autorisation du propriétaire, vérification de l'événement workflow_run et du token réel sur main, preuve ENROLLED/SKIPPED/REVOKED puis pilote de PR ordinaire fusionnée par GitHub sans bypass. Aucune annonce de 24/7 sans exécuteur réel attesté.
+
+## ADR-018 — Protection d'enrôlement contre les changements sensibles après inscription
+
+- Date : 2026-11-24.
+- Statut : ACCEPTED pour le code et les tests, recette runtime et fusion encore à contrôler.
+- Problème réel : après un enrôlement auto-merge natif, un contributeur habilité peut pousser un nouveau SHA contenant un chemin sensible ; GitHub ne désactive pas automatiquement l'auto-merge pour tous les auteurs dotés de droits d'écriture. La révocation événementielle peut donc être trop tardive.
+- Décision : prolonger le job de contrôle obligatoire validate pour vérifier chaque nouveau SHA avec un GITHUB_TOKEN uniquement en lecture (contents:read, pull-requests:read). Si le diff est sensible et que la PR est labellisée automerge-eligible OU inscrite dans le native auto-merge, ce check requis doit échouer sur le SHA courant. La PR sensible sans inscription peut suivre la procédure de fusion expressément autorisée sous les autres checks du ruleset. Le diff manquant/tronqué échoue toujours.
+- Autorisation : l'inscription native privilégiée reste dans le workflow_run fiable utilisant uniquement le code main (sans checkout PR ni artefact) ; le jeton d'enrôlement requiert les permissions contents:write et pull-requests:write pour la mutation GraphQL, avec protection main et aucun contournement de ruleset.
+- Fallback : supprimer le fallback de protection classique non normalisé ; accepter uniquement une règle ruleset active et vérifiable correspondant à main. En l'absence de preuve du statut de bypass du token, aucune inscription.
+- Limite de modèle : un collaborateur disposant du droit de modifier un workflow CI ou d'activer lui-même l'auto-merge peut chercher à contourner un contrôle embarqué dans le contenu d'une PR. Les ACL GitHub et l'exigence de gouvernance des PR sensibles restent donc pertinentes ; le nouveau check garantit le scénario de non-régression d'un ajout sensible accidentel/après enrôlement, et ne doit pas être présenté comme un verrou absolu contre un auteur malveillant habilité.
+- Preuves attendues : tests du required head gate (label/auto_merge, fichiers sensibles et non sensibles), CI + Docker sur SHA exact, revue des fils bloquants, fusion autorisée de PR #37, pilote native auto-merge sur PR ordinaire, test de rejet sur nouvelle révision sensible. Aucun assouplissement des deux checks requis, aucun S1, aucun secret tiers.
+
 ## Modèle d’entrée
 
 ```markdown
