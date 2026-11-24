@@ -1,4 +1,11 @@
 # 09 — Journal de travail et continuité
+
+## 2026-11-24 — Issue #13 / PR #25 : réconciliation de l'audit historique des 44 sources
+- **CONTINUITY_ID** : SADIAAF-CONTINUITY-20261124-01 ; admission 7122923434. Ancien HEAD d1f8c2e26f0aa5e48b77e737de77cfc8cb1c08fd, main ef861ea26b26b82ec7cac987d9404a3707b2439f, socle 73256f48d81d38ce8ff6f51be9e024b25cf5dadb.
+- **TRAVAIL** : merge à deux parents préservant historique main et branche, test historique exact (blob 24507239acb8b46ab96cffce4eba2c68d52eaa76) et ajout de sa seule étape offline dans la CI actuelle, avec toutes les protections de fusion et de sécurité existantes conservées. Aucun changement du registre, d'URL, de données, de licence ou du rapport historique. Le snapshot du 7/11 garde ses comptes 14 HEAD200, 7 HEAD403, 1 HEAD404, 22 NOT_PROBED ; aucun sondage actuel prétendu.
+- **BLOCK_REASON** : CI et Docker exact nouveau HEAD non attestés avant publication, workflow sensible à qualifier séparément ; qualification réelle des 44 sources et six adaptateurs, droits et observations témoins restent incomplètes. Le test vérifie le catalogue historique de 44 ; une extension future devra préserver ce sous-ensemble historique avec un test de compatibilité additive, sans réécrire la preuve historique.
+- **NEXT_ACTION** : contrôler CI/Docker et étape snapshot, résoudre les écarts puis intégrer sous gates sensibles ; poursuivre sources autorisées et lots existants, sans collision avec pilote modèle PR42 ni PR29. Aucun S1, secret, coût, auto-merge sensible ou certification anticipée.
+
 ## 2026-11-24 — Lots 5–7 / PR #32 : garde de valorisation obligataire et Total Return
 - **CONTINUITY_ID** : SADIAAF-CONTINUITY-20261124-01. PR #32, source `src/calc/bonds.ts`, tests `test/bond-financial-inputs.test.ts`, branche `fix/bond-financial-nonfinite-guard-20261115`.
 - **DÉVELOPPEMENT** : rejet des valeurs non finies (courbes, maturités, flux, prix, distributions et résultat), échéances négatives, taux incohérents pour un même tenor ; conservation des doublons cohérents, de l'ordre des données de l'appelant, et des formules de valorisation et Total Return en cas valide. Vérifications d'overflow et de cas numériques extrêmes.
@@ -308,6 +315,148 @@
 - **BLOCK_REASON** : main non protégée, allow-auto-merge désactivé ; aucun reviewer indépendant automatisé attesté ; permissions GitHub de lecture des paramètres admin retournent 403, donc aucun changement admin prétendu. PR #36 reste Draft, aucune revue indépendante.
 - **NEXT_ACTION** : vérifier PR #37 https://github.com/Patricked-code/africafunds-market-data-pipeline/pull/37 et sa CI/Docker sur le HEAD exact et tests de fail-closed ; faire configurer UNE FOIS les settings de protection réelle et Allow auto-merge via droits admin autorisés, contrôler que le workflow peut lire la politique GraphQL, obtenir une revue indépendante de la PR d'intégration ; tester via une PR pilote étiquetée et non Draft avec CI exact-SHA et reviewer indépendant. Aucune fusion ou S1 avant gates. En cas de blocage, poursuivre autres lots admissibles dans leur chantier propriétaire, sans collision.
 - **ROLLBACK** : revert des seuls fichiers workflow/script/test et entrées documentaires de la PR si refus ; jamais de changement de protection ou d'environnement à restaurer.
+
+---
+
+
+## 2026-11-22 — Issue #13 / PR #25 : validation CI du HEAD 87d39b9 attestée
+
+- **RÉCONCILIATION** : PR #1 MERGED ; PR #25 OPEN/Draft au SHA exact `87d39b9aee56c2b56554808481329843b02d04e6`, PR #22 OPEN/Draft non modifiée ; lecture des règles, du journal de branche, du contrat agent et du checkpoint historique. Ce changement est documentaire uniquement.
+- **PREUVE EXACT-HEAD** : [GitHub Actions run 44967048176](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/44967048176), workflow CI #612, `completed/success` sur le HEAD précédent `87d39b9aee56c2b56554808481329843b02d04e6`. Job `validate` #137038314143 `completed/success` ; étapes success : types, tests unitaires, intégrité hors réseau des 44 sources, sécurité S1, validation Compose, build, migrations PostgreSQL et réapplication, seed, tests intégration, claim backfill et garde de fenêtres. La réussite ne s'étend PAS au nouveau HEAD documentaire ni à la PR #22.
+- **REVUE ET LIMITES** : `reviews=[]` pour #25 ; tests locaux NOT_RUN ; ni licence/source réelle, ni données témoins, ni déploiement S1 attestés. Les 22 NOT_PROBED, 7 RESTRICTED, 1 NOT_FOUND et 14 HTTP_OK_UNVERIFIED_CONTENT restent des qualifications historiques, non une certification de couverture.
+- **BLOCK_REASON** : revue indépendante et gates de fusion absents ; qualifications officielles et échantillons autorisés non établis. Aucune nouvelle correction fonctionnelle indépendante revendiquée.
+- **NEXT_ACTION** : obtenir revue indépendante sur #25 ; qualifier protocoles/licences/échantillons de l'issue #13 et adaptateurs #14 sans contourner robots ni toucher aux 44 sources ; reprendre les autres lots indépendants. Vérifier les checks du HEAD documentaire résultant sans créer un commit supplémentaire pour le seul suivi de ce contrôle.
+- **ROLLBACK** : revert ciblé du présent ajout documentaire ; aucun changement du code métier, de main ou de S1.
+
+---
+
+## 2026-11-22 — Issue #13 / PR #25 : CI du checkpoint documentaire précédent attestée
+
+- **RÉCONCILIATION** : PR #1 MERGED ; PR #25 OPEN/Draft, PR #22 OPEN/Draft conservée ; 12 PR et 12 issues ouvertes retrouvées ; lecture des règles, du journal de branche, du protocole et du checkpoint historique. Le présent ajout documentaire ne modifie aucun endpoint, adaptateur ni donnée.
+- **PREUVE EXACT-HEAD** : commit précédent `cce051ae9878e5000e9456e088a1765e9b889f42` ; [GitHub Actions run 44962998218](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/44962998218) `completed/success`, job `validate` #137025718174 `completed/success`. Les étapes attestées incluent tests unitaires, contrôle offline des 44 sources, typecheck, build, migrations et réapplication PostgreSQL, seed, tests intégration, claim backfill et garde des fenêtres. **Ce résultat porte uniquement sur le commit précédent, pas sur le nouveau HEAD produit par cette entrée.**
+- **LIMITES** : tests locaux NOT_RUN ; revue indépendante et accès institutionnels non attestés ; 22 NOT_PROBED, 7 RESTRICTED, 1 NOT_FOUND et 14 HTTP_OK_UNVERIFIED_CONTENT non qualifiés ; aucun historique réel certifié. Aucun merge, push main, secret ou S1.
+- **BLOCK_REASON** : revue/gates et qualification officielle des sources manquantes ; CI du nouveau HEAD documentaire à vérifier.
+- **NEXT_ACTION** : vérifier les checks du nouveau HEAD, faire revoir PR #25 indépendamment ; continuer issue #13 par protocoles/licences/échantillons officiels autorisés, issue #14 sur branche distincte si contrats vérifiés ; ne pas toucher PR #22 occupée ; aucune certification DONE/HISTORY_COMPLETE.
+- **ROLLBACK** : revert ciblé du seul commit documentaire.
+
+---
+
+## 2026-11-22 — Issue #13 / PR #25 : preuve CI détaillée du HEAD exact et reprise documentaire
+
+- **RECONCILIATION** : PR #1 fusionnée ; instructions `AGENTS.md`, `docs/15_AUTONOMOUS_AGENT_EXECUTION.md`, journal et checkpoint historique relus sur `main` ; PR #25 OPEN/Draft au HEAD `8e1a22fe4d5100f5fea15ec024f063b06486c265`, PR #22 OPEN/Draft et laissée intacte ; recherche des PR et issues ouvertes effectuée. Le présent commit documentaire fera évoluer le HEAD : la preuve CI ci-dessous couvre exclusivement le HEAD de code précédent.
+- **PREUVE GITHUB ACTIONS** : [run #102 / 42536032601](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/42536032601) `completed/success` associé au SHA exact `8e1a22fe4d5100f5fea15ec024f063b06486c265` ; job `validate` #128900422548 `completed/success`. Étapes attestées SUCCESS : checkout de la révision PR, installation des dépendances, typecheck, tests unitaires, test offline de cohérence des 44 sources, garde S1 et préflight, validation Compose, build, migrations PostgreSQL et réapplication, seed du registre, tests intégration PostgreSQL, claim backfill et garde de fenêtres. Cette CI ne valide pas les données réelles des sources ni les tests de la PR #22 divergente.
+- **REVUE** : liste GitHub des reviews de PR #25 vide au contrôle ; PR demeure Draft. Tests locaux de cette intervention **NOT_RUN**. Aucune collecte réseau, aucun secret, aucune fusion, aucun déploiement S1.
+- **BLOCK_REASON** : revue indépendante/gates non attestés ; qualifications officielles, droits/licences et échantillons des 22 `NOT_PROBED`, 7 `RESTRICTED`, 1 `NOT_FOUND` non établis ; les 14 `HTTP_OK_UNVERIFIED_CONTENT` ne prouvent pas la qualité des données. CI du nouveau HEAD documentaire à recontrôler après commit.
+- **NEXT_ACTION** : vérifier le run/checks du HEAD documentaire résultant ; obtenir revue indépendante ; qualifier protocole et échantillons officiels autorisés pour issue #13, puis les 6 adaptateurs de #14 sans bypass ; préserver les 44 sources historiques et la PR #22. Aucune certification `HISTORY_COMPLETE` ni `DONE`.
+- **ROLLBACK** : revert ciblé du présent commit documentaire, sans modification des sources ou des données.
+
+---
+
+## 2026-11-09 — Issue #13 / PR #25 : CI #100 sur HEAD antérieur, cohérence fichier/code marché
+
+- **RECONCILIATION** : AGENTS.md et docs/15 relus ; worklog et NEXT_ACTION de PR #25 relus ; issue #13 OPEN ; PR #25 et PR #22 indépendantes ; HEAD initial PR #25 `0652aae2779082a01052fb91927d9fca0dbacf1e` confirmé identique à la branche avant écriture. Aucun merge ni S1.
+- **PREUVE CI** : GitHub Actions run [42530781345](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/42530781345), #100, completed/SUCCESS, trouvé pour le HEAD initial exact via la recherche des runs associés au commit. Ne prouve ni accès/licences, ni historiques complets.
+- **TEST ADDITIF** : commit `8eb827a338b263b2fc633077ad9ba64365e4512c` : le test offline du snapshot vérifie désormais que le code marché interne de chaque fichier correspond au nom de fichier déclaré dans le manifeste, en plus de l'unicité des codes, identifiants et des 44 lignes historiques. Préserve le catalogue et les observations originales.
+- **VALIDATION** : modification enregistrée sur branche Draft ; exécution locale du nouveau test NOT_RUN et CI du HEAD résultant NON ATTESTÉE. Aucune donnée témoin ni validation de disponibilité réseau ajoutée.
+- **BLOCK_REASON** : CI du nouveau HEAD et revue indépendante/gates non attestés ; 22 NOT_PROBED, 7 RESTRICTED et 1 NOT_FOUND restent à qualifier par canaux officiels, sans bypass ; issue #14 dépend des contrats et formats témoins.
+- **NEXT_ACTION** : vérifier CI/checks exacts sur HEAD final de PR #25 et corriger si échec ; solliciter revue indépendante ; avancer l'issue #14 sur branche indépendante seulement avec données officielles autorisées ; préserver PR #22 et ses claims ; pas de fusion ni de déploiement S1.
+- **ROLLBACK** : revert ciblé du commit test et de cette entrée sur la branche Draft.
+
+---
+
+
+## 2026-11-08 — Issue #13 / PR #25 : CI #98 attestée et extraction bornée du tableau historique
+
+- **RÉCONCILIATION** : PR #25 OPEN/Draft HEAD initial `1c9485dfd9f6a6be0591807f0ad47658d03287ff`, PR #22 laissée intacte, issue #13 OPEN ; AGENTS.md, docs/15, journal de branche, audit 42314547906 et commentaires de claim lus. Réservation bornée PR #25 à 23:00 UTC.
+- **PREUVE CI** : [run #98 42526316334](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/42526316334) completed/SUCCESS sur HEAD initial ; job validate `128870640991` SUCCESS (snapshot offline, typecheck, unit, build, migrations PostgreSQL et intégration). Reviews : aucune. Cette preuve ne couvre pas le nouveau code.
+- **CODE/TEST ADDITIF** : commit `508d8f1161e4e77d0e9d8534924d2519f1130609` : extraction du tableau strictement bornée entre ses deux titres ; comptabilisation des lignes avec pipe sans espace et contrôle strict de leur format, au lieu d'ignorer silencieusement les lignes malformées. Les 44 sources et l'artefact historique restent inchangés.
+- **VALIDATION** : nouveau test local NOT_RUN ; CI sur HEAD résultant NON ATTESTÉE à l'instant de l'écriture. Aucune preuve de disponibilité réseau, licence, données témoins ou HISTORY_COMPLETE.
+- **BLOCK_REASON** : CI sur HEAD résultant, revue/gates et qualifications officielles des 22 NOT_PROBED, 7 RESTRICTED, 1 NOT_FOUND non attestées.
+- **NEXT_ACTION** : contrôler CI/checks exacts de PR #25 après ce checkpoint, corriger toute régression ; faire qualifier l'accès officiel et les formats témoins sans bypass ; poursuivre issue #14 indépendamment si les contrats/échantillons sont disponibles. Préserver PR #22. Aucune fusion ni déploiement S1.
+- **ROLLBACK** : revert ciblé du test et de ce checkpoint sur la branche Draft.
+
+---
+
+
+## 2026-11-08 — Issue #13 / PR #25 : CI #96 et garde des marchés du registre
+
+- **RECONCILIATION** : AGENTS.md, docs/15 et dernier worklog lus sur la branche PR #25 ; issue #13 et PR #25 ouvertes ; claim borné PR #25, PR #22 préservée. Historique main/PR à revérifier avant toute fusion.
+- **PREUVE CI EXACTE DU HEAD PRECEDENT** : [run 42521181478](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/42521181478), run #96 completed/SUCCESS, job validate 128854818772 SUCCESS, étapes offline snapshot, typecheck, unit, build, migrations, seed, PostgreSQL SUCCESS. Run lié au HEAD précédent `4a243a3994d988f122ecf81ac2f2b9d6726f4316`, pas au nouveau code.
+- **TEST ADDITIF** : commit `3e0066f82280f88d28dd73814569a722a438186a` : le test d'intégrité refuse désormais les références répétées aux fichiers de marchés et les codes marché dupliqués, en plus des 44 identifiants uniques. Aucun endpoint, résultat historique ou code métier modifié.
+- **VALIDATION** : nouveau test NOT_RUN localement ; CI du HEAD résultant NON ATTESTÉE à cette écriture. Aucune certification réseau, licence, contenu ou HISTORY_COMPLETE.
+- **BLOCK_REASON** : CI sur nouveau HEAD et revue/gates non attestés ; 22 NOT_PROBED, 7 RESTRICTED, 1 NOT_FOUND sans qualification officielle et échantillons autorisés.
+- **NEXT_ACTION** : contrôler les runs/checks de la PR #25 sur le HEAD résultant, corriger les échecs ; obtenir revue et gates, puis qualifier les sources par canaux officiels. Reprendre #14 indépendamment avec contrats et données témoins. Préserver PR #22 ; aucun merge ni S1.
+- **ROLLBACK** : revert ciblé du test et de ce checkpoint sur PR #25 uniquement.
+
+---
+
+## 2026-11-08 — Issue #13 / PR #25 : CI #94 attestée et contrôle des lignes Markdown malformées
+
+- **RECONCILIATION** : lecture AGENTS.md, documents maîtres docs/00–15 dans l'ordre prescrit, dernier journal/checkpoint et matrice SOURCE_AUDIT_RUN_42314547906.md ; PR #25 ouverte, issue #13 ouverte, PR #22 préservée. Main comparé : `73256f48d81d38ce8ff6f51be9e024b25cf5dadb`, branche PR #25 ahead 10 / behind 0 avant écriture. Claim borné dans la discussion PR #25.
+- **PREUVE CI DU HEAD PRECEDENT** : [run 42516155061](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/42516155061) (#94) `completed/success`, job validate `128839525878` SUCCESS, dont typecheck, unit, test snapshot 44 sources, build, migrations PostgreSQL, seed et intégrations. Cette preuve porte sur le HEAD précédent `1581e3fcd15b1ee236defd6fe70d57d14a95fafd` et non sur les commits ci-dessous. Reviews PR #25 : aucune.
+- **CODE/TEST** : commit [e78d93054ec9eba87e794421848ef52888e03854](https://github.com/Patricked-code/africafunds-market-data-pipeline/commit/e78d93054ec9eba87e794421848ef52888e03854) : le test offline ne filtre plus silencieusement les lignes de table dont l'identifiant/format Markdown est malformé ; toutes les lignes de données de la table sont comptées et soumises à une assertion stricte. Aucune modification des 44 sources, du snapshot historique ni du réseau.
+- **VALIDATION** : commit enregistré ; tests locaux NOT_RUN, CI du HEAD résultant NON ATTESTÉE à cet instant. Pas de certification de droits/licences, de formats, de séries ou de HISTORY_COMPLETE.
+- **BLOCK_REASON** : CI du HEAD final et revue indépendante à vérifier ; 22 NOT_PROBED, 7 RESTRICTED, 1 NOT_FOUND non qualifiés, droits/robots et documents témoins non attestés.
+- **NEXT_ACTION** : vérifier CI/check-runs sur le HEAD exact résultant de PR #25, corriger tout échec, obtenir revue/gates ; poursuivre #13 par preuves d'accès officiel et formats témoins, ou #14 sur branche indépendante avec sources autorisées. Ne pas intervenir sur PR #22 concurrente ; pas de merge ni S1.
+- **ROLLBACK** : revert ciblé des commits de test et de journal sur PR #25, sans modifier main, catalogue ou données financières.
+
+---
+
+## 2026-11-08 — Issue #13 / PR #25 : preuve CI #92 et cohérence des motifs du snapshot
+
+- **RECONCILIATION** : PR #1 fusionnée, PR #22 Draft préservée, PR #25 Draft sur base main ; AGENTS.md, docs/00–15 selon ordre prescrit, checkpoint du 06/11, worklog et matrice SOURCE_AUDIT_RUN_42314547906.md relus. PR #25 HEAD initial vérifié `1e7e1c6784066f800cabe4a2df67c68326fc14e5` ; claim borné consigné en commentaire PR #25.
+- **PREUVE CI** : [run 42510745996](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/42510745996) (#92) `completed/success` associé au HEAD initial ; ne pas étendre cette preuve au nouveau commit.
+- **CODE/TEST** : commit [925055b82139ea2cb33231417bfc54d057745237](https://github.com/Patricked-code/africafunds-market-data-pipeline/commit/925055b82139ea2cb33231417bfc54d057745237) renforce le test offline de la matrice : identifiant Markdown strict, motif non vide, concordance entre statuts et motifs historiques `HEAD 200/403/404` ou `ROBOTS_*`. Aucune requête réseau, aucune altération des 44 sources ni de l'artefact historique.
+- **VALIDATION** : code enregistré sur GitHub ; CI du nouveau HEAD **NON ATTESTÉE** à l'instant du checkpoint. Les 22 NOT_PROBED, 7 RESTRICTED, 1 NOT_FOUND et 14 HEAD 200 non qualifiés restent historiques et non certifiés.
+- **BLOCK_REASON** : CI du HEAD résultant à vérifier, revue indépendante et gates non attestées ; contrats/licences/robots et formats témoins manquants pour qualification réelle.
+- **NEXT_ACTION** : contrôler les check-runs de PR #25 sur HEAD exact après ce checkpoint, corriger tout échec ; obtenir revue indépendante ; poursuivre les qualifications officielles des 22/7/1 sans bypass, ou tâche indépendante #14 avec échantillons autorisés. Ne pas modifier PR #22 simultanément. Aucun merge ni déploiement S1.
+- **ROLLBACK** : revert ciblé du test et de cette entrée sur la seule branche PR #25.
+
+---
+
+## 2026-11-08 — Issue #13 / PR #25 : CI SUCCESS sur HEAD documentaire exact (run #91)
+
+- **RECONCILIATION** : AGENTS.md, docs/15, checkpoint du 06/11, journal de branche et audit historique relus ; PR #1 fusionnée, PR #22 Draft isolée, PR #25 Draft HEAD `14af521b2fa317d585655f5222b15f37ccca0279` avant écriture. Issue #13 OPEN. Aucune écriture sur main ni sur PR #22.
+- **PREUVE CI EXACTE** : [GitHub Actions run 42505719515](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/42505719515), workflow CI run #91, job [validate 128807789289](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/42505719515/job/128807789289), `completed/success` sur le HEAD précédent `14af521b2fa317d585655f5222b15f37ccca0279`. Les 19 étapes de validation métier listées, dont snapshot offline 44 sources, typecheck, unit, build, migrations/seed et PostgreSQL, sont SUCCESS. Cela ne certifie pas accès réseau, licences, contenu, historique ou S1.
+- **ACTION** : attestation persistante du run exact dans le journal de PR #25 ; aucun changement aux 44 sources, tests, workflows ou code de production. La présente écriture documentaire avance le HEAD et nécessite donc une nouvelle vérification CI sur le nouveau SHA.
+- **BLOCK_REASON** : revue indépendante/gates de fusion non attestées ; 22 NOT_PROBED, 7 RESTRICTED, 1 NOT_FOUND sans qualification officielle ; pas de données témoins ni historique complet. Aucune fusion autorisée.
+- **NEXT_ACTION** : vérifier les checks sur le HEAD documentaire résultant, obtenir la revue indépendante, puis instruire les accès robots/contrats officiels des 22/7/1 sans bypass ; poursuivre issue #14 sur un chantier indépendant uniquement avec formats et échantillons autorisés. Ne pas modifier PR #22 simultanément.
+- **ROLLBACK** : revert de cette seule entrée de journal sur la branche PR #25 ; aucune action S1.
+
+---
+
+
+## 2026-11-08 — Issue #13 / PR #25 : CI de correction attestée, audit statique validé
+
+- **RECONCILIATION** : PR #25 indépendante de PR #22 ; reprise du NEXT_ACTION de vérification de la CI du correctif de parseur Markdown. HEAD documentaire avant ce checkpoint : `de3b418d04ac7130e060d2882eee683233518a9d` (à recontrôler après écriture). Contrat AGENTS.md et docs/15 relus ; aucune mutation des 44 endpoints.
+- **PREUVE CI GREEN** : run GitHub Actions [42500344667](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/42500344667), job `validate` [128791540744](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/42500344667/job/128791540744), conclusion **SUCCESS**. L'étape `Source audit snapshot integrity (offline, 44 original endpoints)` est SUCCESS ; typecheck, unit tests, build, migrations PostgreSQL, seed et tests d'intégration PostgreSQL du job sont SUCCESS. Ce résultat est limité à la révision exécutée ; il ne certifie pas les 44 accès réseau ni les licences. Un run précédent 42500330156 a été annulé, non assimilé à un PASS.
+- **BLOCK_REASON** : 22 NOT_PROBED, 7 RESTRICTED, 1 NOT_FOUND non qualifiés ; contrats officiels, robots, licences et données témoins manquants. Revue indépendante et gates de fusion non attestés ; PR reste Draft. Toute nouvelle écriture requiert CI sur le nouveau HEAD exact.
+- **NEXT_ACTION** : vérifier la CI de ce checkpoint sur son HEAD exact et la revue indépendante, puis qualifier les accès officiels des 22/7/1 sans contourner robots ; préparer les adaptateurs de l'issue #14 uniquement avec preuve de contrat et échantillons autorisés. Conserver PR #22 intacte et poursuivre une tâche indépendante si revue en attente.
+- **ROLLBACK** : revert de cette entrée documentaire sur la branche PR #25 uniquement ; aucune écriture S1, aucun changement de source ou de données financières.
+
+---
+
+
+## 2026-11-08 — Issue #13 / PR #25 : CI rouge reproduite, correction du parseur de statut Markdown
+
+- **RECONCILIATION** : PR #1 fusionnée ; PR #22 Draft indépendante préservée ; PR #25 Draft. Instructions AGENTS.md, docs/15, dernier worklog de la branche, checkpoint 2026-11-06 et matrice docs/SOURCE_AUDIT_RUN_42314547906.md relus. Le document historique est immuable.
+- **PREUVE CI RED** : GitHub Actions run [42495873780](https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/42495873780), job validate 128777996513, conclusion FAILURE : étape « Source audit snapshot integrity », `unknown status for mar-bvc-indices`. Les étapes Node typecheck et unit tests précédentes ont réussi ; les étapes suivantes ont été sautées.
+- **CAUSE ET CORRECTION** : le document d'audit stocke le statut dans une cellule Markdown avec backticks (ex. `\`NOT_PROBED\``), mais le test comparait cette cellule brute à la valeur sans backticks. Correction ciblée dans `test/source-audit-snapshot.test.mjs` : validation du format de la cellule, extraction du contenu entre backticks, puis contrôle du statut canonique. Commit [17e98e1b3251d8e080070cf8c86602c4d18329ca](https://github.com/Patricked-code/africafunds-market-data-pipeline/commit/17e98e1b3251d8e080070cf8c86602c4d18329ca). Aucune modification des 44 sources, de l'artefact d'audit ou de l'accès réseau.
+- **VALIDATION** : CI précédente **FAILURE** attestée ; nouvelle exécution sur HEAD corrigé **NON ATTESTÉE** au moment de ce checkpoint ; pas de PASS anticipé.
+- **BLOCK_REASON** : attente de la nouvelle CI sur HEAD corrigé ; 22 NOT_PROBED, 7 RESTRICTED, 1 NOT_FOUND toujours non qualifiés juridiquement et techniquement.
+- **NEXT_ACTION** : vérifier le run CI associé au HEAD corrigé, inspecter tous les jobs et corriger tout nouvel échec. Puis qualifier les accès officiels autorisés sans contourner robots ; poursuivre les adaptateurs #14 uniquement avec contrats et données témoins. PR #22 doit rester isolée.
+- **ROLLBACK** : revert ciblé du correctif du test et de cette entrée sur PR #25 ; aucune mutation S1 ni de données financières.
+
+---
+
+## 2026-11-08 — Issue #13 : garde de cohérence du snapshot officiel 44 sources (branche indépendante)
+
+- **RECONCILIATION** : GitHub Patricked-code, dépôt privé ; PR #22 Draft et travail backfill concurrent préservés. AGENTS.md, docs/15, worklog le plus récent de PR #22, checkpoint 2026-11-06 et audit historique docs/SOURCE_AUDIT_RUN_42314547906.md consultés. Le snapshot d'audit annonce 14 HEAD 200 non qualifiés, 7 HEAD 403, 1 HEAD 404 et 22 NOT_PROBED ; ces chiffres ne prouvent ni licences, ni formats, ni historique.
+- **TRAVAIL INDÉPENDANT #13** : branche `test/source-audit-snapshot-integrity-20261108` créée depuis main ; commit `1db9e228ffd92cb82697b5fb99aad8a6f315a41b` ajoute `test/source-audit-snapshot.test.mjs` : vérifie 11 fichiers de marché, 44 identifiants uniques, correspondance exacte marché/endpoint et 44 lignes de preuve, sans réseau et sans modifier les sources ni l'artefact historique. Toute requalification devra produire une nouvelle preuve et non réécrire le snapshot.
+- **VALIDATION** : commits GitHub attestés ; PR #25 Draft ouverte. Le workflow CI existant exécute désormais explicitement le test hors réseau via commit `0d311f53f77cf24c0da208086d9710ee76fed9da` ; exécution locale **NOT_RUN** et résultat CI sur HEAD final **NON ATTESTÉ** tant que le run n'est pas vérifié. Aucune amélioration de disponibilité, licence ou couverture réelle revendiquée.
+- **BLOCK_REASON** : les 22 robots non qualifiés, 7 restrictions et le 404 demandent une preuve d'accès officiel autorisé ; le nouveau test statique ne résout pas ces gates. La PR #22 attend toujours ses preuves PostgreSQL/CI et ne doit pas être modifiée simultanément.
+- **NEXT_ACTION** : obtenir les checks CI du test statique sur son HEAD exact et corriger les échecs ; poursuivre #13 par qualification légale des 22 NOT_PROBED et protocole officiel des 7 RESTRICTED/1 NOT_FOUND, sans bypass ; ensuite #14 adaptateurs sous contrat documenté. Ne pas fusionner sans revue/checks, ni déployer S1.
+- **ROLLBACK** : revert du test et de cette entrée sur la branche indépendante ; aucune donnée financière ni source initiale modifiée.
 
 ---
 

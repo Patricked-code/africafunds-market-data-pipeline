@@ -1,4 +1,11 @@
 # 06 — État réel et écarts
+
+## 2026-11-24 — Issue #13 / PR #25 : réconciliation de l'audit historique des 44 sources
+- **CONTINUITY_ID** : SADIAAF-CONTINUITY-20261124-01 ; admission 7122923434. Ancien HEAD d1f8c2e26f0aa5e48b77e737de77cfc8cb1c08fd, main ef861ea26b26b82ec7cac987d9404a3707b2439f, socle 73256f48d81d38ce8ff6f51be9e024b25cf5dadb.
+- **TRAVAIL** : merge à deux parents préservant historique main et branche, test historique exact (blob 24507239acb8b46ab96cffce4eba2c68d52eaa76) et ajout de sa seule étape offline dans la CI actuelle, avec toutes les protections de fusion et de sécurité existantes conservées. Aucun changement du registre, d'URL, de données, de licence ou du rapport historique. Le snapshot du 7/11 garde ses comptes 14 HEAD200, 7 HEAD403, 1 HEAD404, 22 NOT_PROBED ; aucun sondage actuel prétendu.
+- **BLOCK_REASON** : CI et Docker exact nouveau HEAD non attestés avant publication, workflow sensible à qualifier séparément ; qualification réelle des 44 sources et six adaptateurs, droits et observations témoins restent incomplètes. Le test vérifie le catalogue historique de 44 ; une extension future devra préserver ce sous-ensemble historique avec un test de compatibilité additive, sans réécrire la preuve historique.
+- **NEXT_ACTION** : contrôler CI/Docker et étape snapshot, résoudre les écarts puis intégrer sous gates sensibles ; poursuivre sources autorisées et lots existants, sans collision avec pilote modèle PR42 ni PR29. Aucun S1, secret, coût, auto-merge sensible ou certification anticipée.
+
 ## 2026-11-24 — Lots 5–7 / PR #32 : garde de valorisation obligataire et Total Return
 - **CONTINUITY_ID** : SADIAAF-CONTINUITY-20261124-01. PR #32, source `src/calc/bonds.ts`, tests `test/bond-financial-inputs.test.ts`, branche `fix/bond-financial-nonfinite-guard-20261115`.
 - **DÉVELOPPEMENT** : rejet des valeurs non finies (courbes, maturités, flux, prix, distributions et résultat), échéances négatives, taux incohérents pour un même tenor ; conservation des doublons cohérents, de l'ordre des données de l'appelant, et des formules de valorisation et Total Return en cas valide. Vérifications d'overflow et de cas numériques extrêmes.

@@ -53,6 +53,8 @@ jobs:
         run: npm run typecheck
       - name: Unit tests
         run: npm run test:ci
+      - name: Source audit snapshot integrity (offline, 44 original endpoints)
+        run: node --test test/source-audit-snapshot.test.mjs
       - name: Governed auto-merge policy regression tests
         run: node --test test/governed-native-automerge.test.mjs
       - name: Required governed PR HEAD scope check
