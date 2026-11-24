@@ -11,12 +11,20 @@ export async function startRun(input: { jobType: string; scope: Record<string, u
 }
 
 export async function finishRun(runId: string, status: 'SUCCESS' | 'PARTIAL' | 'FAILED', summary: Record<string, unknown>, error?: unknown): Promise<void> {
-  await pool.query(
+  // TypeScript unions do not validate callers at runtime (e.g. JavaScript or unsafe casts).
+  // Reject invalid terminal statuses before any SQL is sent, preserving the RUNNING row.
+  if (status !== 'SUCCESS' && status !== 'PARTIAL' && status !== 'FAILED') {
+    throw new Error(`INVALID_TERMINAL_STATUS: ${String(status)}`);
+  }
+  const result = await pool.query(
     `UPDATE ops.ingestion_runs
        SET status=$2, finished_at=now(), summary=$3::jsonb, error_message=$4
-     WHERE ingestion_run_id=$1`,
+     WHERE ingestion_run_id=$1 AND status='RUNNING'`,
     [runId, status, JSON.stringify(summary), error instanceof Error ? error.message : error ? String(error) : null],
   );
+  if (result.rowCount !== 1) {
+    throw new Error(`TERMINAL_WRITE_CONFLICT: ingestion run ${runId} is missing or already finalized`);
+  }
 }
 
 export async function upsertEndpoint(client: pg.PoolClient, endpoint: {
