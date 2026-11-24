@@ -1,5 +1,20 @@
 # 06 — État réel et écarts
 
+## 2026-11-24 — Lot 11 / issue #9 : P0 exécuteur indépendant, transport GitHub
+- **CONTINUITY_ID** : SADIAAF-CONTINUITY-20261124-01 ; admission 7122770954. Parent PR42 8ab297d44f5d9b50cbdeb59cafb809fc9234dfed ; CI762/Docker625 SUCCESS, zéro fil ouvert. Main ef861ea26b26b82ec7cac987d9404a3707b2439f après PR32.
+- **TRAVAIL** : réconciliation non destructive à deux parents, préservation des historiques de main et PR42 ; GET ref singulier corrigé (PATCH pluriel), transport HTTP GitHub natif borné au dépôt et chemins coordination, délai, redirections interdites, écritures désactivées par défaut et préflight ruleset dédié. Aucun secret, appel live de runtime ni exécuteur de modèle activé. Tests du nouveau SHA non encore attestés.
+- **PRIORITÉ** : exécuteur permanent indépendant de ChatGPT, moteur de programmation habilité, au service de l'achèvement des 14 lots et six chantiers existants ; pas de nouveau programme directeur. Poursuivre les lots indépendants.
+- **BLOCK_REASON** : CI/Docker exact SHA, identité et jeton runtime autorisés, protection/initialisation ref, fournisseur de programmation sans surcoût, passerelle mutation, transport événementiel et recette réelle non attestés.
+- **NEXT_ACTION** : vérifier CI/Docker ; qualifier et activer un runtime réel autorisé, raccorder sélection et mutations, reprise pending, deux développements successifs hors ChatGPT avec contention, interruption, preuves ; poursuivre PR29/22/25/31 selon gates. Aucun S1, coût, secret, bypass ou certification 24/7 anticipée.
+## 2026-11-24 — Lots 5–7 / PR #32 : garde de valorisation obligataire et Total Return
+- **CONTINUITY_ID** : SADIAAF-CONTINUITY-20261124-01. PR #32, source `src/calc/bonds.ts`, tests `test/bond-financial-inputs.test.ts`, branche `fix/bond-financial-nonfinite-guard-20261115`.
+- **DÉVELOPPEMENT** : rejet des valeurs non finies (courbes, maturités, flux, prix, distributions et résultat), échéances négatives, taux incohérents pour un même tenor ; conservation des doublons cohérents, de l'ordre des données de l'appelant, et des formules de valorisation et Total Return en cas valide. Vérifications d'overflow et de cas numériques extrêmes.
+- **PREUVES** : CI #756 https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45322460514 SUCCESS, Docker/PostgreSQL #619 https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45322460499 SUCCESS, tous deux sur l'ancien HEAD `af65a7f0dfd41ff8ddaf9711d505d782fc316f6e`. Les contrôles seront rejoués sur le nouveau SHA documentaire ; les résultats précédents ne suffisent pas à l'attester.
+- **CONSTAT DE REVUE** : les documents obligatoires docs/06 et docs/09 étaient absents du diff de la PR #32. Le présent checkpoint corrige cet écart P1, sans toucher au calcul ni aux tests.
+- **LIMITES** : les fixtures sont synthétiques ; pas de courbe officielle, historique de marché, licence, méthode validée par le métier ou recette financière exhaustive attestés. Les lots 5–7 et le chantier #17 restent PARTIAL.
+- **BLOCK_REASON / NEXT_ACTION** : vérifier validate et Docker/PostgreSQL au nouveau SHA exact, répondre et résoudre la discussion P1 si preuves suffisantes ; laisser auto-merge natif GitHub fusionner sans bypass. Reprendre les cinq PR encore ouvertes selon dépendances (backfill #22, audit #25, registre #29, gates S1 #31), et achever les 14 lots via le référentiel existant ; aucun déploiement S1.
+
+
 ## 2026-11-24 — Lot 11 / issue #9 : raccordement GitHub du programme directeur
 - **CONTINUITY_ID** : SADIAAF-CONTINUITY-20261124-01 ; PR #42, parent 60c929fa83e4563a860b326548ef848ca44ad01e ; traces issue #9 7122328349 et 7122339314. CI #760 et Docker #623 SUCCESS sur a0ae4f0b ; main 50e35e70 protégée, ruleset 27937019 actif, auto_merge=true.
 - **CODE** : adaptateur githubDirector.ts (CI/merge, lecture live, clé canonique, vérification répétée et raccordement à runDirectorWake), préflight ruleset dédié, cinq scénarios de test. Aucune installation de ref ou exécuteur externe. Ref 404, seul ruleset main ; événements automation indisponibles (404). Aucun S1, secret, coût ni changement des branches métier.

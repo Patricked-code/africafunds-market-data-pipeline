@@ -62,7 +62,7 @@ test("GitHub adapter constructs single-parent commit and non-force ref update; r
   let head=current; const calls:{method:string;path:string;body:unknown}[]=[];
   const request:GitHubRequest=async(method,path,body)=>{
     calls.push({method,path,body});
-    if(method==="GET"&&path.startsWith("/git/refs/"))return {object:{sha:head}};
+    if(method==="GET"&&path==="/git/ref/heads/coordination/sadiaaf-agent-state")return {object:{sha:head}};
     if(method==="GET"&&path.startsWith("/contents/"))return {encoding:"base64",content:Buffer.from(JSON.stringify(emptyState())).toString("base64")};
     if(path==="/git/trees")return {sha:tree};
     if(path==="/git/commits")return {sha:commit};
@@ -74,6 +74,7 @@ test("GitHub adapter constructs single-parent commit and non-force ref update; r
   assert.equal(out.version,commit);
   assert.deepEqual(calls.find(c=>c.path==="/git/commits")?.body,{message:"coordination: claim issue-9",tree,parents:[current]});
   assert.deepEqual(calls.find(c=>c.method==="PATCH")?.body,{sha:commit,force:false});
+  assert.equal(calls.find(c=>c.method==="PATCH")?.path,"/git/refs/heads/coordination/sadiaaf-agent-state");
   await assert.rejects(store.compareAndSwap(current,state()),/CLAIM_CAS_CONFLICT/);
 });
 

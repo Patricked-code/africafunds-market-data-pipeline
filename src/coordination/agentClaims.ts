@@ -160,7 +160,7 @@ const contentsResponse = z.object({encoding:z.literal("base64"),content:z.string
 export class GitHubClaimStore implements ClaimStore {
   constructor(private readonly request:GitHubRequest) {}
   async read():Promise<{version:string;state:State}> {
-    const version = refResponse.parse(await this.request("GET",refPath)).object.sha;
+    const version = refResponse.parse(await this.request("GET","/git/ref/heads/coordination/sadiaaf-agent-state")).object.sha;
     const raw = contentsResponse.parse(await this.request("GET","/contents/"+statePath+"?ref="+version));
     const state = stateSchema.parse(JSON.parse(Buffer.from(raw.content,"base64").toString("utf8")));
     return {version,state};
