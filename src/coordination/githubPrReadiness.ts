@@ -133,7 +133,8 @@ export function createGitHubPrReadiness(config:PrReadinessConfig){
   const absent=async()=>{
    repo.parse(await get(""));
    if(await config.verifyWriterIsolation(c.branch)!==true)throw Error("READINESS_POLICY_UNCONFIRMED");
-   const p=await observe(c,n,o.issue,c.base);
+   const main=z.object({name:z.literal("main"),protected:z.literal(true),commit:z.object({sha})}).parse(await get("/branches/main"));
+   const p=await observe(c,n,o.issue,main.commit.sha);
    return p.draft&&hasLabel(p)===(o.kind==="ready");
   };
   if(!await absent())throw Error("READINESS_EFFECT_NOT_ABSENT");

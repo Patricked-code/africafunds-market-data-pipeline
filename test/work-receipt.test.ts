@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import {emptyState,stateSchema,runClaimedWorkPass,applyCommand,listWorkReceipts,readWorkReceipt,type State,type ClaimStore,type WorkCandidate,type WorkPassPorts} from "../src/coordination/agentClaims.js";
+import {emptyState,stateSchema,runClaimedWorkPass,applyCommand,listWorkReceipts,readWorkReceipt,asPromotionReceipt,type WorkPublicationProof,type State,type ClaimStore,type WorkCandidate,type WorkPassPorts} from "../src/coordination/agentClaims.js";
 const base="a".repeat(40),head="b".repeat(40);
 const candidate:WorkCandidate={workId:"work-a",lot:11,branch:"work/sadiaaf-issue-9-dates",base,scopes:["file:src/utils/dates.ts"],
  trace:{head:base,nextAction:"code",evidence:["issue:9"]}};
@@ -38,4 +38,19 @@ test("manual legacy release remains valid and missing receipt fails closed",asyn
  const f=fixture();const {state}=await applyCommand(f.store,{kind:"claim",...candidate,actor:"app",session:"manual",leaseMs:10000},1000);
  const c=state.claims[0]!;await applyCommand(f.store,{kind:"release",workId:c.workId,actor:c.actor,session:c.session,generation:c.generation,trace:c.trace},1001);
  await assert.rejects(readWorkReceipt(f.store,c.workId,c.generation),/NOT_FOUND/);
+});
+
+const publication:WorkPublicationProof={issue:9,mainSha:base,acceptance:"dates",paths:["src/utils/dates.ts"],
+ red:{status:"fail",subject:"c".repeat(64),suite:"d".repeat(64),evidence:"issue:91",diagnostics:["red"]},
+ green:{status:"pass",subject:"e".repeat(64),suite:"d".repeat(64),evidence:"issue:92",diagnostics:[]}};
+test("structured proof is bound atomically to the original publication receipt",async()=>{
+ const f=fixture();await runClaimedWorkPass({...f.ports,async execute(){return {outcome:"completed",trace:proof,publication};}});
+ const receipt=await readWorkReceipt(f.store,"work-a",1),promotion=asPromotionReceipt(receipt);
+ assert.equal(promotion.prNumber,43);assert.equal(promotion.base,base);assert.equal(promotion.head,head);assert.deepEqual(promotion.red,publication.red);
+ assert.deepEqual(promotion.green,publication.green);assert.equal(promotion.acceptance,"dates");
+});
+test("mismatched publication proof blocks release instead of minting a promotion receipt",async()=>{
+ const f=fixture();await assert.rejects(runClaimedWorkPass({...f.ports,async execute(){return {outcome:"completed",trace:proof,
+ publication:{...publication,green:{...publication.green,evidence:"issue:93"}}};}}),/WORK_PUBLICATION_PROOF_MISMATCH/);
+ assert.equal((await f.store.read()).state.claims.length,1);assert.deepEqual(await listWorkReceipts(f.store,"work-a"),[]);
 });
