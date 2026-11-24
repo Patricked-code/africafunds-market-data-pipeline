@@ -1,25 +1,62 @@
 # 06 — État réel et écarts
 
-## Lot 4 — Réouverture invalide d'un champ cité CSV (PR #35, 2026-11-19)
+## 2026-11-24 — Lot 4 / PR #35 : réconciliation du parseur CSV existant sans réécriture
+- **CONTINUITY_ID** : SADIAAF-CONTINUITY-20261124-01. Reprise non destructive de la PR #35 depuis ancien SHA `dadf871051f2b478eb875125d4dd55b46e2d25ca` vers `main=eb74c0a1d42d8dafa4fa67bbf8aa185b571763fa`.
+- **SOURCE EXACTE** : le blob `src/parsers/csv.ts` (`79f02ea9b636327f7d188a2b93fb71770af7efc3`) et les tests `test/csv-document-parser-regression.test.ts` (`6a66d0a590b4582e96c73252f333d42aeb7587f2`) proviennent IDENTIQUES de la PR #35 ; aucun parseur ni test existant n'est reconstruit, la base de code `main` reste inchangée hors ces deux fichiers.
+- **RÉSOLUTION DES DOCUMENTS** : conserver la version récente complète des journaux de `main`, y ajouter ce checkpoint ; les versions historiques complètes de docs/06 et docs/09 de la branche d'origine sont conservées par son premier parent Git (`dadf871051f2b478eb875125d4dd55b46e2d25ca`), sans substitution à l'autorité documentaire actuelle. Aucun historique n'est supprimé ni force-push.
+- **MÉCANISME** : merge commit à deux parents (PR #35 puis `main`) sur l'arbre de `main`, avec les deux blobs source/test d'origine. Mise à jour du ref uniquement si HEAD d'origine conservé (compare-and-swap / non-force).
+- **GARDE-FOUS** : PR ordinaire, fichiers `src/parsers/csv.ts`, nouveau test, docs/06/09 uniquement, sans modifications d'ingestion #26/#36, ni base de données, secret, dépendance, workflow ou S1. Aucun adaptateur officiel qualifié par cette modification.
+- **BLOCK_REASON** : à cette écriture, nouveau SHA du merge non encore créé/testé. CI `validate` et Docker/PostgreSQL exact SHA, discussions et règles GitHub à vérifier avant label `automerge-eligible` et sortie Draft.
+- **NEXT_ACTION** : valider les deux checks sur le nouveau HEAD, qualifier la PR #35 et laisser GitHub fusionner en natif sous ruleset #27937019 ; ensuite recharger `main` et réconcilier la PR #36 (et la PR #26 recouvrant `src/jobs/ingest.ts`) par ordre de dépendances, conserver les six chantiers de données/14 lots, puis staging/production uniquement après gates.
 
-- **PARTIAL / BRANCH ONLY** : test synthétique `c4981fa` et correctif fail-closed `a9a5516` empêchent la réouverture d'un champ après son guillemet fermant, même séparé par des espaces. CI précédente du HEAD `347b918a` : runs #44556082359 et #44556082411 SUCCESS ; CI du nouveau code non attestée au checkpoint. Tests locaux NOT_RUN, revue indépendante et validation des formats institutionnels manquantes.
-- **NEXT_ACTION** : vérifier CI exact-HEAD et revue PR #35 ; qualifier sources/licences et données témoins #14/#17 avant toute fusion, S1 ou statut DONE.
 
----
+## 2026-11-24 — Lot 4 / PR #41 : durcissement des tokens JSON d'origine
 
-## Lot 4 — Fermeture stricte des champs CSV cités (PR #35, 2026-11-19)
+- **CONTINUITY_ID** : SADIAAF-CONTINUITY-20261124-01. PR #37–#40 intégrées ; main ff23886d78f42a17656df88ab4a65d682b957833 protégée. Deux fusions documentaires natives démontrées, autonomie codeur complète non attestée.
+- **CORRECTION CANDIDATE** : sur la branche existante PR #41, contrôle des représentations numériques avant admission par JSON.parse (refus d'un token mathématiquement non entier arrondi à un entier sûr, y compris sous-flux vers zéro), détection des clés objet dupliquées après décodage des échappements. Validation de lignes existante conservée, pas de nouvelle dépendance ni de modification ingestion. Quatre groupes de tests de régression ajoutés.
+- **PREUVES / LIMITES** : CI #740 et Docker #603 SUCCESS sur l'ancien HEAD 070411cb2ff7cdc2416ce5e49fdad5fc92736034 uniquement ; tests ajoutés non exécutés au moment du commit, RED/GREEN séparés non attestés. Deux discussions doivent rester ouvertes jusqu'à vérification des corrections et checks du nouveau SHA. Pas de source officielle ni licence certifiée ; FR-004 et issue #14 restent PARTIAL.
+- **NEXT_ACTION** : CI/Docker du nouveau SHA, correction si rouge, résolution argumentée des deux fils après preuve, fusion native si admissible ; poursuivre PR #36 et les autres travaux indépendants, issue #9 et six chantiers sans collision, aucun S1.
 
-- **PARTIAL / BRANCH ONLY** : test synthétique et correctif fail-closed contre les caractères non blancs après la fermeture d'un champ cité, commits `53a21b27` et `3fc9958b` (correctifs intermédiaires `2fd0302c`, `57000a5e`). CI antérieure du HEAD `caa7eb35` : #44546013097 et #44546013065 SUCCESS ; CI des nouveaux commits non attestée à l'écriture. Tests locaux NOT_RUN ; revue indépendante et données institutionnelles manquantes.
-- **NEXT_ACTION** : vérifier CI exact-HEAD, revue tierce, puis qualification #14/#17 sans modifier les 44 sources et sans fusion/S1.
 
----
+## 2026-11-24 — Lot 4 / chantier #14 : admission JSON structurée sans source officiellement qualifiée
 
-## Lot 4 — Intégrité des lignes CSV (PR #35, 2026-11-19)
+- **BASE RÉCONCILIÉE** : `main` protégée au commit ff23886d78f42a17656df88ab4a65d682b957833 ; CI #738 SUCCESS ; PR fonctionnelles #22 et #25–#36 ouvertes, dont #35 sur CSV et #36 sur ingestion, non modifiées. Programme 14 lots 0–13 et 6 chantiers issues #5/#13–#17 maintenu.
+- **LACUNE CONSTATÉE** : les parseurs déjà présents couvrent `src/parsers/html.ts`, `csv.ts`, `xlsx.ts`. Aucun parseur JSON générique ne figure dans `src/parsers` sur ce SHA. Le cahier de conception prévoit JSON/XML-SDMX/PDF, sous qualification des droits et champs sources.
+- **MODIFICATION ISOLÉE** : ajout de `src/parsers/json.ts` avec `parseFinancialJsonDocument` pour tableaux d'objets plats ou enveloppes `data`/`records`, limites de taille/lignes/colonnes, refus des documents ambigus, champs dangereux, structures imbriquées, entiers non sûrs ou nombres décimaux JSON potentiellement arrondis par `JSON.parse`. Les valeurs financières décimales doivent être fournies comme chaînes ou attendre un mapping lossless source-spécifique ; aucune transformation de date, devise, maturité ou qualité n'est supposée.
+- **TESTS** : `test/json-document-admission.test.ts` vérifie tableaux, enveloppes, cas vides, champs, sécurité, taille et précision ; CI et Docker sur HEAD de la PR à vérifier avant READY. Aucun endpoint officiel contacté, aucune licence supposée, aucun changement de `src/jobs/ingest.ts`, aucune écriture DB/S1.
+- **STATUT** : `PARTIAL` — composant de parsing disponible en branche candidate, **pas** un adaptateur CBE/GOSDMX pleinement fonctionnel, ni une qualification des 44 sources, ni une recette de données financières. Aucun faux `SUCCESS` ni `HISTORY_COMPLETE`.
+- **BLOCK_REASON** : schémas JSON spécifiques, endpoints officiels, mappings dates/valeurs/droits et formats JSON-SDMX non encore attestés. PR à tester/intégrer ; les opérations d'ingestion globales sont occupées par PR #26/#36.
+- **NEXT_ACTION** : vérifier tests exact SHA, faire qualifier cette PR ordinaire sous auto-merge gouverné ; poursuivre l'issue #14 par contrats de chaque source, témoins officiels autorisés, mapping économique et intégration dans un adaptateur qualifié, sans collision avec les branches CSV/ingestion.
 
-- **PARTIAL / BRANCH ONLY** : tests synthétiques et correction de `rowsToObjects` pour refuser les lignes dont le nombre de champs diffère des en-têtes ; commits `fd20fec88d2ac6ab4b38675cd55640e4cfc7fa98` et `63f6e4aca8edf83c60eb12bf02602af5569b107c`. Tests locaux `NOT_RUN`, CI du nouveau HEAD `NOT_YET_ATTESTED` ; revue indépendante et fixtures institutionnelles manquantes. Ne pas déclarer DONE ni appliquer sur S1.
-- **NEXT_ACTION** : CI exact-HEAD et revue PR #35 ; qualifier les six adaptateurs #14 et recettes #17 sans changer les 44 sources historiques.
 
----
+## 2026-11-24 — Lot 11 : intégration automatique native démontrée sur première PR pilote
+
+- **PROUVÉ** : PR #37 fusionnée dans main, squash ed78d253fbce9b5f94b9ef4d9a38803c6b63d417, CI #733 SUCCESS, Docker #597 SUCCESS, 4/4 fils résolus ; ruleset GitHub #27937019, approvals ordinaires 0 et checks validate/Docker obligatoires préservés.
+- **PREMIER PILOTE E2E DU MERGE NATIF** : PR #38 READY, seul docs/09, label automerge-eligible ; CI #735 et Docker #599 SUCCESS ; workflow_run auto-merge #5 SUCCESS depuis code main ; GitHub API auto_merge enabled_by github-actions[bot] puis PR #38 merged=true avec SHA ffdf04a6fcb534fa1c807cafb867d9de998320d2. Aucune fusion directe de la PR #38 effectuée par le connecteur.
+- **RESTE À PROUVER** : second cycle pilote de la mise à jour documentaire présente ; recrutement/installation réelle d'un exécuteur codeur auto-géré si déjà disponible, 2 tâches de développement distinctes enchaînées, claims atomiques inter-agent, retour après panne, gestion CI rouge et licences/données sources ; aucun agent 24h/24 ni plateforme S1 en production ne sont certifiés par la recette GitHub.
+- **RISQUES** : l'auto-merge natif doit rester limité aux PR internes non sensibles qualifiées, SHA exact, workflow_run authentique, diffusion du label par propriétaire ; les PR sensibles et les opérations S1 relèvent des autorisations gouvernées.
+- **NEXT_ACTION** : valider cette seconde PR documentaire et le mécanisme de merge natif via CI/Docker ; puis poursuivre PR métier #36, les six chantiers #5/#13–#17 et les 14 lots selon dépendances et gates, sans refaire GitHub ruleset ni créer de seconde autorité.
+
+## 2026-11-23 — Lot 11 : sécurisation de l'admission auto-merge, protections et CI partagée
+
+- **État GitHub actuel vérifié** : dépôt public, `main=73256f48d81d38ce8ff6f51be9e024b25cf5dadb`, protected=true, ruleset #27937019 ACTIF, zéro revue obligatoire, `validate` et Docker/PostgreSQL requis strictement, `allow_auto_merge=true`. Les anciens diagnostics `main` non protégée / auto-merge désactivé sont historiques et remplacés.
+- **PR #37** : workflow d'enrôlement natif sécurisé et distinct du développement métier, toujours OPEN/Draft et non fusionné. CI #708 et Docker #572 SUCCESS sur checkpoint précédent `7fdebb49`. Aucun test de fusion native en production GitHub encore effectué ; pas de déclaration d'autonomie intégrale.
+- **Protection complémentaire ajoutée** : code `scripts/ci/governed-native-automerge.mjs` refuse désormais une PR qui modifierait `.github/**`, `deploy/**`, `sql/**`, `config/**`, la configuration de sécurité, les secrets, contrats de déploiement, règles d'agent ou des dépendances. Une liste de fichiers GitHub incomplète, dupliquée, anormale ou dépassant 500 éléments bloque l'enrôlement. Les renames sont inspectés sur les anciens ET nouveaux chemins. Test de non-régression ajouté.
+- **Preuve de correction réelle** : la CI #710 a fait échouer 1/81 tests de politique sur `scripts/credentials-init.sh` : le filtre n'identifiait pas `credentials` au pluriel. Commit `022ade7eb238bc59a9b4c52ed6fc2539ac089544` corrige cette classe de chemins. Aucune affirmation de PASS avant la conclusion des runs plus récents.
+- **Risque de CI intermittente** : `test/integration/backfill-claim.test.ts` et `test/integration/backfill-window.test.ts` partagent PostgreSQL CI et revendiquent globalement le premier job disponible ; exécution simultanée des fichiers peut les perturber. Le script npm `test:integration` est maintenant paramétré `--test-concurrency=1` (commit `c76bd26406a7bb4325d8f31f829a18b6052390ef`), sérialisant les fichiers sans supprimer la véritable concurrence entre workers testée dans un fichier. Hypothèse de cause encore à confirmer par passages répétés ; issue #5 renseignée sans modifier la PR #22.
+- **BLOCK_REASON** : intégration PR #37 non effectuée, usage GITHUB_TOKEN réel pour lecture du ruleset/activation native non attesté, événement GitHub public `pull_request_target` à qualifier, PR pilote non exécutée, stabilité CI historique à confirmer. Les changements de sécurité/sources sous licence/production S1 ne sont PAS rendus auto-merge éligibles par une simple étiquette.
+- **NEXT_ACTION** : vérifier CI #712 et Docker #576 sur le commit `c76bd264` ; corriger et retester chaque échec ; valider les nouveaux tests de périmètre, le contrat token et la sécurité de l'événement ; rendre la PR prête seulement sous ses propres gates, sans fusion implicite d'une PR de gouvernance sensible ; démontrer ensuite l'auto-merge natif sur une PR pilote non sensible. Poursuivre les lots 0–13 sur leurs branches propriétaires sans collision, puis staging S1 avant production autorisée.
+
+
+## 2026-11-23 — Lot 11 / issues #3 et #9 : préparation de l'auto-merge natif GitHub
+
+- **État GitHub vérifié :** dépôt public, `main=73256f48d81d38ce8ff6f51be9e024b25cf5dadb`, `protected=false`, rulesets `[]`, `allow_auto_merge=false` ; PR #36 Draft, sans review indépendante, HEAD `df0129b625798147eb1dc3f283fcbd7fd19fac99`. Aucun mécanisme de fusion autonome n'est actuellement activé.
+- **Travail réalisé sur branche indépendante :** création d'un vérificateur fail-closed d'éligibilité `scripts/ci/governed-native-automerge.mjs`, ses 24 tests de politique, dont quatre scénarios de révocation, et d'un workflow GitHub Actions exploitant le code de `main` seulement. Extension additive de la CI existante pour les tests du vérificateur, et exécution du smoke Docker sur toute PR afin de le rendre réellement exigible. Pas de mutation de settings/admin, pas de fusion, pas de S1.
+- **Gates :** exigence d'une protection réelle de `main` (checks `validate` et Docker obligatoires, branche à jour, revue indépendante requise, approbations obsolètes rejetées, fils résolus, admin inclus), de l'option native Allow auto-merge, d'une PR non Draft et d'un label de préparation posé après contrôles de l'agent. Le workflow ne fait jamais de merge direct ; il révoque également l'enrôlement natif lorsque le label de préparation est retiré, lorsque la PR repasse en Draft ou lorsque les gates deviennent non conformes lors d'un événement de PR.
+- **État des tests :** code committé sur branche, CI GitHub de cette branche à observer à l'ouverture de PR. Pas de test déclaré PASS avant la fin de son workflow.
+- **BLOCK_REASON :** protection et allow-auto-merge actuellement absents, accès d'administration non disponible dans le connecteur GitHub, acteur indépendant de revue automatique non attesté. L'outil GitHub ne peut pas activer la configuration du dépôt via les fonctions actuellement disponibles.
+- **NEXT_ACTION :** contrôler la PR #37 ouverte en Draft, CI et Docker sur son HEAD exact ; appliquer et attester une fois la protection main et Allow auto-merge par un moyen admin autorisé ; intégrer la PR seulement après revue indépendante ; tester l'enrôlement auto-merge natif sur une PR pilote sans bypass, puis reprendre les lots 0–13. Aucun besoin d'intervention humaine à chaque développement si un reviewer indépendant automatisé effectivement habilité intervient.
+
 
 ## Audit S1 et sécurité de déploiement — 2026-11-07
 
@@ -121,25 +158,3 @@ Commencer Phase 1 et Phase 2 sur une branche fonctionnelle : identité/RBAC/audi
 - **Backfill** : PR #12 contient des corrections P0, dernière CI du HEAD `ab45f3ffe175f69e45ba3f06ffe3b033185c6e3e` run 42313428780 SUCCESS vérifié, mais des fenêtres réelles et la reprise des RUNNING expirés restent incomplètes ; issue #5 non DONE.
 - **Normalisation/recette** : issues #15/#17 ouvertes ; PostgreSQL et méthodes financières existants, chaîne raw→canonical→calc→publish non attestée pour 11 marchés.
 - **Protection de main** : dernière vérification `protected=false` ; aucun merge/déploiement autorisé par ce checkpoint. Vérifier de nouveau à chaque reprise.
-
-## 2026-11-18 — Lot 4, PR #35 (en attente de validation)
-
-Le parseur CSV existant reçoit un test supplémentaire et un correctif de sélection de séparateur lorsque les en-têtes cités contiennent des séparateurs concurrents. Les tests locaux sont NOT_RUN ; la CI et la revue du HEAD final restent à attester. Les six adaptateurs institutionnels, leurs licences et les historiques réels ne sont pas certifiés par cette correction. Voir `docs/09_CHANGELOG_WORKLOG.md` et PR #35.
-
-## 2026-11-19 — PR #35 / CSV preamble regression
-
-Test synthétique supplémentaire sur les tabulations de préambule ignoré (`adecee37`), correction ciblée du score des séparateurs (`3e461c0`) sur branche Draft. Les deux workflows du SHA antérieur `aa536744` ont réussi (#44413241529, #44413241513) ; **nouveau HEAD non encore certifié**, tests locaux NOT_RUN, revue indépendante absente. Aucun adaptateur officiel ni historique réel certifié. `NEXT_ACTION` et `BLOCK_REASON` détaillés dans `docs/09_CHANGELOG_WORKLOG.md`.
-
-## 2026-11-19 — CSV document integrity follow-up (PR #35)
-
-- Deux tests synthétiques ajoutés pour les champs cités non refermés et les en-têtes dupliqués ; parseur modifié pour rejeter explicitement ces deux cas (commits `23da9571`, `37c29d54`). Aucun test local exécuté ; CI du HEAD final non encore attestée.
-- Politique fail-closed à revoir indépendamment pour compatibilité des documents institutionnels ; aucune source réelle, licence, collecte ou historique complet certifié. PR Draft, aucun merge/S1.
-- **BLOCK_REASON** : CI exacte, revue indépendante et échantillons/licences officiels manquants.
-- **NEXT_ACTION** : vérifier les workflows du nouveau HEAD, traiter les régressions, obtenir revue indépendante, puis poursuivre #14/#17 sur données autorisées.
-
-## 2026-11-19 — PR #35 : ligne CSV explicitement vide et citée (une colonne)
-
-- Test synthétique `c19d3a9` et correction `905b60d` / `a1e2b1a` sur branche Draft : conservation de `""` comme observation vide explicite, y compris à EOF ; lignes physiques blanches ignorées. Aucun document institutionnel réel certifié.
-- CI et smoke du HEAD précédent `df97d4f` SUCCESS (runs #44507028317 / #44507028294), **ne valident pas les nouveaux commits**. Tests locaux NOT_RUN ; revue indépendante et gates de fusion manquants.
-- **BLOCK_REASON** : CI exact-HEAD et revue à obtenir ; licences, fixtures officielles CBE/GOSDMX et recette #17 incomplètes.
-- **NEXT_ACTION** : vérifier les nouveaux runs, corriger si nécessaire, poursuivre la qualification institutionnelle et la recette sans merge ni S1. Journal canonique : `docs/09_CHANGELOG_WORKLOG.md`.
