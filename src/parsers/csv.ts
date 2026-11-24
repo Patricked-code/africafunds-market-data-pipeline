@@ -34,6 +34,8 @@ export function parseDelimited(text: string, delimiter?: string): string[][] {
     }
   }
   const sep = delimiter ?? ([',', ';', '\t'].sort((a, b) => (counts.get(b) ?? 0) - (counts.get(a) ?? 0))[0] ?? ',');
+  // A leading tab-only physical line is whitespace, not a financial TSV header.
+  // After a genuine header, explicit empty TSV records remain significant.
   const rows: string[][] = [];
   let row: string[] = [];
   let cell = '';
@@ -75,7 +77,7 @@ export function parseDelimited(text: string, delimiter?: string): string[][] {
     } else if ((char === '\n' || char === '\r') && !quoted) {
       if (char === '\r' && next === '\n') i += 1;
       row.push(cellWasQuoted ? cell : cell.trim());
-      if (row.some(Boolean) || row.length > 1 || explicitQuotedCell) rows.push(row);
+      if (row.some(Boolean) || (row.length > 1 && (sep !== '\t' || rows.length > 0)) || explicitQuotedCell) rows.push(row);
       row = [];
       cell = '';
       explicitQuotedCell = false;
@@ -92,7 +94,7 @@ export function parseDelimited(text: string, delimiter?: string): string[][] {
   if (quoted) throw new Error('Unterminated quoted field in delimited document');
   if (cell.length || row.length || explicitQuotedCell) {
     row.push(cellWasQuoted ? cell : cell.trim());
-    if (row.some(Boolean) || row.length > 1 || explicitQuotedCell) rows.push(row);
+    if (row.some(Boolean) || (row.length > 1 && (sep !== '\t' || rows.length > 0)) || explicitQuotedCell) rows.push(row);
   }
   return rows;
 }
