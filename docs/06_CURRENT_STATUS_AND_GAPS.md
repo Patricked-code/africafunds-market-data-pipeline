@@ -1,5 +1,24 @@
 # 06 — État réel et écarts
 
+## 2026-11-24 — Lot 4 / PR #41 : durcissement des tokens JSON d'origine
+
+- **CONTINUITY_ID** : SADIAAF-CONTINUITY-20261124-01. PR #37–#40 intégrées ; main ff23886d78f42a17656df88ab4a65d682b957833 protégée. Deux fusions documentaires natives démontrées, autonomie codeur complète non attestée.
+- **CORRECTION CANDIDATE** : sur la branche existante PR #41, contrôle des représentations numériques avant admission par JSON.parse (refus d'un token mathématiquement non entier arrondi à un entier sûr, y compris sous-flux vers zéro), détection des clés objet dupliquées après décodage des échappements. Validation de lignes existante conservée, pas de nouvelle dépendance ni de modification ingestion. Quatre groupes de tests de régression ajoutés.
+- **PREUVES / LIMITES** : CI #740 et Docker #603 SUCCESS sur l'ancien HEAD 070411cb2ff7cdc2416ce5e49fdad5fc92736034 uniquement ; tests ajoutés non exécutés au moment du commit, RED/GREEN séparés non attestés. Deux discussions doivent rester ouvertes jusqu'à vérification des corrections et checks du nouveau SHA. Pas de source officielle ni licence certifiée ; FR-004 et issue #14 restent PARTIAL.
+- **NEXT_ACTION** : CI/Docker du nouveau SHA, correction si rouge, résolution argumentée des deux fils après preuve, fusion native si admissible ; poursuivre PR #36 et les autres travaux indépendants, issue #9 et six chantiers sans collision, aucun S1.
+
+
+## 2026-11-24 — Lot 4 / chantier #14 : admission JSON structurée sans source officiellement qualifiée
+
+- **BASE RÉCONCILIÉE** : `main` protégée au commit ff23886d78f42a17656df88ab4a65d682b957833 ; CI #738 SUCCESS ; PR fonctionnelles #22 et #25–#36 ouvertes, dont #35 sur CSV et #36 sur ingestion, non modifiées. Programme 14 lots 0–13 et 6 chantiers issues #5/#13–#17 maintenu.
+- **LACUNE CONSTATÉE** : les parseurs déjà présents couvrent `src/parsers/html.ts`, `csv.ts`, `xlsx.ts`. Aucun parseur JSON générique ne figure dans `src/parsers` sur ce SHA. Le cahier de conception prévoit JSON/XML-SDMX/PDF, sous qualification des droits et champs sources.
+- **MODIFICATION ISOLÉE** : ajout de `src/parsers/json.ts` avec `parseFinancialJsonDocument` pour tableaux d'objets plats ou enveloppes `data`/`records`, limites de taille/lignes/colonnes, refus des documents ambigus, champs dangereux, structures imbriquées, entiers non sûrs ou nombres décimaux JSON potentiellement arrondis par `JSON.parse`. Les valeurs financières décimales doivent être fournies comme chaînes ou attendre un mapping lossless source-spécifique ; aucune transformation de date, devise, maturité ou qualité n'est supposée.
+- **TESTS** : `test/json-document-admission.test.ts` vérifie tableaux, enveloppes, cas vides, champs, sécurité, taille et précision ; CI et Docker sur HEAD de la PR à vérifier avant READY. Aucun endpoint officiel contacté, aucune licence supposée, aucun changement de `src/jobs/ingest.ts`, aucune écriture DB/S1.
+- **STATUT** : `PARTIAL` — composant de parsing disponible en branche candidate, **pas** un adaptateur CBE/GOSDMX pleinement fonctionnel, ni une qualification des 44 sources, ni une recette de données financières. Aucun faux `SUCCESS` ni `HISTORY_COMPLETE`.
+- **BLOCK_REASON** : schémas JSON spécifiques, endpoints officiels, mappings dates/valeurs/droits et formats JSON-SDMX non encore attestés. PR à tester/intégrer ; les opérations d'ingestion globales sont occupées par PR #26/#36.
+- **NEXT_ACTION** : vérifier tests exact SHA, faire qualifier cette PR ordinaire sous auto-merge gouverné ; poursuivre l'issue #14 par contrats de chaque source, témoins officiels autorisés, mapping économique et intégration dans un adaptateur qualifié, sans collision avec les branches CSV/ingestion.
+
+
 ## 2026-11-24 — Lot 11 : intégration automatique native démontrée sur première PR pilote
 
 - **PROUVÉ** : PR #37 fusionnée dans main, squash ed78d253fbce9b5f94b9ef4d9a38803c6b63d417, CI #733 SUCCESS, Docker #597 SUCCESS, 4/4 fils résolus ; ruleset GitHub #27937019, approvals ordinaires 0 et checks validate/Docker obligatoires préservés.
