@@ -1,4 +1,10 @@
 # 06 — État réel et écarts
+
+## 2026-11-24 — Issue #16 / PR #29 : réconciliation du catalogue FX, inflation et fonds
+- **CONTINUITY_ID** : SADIAAF-CONTINUITY-20261124-01 ; admission PR29 commentaire 7122422947. Main ef861ea26b26b82ec7cac987d9404a3707b2439f après PR32 native, ancien HEAD b80eaf0d173866306fc384140863b1cddcfe1c95.
+- **TRAVAIL** : merge à deux parents, reprise des blobs historiques exacts de registry.ts, test/source-family-additive-compat.test.ts et note candidate BAM ; code registre main inchangé depuis ancêtre 73256f48d81d38ce8ff6f51be9e024b25cf5dadb. Conservation de toutes les entrées main et ajouts historiques PR29, insérés avant le socle commun de novembre. Aucun endpoint ni donnée réelle ajouté.
+- **BLOCK_REASON** : validation exact HEAD et revue de périmètre sécurité à obtenir ; contrat/licence BAM, observation autorisée, historiques et recettes métier non attestés. Aucun auto-merge implicite ni S1. Lot PARTIAL.
+- **NEXT_ACTION** : vérifier CI/Docker sur nouveau SHA, traiter les écarts et qualifier les gates sensibles (registre, validation de chemin/URL), conserver les 44 sources et identifier les contrats officiels autorisés. Poursuivre lots indépendants sans collision.
 ## 2026-11-24 — Lots 5–7 / PR #32 : garde de valorisation obligataire et Total Return
 - **CONTINUITY_ID** : SADIAAF-CONTINUITY-20261124-01. PR #32, source `src/calc/bonds.ts`, tests `test/bond-financial-inputs.test.ts`, branche `fix/bond-financial-nonfinite-guard-20261115`.
 - **DÉVELOPPEMENT** : rejet des valeurs non finies (courbes, maturités, flux, prix, distributions et résultat), échéances négatives, taux incohérents pour un même tenor ; conservation des doublons cohérents, de l'ordre des données de l'appelant, et des formules de valorisation et Total Return en cas valide. Vérifications d'overflow et de cas numériques extrêmes.
@@ -126,6 +132,15 @@
 - **État des tests :** code committé sur branche, CI GitHub de cette branche à observer à l'ouverture de PR. Pas de test déclaré PASS avant la fin de son workflow.
 - **BLOCK_REASON :** protection et allow-auto-merge actuellement absents, accès d'administration non disponible dans le connecteur GitHub, acteur indépendant de revue automatique non attesté. L'outil GitHub ne peut pas activer la configuration du dépôt via les fonctions actuellement disponibles.
 - **NEXT_ACTION :** contrôler la PR #37 ouverte en Draft, CI et Docker sur son HEAD exact ; appliquer et attester une fois la protection main et Allow auto-merge par un moyen admin autorisé ; intégrer la PR seulement après revue indépendante ; tester l'enrôlement auto-merge natif sur une PR pilote sans bypass, puis reprendre les lots 0–13. Aucun besoin d'intervention humaine à chaque développement si un reviewer indépendant automatisé effectivement habilité intervient.
+
+
+## Issue #16 — Compatibilité additive du catalogue (2026-11-13, PARTIAL)
+
+- Branche `test/source-family-additive-compat-20261113` : test non destructif des 11 fichiers marchés et des 44 endpoints originels, unicité des IDs, et extension **synthétique en mémoire seulement** des familles FX, INFLATION et FUND_NAV.
+- Aucun endpoint, contrat, licence, URL réelle, VL ni adaptateur ajouté au catalogue. La recette de collecte, la couverture historique et la publication restent NON ATTESTÉES.
+- Tests locaux NOT_RUN ; CI exact-HEAD à vérifier dans la PR. Aucune certification de sources officielles.
+- BLOCK_REASON : licences et contrats primaires non qualifiés ; collecte réelle et writer non implémentés dans ce changement ; revue et CI requises.
+- NEXT_ACTION : contrôler la CI, qualifier institutions et licences par pays, puis étendre additivement les sources autorisées sur branche revue, sans toucher aux 44 entrées initiales.
 
 
 ## Audit S1 et sécurité de déploiement — 2026-11-07
