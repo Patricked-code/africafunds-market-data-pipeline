@@ -1,9 +1,9 @@
 import {z} from "zod";
-import {GitHubClaimStore,type ClaimStore,type ClaimedWorkContext,type WorkPassResult} from "./agentClaims.js";
+import {GitHubClaimStore,listAcceptedDirectorWakes,runDeferredDirectorWake,type WakeSignal,type ClaimStore,type ClaimedWorkContext,type WorkPassResult} from "./agentClaims.js";
 import {createGitHubRequest} from "./githubTransport.js";
 import {createCanonicalAdmissionLoader} from "./githubAdmissions.js";
 import {createGitHubWorkSelector,type CanonicalWorkAdmission} from "./githubSelector.js";
-import {runGitHubDirectorWake,type GitHubDirectorEvent} from "./githubDirector.js";
+import {runGitHubDirectorWake,deriveGitHubWake,type GitHubDirectorEvent} from "./githubDirector.js";
 import type {createGitHubAppIdentity} from "./githubIdentity.js";
 import {createGitHubSourceReader} from "./githubSource.js";
 import {createLocalModelCoder,prepareCodingCandidate,type CodingResult} from "./modelCoder.js";
@@ -64,13 +64,35 @@ export interface DirectorRuntimeConfig {
 // Connect the existing modules for one authenticated wake on already-admitted
 // existing PRs. No scheduler, branch creation, PR creation, admin mutation,
 // model credential delivery, or implicit recovery. Not a complete activation.
+export function eventFromAcceptedWake(signal:WakeSignal):GitHubDirectorEvent{
+ const number=(s:string)=>positive.parse(Number(s));
+ if(signal.kind==="ci-completed"){
+  const m=/^ci:([1-9][0-9]*):([1-9][0-9]*)$/.exec(signal.key);
+  if(!m||signal.evidence!=="ci:"+m[1])throw Error("DEFERRED_EVENT_IDENTITY_INVALID");
+  return {kind:"workflow-completed",runId:number(m[1]!),attempt:number(m[2]!),head:signal.head};
+ }
+ if(signal.kind==="pr-merged"){
+  const m=/^pr:([1-9][0-9]*):([a-f0-9]{40})$/.exec(signal.key);
+  if(!m||signal.evidence!=="pr:"+m[1]||signal.head!==m[2])throw Error("DEFERRED_EVENT_IDENTITY_INVALID");
+  return {kind:"pr-merged",number:number(m[1]!),mergeSha:signal.head};
+ }
+ throw Error("DEFERRED_EVENT_KIND_UNSUPPORTED");
+}
 export async function runExistingPrDirector(event:GitHubDirectorEvent,config:DirectorRuntimeConfig){
+ return runDirector(config,event);
+}
+// A trusted worker invokes this entrypoint; the protected state itself is
+// the admitted source, not an externally supplied event or receipt.
+export async function runAcceptedExistingPrDirector(config:DirectorRuntimeConfig){
+ return runDirector(config,null);
+}
+async function runDirector(config:DirectorRuntimeConfig,event:GitHubDirectorEvent|null){
  sessionSchema.parse(config.session);positive.parse(config.coordinationRulesetId);
  if(!Number.isSafeInteger(config.leaseMs)||config.leaseMs<1000||config.leaseMs>3600000||
   !Number.isSafeInteger(config.maxUnits)||config.maxUnits<1||config.maxUnits>10)
   throw Error("DIRECTOR_RUNTIME_LIMIT_INVALID");
  const actor=config.identity.actor;
- if(await config.authenticateDelivery(event)!==true)throw Error("UNAUTHENTICATED_DELIVERY");
+ if(event!==null&&await config.authenticateDelivery(event)!==true)throw Error("UNAUTHENTICATED_DELIVERY");
  if(await config.verifyCoordinationIsolation(actor)!==true)throw Error("DIRECTOR_COORDINATION_ISOLATION_REQUIRED");
  if(await config.verifyAdmissionHistory()!==true)throw Error("DIRECTOR_ADMISSION_HISTORY_REQUIRED");
  const readCredential=await config.identity.issue("read"),writer=await config.identity.issue("publish"),evidenceCredential=await config.identity.issue("evidence");
@@ -137,7 +159,19 @@ export async function runExistingPrDirector(event:GitHubDirectorEvent,config:Dir
    }
   })(context);
  };
- return runGitHubDirectorWake(event,{store,actor,session:config.session,now:config.now,leaseMs:config.leaseMs,maxUnits:config.maxUnits,
+ const ports={store,actor,session:config.session,now:config.now,leaseMs:config.leaseMs,maxUnits:config.maxUnits,
   selectNext:createGitHubWorkSelector({readGitHub,readCanonicalAdmissions:admissions,store,actor,session:config.session,now:config.now,leaseMs:config.leaseMs}),
-  execute,readGitHub,authenticateDelivery:config.authenticateDelivery});
+  execute,readGitHub,authenticateDelivery:config.authenticateDelivery};
+ if(event!==null)return runGitHubDirectorWake(event,ports);
+ const signal=listAcceptedDirectorWakes((await store.read()).state)[0];
+ if(!signal)return {status:"no-accepted-wake" as const,finished:[]};
+ const reconstructed=eventFromAcceptedWake(signal);
+ return runDeferredDirectorWake(signal,{...ports,async verifySignal(s){
+  // Revalidate live GitHub objects on every dispatch. No trust in caller
+  // supplied event, stale CI, or unauthenticated receipt. An accepted receipt
+  // is claimed by CAS in the existing director before model work starts.
+  const live=await deriveGitHubWake(reconstructed,readGitHub);
+  return s.kind===live.kind&&s.key===live.key&&s.head===live.head&&s.evidence===live.evidence;
+ }});
+
 }

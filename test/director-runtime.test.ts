@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import {createExistingPrExecutor,supportedExistingPrAdmissions,runExistingPrDirector,type DirectorRuntimeConfig} from "../src/coordination/directorRuntime.js";
+import {createExistingPrExecutor,supportedExistingPrAdmissions,runExistingPrDirector,runAcceptedExistingPrDirector,eventFromAcceptedWake,type DirectorRuntimeConfig} from "../src/coordination/directorRuntime.js";
 import {emptyState,transition,type ClaimedWorkContext} from "../src/coordination/agentClaims.js";
 import type {CanonicalWorkAdmission} from "../src/coordination/githubSelector.js";
 import type {CodingResult} from "../src/coordination/modelCoder.js";
@@ -51,4 +51,20 @@ test("runtime requires three separate scoped credentials and matching evidence A
  async verifyCoordinationIsolation(){return true;},async verifyWriterIsolation(){return false;},async verifyAdmissionHistory(){return true;},async verifyCandidatePolicy(){return false;},async authenticateDelivery(){return true;},fetcher:async()=>{throw Error("unexpected network");}};
  await assert.rejects(runExistingPrDirector({kind:"pr-merged",number:42,mergeSha:head},config),/DIRECTOR_IDENTITY_MISMATCH/);
  assert.deepEqual(issued,["read","publish","evidence"]);
+});
+
+test("deferred wake reconstructs only canonical exact GitHub event identities",()=>{
+ assert.deepEqual(eventFromAcceptedWake({kind:"ci-completed",key:"ci:123:2",head,evidence:"ci:123"}),{kind:"workflow-completed",runId:123,attempt:2,head});
+ assert.deepEqual(eventFromAcceptedWake({kind:"pr-merged",key:"pr:42:"+head,head,evidence:"pr:42"}),{kind:"pr-merged",number:42,mergeSha:head});
+ assert.throws(()=>eventFromAcceptedWake({kind:"ci-completed",key:"ci:123:2",head,evidence:"ci:124"}),/IDENTITY/);
+ assert.throws(()=>eventFromAcceptedWake({kind:"pr-merged",key:"pr:42:"+next,head,evidence:"pr:42"}),/IDENTITY/);
+ assert.throws(()=>eventFromAcceptedWake({kind:"manual-admission",key:"manual",head,evidence:"issue:9"}),/UNSUPPORTED/);
+});
+test("deferred worker cannot access credentials without proven coordination isolation",async()=>{
+ let issued=0;
+ const config:DirectorRuntimeConfig={identity:{actor:"fixture",async issue(){issued++;throw Error("unexpected");}},
+ session:"session-a",coordinationRulesetId:1,imageId:"sha256:"+"f".repeat(64),now:()=>1000,leaseMs:10000,maxUnits:1,evidenceAppId:10,evidenceBotUserId:20,
+ async verifyCoordinationIsolation(){return false;},async verifyWriterIsolation(){return false;},async verifyAdmissionHistory(){return true;},async verifyCandidatePolicy(){return false;},async authenticateDelivery(){throw Error("deferred entrypoint must not synthesize delivery");}};
+ await assert.rejects(runAcceptedExistingPrDirector(config),/COORDINATION_ISOLATION_REQUIRED/);
+ assert.equal(issued,0);
 });
