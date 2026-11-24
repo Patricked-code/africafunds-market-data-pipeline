@@ -1,5 +1,14 @@
 # 06 — État réel et écarts
 
+## 2026-11-24 — Convergence PR #26 : contrôles d'ingestion et écritures terminales préservés
+- **CONTINUITY_ID** : SADIAAF-CONTINUITY-20261124-01 ; ancienne PR #26 HEAD `bc632405eb8964250c4d88fb56adff846d652a9d`, branche `fix/manual-api-discovery-fail-closed-20261109`, rapprochée du `main=bf42e246a083221d0bd64a5b28f349847215016f` après intégration CSV de PR #35.
+- **TRAVAIL PRÉSERVÉ** : 7 blobs CODE/TEST EXACTS de PR #26 (src/jobs/ingest.ts, ingestionOutcome.ts, runStore.ts, terminalWrite.ts, tests unitaires et intégration PostgreSQL) repris sans réécriture ; classement BLOCKED_ADAPTER pour MANUAL_API_DISCOVERY, NO_STRUCTURED_ROWS en mode ingest, compteurs et statuts terminales, fencing et writeTerminalOnce.
+- **HISTORIQUE** : merge Git non destructif à deux parents (premier PR #26, second main) ; état des docs/06 et docs/09 du main courant maintenu avec checkpoint. Le contenu ancien des docs modifiés par PR #26 reste récupérable par son parent Git original ; aucun force push/suppression, aucune réinitialisation des branches d'autres PR.
+- **DEPENDANCE SUIVANTE** : PR #36 a des modifications concurrentes à src/jobs/ingest.ts : ne pas la merger par écrasement du fichier. Fusionner les contrôles NO_STRUCTURED_ROWS, BLOCKED_ADAPTER, runStore/terminalWrite de #26 et les gardes failedChildren/rows/endpoint de #36 avec tests de comportement discover vs ingest. La PR #36 doit être réconciliée seulement après réussite/intégration de #26.
+- **BLOCK_REASON** : CI/Docker sur HEAD du présent merge non encore certifiées ; aucune qualification des six adaptateurs officiels, aucune conformité des sources/licences/recette S1 attestée.
+- **NEXT_ACTION** : contrôler les checks validate et Docker/PostgreSQL du nouveau HEAD, fichiers diff et reviews, passer PR #26 READY et mettre label automerge-eligible si admissible, déclencher native auto-merge SHA-bound, puis traiter la PR #36 sans collision. Poursuivre les 14 lots et six chantiers selon tests financiers/sources réelles.
+
+
 ## 2026-11-24 — Lot 4 / PR #35 : réconciliation du parseur CSV existant sans réécriture
 - **CONTINUITY_ID** : SADIAAF-CONTINUITY-20261124-01. Reprise non destructive de la PR #35 depuis ancien SHA `dadf871051f2b478eb875125d4dd55b46e2d25ca` vers `main=eb74c0a1d42d8dafa4fa67bbf8aa185b571763fa`.
 - **SOURCE EXACTE** : le blob `src/parsers/csv.ts` (`79f02ea9b636327f7d188a2b93fb71770af7efc3`) et les tests `test/csv-document-parser-regression.test.ts` (`6a66d0a590b4582e96c73252f333d42aeb7587f2`) proviennent IDENTIQUES de la PR #35 ; aucun parseur ni test existant n'est reconstruit, la base de code `main` reste inchangée hors ces deux fichiers.
