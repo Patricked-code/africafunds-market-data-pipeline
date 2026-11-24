@@ -19,6 +19,8 @@ const pendingMutationSchema = z.object({
     ctx.addIssue({code:"custom",message:"INVALID_MUTATION_INTENT"});
 });
 export type PendingMutation=z.infer<typeof pendingMutationSchema>;
+const lifecycleSchema=z.object({kind:z.enum(["branch","pr"]),head:sha,issue:stamp.positive()}).strict();
+export type PendingLifecycle=z.infer<typeof lifecycleSchema>;
 const claim = z.object({
   workId: id, actor: id, session: id, lot: z.number().int().min(0).max(13),
   branch: z.string().min(1).max(200).regex(/^[A-Za-z0-9._/-]+$/)
@@ -27,6 +29,7 @@ const claim = z.object({
   generation: stamp.positive(), leaseUntil: stamp, updatedAt: stamp,
   trace,
   pendingMutation:pendingMutationSchema.optional(),
+  pendingLifecycle:lifecycleSchema.optional(),
 }).strict();
 const wakeSignalSchema = z.object({
   key: id,
@@ -44,7 +47,7 @@ const wakeReceiptSchema = z.object({
 export type WakeSignal = z.infer<typeof wakeSignalSchema>;
 type WakeReceipt = z.infer<typeof wakeReceiptSchema>;
 const event = z.object({
-  revision: stamp.positive(), kind: z.enum(["claim","heartbeat","checkpoint","release","recover","wake-accepted","wake-intent","wake-result","mutation-intent","mutation-result"]),
+  revision: stamp.positive(), kind: z.enum(["claim","heartbeat","checkpoint","release","recover","wake-accepted","wake-intent","wake-result","mutation-intent","mutation-result","lifecycle-intent","lifecycle-result"]),
   at: stamp, workId: id, actor: id, session: id, generation: stamp.positive(),
   previousGeneration: stamp.positive().optional(), wakeKey:id.optional(), trace,
 }).strict();
@@ -68,7 +71,7 @@ export const stateSchema = z.object({
   if (s.lastEvent?.kind.startsWith("wake-") && (!s.lastEvent.wakeKey || !keys.has(s.lastEvent.wakeKey))) fail("missing wake receipt");
   for (const [i,a] of s.claims.entries()) {
     if (a.generation > s.revision || a.updatedAt > s.updatedAt || a.leaseUntil <= a.updatedAt ||
-        new Set(a.scopes).size !== a.scopes.length || (a.pendingMutation && (a.pendingMutation.expectedHead!==a.trace.head || !mutationPathsAllowed(a,a.pendingMutation.paths)))) fail("invalid claim state");
+        new Set(a.scopes).size !== a.scopes.length || (a.pendingMutation && (a.pendingMutation.expectedHead!==a.trace.head || !mutationPathsAllowed(a,a.pendingMutation.paths))) || (a.pendingLifecycle && (a.pendingMutation || a.pendingLifecycle.head!==a.trace.head || !a.branch.startsWith("work/sadiaaf-issue-"+a.pendingLifecycle.issue+"-")))) fail("invalid claim state");
     for (const b of s.claims.slice(i+1)) if (conflicts(a,b)) fail("overlapping existing claims");
   }
 });
@@ -84,7 +87,9 @@ export type Command =
   | ({kind:"checkpoint"; trace:Trace} & Identity)
   | ({kind:"release"; trace:Trace} & Identity)
   | ({kind:"mutation-intent"; mutation:PendingMutation} & Identity)
-  | ({kind:"mutation-result"; candidateHead:string; observedHead:string; trace:Trace} & Identity);
+  | ({kind:"mutation-result"; candidateHead:string; observedHead:string; trace:Trace} & Identity)
+  | ({kind:"lifecycle-intent"; operation:PendingLifecycle} & Identity)
+  | ({kind:"lifecycle-result"; operation:PendingLifecycle; prNumber?:number; trace:Trace} & Identity);
 
 export function emptyState(): State {
   return {continuity:CONTINUITY_ID,revision:0,updatedAt:0,claims:[],lastEvent:null};
@@ -110,6 +115,7 @@ export function transition(input:State, command:Command, now:number):State {
   let claims:Claim[];
   if (old?.pendingMutation && command.kind!=="heartbeat" && command.kind!=="mutation-result")
     throw Error("MUTATION_RECONCILIATION_REQUIRED");
+  if (old?.pendingLifecycle && command.kind!=="heartbeat" && command.kind!=="lifecycle-result") throw Error("LIFECYCLE_RECONCILIATION_REQUIRED");
   if (command.kind === "claim" || command.kind === "recover") {
     if (command.kind === "claim" && old) throw new Error("ALREADY_CLAIMED");
     if (command.kind === "recover") {
@@ -126,6 +132,24 @@ export function transition(input:State, command:Command, now:number):State {
     if (command.kind === "claim" && next.trace.head !== next.base) throw new Error("BASE_NOT_RECONCILED");
     if (s.claims.some(c => c !== old && conflicts(c,next))) throw new Error("SCOPE_OCCUPIED");
     claims = [...s.claims.filter(c => c !== old),next];
+   } else if(command.kind==="lifecycle-intent" || command.kind==="lifecycle-result"){
+    if(!old || old.actor!==command.actor || old.session!==command.session || old.generation!==command.generation)
+      throw Error("STALE_OR_EXPIRED_CLAIM");
+    const operation=lifecycleSchema.parse(command.operation);
+    if(operation.head!==old.trace.head || !old.branch.startsWith("work/sadiaaf-issue-"+operation.issue+"-"))
+      throw Error("LIFECYCLE_SCOPE_MISMATCH");
+    if(command.kind==="lifecycle-intent"){
+      if(now>=old.leaseUntil||old.pendingLifecycle||old.pendingMutation)throw Error("LIFECYCLE_NOT_ADMISSIBLE");
+      next=claim.parse({...old,updatedAt:now,pendingLifecycle:operation});
+    }else{
+      if(!old.pendingLifecycle||JSON.stringify(old.pendingLifecycle)!==JSON.stringify(operation)||
+       command.trace.head!==operation.head||!command.trace.evidence.includes("commit:"+operation.head)||
+       (operation.kind==="pr"&&(!Number.isSafeInteger(command.prNumber)||command.prNumber!<=0||!command.trace.evidence.includes("pr:"+command.prNumber)))||
+       (operation.kind==="branch"&&command.prNumber!==undefined))throw Error("LIFECYCLE_RESULT_NOT_ADMISSIBLE");
+      const {pendingLifecycle:_pending,...rest}=old;
+      next=claim.parse({...rest,trace:command.trace});
+    }
+    claims=[...s.claims.filter(c=>c!==old),next];
   } else if(command.kind==="mutation-intent" || command.kind==="mutation-result") {
     if(!old || old.actor!==command.actor || old.session!==command.session || old.generation!==command.generation)
       throw Error("STALE_OR_EXPIRED_CLAIM");
@@ -178,7 +202,7 @@ export function assertFence(state:State,identity:Identity,now:number):Claim {
   stamp.parse(now);
   const s = stateSchema.parse(state);
   const c = s.claims.find(x => x.workId === identity.workId);
-  if (now < s.updatedAt || !c || c.pendingMutation || c.actor !== identity.actor || c.session !== identity.session ||
+  if (now < s.updatedAt || !c || c.pendingMutation || c.pendingLifecycle || c.actor !== identity.actor || c.session !== identity.session ||
       c.generation !== identity.generation || now >= c.leaseUntil) throw new Error("STALE_OR_EXPIRED_CLAIM");
   return c;
 }

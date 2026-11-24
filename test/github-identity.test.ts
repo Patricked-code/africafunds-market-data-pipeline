@@ -69,3 +69,8 @@ test("evidence credential can write issues but not contents, publication unchang
 test("combined write permissions rejected for either separated mode",async()=>{
  for(const mode of ["evidence","publish"] as const){const f=fixture();f.combined();await assert.rejects(f.broker.issue(mode),/TOKEN_SCOPE_INVALID/);assert.equal(f.calls.length,3);}
 });
+
+test("PR token is separate from contents and evidence writes",async()=>{
+ const f=fixture();await f.broker.issue("pull-request");assert.deepEqual(f.calls[2]?.body,{repository_ids:[1315731572],permissions:{contents:"read",issues:"read",pull_requests:"write"}});
+ const g=fixture();g.combined();await assert.rejects(g.broker.issue("pull-request"),/TOKEN_SCOPE_INVALID/);
+});
