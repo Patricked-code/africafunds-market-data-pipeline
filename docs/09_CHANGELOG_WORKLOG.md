@@ -1,4 +1,12 @@
 # 09 — Journal de travail et continuité
+## 2026-11-24 — Lots 5–7 / PR #32 : garde de valorisation obligataire et Total Return
+- **CONTINUITY_ID** : SADIAAF-CONTINUITY-20261124-01. PR #32, source `src/calc/bonds.ts`, tests `test/bond-financial-inputs.test.ts`, branche `fix/bond-financial-nonfinite-guard-20261115`.
+- **DÉVELOPPEMENT** : rejet des valeurs non finies (courbes, maturités, flux, prix, distributions et résultat), échéances négatives, taux incohérents pour un même tenor ; conservation des doublons cohérents, de l'ordre des données de l'appelant, et des formules de valorisation et Total Return en cas valide. Vérifications d'overflow et de cas numériques extrêmes.
+- **PREUVES** : CI #756 https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45322460514 SUCCESS, Docker/PostgreSQL #619 https://github.com/Patricked-code/africafunds-market-data-pipeline/actions/runs/45322460499 SUCCESS, tous deux sur l'ancien HEAD `af65a7f0dfd41ff8ddaf9711d505d782fc316f6e`. Les contrôles seront rejoués sur le nouveau SHA documentaire ; les résultats précédents ne suffisent pas à l'attester.
+- **CONSTAT DE REVUE** : les documents obligatoires docs/06 et docs/09 étaient absents du diff de la PR #32. Le présent checkpoint corrige cet écart P1, sans toucher au calcul ni aux tests.
+- **LIMITES** : les fixtures sont synthétiques ; pas de courbe officielle, historique de marché, licence, méthode validée par le métier ou recette financière exhaustive attestés. Les lots 5–7 et le chantier #17 restent PARTIAL.
+- **BLOCK_REASON / NEXT_ACTION** : vérifier validate et Docker/PostgreSQL au nouveau SHA exact, répondre et résoudre la discussion P1 si preuves suffisantes ; laisser auto-merge natif GitHub fusionner sans bypass. Reprendre les cinq PR encore ouvertes selon dépendances (backfill #22, audit #25, registre #29, gates S1 #31), et achever les 14 lots via le référentiel existant ; aucun déploiement S1.
+
 
 ## 2026-11-24 — Lot 9 / chantier #17 : réconciliation de la sécurité API/CORS, PR #30
 - **CONTINUITY_ID** : SADIAAF-CONTINUITY-20261124-01 ; ancienne branche `fix/api-cors-origin-admission-20261114` HEAD `c4504755daaacbe1b4682f8ab495a737bbdb0654`, main protégé `9adffe7eaa711fae7f780653c44a847cbf815220`.
