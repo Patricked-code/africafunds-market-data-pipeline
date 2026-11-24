@@ -1,5 +1,14 @@
 # 06 — État réel et écarts
 
+## 2026-11-24 — Lot 2/11, chantier #15 : non-régression de l'admission qualité, PR #28
+- **CONTINUITY_ID** : SADIAAF-CONTINUITY-20261124-01 ; branche originale `test/quality-row-admission-regression-20261112`, ancien HEAD `bebd543671f92d23ed38b4da0fb1a3dfe7ea7c5e`, main protégé `de42e308a932d144d6928419229f35cef07974d5`.
+- **TRAVAUX REPRIS** : réutilisation exacte du blob `src/quality/validate.ts` et de ses tests `test/quality-rows-regression.test.ts` (scoring structurel de lignes) ; aucun nouveau modèle de qualité ni réécriture des modules de provenance intégrés en #27.
+- **HISTORIQUE/GOUVERNANCE** : merge Git à deux parents non force avec main courant et documents docs/06/09 conservés, checkpoint additionnel. Les anciens commits de branche restent consultables via la PR originale. Approbation indépendante ordinaire non exigée (ADR-016), deux checks CI/Docker obligatoires et discussion résolue.
+- **LIMITES** : le scoring structurel ne certifie ni validation financière par source/market, ni dates économiques et provenance complète, ni licence officielle ou publication API. Le chantier #15 et les 14 lots restent PARTIAL.
+- **BLOCK_REASON** : nouvelle CI et Docker sur SHA du merge non certifiés ; toute remarque GitHub P2 devra être examinée, pas contournée.
+- **NEXT_ACTION** : qualifier PR28 READY, vérifier 4 fichiers, valider tests sur SHA exact puis auto-merge native ; reprendre PR30 API ou autres PR indépendantes selon propriété/anti-collision. Aucun S1.
+
+
 ## 2026-11-24 — Lots 2/11, chantier #15 : admission typée et provenance, PR #27
 - **CONTINUITY_ID** : SADIAAF-CONTINUITY-20261124-01. Branche d'origine `feat/quality-financial-observation-gate-20261109`, HEAD source `6b292b66c5201780b6583da6bf502a9817edfac1`, main actuel `ac6166ccff370f721110a7d68b965e95426eac9b`.
 - **REUTILISATION** : trois blobs code `financialObservation.ts`, `rawRecordProvenance.ts`, `withVerifiedRawRecord.ts` et quatre fichiers tests exactement identiques à la PR historique, actuellement ABSENTS du main précédent, ajoutés sans modifier les validateurs existants ni SQL. Protection contre l'admission financière sans provenance / source / marché / méthode documentée ; aucun historique de marché certifié par cette seule création de gate.
