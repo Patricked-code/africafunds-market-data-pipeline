@@ -1,5 +1,10 @@
 # 14 — Matrice des exigences et de recette
 
+## Rattachement aux décisions historiques — MISSION 13
+
+La MISSION 13 (SADIAAF-CONTINUITY-20261124-01) ne remplace pas la présente matrice. **FR-025** (versionner les méthodologies, deux versions sur périodes distinctes) matérialise notamment ADR-007 ; son statut PARTIAL demeure jusqu'à preuve métier. ADR-008 impose l'absence d'anticipation. Les critères d'autonomie de développement du lot 11 figurent dans docs/15 (ADR-010/012, issue #9), dont deux développements réels successifs sans prompt, concurrence et récupération ; une recette pilote auto-merge ou un modèle qui répond ne suffit pas. Les lots métier conservent leurs critères propres. Voir docs/08 pour les ADR, docs/13 pour les lots, docs/06/09 pour les preuves exactes et [filiation](https://github.com/Patricked-code/africafunds-market-data-pipeline/issues/9#issuecomment-7123410131). Aucun statut de cette matrice n'est changé par cet index.
+
+
 Cette matrice relie les besoins, les composants, les preuves attendues et les gates de validation.
 
 ---

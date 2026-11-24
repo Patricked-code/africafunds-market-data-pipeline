@@ -1,5 +1,10 @@
 # 04 — Méthodologies financières maîtres
 
+## Rattachement aux décisions et à la recette existantes
+
+Dans la MISSION 13 (SADIAAF-CONTINUITY-20261124-01), [ADR-007](08_DECISION_LOG.md#adr-007--méthodologies-versionnées) reste la décision maître : bornes CT/MT/LT, pondérations, courbes, règles de qualité et benchmarks historisés avec périodes de validité. ADR-008 impose le calcul sans anticipation. FR-025 dans [docs/14](14_MATRICE_EXIGENCES_RECETTE.md) exige deux versions sur périodes distinctes ; son statut historique PARTIAL n'est pas modifié par ce rattachement. Les lots 5–7 et les issues #15–17 doivent appliquer ces décisions aux données témoins, sans modifier rétroactivement les méthodes historiques. Le codeur autonome est un moyen de réaliser ces exigences et non leur substitut.
+
+
 ## Catégories nationales N5
 
 Chaque jour, pour chaque catégorie nationale : compter les fonds actifs, éligibles, valorisés, utilisés, exclus et sans VL ; calculer le rendement moyen, le niveau de l’indice, le composite officiel, le benchmark, les vues locale/EUR/USD et le score de qualité.

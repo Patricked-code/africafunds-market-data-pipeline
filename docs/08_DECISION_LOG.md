@@ -156,6 +156,34 @@ Utiliser ce fichier pour les décisions durables. Ne pas supprimer les anciennes
 - Limite de modèle : un collaborateur disposant du droit de modifier un workflow CI ou d'activer lui-même l'auto-merge peut chercher à contourner un contrôle embarqué dans le contenu d'une PR. Les ACL GitHub et l'exigence de gouvernance des PR sensibles restent donc pertinentes ; le nouveau check garantit le scénario de non-régression d'un ajout sensible accidentel/après enrôlement, et ne doit pas être présenté comme un verrou absolu contre un auteur malveillant habilité.
 - Preuves attendues : tests du required head gate (label/auto_merge, fichiers sensibles et non sensibles), CI + Docker sur SHA exact, revue des fils bloquants, fusion autorisée de PR #37, pilote native auto-merge sur PR ordinaire, test de rejet sur nouvelle révision sensible. Aucun assouplissement des deux checks requis, aucun S1, aucun secret tiers.
 
+
+## Rattachement des ADR existants à la MISSION 13 (24/11/2026)
+
+**CONTINUITY_ID :** SADIAAF-CONTINUITY-20261124-01. Cette table est un index de lecture, non une nouvelle décision, et ne modifie aucun statut ni texte ADR historique. Le contrat de référence est docs/15 §13, introduit par [d78f6e82](https://github.com/Patricked-code/africafunds-market-data-pipeline/commit/d78f6e82cf180f0128fb8ddaa40e1d35f0f3dcfc) dans PR #37. Filiation vérifiée dans [issue #9](https://github.com/Patricked-code/africafunds-market-data-pipeline/issues/9#issuecomment-7123410131).
+
+| Décision | Rôle dans la MISSION 13 | Autorité de mise en œuvre / preuve |
+|---|---|---|
+| ADR-001 | Mémoire persistante | AGENTS, docs/00/07/09, PR1 |
+| ADR-002 | Gates de production | docs/10/14, lots 12–13, PR31 |
+| ADR-003 | Architecture progressive | docs/02/12, non-refonte |
+| ADR-004 | Modèle canonique indépendant | docs/03/12, lots 2–3 |
+| ADR-005 | Séries locales et conversions FX | docs/04/14, lots 5–7, issue16 |
+| ADR-006 | Séparation officiel/propriétaire | docs/04/14, lots 5–7 |
+| ADR-007 | Méthodologies versionnées et périodes de validité | docs/04, FR-025 docs/14, PARTIAL ; lots 5–7, issue17 |
+| ADR-008 | Historique sans anticipation | docs/04/14, backfill et calculs, issues5/17 |
+| ADR-009 | PostHog distinct des traces techniques | docs/12/13, lot10 |
+| ADR-010 | Mandat fondateur autonomie | docs/15, PR1, issue9 du 06/11, PR42 = continuation |
+| ADR-011 | Convergence mémoire PR1/PR2 | docs/00 + annexe PROJECT_MEMORY.md, PR2 fermée non fusionnée |
+| ADR-012 | Préserver l'architecture et distinguer les deux usines | AGENTS, docs/13/15, PR19/21/23/24 pour exploitation |
+| ADR-013 | SadiaAF plateforme centrale | docs/01/00, pas de confusion AfricaFunds/MCP/UAES/Workers |
+| ADR-014 | Historique dépôt privé et main non protégée | configuration historique, devenue obsolète sur ces points ; issue3, ADR015/016 |
+| ADR-015 | Auto-fusion native sous protections | PR37, règles et tests, revue universelle modifiée par ADR016 |
+| ADR-016 | Pas de revue indépendante systématique pour PR ordinaires | ruleset27937019 et PR37/38/39 ; autres gates maintenus |
+| ADR-017 | Événements fiables et SHA attesté | workflow_run et signaux SHA-bound de PR37, recettes PR38/39/40 |
+| ADR-018 | Refus des changements sensibles après enrôlement | validate required head gate PR37 ; limites ACL explicites |
+
+La fusion de PR37 (ed78d253fbce9b5f94b9ef4d9a38803c6b63d417), puis les recettes PR38/39 et le correctif PR40 actualisent les états historiques d'activation de ces ADR, sans effacer leurs conditions ni prétendre certifier tous les scénarios négatifs. Vérifier les preuves LIVE et docs/06/09. L'ADR-010/012 ne permet pas de créer une nouvelle usine concurrente ; le modèle Qwen de PR42 reste candidat, aucun choix définitif de provider n'est déduit du pilote. Les 14 lots et FR-025 conservent leurs propres recettes.
+
 ## Modèle d’entrée
 
 ```markdown

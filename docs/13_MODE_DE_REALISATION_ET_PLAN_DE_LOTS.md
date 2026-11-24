@@ -1,5 +1,10 @@
 # 13 — Mode de réalisation et plan de lots
 
+## Rattachement transversal — MISSION 13
+
+MISSION 13 (SADIAAF-CONTINUITY-20261124-01) désigne l'achèvement intégral de **ces mêmes 14 lots 0–13**, non un lot 14 ni un second programme. Le lot 11 / issue #9 porte le chantier prioritaire d'exécution autonome du développement selon docs/15 (ADR-010/012 et PR1/4/37–42), au service de tous les lots. Les six chantiers issues #5 et #13–17 demeurent transversaux ; leurs exigences restent dans docs/14. Les recettes financières respectent notamment ADR-007/008, FR-025, sans déclarer de lot DONE par simple fusion ou CI. L'autonomie d'exploitation (lots 4,10,12–13) reste distincte et soumise à docs/10. Voir [filiation historique](https://github.com/Patricked-code/africafunds-market-data-pipeline/issues/9#issuecomment-7123410131) et état LIVE docs/06/09. Aucun changement de découpage ni de critères de lot.
+
+
 **But :** transformer le socle actuel en plateforme validée, testée et déployable sans régression.
 
 ---

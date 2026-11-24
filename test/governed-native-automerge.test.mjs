@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 import { evaluateEnrollment, isExplicitRevocation, normalizeActiveRulesetPolicy, isSensitiveChangePath, checkPullRequestFileScope, resolveTrustedPrSignal, evaluateRequiredScopeGate, isTerminalPullRequest } from '../scripts/ci/governed-native-automerge.mjs';
 
 function fixture() {
@@ -410,4 +411,22 @@ test('native auto-merge keeps an open PR eligible for rechecks', () => {
 test('native auto-merge fails closed for missing PR metadata', () => {
   assert.equal(isTerminalPullRequest(null), true);
   assert.equal(isTerminalPullRequest({}), true);
+});
+
+
+test('both required workflows retain default PR events and explicitly validate ready_for_review', () => {
+  for (const path of ['ci.yml','staging-runtime-smoke.yml']) {
+    const source = readFileSync(new URL('../.github/workflows/'+path, import.meta.url), 'utf8');
+    const match = /^  pull_request:\s*\n    types: \[([^\]]+)\]/m.exec(source);
+    assert.ok(match, path+' must declare PR activity types');
+    assert.deepEqual(match[1].split(',').map(x=>x.trim()).sort(), ['opened','ready_for_review','reopened','synchronize']);
+    assert.doesNotMatch(source,/^  pull_request_target:/m);
+  }
+});
+
+
+test('coordination infrastructure changes are sensitive even when no other governance file changed',()=>{
+ assert.equal(isSensitiveChangePath('src/coordination/githubIdentity.ts'),true);
+ assert.match(checkPullRequestFileScope({files:[{filename:'src/coordination/agentClaims.ts',status:'modified'}],changedFiles:1}),/sensitive/);
+ assert.equal(isSensitiveChangePath('src/utils/dates.ts'),false);
 });

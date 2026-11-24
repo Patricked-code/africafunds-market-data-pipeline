@@ -1,5 +1,12 @@
 # 07 — Protocole de reprise par une IA
 
+## Reprise inter-conversations — MISSION 13
+
+L'identifiant **SADIAAF-CONTINUITY-20261124-01** permet de reprendre le chantier canonique [issue #9](https://github.com/Patricked-code/africafunds-market-data-pipeline/issues/9), et non uniquement la PR #42. Consulter [le checkpoint transversal](https://github.com/Patricked-code/africafunds-market-data-pipeline/issues/9#issuecomment-7123410131), la section 13 historique de docs/15, la table de filiation de docs/08 et docs/00. Appliquer le parcours complet d'AGENTS.md (y compris docs/11–15) avant toute intervention ; la liste abrégée ci-dessus n'y déroge pas. Vérifier les PR #1/#2/#4/#37–40 et leurs preuves, distinguer recettes de CI/auto-fusion, coordination, codeur et exploitation métier. Chercher anciens exécuteurs dans les branches/commits/workflows avant tout remplacement. 
+
+Le handoff transmet MISSION 13, CONTINUITY_ID, issue/PR/branche/SHA exact, dernier checkpoint, claims et conflits, preuves tests, BLOCK_REASON, NEXT_ACTION, décisions applicables, restrictions et opérations effectivement autorisées. Le destinataire relit GitHub LIVE, ne rejoue pas les acquis, laisse ses traces avant/pendant/après et préserve la filiation. Ne jamais présumer qu'une ancienne autorisation sensible ou un ancien SUCCESS s'applique au nouveau HEAD. La reprise horaire existante est un filet complémentaire, pas une preuve de permanence.
+
+
 ## Au démarrage
 
 Pour l'agent codeur Claude ou ChatGPT : suivre la boucle de travail et les contrôles de `docs/15_AUTONOMOUS_AGENT_EXECUTION.md` ; conserver les autorités et les lots existants.
@@ -74,3 +81,7 @@ Une fois une tâche validée, documentée et intégrée conformément aux gates,
 ## Mise à jour de la mémoire
 
 À la fin de chaque session, ajouter une entrée dans `docs/09_CHANGELOG_WORKLOG.md` avec date, branche, commit/PR, actions, tests, blocages et prochaine étape (`NEXT_ACTION`). Référencer un checkpoint daté lorsque la session change la phase du projet ou ferme une longue interruption. Une parenthèse ne remplace pas le `NEXT_ACTION` déjà acté ; la reprise doit vérifier l'actualité des preuves.
+
+## Traces avant et pendant intervention — SADIAAF-CONTINUITY-20261124-01
+
+Ne pas attendre la fin d'une session pour laisser une trace. Enregistrer sur l'issue/PR canonique l'admission, le périmètre occupé, le SHA de base, l'état et NEXT_ACTION avant la première modification ; mettre à jour aux événements significatifs (changement de périmètre, commit, attente CI, blocage, interruption, transfert). Le checkpoint de fin conserve les preuves et le statut dans docs/09 ; docs/06 est réconcilié avec les faits GitHub. Respecter le contrat de claim/heartbeat/fencing docs/15 §14, sans présenter une annonce manuelle comme une réservation atomique. Les traces sont limitées aux références publiques nécessaires, pas au verbatim des conversations.

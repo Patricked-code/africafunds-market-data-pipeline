@@ -1,5 +1,12 @@
 # AGENTS.md — Règles de continuité pour toute IA
 
+## Reprise de la MISSION 13 — filiation obligatoire
+
+**MISSION 13 — SADIAAF-CONTINUITY-20261124-01** désigne l'achèvement intégral des 14 lots, des six chantiers de données et des deux autonomies (développement et exploitation). Priorité absolue : rendre l'exécuteur codeur indépendant de ChatGPT réellement opérationnel et certifié. La cartographie originelle est `docs/15_AUTONOMOUS_AGENT_EXECUTION.md` §13 (commit d78f6e82cf180f0128fb8ddaa40e1d35f0f3dcfc, PR #37) ; elle prolonge ADR-010 du 06/11/2026, PR #1 et issue #9. Lire la filiation et les preuves liées dans docs/00, docs/08, docs/09 et docs/15 avant toute nouvelle conception. Retrouver l'existant dans branches, commits, issues et workflows, y compris les PR fermées ; ne pas assimiler PR42 à l'origine du chantier. Le pilote modèle Qwen est une recette candidate, pas une nouvelle autorité ni une technologie imposée. Si un exécuteur historique admissible existe, le réutiliser après preuve. 
+
+Point de reprise historique : https://github.com/Patricked-code/africafunds-market-data-pipeline/issues/9#issuecomment-7123410131. GitHub LIVE et le dernier checkpoint priment sur tout état ancien. La mémoire historique PR #2 et le checkpoint du 06/11 restent intacts. Aucun doublon d'orchestrateur, de scheduler, de registre ou de roadmap. L'ADR-007 (méthodologies versionnées), FR-025 et les autres exigences métier restent à satisfaire ; ne pas les confondre avec le mécanisme d'autonomie.
+
+
 Ce dépôt est la mémoire technique et fonctionnelle du projet **AfricaFunds Market Data / SadiaAF**.
 
 ## Nomenclature canonique : plateforme SadiaAF et application AfricaFunds
@@ -88,3 +95,9 @@ Une tâche est `DONE` uniquement si :
 - les données ou résultats sont contrôlés sur des cas réels ;
 - aucune régression connue n’est introduite ;
 - le statut est traçable dans le dépôt.
+
+## Admission et traçabilité inter-agents — SADIAAF-CONTINUITY-20261124-01
+
+Avant toute écriture, quel que soit l'intervenant humain, Claude, ChatGPT, automatisation ou autre client : identifier la session par une référence opaque non sensible, consulter les issues/PR actives et le dernier état GitHub, déclarer sur l'issue existante le périmètre, la branche, le SHA et le NEXT_ACTION. Ne pas reprendre un travail déjà occupé. Pendant chaque unité significative, publier le checkpoint, les références de preuves et le prochain pas sur l'issue/PR ; maintenir docs/06 et docs/09 lors de l'intégration et préserver l'historique. Si un autre agent est actif, rester en lecture seule sur son périmètre et choisir une tâche indépendante.
+
+La réservation atomique, le bail, le heartbeat et le fencing du contrat docs/15 §14 sont obligatoires dès activation attestée du dispositif commun. Jusqu'à cette preuve, les déclarations manuelles sur GitHub ne constituent PAS un verrou atomique ; ne pas revendiquer l'absence garantie de collision. Refuser les écritures d'un périmètre non réconcilié. Aucun identifiant privé de conversation, contenu privé ou secret dans le dépôt public.
