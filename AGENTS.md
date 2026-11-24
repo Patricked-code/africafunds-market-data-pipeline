@@ -88,3 +88,9 @@ Une tâche est `DONE` uniquement si :
 - les données ou résultats sont contrôlés sur des cas réels ;
 - aucune régression connue n’est introduite ;
 - le statut est traçable dans le dépôt.
+
+## Admission et traçabilité inter-agents — SADIAAF-CONTINUITY-20261124-01
+
+Avant toute écriture, quel que soit l'intervenant humain, Claude, ChatGPT, automatisation ou autre client : identifier la session par une référence opaque non sensible, consulter les issues/PR actives et le dernier état GitHub, déclarer sur l'issue existante le périmètre, la branche, le SHA et le NEXT_ACTION. Ne pas reprendre un travail déjà occupé. Pendant chaque unité significative, publier le checkpoint, les références de preuves et le prochain pas sur l'issue/PR ; maintenir docs/06 et docs/09 lors de l'intégration et préserver l'historique. Si un autre agent est actif, rester en lecture seule sur son périmètre et choisir une tâche indépendante.
+
+La réservation atomique, le bail, le heartbeat et le fencing du contrat docs/15 §14 sont obligatoires dès activation attestée du dispositif commun. Jusqu'à cette preuve, les déclarations manuelles sur GitHub ne constituent PAS un verrou atomique ; ne pas revendiquer l'absence garantie de collision. Refuser les écritures d'un périmètre non réconcilié. Aucun identifiant privé de conversation, contenu privé ou secret dans le dépôt public.

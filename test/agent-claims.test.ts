@@ -76,3 +76,43 @@ test("GitHub adapter constructs single-parent commit and non-force ref update; r
   assert.deepEqual(calls.find(c=>c.method==="PATCH")?.body,{sha:commit,force:false});
   await assert.rejects(store.compareAndSwap(current,state()),/CLAIM_CAS_CONFLICT/);
 });
+
+test("native Git fast-forward race admits exactly one sibling and preserves winner",async()=>{
+  const {mkdtemp,rm}=await import("node:fs/promises");
+  const {tmpdir}=await import("node:os");
+  const {join}=await import("node:path");
+  const {execFile}=await import("node:child_process");
+  const {promisify}=await import("node:util");
+  const run=promisify(execFile);
+  const dir=await mkdtemp(join(tmpdir(),"sadiaaf-claim-race-"));
+  const env={...process.env,GIT_AUTHOR_NAME:"SadiaAF test",GIT_AUTHOR_EMAIL:"test@example.invalid",GIT_COMMITTER_NAME:"SadiaAF test",GIT_COMMITTER_EMAIL:"test@example.invalid"};
+  const git=async(cwd:string,...args:string[])=>(await run("git",args,{cwd,env})).stdout.trim();
+  try{
+    const remote=join(dir,"remote.git");
+    await git(dir,"init","--bare",remote);
+    await git(dir,"init","-b","main");
+    const {writeFile}=await import("node:fs/promises");
+    await writeFile(join(dir,"agent-claims.json"),JSON.stringify(emptyState()));
+    await git(dir,"add","agent-claims.json");
+    await git(dir,"commit","-m","initial");
+    const parent=await git(dir,"rev-parse","HEAD");
+    const ref="refs/heads/coordination/sadiaaf-agent-state";
+    await git(dir,"push",remote,parent+":"+ref);
+    await writeFile(join(dir,"agent-claims.json"),JSON.stringify(state()));
+    await git(dir,"add","agent-claims.json");
+    await git(dir,"commit","-m","claim A");
+    const a=await git(dir,"rev-parse","HEAD");
+    await git(dir,"checkout","--detach",parent);
+    await writeFile(join(dir,"agent-claims.json"),JSON.stringify(transition(emptyState(),{...first,actor:"agent-b",session:"session-b",scopes:[...first.scopes]},1000)));
+    await git(dir,"add","agent-claims.json");
+    await git(dir,"commit","-m","claim B");
+    const b=await git(dir,"rev-parse","HEAD");
+    const result=await Promise.allSettled([git(dir,"push",remote,a+":"+ref),git(dir,"push",remote,b+":"+ref)]);
+    assert.equal(result.filter(x=>x.status==="fulfilled").length,1);
+    const winner=await git(dir,"--git-dir="+remote,"rev-parse",ref);
+    assert.ok(winner===a||winner===b);
+    const loser=winner===a?b:a;
+    await assert.rejects(git(dir,"push",remote,loser+":"+ref));
+    assert.equal(await git(dir,"--git-dir="+remote,"rev-parse",ref),winner);
+  }finally{await rm(dir,{recursive:true,force:true});}
+});

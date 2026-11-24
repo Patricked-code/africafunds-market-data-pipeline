@@ -74,3 +74,7 @@ Une fois une tâche validée, documentée et intégrée conformément aux gates,
 ## Mise à jour de la mémoire
 
 À la fin de chaque session, ajouter une entrée dans `docs/09_CHANGELOG_WORKLOG.md` avec date, branche, commit/PR, actions, tests, blocages et prochaine étape (`NEXT_ACTION`). Référencer un checkpoint daté lorsque la session change la phase du projet ou ferme une longue interruption. Une parenthèse ne remplace pas le `NEXT_ACTION` déjà acté ; la reprise doit vérifier l'actualité des preuves.
+
+## Traces avant et pendant intervention — SADIAAF-CONTINUITY-20261124-01
+
+Ne pas attendre la fin d'une session pour laisser une trace. Enregistrer sur l'issue/PR canonique l'admission, le périmètre occupé, le SHA de base, l'état et NEXT_ACTION avant la première modification ; mettre à jour aux événements significatifs (changement de périmètre, commit, attente CI, blocage, interruption, transfert). Le checkpoint de fin conserve les preuves et le statut dans docs/09 ; docs/06 est réconcilié avec les faits GitHub. Respecter le contrat de claim/heartbeat/fencing docs/15 §14, sans présenter une annonce manuelle comme une réservation atomique. Les traces sont limitées aux références publiques nécessaires, pas au verbatim des conversations.
