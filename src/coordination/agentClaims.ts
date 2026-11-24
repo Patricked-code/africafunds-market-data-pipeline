@@ -10,6 +10,15 @@ const trace = z.object({
   head: sha, nextAction: z.string().min(1).max(500),
   evidence: z.array(z.string().regex(/^(commit:[a-f0-9]{40}|(?:pr|issue|ci):[1-9][0-9]{0,19})$/)).max(30),
 }).strict();
+const pendingMutationSchema = z.object({
+  expectedHead:sha, candidateHead:sha,
+  paths:z.array(z.string().max(295).regex(/^[A-Za-z0-9_.\/-]+$/)
+    .refine(p=>!p.split("/").some(x=>x===""||x==="."||x===".."))).min(1).max(100),
+}).strict().superRefine((m,ctx)=>{
+  if(m.expectedHead===m.candidateHead || new Set(m.paths).size!==m.paths.length)
+    ctx.addIssue({code:"custom",message:"INVALID_MUTATION_INTENT"});
+});
+export type PendingMutation=z.infer<typeof pendingMutationSchema>;
 const claim = z.object({
   workId: id, actor: id, session: id, lot: z.number().int().min(0).max(13),
   branch: z.string().min(1).max(200).regex(/^[A-Za-z0-9._/-]+$/)
@@ -17,6 +26,7 @@ const claim = z.object({
   base: sha, scopes: z.array(scope).min(1).max(100),
   generation: stamp.positive(), leaseUntil: stamp, updatedAt: stamp,
   trace,
+  pendingMutation:pendingMutationSchema.optional(),
 }).strict();
 const wakeSignalSchema = z.object({
   key: id,
@@ -34,7 +44,7 @@ const wakeReceiptSchema = z.object({
 export type WakeSignal = z.infer<typeof wakeSignalSchema>;
 type WakeReceipt = z.infer<typeof wakeReceiptSchema>;
 const event = z.object({
-  revision: stamp.positive(), kind: z.enum(["claim","heartbeat","checkpoint","release","recover","wake-intent","wake-result"]),
+  revision: stamp.positive(), kind: z.enum(["claim","heartbeat","checkpoint","release","recover","wake-intent","wake-result","mutation-intent","mutation-result"]),
   at: stamp, workId: id, actor: id, session: id, generation: stamp.positive(),
   previousGeneration: stamp.positive().optional(), wakeKey:id.optional(), trace,
 }).strict();
@@ -58,7 +68,7 @@ export const stateSchema = z.object({
   if (s.lastEvent?.kind.startsWith("wake-") && (!s.lastEvent.wakeKey || !keys.has(s.lastEvent.wakeKey))) fail("missing wake receipt");
   for (const [i,a] of s.claims.entries()) {
     if (a.generation > s.revision || a.updatedAt > s.updatedAt || a.leaseUntil <= a.updatedAt ||
-        new Set(a.scopes).size !== a.scopes.length) fail("invalid claim state");
+        new Set(a.scopes).size !== a.scopes.length || (a.pendingMutation && (a.pendingMutation.expectedHead!==a.trace.head || !mutationPathsAllowed(a,a.pendingMutation.paths)))) fail("invalid claim state");
     for (const b of s.claims.slice(i+1)) if (conflicts(a,b)) fail("overlapping existing claims");
   }
 });
@@ -72,7 +82,9 @@ export type Command =
   | ({kind:"recover"; leaseMs:number; previousGeneration:number; reconciledHead:string} & Admission)
   | ({kind:"heartbeat"; leaseMs:number} & Identity)
   | ({kind:"checkpoint"; trace:Trace} & Identity)
-  | ({kind:"release"; trace:Trace} & Identity);
+  | ({kind:"release"; trace:Trace} & Identity)
+  | ({kind:"mutation-intent"; mutation:PendingMutation} & Identity)
+  | ({kind:"mutation-result"; candidateHead:string; observedHead:string; trace:Trace} & Identity);
 
 export function emptyState(): State {
   return {continuity:CONTINUITY_ID,revision:0,updatedAt:0,claims:[],lastEvent:null};
@@ -80,6 +92,9 @@ export function emptyState(): State {
 function conflicts(a: Pick<Claim,"workId"|"branch"|"scopes">, b: Pick<Claim,"workId"|"branch"|"scopes">): boolean {
   return a.workId === b.workId || a.branch === b.branch || a.scopes.some(x =>
     b.scopes.some(y => x === y || x.startsWith(y+"/") || y.startsWith(x+"/")));
+}
+function mutationPathsAllowed(c:Pick<Claim,"scopes">,paths:readonly string[]):boolean {
+  return paths.every(p=>c.scopes.some(s=>s==="file:"+p || ("file:"+p).startsWith(s+"/")));
 }
 function lease(now:number, ms:number):number {
   if (!Number.isSafeInteger(ms) || ms < 1000 || ms > 3600000) throw new Error("INVALID_LEASE");
@@ -93,6 +108,8 @@ export function transition(input:State, command:Command, now:number):State {
   const old = s.claims.find(c => c.workId === command.workId);
   let next:Claim;
   let claims:Claim[];
+  if (old?.pendingMutation && command.kind!=="heartbeat" && command.kind!=="mutation-result")
+    throw Error("MUTATION_RECONCILIATION_REQUIRED");
   if (command.kind === "claim" || command.kind === "recover") {
     if (command.kind === "claim" && old) throw new Error("ALREADY_CLAIMED");
     if (command.kind === "recover") {
@@ -109,6 +126,26 @@ export function transition(input:State, command:Command, now:number):State {
     if (command.kind === "claim" && next.trace.head !== next.base) throw new Error("BASE_NOT_RECONCILED");
     if (s.claims.some(c => c !== old && conflicts(c,next))) throw new Error("SCOPE_OCCUPIED");
     claims = [...s.claims.filter(c => c !== old),next];
+  } else if(command.kind==="mutation-intent" || command.kind==="mutation-result") {
+    if(!old || old.actor!==command.actor || old.session!==command.session || old.generation!==command.generation)
+      throw Error("STALE_OR_EXPIRED_CLAIM");
+    if(command.kind==="mutation-intent"){
+      const m=pendingMutationSchema.parse(command.mutation);
+      if(now>=old.leaseUntil || old.pendingMutation || m.expectedHead!==old.trace.head || !mutationPathsAllowed(old,m.paths))
+        throw Error("MUTATION_NOT_ADMISSIBLE");
+      next=claim.parse({...old,updatedAt:now,pendingMutation:m});
+    }else{
+      const m=old.pendingMutation;
+      if(!m || m.candidateHead!==command.candidateHead ||
+         (command.observedHead!==m.expectedHead && command.observedHead!==m.candidateHead) ||
+         command.trace.head!==command.observedHead || !command.trace.evidence.includes("commit:"+command.observedHead))
+        throw Error("MUTATION_RESULT_NOT_ADMISSIBLE");
+      // A trusted gateway can settle a confirmed terminal outcome even after
+      // expiry. Preserve original lease and updatedAt so recovery remains explicit.
+      const {pendingMutation: _pending,...rest}=old;
+      next=claim.parse({...rest,trace:command.trace});
+    }
+    claims=[...s.claims.filter(c=>c!==old),next];
   } else {
     if (!old || old.actor !== command.actor || old.session !== command.session ||
         old.generation !== command.generation || now >= old.leaseUntil) throw new Error("STALE_OR_EXPIRED_CLAIM");
@@ -141,7 +178,7 @@ export function assertFence(state:State,identity:Identity,now:number):Claim {
   stamp.parse(now);
   const s = stateSchema.parse(state);
   const c = s.claims.find(x => x.workId === identity.workId);
-  if (now < s.updatedAt || !c || c.actor !== identity.actor || c.session !== identity.session ||
+  if (now < s.updatedAt || !c || c.pendingMutation || c.actor !== identity.actor || c.session !== identity.session ||
       c.generation !== identity.generation || now >= c.leaseUntil) throw new Error("STALE_OR_EXPIRED_CLAIM");
   return c;
 }
