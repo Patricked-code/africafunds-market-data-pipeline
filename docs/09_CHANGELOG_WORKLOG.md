@@ -1,5 +1,15 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-24 — PR #41 : séquencement auto-merge sur validation trop rapide
+
+- **PREUVE CI** : HEAD précédent 922bfa7e784158c2b2dbfecbeba196948b129e8b : CI #739 SUCCESS et Docker #602 SUCCESS. Les tests JSON sont passés, aucun problème de code avéré sur cette révision.
+- **ANOMALIE RUNTIME** : workflows de gouvernance auto-merge #19 run 45293229133 et #20 run 45293258389 ont échoué malgré les checks verts, avec message GitHub GraphQL API HTTP 200 `Pull request Pull request is in clean status`. La mutation d'enrôlement demandée après que la PR est immédiatement fusionnable n'a pas abouti ; PR #41 n'est toujours pas fusionnée. Ne pas déclarer auto-merge PASS.
+- **RECETTE COMPLÉMENTAIRE NON DESTRUCTIVE** : créer ce seul checkpoint documentaire sur la branche de PR #41 afin de produire un nouveau SHA, puis transmettre immédiatement la commande propriétaire SHA-bound `/sadiaaf-automerge <SHA>` via commentaire de cette PR, avant conclusion des nouveaux checks. Le workflow en confiance sur main doit vérifier le SHA, le diff, le ruleset et le label `automerge-eligible`, enrôler sous GitHub natif puis laisser les checks obligatoires terminer avant fusion. Ce n'est ni un bypass, ni un direct merge ni une nouvelle automatisation.
+- **LIMITES / BLOCK_REASON** : si le GITHUB_TOKEN refuse l'enrôlement ou si GitHub renvoie encore clean, consigner les logs et traiter dans un correctif de workflow gouverné séparé ; ne pas forcer la fusion. Aucun endpoint/licence/adaptateur officiel qualifié par ce test.
+- **NEXT_ACTION** : constater événement `issue_comment`, workflow auto-merge succès, PR auto_merge puis merged=true et SHA main, ou consigner BLOCK_REASON. Reprendre ensuite les 14 lots et les 6 chantiers sans collision, et séparer la recette d'un agent codeur 24/7.
+
+---
+
 ## 2026-11-24 — Reprise du programme des 14 lots : composant JSON sûr, chantier officiel #14
 
 - **LECTURES** : AGENTS.md ; documents maîtres 00/01/11/02/12/03/04/13/14/05/06/07/08/09/10/15 ; issues #5/#13–#17 et PR ouvertes #22/#25–#36 ; arbre `src/parsers`, ingestion actuelle, contrat des adaptateurs et test existant.
