@@ -9,7 +9,7 @@ const slug=z.string().regex(/^[a-z0-9][a-z0-9-]{0,99}$/);
 const app=z.object({id:positive,slug});
 const installation=z.object({id:positive,app_id:positive,account:z.object({id:positive,login:z.literal("Patricked-code")}),suspended_at:z.null()});
 const repository=z.object({id:z.literal(repoId),full_name:z.literal(repo)});
-const permissionSchema=z.object({contents:z.enum(["read","write"]),metadata:z.literal("read"),issues:z.enum(["read","write"]),pull_requests:z.enum(["read","write"])}).strict();
+const permissionSchema=z.object({contents:z.enum(["read","write"]),metadata:z.literal("read"),issues:z.enum(["read","write"]),pull_requests:z.enum(["read","write"]),actions:z.literal("read").optional()}).strict();
 const tokenResponse=z.object({token:z.string().min(20).max(4096).regex(/^[A-Za-z0-9_.-]+$/),expires_at:z.string().datetime(),permissions:permissionSchema,repositories:z.array(repository).length(1)});
 const visibleRepos=z.object({total_count:z.literal(1),repositories:z.array(repository).length(1)});
 export type RuntimeCredentialMode="read"|"publish"|"evidence"|"pull-request";
@@ -70,13 +70,14 @@ export function createGitHubAppIdentity(config:GitHubAppIdentityConfig){
     const contents=mode==="publish"?"write":"read";
     const issues=mode==="evidence"?"write":"read";
     const pull_requests=mode==="pull-request"?"write":"read";
+    const actions=mode==="read"?{actions:"read" as const}:{};
     // GitHub grants metadata:read automatically. Never request administrative,
     // workflow or secret permissions. Evidence-only tokens cannot publish
     // contents; publish tokens cannot write issue comments. The key itself
     // remains in the trusted broker, never in either consuming worker.
     const issued=tokenResponse.safeParse(await request("POST","/app/installations/"+installationId+"/access_tokens",auth,
-      {repository_ids:[repoId],permissions:{contents,issues,pull_requests}}));
-    if(!issued.success||issued.data.permissions.contents!==contents||issued.data.permissions.issues!==issues||issued.data.permissions.pull_requests!==pull_requests)throw Error("APP_TOKEN_SCOPE_INVALID");
+      {repository_ids:[repoId],permissions:{contents,issues,pull_requests,...actions}}));
+    if(!issued.success||issued.data.permissions.contents!==contents||issued.data.permissions.issues!==issues||issued.data.permissions.pull_requests!==pull_requests||issued.data.permissions.actions!==actions.actions)throw Error("APP_TOKEN_SCOPE_INVALID");
     const expiresAt=Date.parse(issued.data.expires_at),remaining=expiresAt-now();
     if(!Number.isFinite(expiresAt)||remaining<120000||remaining>3700000)throw Error("APP_TOKEN_EXPIRY_INVALID");
     const visible=visibleRepos.safeParse(await request("GET","/installation/repositories?per_page=100",issued.data.token));

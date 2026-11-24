@@ -7,7 +7,7 @@ const time=Date.parse("2026-11-24T06:20:00Z");
 const repo={id:1315731572,full_name:"Patricked-code/africafunds-market-data-pipeline"};
 const fakeToken="fixture-installation-token-not-real";
 function fixture(){
-  let badApp=false,badInstall=false,overprivileged=false,extraRepo=false,expired=false,failed=false,combined=false;
+  let badApp=false,badInstall=false,overprivileged=false,extraRepo=false,expired=false,failed=false,combined=false,extraActions=false,missingActions=false;
   const calls:{url:string;method:string;body:unknown}[]=[];
   const fetcher:typeof fetch=async(input,init)=>{
     const url=String(input),method=init?.method??"GET",header=new Headers(init?.headers).get("authorization")??"";
@@ -28,13 +28,13 @@ function fixture(){
     if(url.endsWith("/access_tokens")){
       if(failed)throw Error("do not expose upstream body "+fakeToken);
       return Response.json({token:fakeToken,expires_at:new Date(time+(expired?1000:3600000)).toISOString(),
-        permissions:{...body.permissions,...(combined?{contents:"write",issues:"write"}:{}),metadata:"read",...(overprivileged?{administration:"write"}:{})},repositories:[repo]});
+        permissions:{...body.permissions,...(extraActions?{actions:"write"}:{}),...(missingActions?{actions:undefined}:{}),...(combined?{contents:"write",issues:"write"}:{}),metadata:"read",...(overprivileged?{administration:"write"}:{})},repositories:[repo]});
     }
     throw Error("unexpected request");
   };
   const broker=createGitHubAppIdentity({appId:1234,appSlug:"sadiaaf-executor",installationId:5678,privateKey,now:()=>time,fetcher});
   return {broker,calls,badApp:()=>{badApp=true;},badInstall:()=>{badInstall=true;},overprivileged:()=>{overprivileged=true;},
-    extraRepo:()=>{extraRepo=true;},expired:()=>{expired=true;},failed:()=>{failed=true;},combined:()=>{combined=true;}};
+    extraRepo:()=>{extraRepo=true;},expired:()=>{expired=true;},failed:()=>{failed=true;},combined:()=>{combined=true;},extraActions:()=>{extraActions=true;},missingActions:()=>{missingActions=true;}};
 }
 test("GitHub App JWT and installation scope are verified; publish token is repository-bound",async()=>{
   const f=fixture(),c=await f.broker.issue("publish");
@@ -44,7 +44,7 @@ test("GitHub App JWT and installation scope are verified; publish token is repos
 });
 test("read identity requests no write permission",async()=>{
   const f=fixture();await f.broker.issue("read");
-  assert.deepEqual(f.calls[2]?.body,{repository_ids:[1315731572],permissions:{contents:"read",issues:"read",pull_requests:"read"}});
+  assert.deepEqual(f.calls[2]?.body,{repository_ids:[1315731572],permissions:{contents:"read",issues:"read",pull_requests:"read",actions:"read"}});
 });
 test("wrong App or installation refuses token issuance",async()=>{
   const a=fixture();a.badApp();await assert.rejects(a.broker.issue("publish"),/APP_IDENTITY_MISMATCH/);assert.equal(a.calls.length,1);
@@ -73,4 +73,9 @@ test("combined write permissions rejected for either separated mode",async()=>{
 test("PR token is separate from contents and evidence writes",async()=>{
  const f=fixture();await f.broker.issue("pull-request");assert.deepEqual(f.calls[2]?.body,{repository_ids:[1315731572],permissions:{contents:"read",issues:"read",pull_requests:"write"}});
  const g=fixture();g.combined();await assert.rejects(g.broker.issue("pull-request"),/TOKEN_SCOPE_INVALID/);
+});
+
+test("Actions permission is read-only and restricted to the read credential",async()=>{
+ for(const mode of ["read","publish","evidence","pull-request"] as const){const f=fixture();f.extraActions();await assert.rejects(f.broker.issue(mode),/TOKEN_SCOPE_INVALID/);}
+ const f=fixture();f.missingActions();await assert.rejects(f.broker.issue("read"),/TOKEN_SCOPE_INVALID/);
 });

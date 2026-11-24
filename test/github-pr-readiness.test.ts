@@ -15,6 +15,7 @@ function fixture(){
  const fetcher:typeof fetch=async(input,init)=>{
   const url=String(input),path=url.split(name)[1]??"/graphql",method=init?.method??"GET";
   if(method==="POST"){
+   assert.equal(new Headers(init?.headers).get("authorization"),"Bearer pr-token");
    writes++;assert.ok(state.claims[0]?.pendingLifecycle);if(noEffect)throw Error("lost before effect");
    if(path==="/issues/43/labels"){assert.equal(state.claims[0]?.pendingLifecycle?.kind,"label");labeled=true;if(uncertain)throw Error("lost");return Response.json([{name:"automerge-eligible"}]);}
    if(path==="/graphql"){assert.equal(state.claims[0]?.pendingLifecycle?.kind,"ready");assert.equal(labeled,true);draft=false;
@@ -29,13 +30,14 @@ function fixture(){
    head:{sha:head,ref:branch,repo},base:{sha:main,ref:"main",repo}});
   if(path==="/pulls/43/files?per_page=100")return Response.json([{filename:sensitive?"src/coordination/agentClaims.ts":"src/utils/dates.ts",status:"modified"}]);
   if(path.startsWith("/actions/runs/")){
+   assert.equal(new Headers(init?.headers).get("authorization"),"Bearer actions-read-token");
    const id=Number(path.split("/")[3]),isCi=id===ci;
    if(path.includes("/jobs?"))return Response.json({total_count:1,jobs:[{name:isCi?"validate":"Build, boot, migrate and verify persistent PostgreSQL",status:"completed",conclusion:"success",head_sha:head}]});
    return Response.json({id,workflow_id:isCi?409761758:410494947,event:"pull_request",head_sha:badRun?main:head,status:"completed",conclusion:"success",run_attempt:1,head_repository:repo,pull_requests:[{number:n,head:{sha:head},base:{ref:"main"}}]});
   }
   throw Error("unexpected read");
  };
- const port=createGitHubPrReadiness({store,now:()=>1000+version,prToken:"pr-token",fetcher,async authenticate(){return true;},
+ const port=createGitHubPrReadiness({store,now:()=>1000+version,prToken:"pr-token",actionsToken:"actions-read-token",fetcher,async authenticate(){return true;},
   async readAdmission(){return admission;},async verifyWriterIsolation(){return true;},async verifyEligibility(){return allowed;},async verifyQuiescence(){return quiet;},async verifyRecovery(){return proof;}});
  return {port,identity,store,writes:()=>writes,deny:()=>{allowed=false;},sensitive:()=>{sensitive=true;},badRun:()=>{badRun=true;},uncertain:()=>{uncertain=true;},quiet:()=>{quiet=true;},noEffect:()=>{noEffect=true;},merged:()=>{merged=true;},proof:()=>{proof=true;}};
 }

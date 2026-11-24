@@ -16,7 +16,7 @@ type ReadinessOperation="label"|"ready";
 type Pr=z.infer<typeof prSchema>;
 type Files=z.infer<typeof file>[];
 export interface PrReadinessConfig{
- store:ClaimStore;now():number;prToken:string;fetcher?:typeof fetch;timeoutMs?:number;
+ store:ClaimStore;now():number;prToken:string;actionsToken:string;fetcher?:typeof fetch;timeoutMs?:number;
  authenticate(identity:Owner):Promise<boolean>;
  readAdmission(workId:string):Promise<unknown>;
  verifyWriterIsolation(branch:string):Promise<boolean>;
@@ -30,14 +30,16 @@ export interface PrReadinessConfig{
  verifyRecovery?(input:{claim:Readonly<Claim>;operation:Readonly<PendingLifecycle>;effect:"absent"|"merged";evidence:readonly string[];mergeSha?:string}):Promise<boolean>;
 }
 export function createGitHubPrReadiness(config:PrReadinessConfig){
- const token=z.string().min(1).max(4096).regex(/^[A-Za-z0-9_.-]+$/).parse(config.prToken);
+ const tokenSchema=z.string().min(1).max(4096).regex(/^[A-Za-z0-9_.-]+$/);
+ const token=tokenSchema.parse(config.prToken),actionsToken=tokenSchema.parse(config.actionsToken);
+ if(token===actionsToken)throw Error("READINESS_CREDENTIAL_SEPARATION_REQUIRED");
  const timeout=config.timeoutMs??15000;
  if(!Number.isSafeInteger(timeout)||timeout<100||timeout>60000)throw Error("READINESS_TIMEOUT_INVALID");
  const fetcher=config.fetcher??fetch;
  async function request(method:"GET"|"POST",url:string,body?:unknown):Promise<unknown>{
   let result:Response;
   try{result=await fetcher(root+url,{method,redirect:"error",signal:AbortSignal.timeout(timeout),headers:{
-   Authorization:"Bearer "+token,Accept:"application/vnd.github+json","X-GitHub-Api-Version":"2022-11-28",
+   Authorization:"Bearer "+(method==="GET"&&url.startsWith(path+"/actions/runs/")?actionsToken:token),Accept:"application/vnd.github+json","X-GitHub-Api-Version":"2022-11-28",
    ...(body===undefined?{}:{"Content-Type":"application/json"})},...(body===undefined?{}:{body:JSON.stringify(body)})});}
   catch{throw Error("READINESS_TRANSPORT_UNCONFIRMED");}
   if(!result.ok||result.headers.get("link")?.includes('rel="next"'))throw Error("READINESS_HTTP_UNCONFIRMED");
