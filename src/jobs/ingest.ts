@@ -1,5 +1,5 @@
 import { Buffer } from 'node:buffer';
-import { assertCollectorImplemented, assertIngestionSucceeded, assertStructuredIngestionRows, ingestionRunStatus } from './ingestionOutcome.js';
+import { accountForEndpointResult, assertCollectorImplemented, assertIngestionSucceeded, ingestionRunStatus } from './ingestionOutcome.js';
 import { fetchWithRetry } from '../http/fetcher.js';
 import { archiveRaw } from '../archive/rawStore.js';
 import { discoverLinks, parseHtmlTables } from '../parsers/html.js';
@@ -137,13 +137,9 @@ export async function runIngestion(input: { market?: string; family?: string; en
     for (const endpoint of endpoints) {
       try {
         const result = await ingestEndpoint(endpoint, mode);
-        // A fetched/archived page with zero parsed rows is not successful financial ingestion.
-        // Discovery mode remains eligible to report links without structured financial rows.
-        assertStructuredIngestionRows(result.rows, mode);
-        summary.success += 1;
-        summary.artifacts += result.artifacts;
-        summary.rows += result.rows;
-        summary.links += result.links;
+        // Preserve real archive/link counters even if no financial rows qualify.
+        // Keep success=0 when ingest mode rejects the endpoint.
+        accountForEndpointResult(summary, result, mode);
         logger.info({ endpoint: endpoint.id, ...result }, 'Source ingérée');
       } catch (error) {
         summary.failed += 1;
