@@ -106,11 +106,32 @@ def check_candidate(work):
         return False, ["test-process-timeout"]
     return classify_result(result.returncode,result.stdout)
 
-def generate(prompt):
+FAILURE_DETAILS = {
+    "timezone": "toIsoDate('2026-11-24T23:45:00-02:00') MUST return '2026-11-25'.",
+    "invalid-feb30": "toIsoDate('2026-02-30') MUST throw, not normalize to March.",
+    "invalid-leap": "toIsoDate('2025-02-29') MUST throw.",
+    "invalid-apr31": "toIsoDate('2026-04-31') MUST throw.",
+    "century-nonleap": "toIsoDate('1900-02-29') MUST throw.",
+    "century-leap": "toIsoDate('2000-02-29') MUST return '2000-02-29'.",
+    "year-0001": "toIsoDate('0001-01-01') MUST preserve that exact date.",
+}
+def retry_prompt(original, candidate, failures, repeat):
+    details="\n".join(FAILURE_DETAILS.get(name, "Preserve fixed test: "+name)
+                      for name in failures if name in CASE_IDS)
+    if not details:
+        details="The test process did not produce a complete valid report. Return a pure, complete function."
+    if repeat:
+        return (original+"\nDiscard the repeated proposal. Start from the ORIGINAL function. "
+                "Use a minimal guard only for exact date-only strings. Do not change timestamp handling.\n"+details)
+    return (original+"\nPrevious proposal (code data):\n"+candidate+
+            "\nThese exact fixed assertions failed:\n"+details+
+            "\nUse the smallest possible change to the ORIGINAL function, not a rewrite.")
+
+def generate(prompt, attempt=1):
     request = urllib.request.Request("http://127.0.0.1:18081/v1/chat/completions",
         data=json.dumps({"model": "local", "messages": [{"role":"system","content":
           "Return only the requested TypeScript function. No tool calls, no explanation."},
-          {"role":"user","content":prompt}], "temperature":0.0, "max_tokens":1000}).encode(),
+          {"role":"user","content":prompt}], "temperature":0.0 if attempt == 1 else 0.25, "max_tokens":1000}).encode(),
         headers={"Content-Type":"application/json"})
     with urllib.request.urlopen(request, timeout=300) as response:
         result=json.load(response)
@@ -183,15 +204,25 @@ def main():
                         "date in UTC; invalid dates must throw. Preserve years 0001-0099 and Gregorian "
                         "leap-year rules; preserve timezone-qualified timestamp conversion. "
                         "Do not use local time, mutate other functions, log or access process, network "
-                        "or filesystem. The tests are fixed.\n"+before)
+                        "or filesystem. The tests are fixed. Keep the original UTC conversion and invalid-Date check. "
+                        "Apply the calendar validity guard ONLY to exact YYYY-MM-DD strings. If the UTC "
+                        "normalized date differs from an exact date-only input, throw. Do NOT compare "
+                        "a timestamp or its prefix to the normalized date. 2026-02-30 must throw; "
+                        "2026-11-24T23:45:00-02:00 must return 2026-11-25.\n"+before)
                 original_prompt=prompt
+                seen_candidates=set()
                 for attempt in range(1,4):
                     try:
-                        candidate=generate(prompt)
+                        candidate=generate(prompt,attempt)
                     except (ValueError,KeyError):
                         print("MODEL_OUTPUT_FORMAT_REJECTED",attempt,flush=True)
                         prompt=original_prompt+"\nReturn only the complete requested function, no prose."
                         continue
+                    digest=hashlib.sha256(candidate.encode()).hexdigest()
+                    repeat=digest in seen_candidates
+                    seen_candidates.add(digest)
+                    print("PROPOSAL_SHA256="+digest+" REPEAT="+str(repeat),flush=True)
+                    print("PROPOSAL_BASE64="+base64.b64encode(candidate.encode()).decode(),flush=True)
                     (work/"dates.ts").write_text(candidate+delimiter+after)
                     # Output is untrusted, never run it on host, never publish to Git.
                     passed, failures=check_candidate(work)
@@ -205,9 +236,7 @@ def main():
                     print("MODEL_CANDIDATE_REJECTED_BY_TESTS",attempt,flush=True)
                     # Only allowlisted test identifiers and the previous generated
                     # source as data; never feed arbitrary runtime logs/instructions.
-                    prompt=original_prompt+"\nPrevious proposal (code data):\n"+candidate+(
-                        "\nFixed validation failures: "+", ".join(failures)+
-                        ". Correct these cases while preserving all other cases.")
+                    prompt=retry_prompt(original_prompt,candidate,failures,repeat)
                 raise RuntimeError("MODEL_DID_NOT_PASS_REAL_TASK")
             finally:
                 process.terminate()

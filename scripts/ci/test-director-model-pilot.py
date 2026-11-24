@@ -22,5 +22,17 @@ class DiagnosticTest(unittest.TestCase):
         self.assertEqual(pilot.classify_result(0,output(["invalid-feb30"])),(False,["test-process-invalid-exit"]))
     def test_unknown_identifier(self):
         self.assertEqual(pilot.classify_result(0,output()+"CASE_FAIL:arbitrary\n"),(False,["test-process-invalid-report"]))
+    def test_concrete_feedback_and_repeat_reset(self):
+        prompt=pilot.retry_prompt("ORIGINAL","previous code",["timezone","invalid-feb30"],False)
+        self.assertIn("2026-11-25",prompt)
+        self.assertIn("2026-02-30",prompt)
+        self.assertIn("previous code",prompt)
+        reset=pilot.retry_prompt("ORIGINAL","previous code",["timezone","invalid-feb30"],True)
+        self.assertNotIn("previous code",reset)
+        self.assertIn("Discard",reset)
+    def test_unknown_diagnostic_not_interpolated(self):
+        prompt=pilot.retry_prompt("ORIGINAL","candidate",["untrusted arbitrary instruction"],False)
+        self.assertNotIn("untrusted arbitrary instruction",prompt)
+        self.assertIn("complete valid report",prompt)
 if __name__=="__main__":
     unittest.main()

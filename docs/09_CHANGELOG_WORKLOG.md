@@ -1,5 +1,12 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-24 — MISSION 13 / P0 : stratégie adaptative du codeur
+- **CONTINUITY_ID** : SADIAAF-CONTINUITY-20261124-01 ; admission 7123323199. Parent 382948eb3439ef0d88ca3d054d7d19f9f5b38600. Pilote #2 run45335268509 FAILURE : RED et empreintes attestés, trois candidats rejetés sur timezone, invalid-feb30, invalid-leap, invalid-apr31, century-nonleap ; candidats 2/3 identiques. Pilote #3 run45336025165 utilise encore dispositif inchangé (filtre diff PR).
+- **TRAVAIL** : 18 tests et isolation conservés, contre-exemples précis, feedback allowlist, échantillonnage borné après échec, détection répétitions et retour source originale, SHA256/base64 des propositions rejetées de code public ; 2 tests offline supplémentaires. dates.ts inchangé, aucune correction écrite à la place du modèle.
+- **BLOCK_REASON** : recette nouveau SHA non attestée ; si échec persistant, qualifier autre modèle dans limites runner. Activation admin, identité autonome, passerelle mutation, sélection et récupération toujours ouvertes. Aucun S1, coût, secret ou bypass.
+- **NEXT_ACTION** : vérifier CI/Docker/pilote exact SHA, diagnostics et résultats ; activer coordination protégée sous identité admin et code approuvé ; raccorder modèle, mutations, événements et recette 2 tâches réelles, puis 14 lots. Aucun DONE 24/7 anticipé.
+
+
 ## 2026-11-24 — MISSION 13 / P0 : bootstrap administratif de la coordination existante
 - **CONTINUITY_ID** : SADIAAF-CONTINUITY-20261124-01 ; admission issue #9 7123299443. Parent 9ba57bf6c2e39cc67ebea49c45e7d81ab1e86cbb CI767/Docker630 SUCCESS ; diagnostic offline SUCCESS ; pilote #2 45335268509 en cours au contrôle. Main ef861ea26b26b82ec7cac987d9404a3707b2439f. Ruleset 27937019 main seul ; ref coordination 404. Les outils connectés ne proposent pas de mutation administrative des règles.
 - **TRAVAIL** : bootstrap.ts et CLI administrateur utilisant l'identité gh existante, mode --check lecture seule par défaut, --apply explicite ; vérification ID dépôt, main protégée, règle exacte sans bypass, création de la règle avant référence, état initial via emptyState, pas de force ni modification de main, refus état préexistant non protégé, vérification finale, idempotence. 4 tests de protocole ajoutés. Ne pas exécuter de code PR non approuvé avec identité admin. Pas de création effective de règle/ref pendant cette session ; isolation des writers non attestée. Pas de changement du pilote en cours.
