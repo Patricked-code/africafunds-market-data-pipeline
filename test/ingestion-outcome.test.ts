@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { assertCollectorImplemented, assertIngestionSucceeded, assertStructuredIngestionRows, ingestionRunStatus } from '../src/jobs/ingestionOutcome.js';
+import { accountForEndpointResult, assertCollectorImplemented, assertIngestionSucceeded, assertStructuredIngestionRows, ingestionRunStatus } from '../src/jobs/ingestionOutcome.js';
 
 test('successful endpoint run is accepted', () => {
   assert.doesNotThrow(() => assertIngestionSucceeded({ endpoints: 1, success: 1, failed: 0 }));
@@ -64,4 +64,25 @@ test('ingest mode rejects empty, invalid or fractional row counts before countin
   }
   assert.doesNotThrow(() => assertStructuredIngestionRows(1, 'ingest'));
   assert.doesNotThrow(() => assertStructuredIngestionRows(0, 'discover'));
+});
+
+test('collection counters remain true when zero-row financial ingestion is rejected', () => {
+  const summary = { endpoints: 1, success: 0, failed: 0, artifacts: 0, rows: 0, links: 0 };
+  assert.throws(
+    () => accountForEndpointResult(summary, { artifacts: 2, rows: 0, links: 3 }, 'ingest'),
+    /NO_STRUCTURED_ROWS/,
+  );
+  assert.deepEqual(summary, {
+    endpoints: 1, success: 0, failed: 0, artifacts: 2, rows: 0, links: 3
+  });
+});
+test('successful financial observations increment counters exactly once', () => {
+  const summary = { success: 0, artifacts: 0, rows: 0, links: 0 };
+  accountForEndpointResult(summary, { artifacts: 2, rows: 5, links: 1 }, 'ingest');
+  assert.deepEqual(summary, { success: 1, artifacts: 2, rows: 5, links: 1 });
+});
+test('discovery-only collection remains auditable with zero financial rows', () => {
+  const summary = { success: 0, artifacts: 0, rows: 0, links: 0 };
+  accountForEndpointResult(summary, { artifacts: 1, rows: 0, links: 2 }, 'discover');
+  assert.deepEqual(summary, { success: 1, artifacts: 1, rows: 0, links: 2 });
 });
