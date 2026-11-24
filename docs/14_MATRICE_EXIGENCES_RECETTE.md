@@ -169,7 +169,7 @@ Le staging est validé uniquement si :
 
 La production S1 nécessite :
 
-- validation de tous les items de `docs/10_DEPLOYMENT_GATES.md` ;
+- validation documentée des **gates préalables** de `docs/10_DEPLOYMENT_GATES.md` (sections Cadrage à S1), sans exiger avant le premier déploiement les contrôles de la section Après déploiement ;
 - commit/tag immuable ;
 - approbation humaine explicite ;
 - inventaire et sauvegarde vérifiés ;
@@ -178,4 +178,5 @@ La production S1 nécessite :
 - plan de retour arrière ;
 - fenêtre de changement ;
 - runbook d’incident ;
-- rapport post-déploiement.
+- plan de vérification et de rapport post-déploiement préparé ;
+- **après** l'exécution autorisée : contrôles de la section Après déploiement réussis et rapport de déploiement réellement enregistré **avant toute déclaration de succès** ; échec ou contrôle non exécuté = succès interdit, incident/rollback selon runbook.
