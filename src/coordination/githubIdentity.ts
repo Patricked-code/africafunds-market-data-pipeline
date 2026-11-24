@@ -9,10 +9,10 @@ const slug=z.string().regex(/^[a-z0-9][a-z0-9-]{0,99}$/);
 const app=z.object({id:positive,slug});
 const installation=z.object({id:positive,app_id:positive,account:z.object({id:positive,login:z.literal("Patricked-code")}),suspended_at:z.null()});
 const repository=z.object({id:z.literal(repoId),full_name:z.literal(repo)});
-const permissionSchema=z.object({contents:z.enum(["read","write"]),metadata:z.literal("read"),issues:z.literal("read"),pull_requests:z.literal("read")}).strict();
+const permissionSchema=z.object({contents:z.enum(["read","write"]),metadata:z.literal("read"),issues:z.enum(["read","write"]),pull_requests:z.literal("read")}).strict();
 const tokenResponse=z.object({token:z.string().min(20).max(4096).regex(/^[A-Za-z0-9_.-]+$/),expires_at:z.string().datetime(),permissions:permissionSchema,repositories:z.array(repository).length(1)});
 const visibleRepos=z.object({total_count:z.literal(1),repositories:z.array(repository).length(1)});
-export type RuntimeCredentialMode="read"|"publish";
+export type RuntimeCredentialMode="read"|"publish"|"evidence";
 export interface GitHubAppIdentityConfig {
   appId:number;appSlug:string;installationId:number;
   // Supplied by a trusted secret store, not by GitHub issue text or model.
@@ -59,7 +59,7 @@ export function createGitHubAppIdentity(config:GitHubAppIdentityConfig){
   }
   const actor="github-app:"+appId+":installation:"+installationId;
   return {actor,async issue(mode:RuntimeCredentialMode):Promise<RuntimeCredential>{
-    if(mode!=="read"&&mode!=="publish")throw Error("APP_CREDENTIAL_MODE_INVALID");
+    if(mode!=="read"&&mode!=="publish"&&mode!=="evidence")throw Error("APP_CREDENTIAL_MODE_INVALID");
     const auth=jwt(key,appId,now());
     const identity=app.safeParse(await request("GET","/app",auth));
     if(!identity.success||identity.data.id!==appId||identity.data.slug!==appSlug)
@@ -68,11 +68,14 @@ export function createGitHubAppIdentity(config:GitHubAppIdentityConfig){
     if(!bound.success||bound.data.id!==installationId||bound.data.app_id!==appId||bound.data.account.id!==ownerId)
       throw Error("APP_INSTALLATION_MISMATCH");
     const contents=mode==="publish"?"write":"read";
+    const issues=mode==="evidence"?"write":"read";
     // GitHub grants metadata:read automatically. Never request administrative,
-    // workflow, secret or issue-write permissions for this credential.
+    // workflow or secret permissions. Evidence-only tokens cannot publish
+    // contents; publish tokens cannot write issue comments. The key itself
+    // remains in the trusted broker, never in either consuming worker.
     const issued=tokenResponse.safeParse(await request("POST","/app/installations/"+installationId+"/access_tokens",auth,
-      {repository_ids:[repoId],permissions:{contents,issues:"read",pull_requests:"read"}}));
-    if(!issued.success||issued.data.permissions.contents!==contents)throw Error("APP_TOKEN_SCOPE_INVALID");
+      {repository_ids:[repoId],permissions:{contents,issues,pull_requests:"read"}}));
+    if(!issued.success||issued.data.permissions.contents!==contents||issued.data.permissions.issues!==issues)throw Error("APP_TOKEN_SCOPE_INVALID");
     const expiresAt=Date.parse(issued.data.expires_at),remaining=expiresAt-now();
     if(!Number.isFinite(expiresAt)||remaining<120000||remaining>3700000)throw Error("APP_TOKEN_EXPIRY_INVALID");
     const visible=visibleRepos.safeParse(await request("GET","/installation/repositories?per_page=100",issued.data.token));

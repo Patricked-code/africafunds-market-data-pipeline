@@ -7,7 +7,7 @@ const time=Date.parse("2026-11-24T06:20:00Z");
 const repo={id:1315731572,full_name:"Patricked-code/africafunds-market-data-pipeline"};
 const fakeToken="fixture-installation-token-not-real";
 function fixture(){
-  let badApp=false,badInstall=false,overprivileged=false,extraRepo=false,expired=false,failed=false;
+  let badApp=false,badInstall=false,overprivileged=false,extraRepo=false,expired=false,failed=false,combined=false;
   const calls:{url:string;method:string;body:unknown}[]=[];
   const fetcher:typeof fetch=async(input,init)=>{
     const url=String(input),method=init?.method??"GET",header=new Headers(init?.headers).get("authorization")??"";
@@ -28,13 +28,13 @@ function fixture(){
     if(url.endsWith("/access_tokens")){
       if(failed)throw Error("do not expose upstream body "+fakeToken);
       return Response.json({token:fakeToken,expires_at:new Date(time+(expired?1000:3600000)).toISOString(),
-        permissions:{...body.permissions,metadata:"read",...(overprivileged?{administration:"write"}:{})},repositories:[repo]});
+        permissions:{...body.permissions,...(combined?{contents:"write",issues:"write"}:{}),metadata:"read",...(overprivileged?{administration:"write"}:{})},repositories:[repo]});
     }
     throw Error("unexpected request");
   };
   const broker=createGitHubAppIdentity({appId:1234,appSlug:"sadiaaf-executor",installationId:5678,privateKey,now:()=>time,fetcher});
   return {broker,calls,badApp:()=>{badApp=true;},badInstall:()=>{badInstall=true;},overprivileged:()=>{overprivileged=true;},
-    extraRepo:()=>{extraRepo=true;},expired:()=>{expired=true;},failed:()=>{failed=true;}};
+    extraRepo:()=>{extraRepo=true;},expired:()=>{expired=true;},failed:()=>{failed=true;},combined:()=>{combined=true;}};
 }
 test("GitHub App JWT and installation scope are verified; publish token is repository-bound",async()=>{
   const f=fixture(),c=await f.broker.issue("publish");
@@ -58,4 +58,14 @@ test("overprivileged, expired or multi-repository credentials fail closed",async
 test("transport ambiguity does not retry or leak upstream token",async()=>{
   const f=fixture();f.failed();await assert.rejects(f.broker.issue("publish"),(error:unknown)=>error instanceof Error&&error.message==="APP_IDENTITY_TRANSPORT_UNCONFIRMED");
   assert.equal(f.calls.length,3);
+});
+
+test("evidence credential can write issues but not contents, publication unchanged",async()=>{
+ const f=fixture();await f.broker.issue("evidence");
+ assert.deepEqual(f.calls[2]?.body,{repository_ids:[1315731572],permissions:{contents:"read",issues:"write",pull_requests:"read"}});
+ const p=fixture();await p.broker.issue("publish");
+ assert.deepEqual(p.calls[2]?.body,{repository_ids:[1315731572],permissions:{contents:"write",issues:"read",pull_requests:"read"}});
+});
+test("combined write permissions rejected for either separated mode",async()=>{
+ for(const mode of ["evidence","publish"] as const){const f=fixture();f.combined();await assert.rejects(f.broker.issue(mode),/TOKEN_SCOPE_INVALID/);assert.equal(f.calls.length,3);}
 });
