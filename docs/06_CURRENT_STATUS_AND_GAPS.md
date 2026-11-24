@@ -1,5 +1,14 @@
 # 06 — État réel et écarts
 
+## 2026-11-24 — Lot 9 / chantier #17 : réconciliation de la sécurité API/CORS, PR #30
+- **CONTINUITY_ID** : SADIAAF-CONTINUITY-20261124-01 ; ancienne branche `fix/api-cors-origin-admission-20261114` HEAD `c4504755daaacbe1b4682f8ab495a737bbdb0654`, main protégé `9adffe7eaa711fae7f780653c44a847cbf815220`.
+- **CODE EXISTANT** : huit blobs code/tests PR #30 repris sans reconstruction : `src/api/cors.ts`, `queries.ts`, `server.ts`, tests du refus d'origines non sûres et visibilité de publication des taux et indices (unitaires et PostgreSQL). Le reste de main conserve les protecteurs d'ingestion, de provenance et de qualité déjà intégrés.
+- **GIT/MEMOIRE** : merge à deux parents sans force, docs/06 et docs/09 du main actuel préservés + checkpoint ; anciennes entrées de PR accessibles par son historique Git et la PR source.
+- **LIMITES** : contrôles CORS et de publication ne certifient ni les droits de redistribution, ni les séries, ni l'API complète ou les recettes financières par marché. La publication de données non licenciées demeure interdite.
+- **BLOCK_REASON** : CI validate et smoke Docker/PostgreSQL sur HEAD exact et remarques de revue à vérifier, aucune production S1.
+- **NEXT_ACTION** : qualifier PR30 READY (10 fichiers non sensibles), label native auto-merge sous gates, CI/Docker exact SHA, corriger défauts et threads. Poursuivre ensuite backfill #22, sujets de configuration/workflows sensibles par procédure gouvernée, puis lots 0–13 selon dépendances.
+
+
 ## 2026-11-24 — Lot 2/11, chantier #15 : non-régression de l'admission qualité, PR #28
 - **CONTINUITY_ID** : SADIAAF-CONTINUITY-20261124-01 ; branche originale `test/quality-row-admission-regression-20261112`, ancien HEAD `bebd543671f92d23ed38b4da0fb1a3dfe7ea7c5e`, main protégé `de42e308a932d144d6928419229f35cef07974d5`.
 - **TRAVAUX REPRIS** : réutilisation exacte du blob `src/quality/validate.ts` et de ses tests `test/quality-rows-regression.test.ts` (scoring structurel de lignes) ; aucun nouveau modèle de qualité ni réécriture des modules de provenance intégrés en #27.

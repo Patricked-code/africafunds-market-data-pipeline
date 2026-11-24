@@ -1,0 +1,120 @@
+import assert from 'node:assert/strict';
+import test from 'node:test';
+import pg from 'pg';
+import { pool } from '../../src/db/pool.js';
+import { indices } from '../../src/api/queries.js';
+
+// Transactional PostgreSQL recipe: invoke the actual API query against isolated CI database.
+// No financial observations or publication decisions are persisted.
+test('issue #17: public indices omit DRAFT, future publication, future observation and undated values', async () => {
+  assert.ok(process.env.DATABASE_URL, 'isolated DATABASE_URL required');
+  const client = new pg.Client({ connectionString: process.env.DATABASE_URL });
+  await client.connect();
+  const originalQuery = pool.query;
+  try {
+    await client.query('BEGIN');
+    const seeded = await client.query<{ market_code: string; currency_code: string }>(
+      'SELECT market_code,currency_code FROM ref.markets WHERE active=true AND currency_code IS NOT NULL LIMIT 1',
+    );
+    const market = seeded.rows[0];
+    assert.ok(market, 'seeded market and currency required');
+    const ids: Record<string, string> = {};
+    const fixtureCodes = new Set<string>();
+    for (const status of ['DRAFT', 'PUBLISHED']) {
+      const indexCode = `CI_VISIBILITY_${status}_${Date.now()}_${Math.random().toString(36).slice(2)}`;
+      fixtureCodes.add(indexCode);
+      const definition = await client.query<{ index_id: string }>(
+        `INSERT INTO calc.index_definitions
+         (index_code,index_name,index_family,market_code,base_currency_code,base_date,return_type,calculation_method,publication_status)
+         VALUES ($1,$1,'TEST',$2,$3,CURRENT_DATE,'PRICE','TEST',$4)
+         RETURNING index_id`,
+        [indexCode, market.market_code, market.currency_code, status],
+      );
+      ids[status] = definition.rows[0]!.index_id;
+    }
+    for (const [status, observationOffset, offset, level] of [
+      ['DRAFT', -3, -1, 101], ['PUBLISHED', -2, -1, 102],
+      ['PUBLISHED', -1, 1, 103], ['PUBLISHED', -4, null, 104], ['PUBLISHED', 1, -1, 105],
+      ['PUBLISHED', 0, 0, 106],
+    ] as const) {
+      await client.query(
+        `INSERT INTO calc.index_daily_values
+         (index_id,observation_date,calculation_date,publication_date,currency_code,currency_context,index_level)
+         VALUES ($1,CURRENT_DATE + $2::integer,CURRENT_DATE,
+                 CASE WHEN $3::integer IS NULL THEN NULL ELSE CURRENT_DATE + $3::integer END,
+                 $4,'LOCAL',$5)`,
+        [ids[status], observationOffset, offset, market.currency_code, level],
+      );
+    }
+    // Keep all SELECTs on the same transaction connection, including uncommitted fixtures.
+    (pool as unknown as { query: typeof client.query }).query = client.query.bind(client);
+    const rows = await indices(
+      new URL(`http://localhost/api/v1/indices?market=${encodeURIComponent(market.market_code)}&currency=${market.currency_code}`),
+      1000,
+    ) as Array<{ index_code: string; observation_date: Date; index_level: string }>;
+    const ownRows = rows.filter(row => fixtureCodes.has(row.index_code));
+    const levels = ownRows.map(row => Number(row.index_level));
+    assert.deepEqual([...levels].sort((a, b) => a - b), [102, 106],
+      'filtered public read must expose each eligible fixture exactly once and no blocked fixture');
+    assert.ok(levels.includes(102), 'published historical value must remain visible');
+    assert.ok(levels.includes(106), 'same-day economic observation and publication must remain visible');
+    const limited = await indices(
+      new URL(`http://localhost/api/v1/indices?market=${encodeURIComponent(market.market_code)}&currency=${market.currency_code}`),
+      1,
+    ) as Array<{ index_code: string; observation_date: Date; index_level: string }>;
+    assert.equal(limited.length, 1, 'LIMIT applies after the visibility filter');
+    // Compare the complete public observation identity, not just its numeric level:
+    // two unrelated indices may legitimately share the same level.
+    assert.deepEqual(
+      {
+        index_code: limited[0]!.index_code,
+        observation_date: limited[0]!.observation_date,
+        index_level: limited[0]!.index_level,
+      },
+      {
+        index_code: rows[0]!.index_code,
+        observation_date: rows[0]!.observation_date,
+        index_level: rows[0]!.index_level,
+      },
+      'LIMIT=1 must return the same published observation as the unbounded ordered query',
+    );
+    // Parameterized optional filters must not return observations from unrelated scopes.
+    assert.deepEqual(
+      await indices(new URL(`http://localhost/api/v1/indices?market=NONEXISTENT_${Date.now()}&currency=${market.currency_code}`), 1000),
+      [],
+      'unknown market must not expose published indices',
+    );
+    assert.deepEqual(
+      await indices(new URL(`http://localhost/api/v1/indices?market=${encodeURIComponent(market.market_code)}&currency=NONEXISTENT_${Date.now()}`), 1000),
+      [],
+      'unknown currency must not expose published indices',
+    );
+    // The same fail-closed policy must hold when clients omit both optional filters.
+    // Restrict assertions to this transaction's synthetic index IDs to avoid assuming
+    // that an otherwise populated integration database has no unrelated observations.
+    // Include every row potentially visible in this isolated transaction, even when
+    // the CI database grows beyond the former hard-coded 1000-row assumption.
+    const totalRows = await client.query<{ count: string }>('SELECT count(*)::text AS count FROM calc.index_daily_values');
+    const unfilteredLimit = Number(totalRows.rows[0]!.count) + 1;
+    assert.ok(Number.isSafeInteger(unfilteredLimit) && unfilteredLimit > 0, 'safe integration row bound required');
+    const unfiltered = (await indices(new URL('http://localhost/api/v1/indices'), unfilteredLimit)) as Array<{ index_code: string; index_level: string }>;
+    const ownUnfiltered = unfiltered.filter(row => fixtureCodes.has(row.index_code));
+    assert.deepEqual(ownUnfiltered.map(row => Number(row.index_level)).sort((a, b) => a - b), [102, 106],
+      'unfiltered public read must expose each eligible fixture exactly once and no blocked fixture');
+    assert.ok(ownUnfiltered.some(row => Number(row.index_level) === 102),
+      'unfiltered public read retains eligible historical observations');
+    assert.ok(ownUnfiltered.some(row => Number(row.index_level) === 106),
+      'unfiltered public read retains eligible same-day observations');
+    for (const forbidden of [101, 103, 104, 105]) {
+      assert.ok(!ownUnfiltered.some(row => Number(row.index_level) === forbidden),
+        `unfiltered public read must hide fixture ${forbidden}`);
+    }
+    for (const forbidden of [101, 103, 104, 105]) {
+      assert.ok(!levels.includes(forbidden), `unpublished fixture ${forbidden} must be hidden`);
+    }
+  } finally {
+    (pool as unknown as { query: typeof client.query }).query = originalQuery as typeof client.query;
+    await client.query('ROLLBACK');
+    await client.end();
+  }
+});
