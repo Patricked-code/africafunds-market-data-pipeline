@@ -34,5 +34,20 @@ class DiagnosticTest(unittest.TestCase):
         prompt=pilot.retry_prompt("ORIGINAL","candidate",["untrusted arbitrary instruction"],False)
         self.assertNotIn("untrusted arbitrary instruction",prompt)
         self.assertIn("complete valid report",prompt)
+    def test_bounded_edit_keeps_original_statements(self):
+        original="export function toIsoDate(value: Date | string): string {\n  const date = new Date(value);\n"+pilot.RETURN_ANCHOR+"\n}\n"
+        guard='if (typeof value !== "string") throw new Error("test");'
+        result=pilot.compose_guard(original,guard)
+        self.assertEqual(result.replace("  "+guard+"\n","",1),original)
+        self.assertEqual(result.count(pilot.RETURN_ANCHOR),1)
+    def test_bounded_edit_refuses_wrong_scope(self):
+        with self.assertRaises(ValueError):
+            pilot.parse_guard('export function toIsoDate() { return ""; }')
+        with self.assertRaises(ValueError):
+            pilot.parse_guard('if (true) throw new Error("x"); return "x";')
+        with self.assertRaises(RuntimeError):
+            pilot.compose_guard("different source",'if (true) throw new Error("x");')
+        with self.assertRaises(RuntimeError):
+            pilot.compose_guard(pilot.RETURN_ANCHOR+"\n"+pilot.RETURN_ANCHOR,'if (true) throw new Error("x");')
 if __name__=="__main__":
     unittest.main()

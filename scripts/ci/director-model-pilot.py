@@ -119,7 +119,7 @@ def retry_prompt(original, candidate, failures, repeat):
     details="\n".join(FAILURE_DETAILS.get(name, "Preserve fixed test: "+name)
                       for name in failures if name in CASE_IDS)
     if not details:
-        details="The test process did not produce a complete valid report. Return a pure, complete function."
+        details="The test process did not produce a complete valid report. Return only the pure guard statements."
     if repeat:
         return (original+"\nDiscard the repeated proposal. Start from the ORIGINAL function. "
                 "Use a minimal guard only for exact date-only strings. Do not change timestamp handling.\n"+details)
@@ -127,10 +127,35 @@ def retry_prompt(original, candidate, failures, repeat):
             "\nThese exact fixed assertions failed:\n"+details+
             "\nUse the smallest possible change to the ORIGINAL function, not a rewrite.")
 
+# An edit is data, never a command. Preserve the original parsing, invalid-Date
+# check and return statement byte-for-byte. This is a narrow repair recipe, not
+# a general-purpose code execution or a proof of autonomous development.
+RETURN_ANCHOR = "  return date.toISOString().slice(0, 10);"
+def parse_guard(value):
+    value=value.strip()
+    match=re.fullmatch(r"```(?:typescript|ts)?\s*\n(.*?)\n```",value,re.S)
+    if match:
+        value=match.group(1).strip()
+    if (not value or len(value)>1200 or len(value.splitlines())>12 or
+        not re.search(r"\bif\s*\(",value) or not re.search(r"\bthrow\b",value) or
+        re.search(r"\b(?:return|function|import|export|class|process|globalThis|require|eval|fetch|console|await|async)\b",value)):
+        raise ValueError("MODEL_GUARD_REJECTED")
+    return value
+
+def compose_guard(original, guard):
+    if original.count(RETURN_ANCHOR)!=1:
+        raise RuntimeError("EDIT_ANCHOR_CHANGED")
+    guard=parse_guard(guard)
+    addition="".join("  "+line+"\n" for line in guard.splitlines())
+    candidate=original.replace(RETURN_ANCHOR,addition+RETURN_ANCHOR,1)
+    if candidate.replace(addition,"",1)!=original:
+        raise RuntimeError("EDIT_SCOPE_CHANGED")
+    return candidate
+
 def generate(prompt, attempt=1):
     request = urllib.request.Request("http://127.0.0.1:18081/v1/chat/completions",
         data=json.dumps({"model": "local", "messages": [{"role":"system","content":
-          "Return only the requested TypeScript function. No tool calls, no explanation."},
+          "Return only the requested TypeScript guard statements. No function wrapper, return statement, tool calls or explanation."},
           {"role":"user","content":prompt}], "temperature":0.0 if attempt == 1 else 0.25, "max_tokens":1000}).encode(),
         headers={"Content-Type":"application/json"})
     with urllib.request.urlopen(request, timeout=300) as response:
@@ -138,13 +163,7 @@ def generate(prompt, attempt=1):
     choice=result["choices"][0]
     if choice.get("finish_reason") == "length":
         raise ValueError("MODEL_OUTPUT_TRUNCATED")
-    value=choice["message"]["content"].strip()
-    match=re.fullmatch(r"```(?:typescript|ts)?\s*\n(.*?)\n```",value,re.S)
-    if match:
-        value=match.group(1).strip()
-    if len(value)>5000 or not value.startswith("export function toIsoDate(") or not value.endswith("}"):
-        raise ValueError("MODEL_OUTPUT_REJECTED")
-    return value+"\n"
+    return parse_guard(choice["message"]["content"])
 
 def main():
     source=SOURCE.read_text()
@@ -195,28 +214,26 @@ def main():
                     time.sleep(2)
                 else:
                     raise RuntimeError("MODEL_START_TIMEOUT")
-                prompt=("Fix the actual TypeScript toIsoDate function below: reject invalid calendar "
-                        "days for exact YYYY-MM-DD strings instead of accepting JS Date rollover. "
-                        "Preserve behavior for valid date-only strings, Date objects, timezone-qualified "
-                        "timestamps and invalid inputs. Preserve the exported signature. Return ONLY "
-                        "the full replacement function, no imports, no new dependencies. "
-                        "Requirements: exact YYYY-MM-DD strings must round-trip to the same calendar "
-                        "date in UTC; invalid dates must throw. Preserve years 0001-0099 and Gregorian "
-                        "leap-year rules; preserve timezone-qualified timestamp conversion. "
-                        "Do not use local time, mutate other functions, log or access process, network "
-                        "or filesystem. The tests are fixed. Keep the original UTC conversion and invalid-Date check. "
-                        "Apply the calendar validity guard ONLY to exact YYYY-MM-DD strings. If the UTC "
-                        "normalized date differs from an exact date-only input, throw. Do NOT compare "
-                        "a timestamp or its prefix to the normalized date. 2026-02-30 must throw; "
-                        "2026-11-24T23:45:00-02:00 must return 2026-11-25.\n"+before)
+                prompt=("Write ONLY the TypeScript guard statements to INSERT just before the "
+                        "existing return statement of the function below. The original value is still "
+                        "available as value (Date|string); date is its parsed Date. Keep all original "
+                        "statements, including the return, unchanged. Reject invalid calendar days "
+                        "ONLY for exact YYYY-MM-DD strings. Compare the original input with the UTC "
+                        "normalized calendar date, not a date reconstructed from the normalized value. "
+                        "For example '2026-02-30' must throw, but a timestamp "
+                        "'2026-11-24T23:45:00-02:00' must keep the existing UTC result '2026-11-25'. "
+                        "Do not reject non-midnight Date objects. No new functions, return, imports or "
+                        "dependencies. No logging, filesystem, network or process access. "
+                        "Return only the inserted statements. Original function:\n"+before)
                 original_prompt=prompt
                 seen_candidates=set()
                 for attempt in range(1,4):
                     try:
-                        candidate=generate(prompt,attempt)
+                        guard=generate(prompt,attempt)
+                        candidate=compose_guard(before,guard)
                     except (ValueError,KeyError):
                         print("MODEL_OUTPUT_FORMAT_REJECTED",attempt,flush=True)
-                        prompt=original_prompt+"\nReturn only the complete requested function, no prose."
+                        prompt=original_prompt+"\nReturn only the guard statements to insert, no prose or wrapper."
                         continue
                     digest=hashlib.sha256(candidate.encode()).hexdigest()
                     repeat=digest in seen_candidates
@@ -236,7 +253,7 @@ def main():
                     print("MODEL_CANDIDATE_REJECTED_BY_TESTS",attempt,flush=True)
                     # Only allowlisted test identifiers and the previous generated
                     # source as data; never feed arbitrary runtime logs/instructions.
-                    prompt=retry_prompt(original_prompt,candidate,failures,repeat)
+                    prompt=retry_prompt(original_prompt,guard,failures,repeat)
                 raise RuntimeError("MODEL_DID_NOT_PASS_REAL_TASK")
             finally:
                 process.terminate()
