@@ -1,5 +1,12 @@
 # 06 — État réel et écarts
 
+## 2026-11-24 — Lot 11 / issue #9 : coordination inter-agents (socle en validation)
+- **CONTINUITY_ID** : SADIAAF-CONTINUITY-20261124-01 ; admission publiée dans issue #9 commentaire 7121998305 ; base 50e35e703c55a0e3f22fefe862bdc9bbe657bf13. Branche dédiée `feat/sadiaaf-agent-coordination-20261124`, aucune modification des PR #22/#25/#29/#31/#32.
+- **IMPLEMENTATION** : machine d'état claim/heartbeat/checkpoint/release/recover, exclusion tâche/branche/périmètre explicite, bail et génération de fencing, adaptateur GitHub Git Data CAS non-force sur ref opérationnelle dédiée. Tests unitaires et contention simulée ; pas d'initialisation live ni de preuve de contrôle universel.
+- **BLOCK_REASON** : CI et Docker exact SHA à vérifier ; ref de coordination à protéger contre force push/suppression, identité/horloge de confiance et passerelle d'écriture avec fencing à raccorder ; pas de garantie contre un client qui écrit hors passerelle. Aucun S1, secret, coût supplémentaire.
+- **NEXT_ACTION** : valider les tests, qualifier la ref opérationnelle et son bootstrap gouverné, exécuter contention/reprise réelle avec deux agents, imposer admission/fencing sur écritures et gate PR ; réconcilier les checkpoints avec main actuel. Lot 11 PARTIAL. Ne pas remplacer les travaux métier ni les autorités existantes.
+
+
 ## 2026-11-24 — Lot 9 / chantier #17 : réconciliation de la sécurité API/CORS, PR #30
 - **CONTINUITY_ID** : SADIAAF-CONTINUITY-20261124-01 ; ancienne branche `fix/api-cors-origin-admission-20261114` HEAD `c4504755daaacbe1b4682f8ab495a737bbdb0654`, main protégé `9adffe7eaa711fae7f780653c44a847cbf815220`.
 - **CODE EXISTANT** : huit blobs code/tests PR #30 repris sans reconstruction : `src/api/cors.ts`, `queries.ts`, `server.ts`, tests du refus d'origines non sûres et visibilité de publication des taux et indices (unitaires et PostgreSQL). Le reste de main conserve les protecteurs d'ingestion, de provenance et de qualité déjà intégrés.
