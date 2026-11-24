@@ -1,5 +1,39 @@
 # 09 — Journal de travail et continuité
 
+## 2026-11-24 — Lot 9 / chantier #17 : réconciliation de la sécurité API/CORS, PR #30
+- **CONTINUITY_ID** : SADIAAF-CONTINUITY-20261124-01 ; ancienne branche `fix/api-cors-origin-admission-20261114` HEAD `c4504755daaacbe1b4682f8ab495a737bbdb0654`, main protégé `9adffe7eaa711fae7f780653c44a847cbf815220`.
+- **CODE EXISTANT** : huit blobs code/tests PR #30 repris sans reconstruction : `src/api/cors.ts`, `queries.ts`, `server.ts`, tests du refus d'origines non sûres et visibilité de publication des taux et indices (unitaires et PostgreSQL). Le reste de main conserve les protecteurs d'ingestion, de provenance et de qualité déjà intégrés.
+- **GIT/MEMOIRE** : merge à deux parents sans force, docs/06 et docs/09 du main actuel préservés + checkpoint ; anciennes entrées de PR accessibles par son historique Git et la PR source.
+- **LIMITES** : contrôles CORS et de publication ne certifient ni les droits de redistribution, ni les séries, ni l'API complète ou les recettes financières par marché. La publication de données non licenciées demeure interdite.
+- **BLOCK_REASON** : CI validate et smoke Docker/PostgreSQL sur HEAD exact et remarques de revue à vérifier, aucune production S1.
+- **NEXT_ACTION** : qualifier PR30 READY (10 fichiers non sensibles), label native auto-merge sous gates, CI/Docker exact SHA, corriger défauts et threads. Poursuivre ensuite backfill #22, sujets de configuration/workflows sensibles par procédure gouvernée, puis lots 0–13 selon dépendances.
+
+
+## 2026-11-24 — Lot 2/11, chantier #15 : non-régression de l'admission qualité, PR #28
+- **CONTINUITY_ID** : SADIAAF-CONTINUITY-20261124-01 ; branche originale `test/quality-row-admission-regression-20261112`, ancien HEAD `bebd543671f92d23ed38b4da0fb1a3dfe7ea7c5e`, main protégé `de42e308a932d144d6928419229f35cef07974d5`.
+- **TRAVAUX REPRIS** : réutilisation exacte du blob `src/quality/validate.ts` et de ses tests `test/quality-rows-regression.test.ts` (scoring structurel de lignes) ; aucun nouveau modèle de qualité ni réécriture des modules de provenance intégrés en #27.
+- **HISTORIQUE/GOUVERNANCE** : merge Git à deux parents non force avec main courant et documents docs/06/09 conservés, checkpoint additionnel. Les anciens commits de branche restent consultables via la PR originale. Approbation indépendante ordinaire non exigée (ADR-016), deux checks CI/Docker obligatoires et discussion résolue.
+- **LIMITES** : le scoring structurel ne certifie ni validation financière par source/market, ni dates économiques et provenance complète, ni licence officielle ou publication API. Le chantier #15 et les 14 lots restent PARTIAL.
+- **BLOCK_REASON** : nouvelle CI et Docker sur SHA du merge non certifiés ; toute remarque GitHub P2 devra être examinée, pas contournée.
+- **NEXT_ACTION** : qualifier PR28 READY, vérifier 4 fichiers, valider tests sur SHA exact puis auto-merge native ; reprendre PR30 API ou autres PR indépendantes selon propriété/anti-collision. Aucun S1.
+
+
+## 2026-11-24 — Lots 2/11, chantier #15 : admission typée et provenance, PR #27
+- **CONTINUITY_ID** : SADIAAF-CONTINUITY-20261124-01. Branche d'origine `feat/quality-financial-observation-gate-20261109`, HEAD source `6b292b66c5201780b6583da6bf502a9817edfac1`, main actuel `ac6166ccff370f721110a7d68b965e95426eac9b`.
+- **REUTILISATION** : trois blobs code `financialObservation.ts`, `rawRecordProvenance.ts`, `withVerifiedRawRecord.ts` et quatre fichiers tests exactement identiques à la PR historique, actuellement ABSENTS du main précédent, ajoutés sans modifier les validateurs existants ni SQL. Protection contre l'admission financière sans provenance / source / marché / méthode documentée ; aucun historique de marché certifié par cette seule création de gate.
+- **HISTORIQUE** : merge Git à deux parents sans force, docs/06 et docs/09 autorité main conservés et checkpoint additif, ancienne version du journal disponible via commit PR historique. Pas de nouvelle file/roadmap, pas de changement S1.
+- **BLOCK_REASON** : CI unitaires/PostgreSQL et Docker du nouveau HEAD non certifiées, éventuelles remarques de revue ; qualification de sources et mappings officiels restent incomplètes.
+- **NEXT_ACTION** : qualifier PR READY sans chemins sensibles et sous SHA attendu, CI validate + Docker/PostgreSQL exacts, auto-merge native si réussite et aucun fil bloquant, puis PR #28 scoring qualité après relecture du main. Maintenir les six chantiers et 14 lots sans reconstruction.
+
+
+## 2026-11-24 — Lots 5–7 / PR #34 : réconciliation des calculs de rendement et indices
+- **CONTINUITY_ID** : SADIAAF-CONTINUITY-20261124-01 ; branche d'origine `7c9f5cfc65dfb7b3e8162c9a4eb62fecaeeb18ec`, parent main protégé `5236d3895a81efd3c48b03f2040041dcf6be7e7c`.
+- **CODE/TEST EXACTS** : `src/calc/indices.ts` et `test/indices-finite-output.test.ts` repris tels quels de la PR historique ; contrôle des valeurs finies en entrée/sortie, overflow de moyenne/pondérations, indices positifs, sous-flux de taux FX et pertes nominales au-delà de 100 %. L'exactitude des méthodes financières et des courbes n'est PAS validée par ces tests synthétiques seuls.
+- **GIT / MEMOIRE** : commit à deux parents sans force, arbre du main courant + blobs de PR #34, documents docs/06 et docs/09 actuels préservés avec ce checkpoint ; anciennes versions documentaires sont conservées dans le parent PR.
+- **BLOCK_REASON** : CI validate et Docker exact SHA encore à obtenir, réactions de revue à examiner, licences/données officielles et recettes méthodologiques par marché non attestées.
+- **NEXT_ACTION** : qualifier PR READY sous ruleset, lancer/enrôler auto-merge natif après périmètre et tests, corriger les anomalies, puis PR #32 obligations/Total Return. Reprendre qualité et sources officielles sans collision, aucun S1 ni coûts ajoutés.
+
+
 ## 2026-11-24 — Lot 4/11 : réconciliation PR #33, fiabilité des réponses HTTP avant archivage
 - **CONTINUITY_ID** : SADIAAF-CONTINUITY-20261124-01. Branche source historique PR #33 `6b428474483d8086e26c995f970d88425c190a45`, base main `4b1612458f53124e4de8a5d1e74ba11ded4cee54`. Retenir les deux blobs de code/test de la PR #33 tels quels sans reconstruction.
 - **MÉCANISME GIT** : merge à deux parents (branche historique comme premier parent, main comme second), branche mise à jour sans force sous expected_SHA. Documents docs/06 et docs/09 du main courant conservés avec checkpoint ; anciens journaux intégraux disponibles dans parent original.
