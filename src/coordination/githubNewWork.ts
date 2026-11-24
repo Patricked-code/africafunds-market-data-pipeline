@@ -1,5 +1,5 @@
 import {z} from "zod";
-import {applyCommand,assertFence,type Claim,type ClaimStore,type PendingLifecycle} from "./agentClaims.js";
+import {applyCommand,assertFence,transition,type Claim,type ClaimStore,type PendingLifecycle} from "./agentClaims.js";
 import {canonicalWorkAdmissionSchema,type CanonicalWorkAdmission} from "./githubSelector.js";
 
 const root="https://api.github.com/repos/Patricked-code/africafunds-market-data-pipeline";
@@ -20,6 +20,8 @@ export interface NewWorkConfig{
  verifyPublishedCandidate(claim:Claim):Promise<boolean>;
  // Must prove old request terminal and writer stopped, not merely lease expiry.
  verifyQuiescence(identity:Owner,operation:PendingLifecycle):Promise<boolean>;
+ // Independent evidence of terminal absence; not a model-supplied callback.
+ verifyAbsentEffect?(claim:Readonly<Claim>,operation:Readonly<PendingLifecycle>,evidence:readonly string[]):Promise<boolean>;
 }
 export function createGitHubNewWork(config:NewWorkConfig){
  const token=z.string().min(1).max(4096).regex(/^[A-Za-z0-9_.-]+$/);
@@ -100,6 +102,32 @@ export function createGitHubNewWork(config:NewWorkConfig){
   await finish(c,o,created.number);return {head:o.head,prNumber:created.number};
  }
  return {createBranch:(i:Owner)=>start(i,"branch"),createDraftPr:(i:Owner)=>start(i,"pr"),
+  async reconcileAbsent(i:Owner,rawEvidence:readonly string[]){
+   const evidence=z.array(z.string().regex(/^(?:issue|pr|ci):[1-9][0-9]{0,19}$/)).min(1).max(20).parse(rawEvidence);
+   if(new Set(evidence).size!==evidence.length)throw Error("LIFECYCLE_ABSENCE_EVIDENCE_INVALID");
+   if(await config.authenticate(i)!==true)throw Error("LIFECYCLE_UNAUTHENTICATED");
+   const snapshot=await config.store.read(),c=snapshot.state.claims.find(x=>same(x,i)),o=c?.pendingLifecycle;
+   if(!c||!o||await config.verifyQuiescence(i,o)!==true)throw Error("LIFECYCLE_STILL_UNCERTAIN");
+   if(!config.verifyAbsentEffect)throw Error("LIFECYCLE_ABSENCE_PROOF_REQUIRED");
+   const absent=async()=>{
+    repo.parse(await request("GET","",bt));
+    if(await config.verifyWriterIsolation(c.branch)!==true)throw Error("LIFECYCLE_WRITER_ISOLATION_REQUIRED");
+    const observed=await getHead(c.branch);
+    if(o.kind==="branch")return observed===null&&await readPr(c,o.issue)===null;
+    return observed===o.head&&await readPr(c,o.issue)===null;
+   };
+   if(!await absent())throw Error("LIFECYCLE_EFFECT_NOT_ABSENT");
+   if(await config.verifyAbsentEffect(structuredClone(c),structuredClone(o),[...evidence])!==true)
+    throw Error("LIFECYCLE_ABSENCE_PROOF_DENIED");
+   if(!await absent()||await config.verifyQuiescence(i,o)!==true)throw Error("LIFECYCLE_ABSENCE_CHANGED");
+   const next=transition(snapshot.state,{kind:"lifecycle-absent",...i,operation:o,
+    trace:{head:o.head,nextAction:"Reconcile fresh canonical admission before any new operation",
+     evidence:[...new Set([...evidence,"commit:"+o.head,...c.trace.evidence.slice(0,9)])]}},config.now());
+   // Bind proof and absence observation to the original state version.
+   // No external mutation, no retry, and no clearing a newer intent.
+   await config.store.compareAndSwap(snapshot.version,next);
+   return {status:"absent" as const,head:o.head};
+  },
   async reconcile(i:Owner){
    if(await config.authenticate(i)!==true)throw Error("LIFECYCLE_UNAUTHENTICATED");
    const c=(await config.store.read()).state.claims.find(x=>same(x,i)),o=c?.pendingLifecycle;
@@ -112,4 +140,4 @@ export function createGitHubNewWork(config:NewWorkConfig){
   }};
 }
 // No direct main mutation, branch deletion, merge or auto-merge activation.
-// Absent/ambiguous effects stay pending until explicitly reconciled.
+// Absent/ambiguous effects stay pending until explicit evidence-based reconciliation.

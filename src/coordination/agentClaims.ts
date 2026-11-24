@@ -52,7 +52,7 @@ const wakeReceiptSchema = z.object({
 export type WakeSignal = z.infer<typeof wakeSignalSchema>;
 type WakeReceipt = z.infer<typeof wakeReceiptSchema>;
 const event = z.object({
-  revision: stamp.positive(), kind: z.enum(["claim","heartbeat","checkpoint","release","recover","wake-accepted","wake-intent","wake-result","wake-reconciled","mutation-intent","mutation-result","lifecycle-intent","lifecycle-result"]),
+  revision: stamp.positive(), kind: z.enum(["claim","heartbeat","checkpoint","release","recover","wake-accepted","wake-intent","wake-result","wake-reconciled","mutation-intent","mutation-result","lifecycle-intent","lifecycle-result","lifecycle-absent"]),
   at: stamp, workId: id, actor: id, session: id, generation: stamp.positive(),
   previousGeneration: stamp.positive().optional(), wakeKey:id.optional(), trace,
 }).strict();
@@ -96,7 +96,8 @@ export type Command =
   | ({kind:"mutation-intent"; mutation:PendingMutation} & Identity)
   | ({kind:"mutation-result"; candidateHead:string; observedHead:string; trace:Trace} & Identity)
   | ({kind:"lifecycle-intent"; operation:PendingLifecycle} & Identity)
-  | ({kind:"lifecycle-result"; operation:PendingLifecycle; prNumber?:number; trace:Trace} & Identity);
+  | ({kind:"lifecycle-result"; operation:PendingLifecycle; prNumber?:number; trace:Trace} & Identity)
+  | ({kind:"lifecycle-absent"; operation:PendingLifecycle; trace:Trace} & Identity);
 
 export function emptyState(): State {
   return {continuity:CONTINUITY_ID,revision:0,updatedAt:0,claims:[],lastEvent:null};
@@ -122,7 +123,7 @@ export function transition(input:State, command:Command, now:number):State {
   let claims:Claim[];
   if (old?.pendingMutation && command.kind!=="heartbeat" && command.kind!=="mutation-result")
     throw Error("MUTATION_RECONCILIATION_REQUIRED");
-  if (old?.pendingLifecycle && command.kind!=="heartbeat" && command.kind!=="lifecycle-result") throw Error("LIFECYCLE_RECONCILIATION_REQUIRED");
+  if (old?.pendingLifecycle && command.kind!=="heartbeat" && command.kind!=="lifecycle-result" && command.kind!=="lifecycle-absent") throw Error("LIFECYCLE_RECONCILIATION_REQUIRED");
   if (command.kind === "claim" || command.kind === "recover") {
     if (command.kind === "claim" && old) throw new Error("ALREADY_CLAIMED");
     if (command.kind === "recover") {
@@ -139,7 +140,7 @@ export function transition(input:State, command:Command, now:number):State {
     if (command.kind === "claim" && next.trace.head !== next.base) throw new Error("BASE_NOT_RECONCILED");
     if (s.claims.some(c => c !== old && conflicts(c,next))) throw new Error("SCOPE_OCCUPIED");
     claims = [...s.claims.filter(c => c !== old),next];
-   } else if(command.kind==="lifecycle-intent" || command.kind==="lifecycle-result"){
+   } else if(command.kind==="lifecycle-intent" || command.kind==="lifecycle-result" || command.kind==="lifecycle-absent"){
     if(!old || old.actor!==command.actor || old.session!==command.session || old.generation!==command.generation)
       throw Error("STALE_OR_EXPIRED_CLAIM");
     const operation=lifecycleSchema.parse(command.operation);
@@ -151,8 +152,10 @@ export function transition(input:State, command:Command, now:number):State {
     }else{
       if(!old.pendingLifecycle||JSON.stringify(old.pendingLifecycle)!==JSON.stringify(operation)||
        command.trace.head!==operation.head||!command.trace.evidence.includes("commit:"+operation.head)||
-       (operation.kind==="pr"&&(!Number.isSafeInteger(command.prNumber)||command.prNumber!<=0||!command.trace.evidence.includes("pr:"+command.prNumber)))||
-       (operation.kind==="branch"&&command.prNumber!==undefined))throw Error("LIFECYCLE_RESULT_NOT_ADMISSIBLE");
+       (command.kind==="lifecycle-result"&&operation.kind==="pr"&&(!Number.isSafeInteger(command.prNumber)||command.prNumber!<=0||!command.trace.evidence.includes("pr:"+command.prNumber)))||
+       (command.kind==="lifecycle-result"&&operation.kind==="branch"&&command.prNumber!==undefined)||
+       (command.kind==="lifecycle-absent"&&!command.trace.evidence.some(e=>e.startsWith("issue:")||e.startsWith("ci:")||e.startsWith("pr:"))))
+       throw Error("LIFECYCLE_RESULT_NOT_ADMISSIBLE");
       const {pendingLifecycle:_pending,...rest}=old;
       next=claim.parse({...rest,trace:command.trace});
     }

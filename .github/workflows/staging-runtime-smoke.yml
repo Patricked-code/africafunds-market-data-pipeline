@@ -1,7 +1,8 @@
 name: SadiaAF — isolated Docker runtime and PostgreSQL persistence smoke
 
 on:
-  pull_request:  # Always create a required check, even for docs-only PRs
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review] # Preserve existing events and validate readiness
   push:
     branches: [main]
     paths:

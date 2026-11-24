@@ -1,7 +1,8 @@
 name: CI — AfricaFunds Market Data Pipeline
 
 on:
-  pull_request:  # Validate stacked PRs and ordinary PRs with the same gate
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review] # Preserve existing events and validate readiness
   push:
     branches: [main]
   workflow_dispatch:
