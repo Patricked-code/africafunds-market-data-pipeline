@@ -2,6 +2,7 @@ import { createServer, type IncomingMessage, type ServerResponse } from 'node:ht
 import { pool } from '../db/pool.js';
 import { logger } from '../config/logger.js';
 import * as query from './queries.js';
+import { resolveCorsOrigin } from './cors.js';
 
 const host = process.env.API_HOST || '0.0.0.0';
 const port = Number.parseInt(process.env.API_PORT || '8080', 10);
@@ -9,7 +10,7 @@ const allowedOrigins = (process.env.DASHBOARD_ORIGINS || '*').split(',').map((va
 
 function setCors(req: IncomingMessage, res: ServerResponse): void {
   const origin = req.headers.origin;
-  const allowed = allowedOrigins.includes('*') ? '*' : origin && allowedOrigins.includes(origin) ? origin : allowedOrigins[0];
+  const allowed = resolveCorsOrigin(origin, allowedOrigins);
   if (allowed) res.setHeader('Access-Control-Allow-Origin', allowed);
   res.setHeader('Vary', 'Origin');
   res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS');

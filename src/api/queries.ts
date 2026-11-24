@@ -89,13 +89,14 @@ export async function indices(url: URL, limit: number): Promise<unknown[]> {
   const market = url.searchParams.get('market');
   const currency = url.searchParams.get('currency');
   const values: unknown[] = [];
-  const clauses: string[] = [];
+  // Conservative public-read gate; NULL publication dates remain private until approved policy. 
+  const clauses: string[] = ["d.publication_status = 'PUBLISHED'", 'v.publication_date IS NOT NULL', 'v.publication_date <= CURRENT_DATE', 'v.observation_date <= CURRENT_DATE'];
   if (market) { values.push(market); clauses.push(`d.market_code=$${values.length}`); }
   if (currency) { values.push(currency); clauses.push(`v.currency_code=$${values.length}`); }
   values.push(limit);
   return (await pool.query(`SELECT d.index_code,d.index_name,d.market_code,v.observation_date,v.currency_code,v.index_level,v.daily_return,v.quality_score
     FROM calc.index_daily_values v JOIN calc.index_definitions d ON d.index_id=v.index_id
-    ${clauses.length ? `WHERE ${clauses.join(' AND ')}` : ''}
+    WHERE ${clauses.join(' AND ')}
     ORDER BY v.observation_date DESC,d.index_code LIMIT $${values.length}`, values)).rows;
 }
 
@@ -103,7 +104,7 @@ export async function rates(url: URL, limit: number): Promise<unknown[]> {
   const market = url.searchParams.get('market');
   const family = url.searchParams.get('family');
   const values: unknown[] = [];
-  const clauses: string[] = [];
+  const clauses: string[] = ['o.publication_date IS NOT NULL', 'o.publication_date <= CURRENT_DATE', 'o.observation_date <= CURRENT_DATE'];
   if (market) { values.push(market); clauses.push(`s.market_code=$${values.length}`); }
   if (family) { values.push(family); clauses.push(`s.rate_family=$${values.length}`); }
   values.push(limit);
