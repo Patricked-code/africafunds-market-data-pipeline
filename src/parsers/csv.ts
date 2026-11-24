@@ -1,11 +1,48 @@
 export function parseDelimited(text: string, delimiter?: string): string[][] {
+  // Invalid caller-supplied separators must not silently collapse source columns.
+  // Preserve support for legitimate custom single-character separators.
+  if (delimiter !== undefined && (delimiter.length !== 1 || delimiter === '"' || delimiter === '\r' || delimiter === '\n')) {
+    throw new Error('Invalid delimited document separator');
+  }
   const normalized = text.replace(/^\uFEFF/, '');
-  const firstLine = normalized.split(/\r?\n/, 1)[0] ?? '';
-  const sep = delimiter ?? ([',', ';', '\t'].sort((a, b) => firstLine.split(b).length - firstLine.split(a).length)[0] ?? ',');
+  // Inspect the complete first logical record, including multiline quoted headers.
+  // Only unquoted delimiters contribute to autodetection.
+  const counts = new Map<string, number>([[',', 0], [';', 0], ['\t', 0]]);
+  let inQuotes = false;
+  // Track whether the first meaningful header has begun without repeatedly
+  // slicing the entire preamble (quadratic on large whitespace-only inputs).
+  let headerStarted = false;
+  for (let i = 0; i < normalized.length; i += 1) {
+    const char = normalized[i];
+    // Ignore empty or whitespace-only physical lines before the header.
+    // The parser itself discards these rows, so autodetection must agree.
+    if (!inQuotes && (char === '\n' || char === '\r')) {
+      if (!headerStarted) {
+        // Discard separator counts from whitespace-only preamble lines.
+        // Tabs in those ignored rows are not header delimiters.
+        for (const candidate of counts.keys()) counts.set(candidate, 0);
+        continue;
+      }
+      break;
+    }
+    if (char !== undefined && !/\s/.test(char)) headerStarted = true;
+    if (char === '"') {
+      if (inQuotes && normalized[i + 1] === '"') i += 1;
+      else inQuotes = !inQuotes;
+    } else if (char !== undefined && !inQuotes && counts.has(char)) {
+      counts.set(char, (counts.get(char) ?? 0) + 1);
+    }
+  }
+  const sep = delimiter ?? ([',', ';', '\t'].sort((a, b) => (counts.get(b) ?? 0) - (counts.get(a) ?? 0))[0] ?? ',');
+  // A leading tab-only physical line is whitespace, not a financial TSV header.
+  // After a genuine header, explicit empty TSV records remain significant.
   const rows: string[][] = [];
   let row: string[] = [];
   let cell = '';
   let quoted = false;
+  let explicitQuotedCell = false;
+  let closedQuotedCell = false;
+  let cellWasQuoted = false;
 
   for (let i = 0; i < normalized.length; i += 1) {
     const char = normalized[i];
@@ -14,28 +51,64 @@ export function parseDelimited(text: string, delimiter?: string): string[][] {
       cell += '"';
       i += 1;
     } else if (char === '"') {
+      // A closed quoted field cannot be reopened, even after whitespace.
+      // Otherwise distinct source fragments can be silently concatenated.
+      if (closedQuotedCell) {
+        throw new Error('Invalid quote after closing quoted delimited field');
+      }
+      // Quotes cannot begin inside an already populated unquoted value.
+      // Reject rather than silently stripping a character from financial data.
+      if (!quoted && cell.trim().length > 0) {
+        throw new Error('Invalid quote inside unquoted delimited field');
+      }
+      if (!quoted) {
+        // Leading whitespace outside quotes is not part of the quoted value.
+        cell = '';
+        cellWasQuoted = true;
+      }
+      explicitQuotedCell = true;
       quoted = !quoted;
+      closedQuotedCell = !quoted;
     } else if (char === sep && !quoted) {
-      row.push(cell.trim());
+      row.push(cellWasQuoted ? cell : cell.trim());
       cell = '';
+      cellWasQuoted = false;
+      closedQuotedCell = false;
     } else if ((char === '\n' || char === '\r') && !quoted) {
       if (char === '\r' && next === '\n') i += 1;
-      row.push(cell.trim());
-      if (row.some(Boolean)) rows.push(row);
+      row.push(cellWasQuoted ? cell : cell.trim());
+      if (row.some(Boolean) || (row.length > 1 && (sep !== '\t' || rows.length > 0)) || explicitQuotedCell) rows.push(row);
       row = [];
       cell = '';
+      explicitQuotedCell = false;
+      cellWasQuoted = false;
+      closedQuotedCell = false;
     } else {
-      cell += char;
+      if (closedQuotedCell && char !== undefined && !/\s/.test(char)) {
+        throw new Error('Invalid characters after closing quote in delimited field');
+      }
+      // Whitespace after a closing quote is formatting, not source content.
+      if (!closedQuotedCell) cell += char;
     }
   }
-  if (cell.length || row.length) {
-    row.push(cell.trim());
-    if (row.some(Boolean)) rows.push(row);
+  if (quoted) throw new Error('Unterminated quoted field in delimited document');
+  if (cell.length || row.length || explicitQuotedCell) {
+    row.push(cellWasQuoted ? cell : cell.trim());
+    if (row.some(Boolean) || (row.length > 1 && (sep !== '\t' || rows.length > 0)) || explicitQuotedCell) rows.push(row);
   }
   return rows;
 }
 
 export function rowsToObjects(rows: string[][]): Array<Record<string, string>> {
   const headers = rows[0] ?? [];
-  return rows.slice(1).map((row) => Object.fromEntries(headers.map((header, i) => [header || `column_${i + 1}`, row[i] ?? ''])));
+  const names = headers.map((header, i) => header || `column_${i + 1}`);
+  if (new Set(names).size !== names.length) {
+    throw new Error('Duplicate header in delimited document');
+  }
+  return rows.slice(1).map((row, index) => {
+    if (row.length !== names.length) {
+      throw new Error(`Delimited document row ${index + 2} has ${row.length} fields; expected ${names.length}`);
+    }
+    return Object.fromEntries(names.map((name, i) => [name, row[i] ?? '']));
+  });
 }
