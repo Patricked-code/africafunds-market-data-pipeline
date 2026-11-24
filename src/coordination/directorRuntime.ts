@@ -7,7 +7,7 @@ import {runGitHubDirectorWake,deriveGitHubWake,type GitHubDirectorEvent} from ".
 import type {createGitHubAppIdentity} from "./githubIdentity.js";
 import {createGitHubSourceReader} from "./githubSource.js";
 import {createLocalModelCoder,prepareCodingCandidate,type CodingResult} from "./modelCoder.js";
-import {createDatesValidationPort,DATES_ACCEPTANCE,datesValidationSuite} from "./isolatedValidation.js";
+import {createIsolatedValidationPort,DATES_ACCEPTANCE,validationContract,validationScope} from "./isolatedValidation.js";
 import {createGitHubValidationEvidence} from "./githubValidationEvidence.js";
 import {createGitHubCommitBuilder} from "./githubCommitBuilder.js";
 import {createGitHubPublicationPort} from "./githubPublication.js";
@@ -57,8 +57,7 @@ export function supportedExistingPrAdmissions(admissions:readonly CanonicalWorkA
   a.scopes.length===1&&a.scopes[0]==="file:src/utils/dates.ts");
 }
 export function supportedDirectorAdmissions(admissions:readonly CanonicalWorkAdmission[]){
- return admissions.filter(a=>a.acceptance===DATES_ACCEPTANCE&&a.scopes.length===1&&
-  a.scopes[0]==="file:src/utils/dates.ts");
+ return admissions.filter(a=>a.scopes.length===1&&validationScope(a.acceptance)===a.scopes[0]);
 }
 export interface DirectorRuntimeConfig {
  identity:ReturnType<typeof createGitHubAppIdentity>;
@@ -144,13 +143,14 @@ async function runDirector(config:DirectorRuntimeConfig,event:GitHubDirectorEven
   return (await admissions(main)).find(a=>a.workId===workId)??null;
  };
  const readSource=createGitHubSourceReader({token:readCredential.token,fetcher:readFetch});
- const evidence=createGitHubValidationEvidence({token:evidenceCredential.token,appId:config.evidenceAppId,
-  botUserId:positive.parse(config.evidenceBotUserId),expectedSuite:datesValidationSuite(config.imageId),fetcher:scopedFetch(evidenceCredential.expiresAt)});
- const validate=createDatesValidationPort({imageId:config.imageId,readSource,persistEvidence:evidence.persistEvidence});
  const model=createLocalModelCoder(); // loopback only; no GitHub credentials
  const execute=async(context:ClaimedWorkContext)=>{
   const initial=await readAdmission(context.claim.workId);
   if(!initial)throw Error("DIRECTOR_ADMISSION_REQUIRED");
+  const contract=validationContract(initial.acceptance,config.imageId);
+  const evidence=createGitHubValidationEvidence({token:evidenceCredential.token,appId:config.evidenceAppId,
+   botUserId:positive.parse(config.evidenceBotUserId),expectedSuite:contract.suite,expectedCaseIds:contract.caseIds,fetcher:scopedFetch(evidenceCredential.expiresAt)});
+  const validate=createIsolatedValidationPort({imageId:config.imageId,readSource,persistEvidence:evidence.persistEvidence},initial.acceptance);
   const checkAdmission=async()=>{
    const current=await readAdmission(initial.workId);
    if(JSON.stringify(current)!==JSON.stringify(initial))throw Error("DIRECTOR_ADMISSION_CHANGED");

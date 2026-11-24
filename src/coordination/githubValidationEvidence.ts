@@ -8,15 +8,19 @@ const marker="SADIAAF_VALIDATION_EVIDENCE_V1";
 const digest=z.string().regex(/^[a-f0-9]{64}$/),sha=z.string().regex(/^[a-f0-9]{40}$/);
 const positive=z.number().int().positive().safe();
 const ids=["valid-leap","valid-date","timezone","date-object","invalid-text","invalid-object","days-between","bucket-365","bucket-366","invalid-feb30","invalid-leap","invalid-apr31","invalid-month13","invalid-month00","invalid-day00","century-leap","century-nonleap","year-0001"] as const;
-const caseId=z.enum(ids);
+const caseId=z.string().regex(/^[a-z0-9][a-z0-9-]{0,79}$/);
 const result=z.discriminatedUnion("kind",[
  z.object({id:caseId,kind:z.literal("value"),value:z.union([z.string().max(300),z.number().finite()])}).strict(),
  z.object({id:caseId,kind:z.literal("throw")}).strict()
 ]);
-const record=z.object({head:sha,subject:digest,suite:digest,status:z.enum(["pass","fail"]),diagnostics:z.array(caseId).max(18),observed:z.array(result).length(18)}).strict().superRefine((r,ctx)=>{
- if(new Set(r.observed.map(x=>x.id)).size!==18||new Set(r.diagnostics).size!==r.diagnostics.length||
-  (r.status==="pass")!==(!r.diagnostics.length))ctx.addIssue({code:"custom",message:"INVALID_EVIDENCE_CASES"});
-});
+function evidenceRecord(caseIds:readonly string[]){
+ const allowed=new Set(z.array(caseId).min(1).max(30).parse(caseIds));
+ if(allowed.size!==caseIds.length)throw Error("EVIDENCE_CASE_CONTRACT_INVALID");
+ return z.object({head:sha,subject:digest,suite:digest,status:z.enum(["pass","fail"]),diagnostics:z.array(caseId).max(allowed.size),observed:z.array(result).length(allowed.size)}).strict().superRefine((r,ctx)=>{
+  if(new Set(r.observed.map(x=>x.id)).size!==allowed.size||r.observed.some(x=>!allowed.has(x.id))||r.diagnostics.some(x=>!allowed.has(x))||new Set(r.diagnostics).size!==r.diagnostics.length||
+   (r.status==="pass")!==(!r.diagnostics.length))ctx.addIssue({code:"custom",message:"INVALID_EVIDENCE_CASES"});
+ });
+}
 const envelope=z.object({continuity:z.literal("SADIAAF-CONTINUITY-20261124-01"),recordHash:digest,
  recordBase64:z.string().max(20000)}).strict();
 const comment=z.object({id:positive,issue_url:z.literal(root+"/issues/9"),body:z.string().max(22000),
@@ -28,12 +32,13 @@ type Validated=Extract<CodingResult,{outcome:"validated"}>;
 export interface ValidationEvidenceConfig{
  // Separate least-privilege issue-write credential from the verified broker,
  // never supplied by the model or reused as a branch publication credential.
- token:string;appId:number;botUserId:number;expectedSuite:string;
+ token:string;appId:number;botUserId:number;expectedSuite:string;expectedCaseIds?:readonly string[];
  fetcher?:typeof fetch;timeoutMs?:number;
 }
 export function createGitHubValidationEvidence(config:ValidationEvidenceConfig){
  const token=z.string().min(1).max(4096).regex(/^[A-Za-z0-9_.-]+$/).parse(config.token);
  const appId=positive.parse(config.appId),botId=positive.parse(config.botUserId),suite=digest.parse(config.expectedSuite);
+ const record=evidenceRecord(config.expectedCaseIds??ids);
  const timeout=config.timeoutMs??15000;
  if(!Number.isSafeInteger(timeout)||timeout<100||timeout>60000)throw Error("EVIDENCE_TIMEOUT_INVALID");
  const send=config.fetcher??fetch;

@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import {createHash} from "node:crypto";
-import {createDatesValidationPort,DATES_ACCEPTANCE,type DatesValidationConfig,type ValidationRecord} from "../src/coordination/isolatedValidation.js";
+import {createDatesValidationPort,createIsolatedValidationPort,INDICES_ACCEPTANCE,validationContract,DATES_ACCEPTANCE,type DatesValidationConfig,type ValidationRecord} from "../src/coordination/isolatedValidation.js";
 import {codingSubject} from "../src/coordination/modelCoder.js";
 const head="a".repeat(40),imageId="sha256:"+"b".repeat(64),source="original";
 const change={path:"src/utils/dates.ts",originalSha256:createHash("sha256").update(source).digest("hex"),content:"candidate"};
@@ -43,4 +43,16 @@ test("reject candidate-provided PASS marker and truncated results",async()=>{
 test("requires immutable image and persistence success",async()=>{
  const f=fixture();assert.throws(()=>createDatesValidationPort({...f.config,imageId:"node:22"}));
  await assert.rejects(createDatesValidationPort({...f.config,persistEvidence:async()=>{throw Error("not persisted");}})(head,[],DATES_ACCEPTANCE),/not persisted/);
+});
+
+test("second financial contract uses its own path, suite and exact cases without changing dates digest",async()=>{
+ const f=fixture(),path="src/calc/indices.ts";
+ const record=validationContract(INDICES_ACCEPTANCE,imageId);
+ assert.equal(record.caseIds.length,14);
+ assert.notEqual(record.suite,validationContract(DATES_ACCEPTANCE,imageId).suite);
+ const v=createIsolatedValidationPort({...f.config,async readSource(h,p){assert.equal(h,head);assert.equal(p,path);return source;},
+ async runner(_s,inputs){return inputs.map(c=>({id:c.id,kind:"throw"}));}},INDICES_ACCEPTANCE);
+ const p=await v(head,[],INDICES_ACCEPTANCE);assert.equal(p.status,"fail");assert.equal(p.suite,record.suite);
+ await assert.rejects(v(head,[],DATES_ACCEPTANCE),/CONTRACT/);
+ await assert.rejects(v(head,[change],INDICES_ACCEPTANCE),/SCOPE/);
 });

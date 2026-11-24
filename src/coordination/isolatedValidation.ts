@@ -10,7 +10,7 @@ import {codingSubject,type CodingChange,type CodingProof} from "./modelCoder.js"
 const sha256=(value:string)=>createHash("sha256").update(value).digest("hex");
 const sourcePath="src/utils/dates.ts";
 export const DATES_ACCEPTANCE="SADIAAF-DATES-CALENDAR-V1";
-type Input={id:string;fn:"iso"|"days"|"bucket";args:(string|number)[];dateObject?:boolean};
+type Input={id:string;fn:"iso"|"days"|"bucket"|"capitalise"|"next"|"mean"|"real"|"convert";args:(string|number)[];dateObject?:boolean};
 type Result={id:string;kind:"value";value:string|number}|{id:string;kind:"throw"};
 // Same 18 historical pilot cases; expected outputs never mounted in Docker.
 const cases:readonly {input:Input;expected:Result}[]=[
@@ -42,6 +42,57 @@ const results=inputs.map(c=>{
  }catch{return {id:c.id,kind:"throw"};}
 });
 process.stdout.write(JSON.stringify(results));`;
+export const INDICES_ACCEPTANCE="SADIAAF-INDICES-DAYCOUNT-V1";
+// The existing TypeScript contract limits dayCountBasis to 360 or 365.
+// Runtime inputs must not bypass it. Preserve default and valid calculations.
+const indexCases:readonly {input:Input;expected:Result}[]=[
+ ...([
+ ["capitalise-default",[100,.25,360],125],
+ ["capitalise-360",[100,.25,360,360],125],
+ ["capitalise-365",[100,.25,365,365],125],
+ ["capitalise-zero-days",[100,.25,0,365],100],
+ ["capitalise-negative-rate",[100,-.25,360,360],75]
+ ] as const).map(([id,args,value])=>({input:{id,fn:"capitalise" as const,args:[...args]},expected:{id,kind:"value" as const,value}})),
+ ...([["invalid-basis-180",180],["invalid-basis-1",1],["invalid-basis-fraction",365.5],["invalid-basis-zero",0]] as const).map(([id,basis])=>({input:{id,fn:"capitalise" as const,args:[100,.25,360,basis]},expected:{id,kind:"throw" as const}})),
+ {input:{id:"invalid-days",fn:"capitalise",args:[100,.25,-1,360]},expected:{id:"invalid-days",kind:"throw"}},
+ {input:{id:"next-level",fn:"next",args:[100,.25]},expected:{id:"next-level",kind:"value",value:125}},
+ {input:{id:"mean-return",fn:"mean",args:[0,.5]},expected:{id:"mean-return",kind:"value",value:.25}},
+ {input:{id:"real-return",fn:"real",args:[.25,.25]},expected:{id:"real-return",kind:"value",value:0}},
+ {input:{id:"fx-return",fn:"convert",args:[.25,2,2]},expected:{id:"fx-return",kind:"value",value:.25}}
+];
+const indexDriver=`import {readFileSync} from "node:fs";
+import {capitaliseAnnualRate,nextIndexLevel,meanReturn,realReturn,convertReturn} from "./dates.ts";
+const inputs=JSON.parse(readFileSync("/work/inputs.json","utf8"));
+const results=inputs.map(c=>{
+ try{
+ const a=c.args;let value;
+ switch(c.fn){
+ case "capitalise":value=capitaliseAnnualRate({previousLevel:a[0],annualRate:a[1],elapsedDays:a[2],...(a.length===4?{dayCountBasis:a[3]}:{})});break;
+ case "next":value=nextIndexLevel(...a);break;
+ case "mean":value=meanReturn(a);break;
+ case "real":value=realReturn(...a);break;
+ case "convert":value=convertReturn({localReturn:a[0],fxToday:a[1],fxPrevious:a[2]});break;
+ default:throw new Error("unknown case");
+ }
+ return {id:c.id,kind:"value",value};
+ }catch{return {id:c.id,kind:"throw"};}
+});
+process.stdout.write(JSON.stringify(results));`;
+function recipe(acceptance:string){
+ if(acceptance===DATES_ACCEPTANCE)return {sourcePath,driver,cases};
+ if(acceptance===INDICES_ACCEPTANCE)return {sourcePath:"src/calc/indices.ts",driver:indexDriver,cases:indexCases};
+ throw Error("VALIDATION_CONTRACT_NOT_ADMITTED");
+}
+export function validationScope(acceptance:string):string|null{
+ if(acceptance===DATES_ACCEPTANCE)return "file:"+sourcePath;
+ if(acceptance===INDICES_ACCEPTANCE)return "file:src/calc/indices.ts";
+ return null;
+}
+export function validationContract(acceptance:string,imageId:string){
+ const image=imageSchema.parse(imageId),r=recipe(acceptance);
+ // Preserve the original dates-suite digest byte for byte.
+ return {suite:sha256(JSON.stringify({acceptance,image,driver:r.driver,cases:r.cases})),caseIds:r.cases.map(c=>c.input.id)};
+}
 const resultSchema=z.discriminatedUnion("kind",[
  z.object({id:z.string(),kind:z.literal("value"),value:z.union([z.string().max(300),z.number().finite()])}).strict(),
  z.object({id:z.string(),kind:z.literal("throw")}).strict()
@@ -52,7 +103,8 @@ export type IsolatedRunner=(source:string,inputs:readonly Input[])=>Promise<unkn
 // The caller supplies an already installed, reviewed Node 22 image ID, not a
 // mutable tag. No pull, network, host environment, Docker socket or repo mount
 // is made available inside the candidate container.
-export function createDockerDatesRunner(imageId:string):IsolatedRunner{
+export function createDockerDatesRunner(imageId:string):IsolatedRunner{return createDockerRunner(imageId,driver);}
+function createDockerRunner(imageId:string,driverText:string):IsolatedRunner{
  imageSchema.parse(imageId);
  return async(source,inputs)=>{
   const dir=await mkdtemp(join(tmpdir(),"sadiaaf-validate-")),name="sadiaaf-validation-"+randomUUID();
@@ -61,7 +113,7 @@ export function createDockerDatesRunner(imageId:string):IsolatedRunner{
    await chmod(dir,0o755);
    await writeFile(join(dir,"dates.ts"),source,{mode:0o644,flag:"wx"});
    await writeFile(join(dir,"inputs.json"),JSON.stringify(inputs),{mode:0o644,flag:"wx"});
-   await writeFile(join(dir,"driver.mjs"),driver,{mode:0o644,flag:"wx"});
+   await writeFile(join(dir,"driver.mjs"),driverText,{mode:0o644,flag:"wx"});
    const r=await exec("docker",["--host","unix:///var/run/docker.sock","run","--name",name,"--rm","--pull=never",
     "--network","none","--read-only","--cap-drop","ALL","--security-opt","no-new-privileges",
     "--pids-limit","64","--memory","256m","--cpus","1","--user","65534:65534","--log-driver","none",
@@ -98,11 +150,13 @@ export function datesValidationSuite(imageId:string):string{
  const image=imageSchema.parse(imageId);
  return sha256(JSON.stringify({acceptance:DATES_ACCEPTANCE,image,driver,cases}));
 }
-export function createDatesValidationPort(config:DatesValidationConfig){
- const image=imageSchema.parse(config.imageId),run=config.runner??createDockerDatesRunner(image);
- const suite=datesValidationSuite(image);
+export function createDatesValidationPort(config:DatesValidationConfig){return createIsolatedValidationPort(config,DATES_ACCEPTANCE);}
+export function createIsolatedValidationPort(config:DatesValidationConfig,contract:string){
+ const image=imageSchema.parse(config.imageId),r=recipe(contract),run=config.runner??createDockerRunner(image,r.driver);
+ const {sourcePath,cases}=r;
+ const suite=validationContract(contract,image).suite;
  return async(head:string,changes:readonly CodingChange[],acceptance:string):Promise<CodingProof>=>{
-  if(!/^[a-f0-9]{40}$/.test(head)||acceptance!==DATES_ACCEPTANCE)throw Error("VALIDATION_CONTRACT_NOT_ADMITTED");
+  if(!/^[a-f0-9]{40}$/.test(head)||acceptance!==contract)throw Error("VALIDATION_CONTRACT_NOT_ADMITTED");
   if(changes.length>1||changes.some(c=>c.path!==sourcePath))throw Error("VALIDATION_SCOPE_MISMATCH");
   const original=await config.readSource(head,sourcePath),change=changes[0];
   if(change&&change.originalSha256!==sha256(original))throw Error("VALIDATION_ORIGINAL_MISMATCH");

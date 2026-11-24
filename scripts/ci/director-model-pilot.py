@@ -190,10 +190,50 @@ def parse_model_response(raw):
         raise ValueError("MODEL_JSON_SCHEMA_INVALID")
     return parse_guard(obj["guard"])
 
+# The trusted boundary excludes timestamps and Date instances. The model
+# must invent the invalid-calendar predicate; no fallback repair.
+def parse_model_condition(raw):
+    if not isinstance(raw,str) or len(raw)>8000:
+        raise ValueError("MODEL_RESPONSE_LIMIT")
+    try:
+        obj=json.loads(raw)
+    except json.JSONDecodeError as exc:
+        raise ValueError("MODEL_JSON_INVALID") from exc
+    if not isinstance(obj,dict) or set(obj)!={"condition"} or not isinstance(obj["condition"],str):
+        raise ValueError("MODEL_CONDITION_SCHEMA_INVALID")
+    condition=obj["condition"].strip()
+    if not condition or len(condition)>500 or not re.fullmatch(r"[A-Za-z0-9_.(), !<>=&|+\-*: ?]+",condition):
+        raise ValueError("MODEL_CONDITION_SYNTAX")
+    identifiers=set(re.findall(r"[A-Za-z_][A-Za-z0-9_]*",condition))
+    allowed={"value","date","toISOString","slice","substring","getUTCFullYear","getUTCMonth","getUTCDate","length","Number","parseInt","true","false"}
+    if not identifiers<=allowed or not {"value","date"}<=identifiers or re.search(r"(?<![=!<>])=(?!=)|\+\+|--",condition):
+        raise ValueError("MODEL_CONDITION_SCOPE")
+    depth=0
+    for char in condition:
+        if char=="(": depth+=1
+        if char==")": depth-=1
+        if depth<0: raise ValueError("MODEL_CONDITION_PARENS")
+    if depth: raise ValueError("MODEL_CONDITION_PARENS")
+    return condition
+
+def compose_date_only_condition(original,condition):
+    condition=parse_model_condition(json.dumps({"condition":condition}))
+    if original.count(RETURN_ANCHOR)!=1:
+        raise RuntimeError("EDIT_ANCHOR_CHANGED")
+    addition=(
+        r'  if (typeof value === "string" && /^\d{4}-\d{2}-\d{2}$/.test(value)) {'+'\n'
+        '    if ('+condition+') throw new Error("Invalid calendar date");\n'
+        '  }\n'
+    )
+    candidate=original.replace(RETURN_ANCHOR,addition+RETURN_ANCHOR,1)
+    if candidate.replace(addition,"",1)!=original:
+        raise RuntimeError("EDIT_SCOPE_CHANGED")
+    return candidate
+
 def generate(prompt, attempt=1):
     request = urllib.request.Request("http://127.0.0.1:18081/v1/chat/completions",
         data=json.dumps({"model": "local", "messages": [{"role":"system","content":
-          "Return a JSON object with exactly one string field named guard containing only TypeScript guard statements. No function wrapper, return statement, tool calls or explanation."},
+          "Return one JSON object with exactly one string field named condition: a TypeScript boolean expression true for an invalid exact calendar day. No statements, assignments, braces, tools or explanation."},
           {"role":"user","content":prompt}], "temperature":0.0 if attempt == 1 else 0.25, "max_tokens":1200, "response_format":{"type":"json_object"}}).encode(),
         headers={"Content-Type":"application/json"})
     with urllib.request.urlopen(request, timeout=300) as response:
@@ -206,7 +246,7 @@ def generate(prompt, attempt=1):
         print("MODEL_RAW_OUTPUT_BASE64="+base64.b64encode(raw[:8000].encode()).decode(),flush=True)
     if choice.get("finish_reason") != "stop":
         raise ValueError("MODEL_OUTPUT_NOT_COMPLETE")
-    return parse_model_response(raw)
+    return parse_model_condition(raw)
 
 def main():
     source=SOURCE.read_text()
@@ -258,26 +298,24 @@ def main():
                     time.sleep(2)
                 else:
                     raise RuntimeError("MODEL_START_TIMEOUT")
-                prompt=("Write ONLY the TypeScript guard statements to INSERT just before the "
-                        "existing return statement of the function below. The original value is still "
-                        "available as value (Date|string); date is its parsed Date. Keep all original "
-                        "statements, including the return, unchanged. Reject invalid calendar days "
-                        "ONLY for exact YYYY-MM-DD strings. Compare the original input with the UTC "
-                        "normalized calendar date, not a date reconstructed from the normalized value. "
-                        "For example '2026-02-30' must throw, but a timestamp "
-                        "'2026-11-24T23:45:00-02:00' must keep the existing UTC result '2026-11-25'. "
-                        "Do not reject non-midnight Date objects. No new functions, return, imports or "
-                        "dependencies. No logging, filesystem, network or process access. "
-                        "Return JSON with a single guard string containing the inserted statements. Original function:\n"+before)
+                prompt=("Generate a boolean predicate true only when an exact YYYY-MM-DD "
+                        "input has an impossible calendar day. The trusted harness already checks "
+                        "that value is an exact date-only string, so do not test its type or format. "
+                        "The original string is value and its parsed Date is date. Use both. "
+                        "Preserve valid leap days, dates in year 0001, and all original statements. "
+                        "Use only side-effect-free expressions using value, date, toISOString, slice, "
+                        "substring, getUTCFullYear, getUTCMonth, getUTCDate, length, Number or parseInt. "
+                        "Return JSON with one field condition. No code statements, quotes inside the "
+                        "expression, or additional fields. Original function:\n"+before)
                 original_prompt=prompt
                 seen_candidates=set()
                 for attempt in range(1,4):
                     try:
-                        guard=generate(prompt,attempt)
-                        candidate=compose_guard(before,guard)
+                        condition=generate(prompt,attempt)
+                        candidate=compose_date_only_condition(before,condition)
                     except (ValueError,KeyError) as error:
                         print("MODEL_OUTPUT_FORMAT_REJECTED",attempt,type(error).__name__,str(error)[:120],flush=True)
-                        prompt=original_prompt+"\nReturn one JSON object with exactly the guard string. No prose or function wrapper."
+                        prompt=original_prompt+"\nReturn one JSON object containing only the condition expression."
                         continue
                     digest=hashlib.sha256(candidate.encode()).hexdigest()
                     repeat=digest in seen_candidates
@@ -297,7 +335,7 @@ def main():
                     print("MODEL_CANDIDATE_REJECTED_BY_TESTS",attempt,flush=True)
                     # Only allowlisted test identifiers and the previous generated
                     # source as data; never feed arbitrary runtime logs/instructions.
-                    prompt=retry_prompt(original_prompt,guard,failures,repeat)
+                    prompt=original_prompt+"\nPrevious predicate rejected: "+condition+"\nFixed assertions failed: "+json.dumps([x for x in failures if x in CASE_IDS])+"\nGenerate a different correct predicate."
                 raise RuntimeError("MODEL_DID_NOT_PASS_REAL_TASK")
             finally:
                 process.terminate()

@@ -95,3 +95,8 @@ test("director admits new and existing work only within supported contract",()=>
  const fresh={...admission,pr:null};
  assert.deepEqual(supportedDirectorAdmissions([fresh,admission,{...fresh,acceptance:"unknown"}]),[fresh,admission]);
 });
+
+test("financial contract is admitted only with exact corresponding source scope",()=>{
+ const indices={...admission,acceptance:"SADIAAF-INDICES-DAYCOUNT-V1",scopes:["file:src/calc/indices.ts"]};
+ assert.deepEqual(supportedDirectorAdmissions([indices,{...indices,scopes:admission.scopes}]),[indices]);
+});

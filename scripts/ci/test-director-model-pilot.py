@@ -87,5 +87,17 @@ class DiagnosticTest(unittest.TestCase):
         for invalid in [guard,json.dumps({"guard":guard,"extra":"x"}),json.dumps({"guard":3}),json.dumps({"guard":"return 1;"})]:
             with self.assertRaises(ValueError):
                 pilot.parse_model_response(invalid)
+    def test_predicate_scope_preserves_original_and_wraps_date_only(self):
+        original="export function toIsoDate(value: Date | string): string {\n  const date = new Date(value);\n"+pilot.RETURN_ANCHOR+"\n}\n"
+        predicate="date.getUTCDate() !== Number(value.slice(8,10))"
+        self.assertEqual(pilot.parse_model_condition(json.dumps({"condition":predicate})),predicate)
+        result=pilot.compose_date_only_condition(original,predicate)
+        self.assertIn(r'/^\d{4}-\d{2}-\d{2}$/.test(value)',result)
+        self.assertIn("if ("+predicate+")",result)
+        self.assertTrue(result.endswith(pilot.RETURN_ANCHOR+"\n}\n"))
+    def test_predicate_rejects_escape_assignment_and_unknown_identifiers(self):
+        for x in ["date.getUTCDate() !== Number(value.slice(8,10))); process.exit(0); if (true)", "value = date", "date.constructor(value)", "date.getUTCDate()++ !== value.length", "value.length !== date.getUTCDate())", "true"]:
+            with self.assertRaises(ValueError):
+                pilot.parse_model_condition(json.dumps({"condition":x}))
 if __name__=="__main__":
     unittest.main()
