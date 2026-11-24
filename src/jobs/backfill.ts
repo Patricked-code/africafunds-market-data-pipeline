@@ -5,7 +5,7 @@ import { toIsoDate } from '../utils/dates.js';
 import { logger } from '../config/logger.js';
 import { loadRegistry } from '../config/registry.js';
 import { assertHistoricalWindowEvidence, findHistoricalWindowAdapter } from './historicalWindowAdapter.js';
-import { CLAIM_PENDING_BACKFILLS_SQL } from './backfillClaim.js';
+import { CLAIM_PENDING_BACKFILLS_SQL, FAIL_EXHAUSTED_BACKFILLS_SQL, RECOVER_EXPIRED_BACKFILLS_SQL, RENEW_BACKFILL_LEASE_SQL } from './backfillClaim.js';
 
 export async function enqueueBackfill(input: { market?: string; family?: string; from: string; to: string }): Promise<number> {
   const endpoints = await listEndpoints({
@@ -23,13 +23,15 @@ export async function enqueueBackfill(input: { market?: string; family?: string;
         end.getTime(),
         batchStart.getTime() + (env.BACKFILL_BATCH_DAYS - 1) * 86_400_000,
       ));
-      await pool.query(
+      const inserted = await pool.query(
         `INSERT INTO ops.backfill_jobs(endpoint_code, window_from, window_to, status)
          VALUES ($1,$2,$3,'PENDING')
          ON CONFLICT(endpoint_code, window_from, window_to) DO NOTHING`,
         [endpoint.id, toIsoDate(batchStart), toIsoDate(batchEnd)],
       );
-      count += 1;
+      // Idempotent enqueue must report rows actually inserted, not attempted
+      // windows that already exist (including jobs owned by another worker).
+      count += inserted.rowCount ?? 0;
       cursor = new Date(batchEnd.getTime() + 86_400_000);
     }
   }
@@ -53,6 +55,19 @@ export async function listPendingBackfills(limit = 100): Promise<void> {
 export async function processBackfillJobs(limit = 10): Promise<void> {
   const registry = await loadRegistry();
   const collectors = new Map(registry.markets.flatMap((market) => market.endpoints.map((endpoint) => [endpoint.id, endpoint.collector] as const)));
+  // Recover only expired RUNNING claims before selecting new work. Recovery and
+  // claim each use bounded, atomic SKIP LOCKED statements; never mark SUCCESS.
+  // Keep the lease conservative until periodic renewal and cancellation are wired.
+  // Retire exhausted legacy PENDING/RETRY rows before any new claims.
+  // This is bounded and idempotent; it never changes RUNNING or financial data.
+  const exhausted = await pool.query(FAIL_EXHAUSTED_BACKFILLS_SQL, [Math.max(0, Math.min(limit, 100))]);
+  if (exhausted.rowCount) {
+    logger.warn({ exhaustedJobs: exhausted.rowCount }, 'Exhausted legacy backfill jobs marked FAILED');
+  }
+  const recovery = await pool.query(RECOVER_EXPIRED_BACKFILLS_SQL, [900, Math.max(0, Math.min(limit, 100))]);
+  if (recovery.rowCount) {
+    logger.warn({ recoveredJobs: recovery.rowCount }, 'Expired backfill claims requeued');
+  }
   // Atomic claim: row locks and RUNNING transitions occur in the same SQL statement.
   // A plain SELECT ... FOR UPDATE through pool.query releases its lock before
   // the subsequent UPDATE, allowing two workers to process the same job.
@@ -62,6 +77,8 @@ export async function processBackfillJobs(limit = 10): Promise<void> {
     window_from: string;
     window_to: string;
     attempts: number;
+    claim_attempt: number;
+    claim_locked_at: string;
   }>(CLAIM_PENDING_BACKFILLS_SQL, [limit]);
 
   for (const job of jobs.rows) {
@@ -73,30 +90,73 @@ export async function processBackfillJobs(limit = 10): Promise<void> {
     if (!adapter) {
       await pool.query(
         `UPDATE ops.backfill_jobs
-            SET status='BLOCKED_ADAPTER', finished_at=now(), last_error=$2
-          WHERE backfill_job_id=$1 AND status='RUNNING'`,
-        [job.backfill_job_id,
+            SET status='BLOCKED_ADAPTER', finished_at=now(), last_error=$4
+          WHERE backfill_job_id=$1 AND status='RUNNING'
+            AND attempts=$2 AND locked_at::text=$3`,
+        [job.backfill_job_id, job.claim_attempt, job.claim_locked_at,
           `No qualified date-bounded adapter for ${job.endpoint_code} (collector=${collector ?? 'UNKNOWN'}, window=${job.window_from}..${job.window_to})`],
       );
       continue;
     }
+    // Heartbeat only while the adapter is active. The mutable timestamp is the
+    // fencing token: terminal writes must use the last successfully renewed value.
+    // If renewal fails, do not write a terminal state. The adapter may still have
+    // external effects; full cancellation requires adapter-level AbortSignal support.
+    let ownedAt = job.claim_locked_at;
+    let leaseLost = false;
+    const abortController = new AbortController();
+    let renewing: Promise<void> = Promise.resolve();
+    const renew = async (): Promise<void> => {
+      if (leaseLost) return;
+      try {
+        const result = await pool.query<{ claim_locked_at: string }>(
+          RENEW_BACKFILL_LEASE_SQL,
+          [job.backfill_job_id, job.claim_attempt, ownedAt],
+        );
+        if (result.rowCount !== 1 || !result.rows[0]) {
+          leaseLost = true;
+          abortController.abort(new Error('Backfill lease ownership lost'));
+          logger.error({ jobId: job.backfill_job_id }, 'Backfill lease ownership lost');
+          return;
+        }
+        ownedAt = result.rows[0].claim_locked_at;
+      } catch (error) {
+        leaseLost = true;
+        abortController.abort(error);
+        logger.error({ jobId: job.backfill_job_id, error }, 'Backfill lease renewal failed');
+      }
+    };
+    const timer = setInterval(() => {
+      renewing = renewing.then(renew);
+    }, 60_000);
     try {
       const window = { endpointCode: job.endpoint_code, from: job.window_from, to: job.window_to };
-      const evidence = await adapter.ingestWindow(window);
+      const evidence = await adapter.ingestWindow(window, abortController.signal);
       assertHistoricalWindowEvidence(window, evidence);
+      clearInterval(timer);
+      await renewing;
+      if (leaseLost) continue;
       await pool.query(
         `UPDATE ops.backfill_jobs SET status='SUCCESS', finished_at=now(), last_error=NULL
-          WHERE backfill_job_id=$1 AND status='RUNNING'`,
-        [job.backfill_job_id],
+          WHERE backfill_job_id=$1 AND status='RUNNING'
+            AND attempts=$2 AND locked_at::text=$3`,
+        [job.backfill_job_id, job.claim_attempt, ownedAt],
       );
     } catch (error) {
+      clearInterval(timer);
+      await renewing;
+      if (leaseLost) continue;
       const attempts = job.attempts + 1;
       await pool.query(
         `UPDATE ops.backfill_jobs
-            SET status=$2, finished_at=now(), last_error=$3
-          WHERE backfill_job_id=$1`,
-        [job.backfill_job_id, attempts >= 4 ? 'FAILED' : 'RETRY', error instanceof Error ? error.message : String(error)],
+            SET status=$4, finished_at=now(), last_error=$5
+          WHERE backfill_job_id=$1 AND status='RUNNING'
+            AND attempts=$2 AND locked_at::text=$3`,
+        [job.backfill_job_id, job.claim_attempt, ownedAt,
+          attempts >= 4 ? 'FAILED' : 'RETRY', error instanceof Error ? error.message : String(error)],
       );
+    } finally {
+      clearInterval(timer);
     }
   }
 }

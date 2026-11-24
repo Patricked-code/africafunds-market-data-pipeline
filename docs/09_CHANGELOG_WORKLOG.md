@@ -337,6 +337,287 @@
 
 ---
 
+## 2026-11-08 — Issue #5 / PR #22 : fixture d'idempotence indépendante de BACKFILL_BATCH_DAYS
+
+- **RECONCILIATION** : AGENTS.md et docs/15 lus sur main (PR #1 fusionnée) ; journal courant sur PR #22 et checkpoint docs/CONTINUITY_CHECKPOINT_2026-11-06.md relus ; issue #5 et PR #22 OPEN/Draft vérifiées. Branche PR #22 comparée au SHA historique bc94dcc0b3d8475f16c6568aedc4f79cc21c01a5 : identical avant modification. Aucun claim concurrent récent visible dans les commentaires récupérés ; absence de preuve de verrou exclusif.
+- **DÉFAUT DE TEST** : test/integration/backfill-enqueue-count.test.ts utilisait deux jours et attendait une fenêtre par endpoint. Si BACKFILL_BATCH_DAYS=1, deux fenêtres sont créées : assertion fragile dépendant de la configuration, sans défaut métier démontré.
+- **TEST CORRIGÉ** : commit `377ddab330b0ff4008f8a57ca45bf727054238cc` utilise une seule date de fixture (1691-02-03) : une fenêtre par endpoint quelle que soit la taille de lot positive. Le test conserve les assertions d'insertion réelle, de répétition idempotente et le nettoyage limité aux IDs créés. Aucun code métier, migration, source ni donnée financière modifié.
+- **VALIDATION** : écriture GitHub attestée ; PostgreSQL **NOT_RUN**. Recherche des runs GitHub Actions pull_request sur le HEAD précédent bc94dcc0b3d8475f16c6568aedc4f79cc21c01a5 : zéro résultat dans l'interface limitée, **CI NON ATTESTÉE** (ne prouve pas absence de check-runs). Aucune revendication de PASS.
+- **BLOCK_REASON** : PostgreSQL isolé et CI/check-runs complets sur HEAD exact non attestés ; revue indépendante et gates de fusion non validés ; timer heartbeat réel et AbortSignal d'adaptateurs non certifiés.
+- **NEXT_ACTION** : vérifier checks CI du nouveau HEAD et exécuter PostgreSQL isolé, corriger les échecs ; compléter test de perte de possession/annulation coopérative, ou poursuivre les issues #13/#14 sur branche distincte si PR #22 revendiquée par une autre exécution. Aucun merge, push main ou S1.
+- **ROLLBACK** : revert ciblé du commit de test et de cette entrée documentaire ; aucun effacement de données.
+
+---
+
+## 2026-11-08 — Issue #5 / PR #22 : comptage idempotent des fenêtres de backfill
+
+- **RECONCILIATION** : AGENTS.md, docs/15, worklog de la branche PR #22 et checkpoint historique lus ; PR #1/#12/#18 fusionnées, PR #22 OPEN/Draft au HEAD initial `59ff0b6a7aaece46d625b707969ef5a944675311` (vérification GitHub). Aucune autorisation de fusion ou de déploiement implicite.
+- **DÉFAUT STATIQUE** : `enqueueBackfill()` incrémentait `count` pour chaque fenêtre tentée, même si `INSERT ... ON CONFLICT DO NOTHING` n'insérait rien. Une reprise identique pouvait donc annoncer de fausses nouvelles fenêtres. Aucune anomalie de données financières en production n'est attestée.
+- **CODE** : commit `bda9eb0a1e514c74222c74349b05188ea5a265ee` utilise le `rowCount` réel de l'INSERT pour compter seulement les fenêtres créées ; aucune migration, changement de schéma, source ou ordonnanceur.
+- **TEST** : commit `b86b2a96deddb46118236b434875a2da86c45279` crée `test/integration/backfill-enqueue-count.test.ts` : fenêtre de fixture inutilisée, première insertion, seconde invocation idempotente (retour 0), absence de doublons, nettoyage par IDs créés uniquement. PostgreSQL isolé requis. **NOT_RUN** : aucun PASS PostgreSQL ou CI attesté sur ces commits.
+- **BLOCK_REASON** : checks GitHub Actions/PostgreSQL sur HEAD final et revue indépendante non attestés ; heartbeat réel/AbortSignal et protections de main non certifiés ; les adaptateurs historiques restent partiellement non qualifiés.
+- **NEXT_ACTION** : contrôler CI/check-runs sur le HEAD exact de PR #22 et exécuter les tests PostgreSQL isolés ; corriger les éventuels échecs ; couvrir perte de possession pendant adaptateur et annulation coopérative. Si PR #22 revendiquée par un autre agent, continuer indépendamment #13/#14 sans toucher à ses fichiers.
+- **ROLLBACK** : revert ciblé des deux commits code/test et de cette entrée, sans suppression de données ni écriture S1.
+
+---
+
+
+## 2026-11-08 — Issue #5 / PR #22 : fixture heartbeat non destructive (continuité)
+
+- **RECONCILIATION** : lecture GitHub des AGENTS.md, docs/15, dernier worklog et checkpoint historique, issue #5, PR #1/#12/#18/#22, code du worker et du claim, test de concurrence et commentaires PR #22. PR #22 toujours OPEN/Draft ; la recherche limitée des runs pull_request pour HEAD antérieur `e1247eb5e6e0bf4b90c2472c07d44bfb0cea3d8f` renvoie zéro résultat : **CI NON ATTESTÉE**, pas une preuve d'absence de checks.
+- **DÉFAUT STATIQUE** : le test `backfill-heartbeat-recovery-race.test.ts` utilisait `ON CONFLICT ... DO UPDATE` pour sa fixture historique ; en cas de collision avec une ligne préexistante, il pouvait modifier puis supprimer un job qui ne lui appartenait pas. Cette anomalie concerne le test, pas un incident de production observé.
+- **CORRECTION** : commit `e1606b39bf871d56f6cac7bdf637735c2c435980` remplace l'upsert destructif par `ON CONFLICT ... DO NOTHING` et exige une insertion effective avant toute manipulation/nettoyage. Aucune modification de code métier, migration, source ou donnée financière.
+- **VALIDATION** : écriture GitHub confirmée ; PostgreSQL **NOT_RUN**, CI sur nouveau HEAD **NON ATTESTÉE**. L'absence de collision reste un prérequis explicite du test ; un schéma de fixtures entièrement isolées doit être privilégié pour l'exécution.
+- **BLOCK_REASON** : exécution PostgreSQL isolée, checks CI complets, revue indépendante, timer heartbeat réel et annulation coopérative non attestés ; ne pas fusionner ni déployer.
+- **NEXT_ACTION** : vérifier le HEAD et les checks complets de PR #22 ; lancer PostgreSQL isolé et corriger les tests ; couvrir le timer réel et la perte de possession en cours d'adaptateur, puis avancer #13/#14 sur branche indépendante si collision de possession.
+- **ROLLBACK** : revert ciblé du commit de test et de cette entrée sur la branche Draft.
+
+---
+
+
+## 2026-11-08 — Issue #5 / PR #22 : course heartbeat vs recovery sous verrou PostgreSQL
+
+- **RECONCILIATION** : GitHub Patricked-code vérifié ; dépôt privé ; PR #1 fusionnée ; PR #22 OPEN/Draft, HEAD initial `f5c89ed3b76b8d0e19991ad0f547f9179b12e950`, base main `d61fe17a6d038de00c06ea1d78ed20cf05e3c5c8` selon PR. AGENTS.md, docs/15, dernier journal, checkpoint historique, code SQL et tests existants relus. Statuts combinés sur HEAD initial : liste vide ; cela ne prouve pas l'absence de workflows/check-runs. Aucune fusion ni déploiement.
+- **TEST ADDITIF** : commit `65c0117d08f864726a320391f8762df70d8633f8` crée `test/integration/backfill-heartbeat-recovery-race.test.ts`. Deux connexions PostgreSQL : renouvellement du lease dans une transaction qui conserve le verrou ; recovery concurrente avec SKIP LOCKED doit ignorer la ligne ; après COMMIT, le lease rafraîchi reste non récupérable, ancien token refusé, statut RUNNING/attempts conservés. Timeout de statement borné et nettoyage de fixture ; aucune migration ni modification des sources.
+- **VALIDATION** : commit enregistré par GitHub ; exécution PostgreSQL **NOT_RUN**, CI du nouveau HEAD **NON ATTESTÉE** ; aucune affirmation de PASS. Test de verrouillage SQL seulement, **pas** une preuve du timer de 60 s ni d'AbortSignal réel.
+- **BLOCK_REASON** : environnement PostgreSQL isolé et preuves CI/check-runs sur HEAD exact non obtenus ; comportement timer/annulation et effets externes non certifiés ; revue/protections à satisfaire avant merge.
+- **NEXT_ACTION** : vérifier le HEAD exact et les exécutions CI complètes, lancer la suite PostgreSQL isolée et corriger les échecs ; ajouter test du timer heartbeat et de perte de possession pendant un adaptateur coopératif ; reprendre #13/#14 sur branche indépendante si collision de claim. Ne pas fusionner ni déployer S1.
+- **ROLLBACK** : revert ciblé du commit de test et de cette entrée documentaire ; aucune donnée financière ni infrastructure modifiée.
+
+---
+
+## 2026-11-08 — Issue #5 / PR #22 : limites négatives de claim et recovery sécurisées
+
+- **RECONCILIATION** : dépôt privé confirmé via GitHub ; PR #1 fusionnée ; PR #22 OPEN/Draft, HEAD initial vérifié `7a2e977dd498badb51627af66c9cc16902d7893a`. AGENTS.md, docs/00–15, journal courant, checkpoint du 06/11, issue #5 et commentaires de PR #22 consultés. Recherche GitHub Actions pull_request sur HEAD initial : zéro run retourné (filtre et première page seulement) ; CI non attestée. Aucun claim concurrent explicite dans les commentaires consultés.
+- **DÉFAUT ET CODE** : `CLAIM_PENDING_BACKFILLS_SQL` et `RECOVER_EXPIRED_BACKFILLS_SQL` utilisaient `LIMIT $1` et `LIMIT $2` sans borne non négative, contrairement à la normalisation déjà corrigée. Une limite négative pouvait déclencher une erreur PostgreSQL. Commit `8cac94ec61b208e27523941f6a1a6f66d57e377f` utilise `GREATEST(param::integer, 0)` pour ces deux sélections, sans changer les limites positives, les critères, les locks ou les données.
+- **TEST** : commit `fc3e343f2438fa6e25e115d82a1524a07ddfc17f` ajoute `test/integration/backfill-negative-limits.test.ts`, couvrant -1 et 0 pour claim et recovery dans PostgreSQL isolé ; aucun write de fixture. **NOT_RUN** : ni exécution PostgreSQL ni CI verte sur le nouveau HEAD attestée.
+- **BLOCK_REASON** : CI/check-runs et PostgreSQL isolé non attestés ; revue indépendante et protections main à vérifier ; course heartbeat/recovery/AbortSignal et effets externes des adaptateurs non certifiés.
+- **NEXT_ACTION** : vérifier les CI et checks sur HEAD exact de PR #22, exécuter PostgreSQL isolé, corriger toute régression, tester heartbeat/recovery/annulation coopérative ; poursuivre #13/#14 indépendamment si #22 est revendiquée. Aucun merge, S1, source modifiée ou registre parallèle.
+- **ROLLBACK** : revert ciblé des deux commits de code/test et de cette entrée de journal ; aucune donnée financière ou infrastructure modifiée.
+
+---
+
+
+## 2026-11-08 — Issue #5 / PR #22 : borne négative de normalisation sans erreur SQL
+
+- **RECONCILIATION** : AGENTS.md, docs/15, journal le plus récent, checkpoint du 06/11 et SQL/tests concernés relus sur branche Draft ; issue #5 et PR #22 ouvertes au contrôle GitHub ; PR #1 documentaire déjà fusionnée d'après continuité précédente. CI pull_request filtrée sur HEAD antérieur `8209f5a5641e0a91cb4caef52890cef5f5447cc0` : zéro résultat, périmètre limité ; aucune CI réussie attestée. Les métadonnées de protection de main et les revues restent à vérifier avant intégration.
+- **DÉFAUT** : `FAIL_EXHAUSTED_BACKFILLS_SQL` vérifiait `$1 > 0` dans WHERE mais passait `LIMIT $1` directement à PostgreSQL : un argument négatif pouvait déclencher une erreur SQL plutôt que retourner zéro ligne. Aucun appel production avec limite négative n'a été attesté.
+- **CODE** : commit `26ca0acf5cf493ac6eb1d6c70ff9aef0146a45f8` remplace uniquement cette borne par `LIMIT GREATEST($1::integer, 0)`. Le traitement nominal positif et les exclusions RUNNING restent inchangés ; aucune migration, source ou donnée réelle modifiée.
+- **TEST** : commit `647ec28f70bd499ce5bd8695eb0ee684909f2f5b` étend le test PostgreSQL de normalisation : limite -1 retourne zéro ligne, en complément de la limite 0 et des fixtures RUNNING/RETRY/PENDING. **NOT_RUN** : aucune exécution PostgreSQL ou CI sur le nouveau HEAD attestée.
+- **BLOCK_REASON** : preuve CI/PostgreSQL isolée et revue indépendante manquantes ; heartbeat et annulation d'effets externes encore non certifiés ; gates de fusion et de S1 non satisfaits.
+- **NEXT_ACTION** : vérifier CI/check-runs sur HEAD exact de PR #22, exécuter les tests PostgreSQL isolés et corriger toute régression ; tester course heartbeat/recovery/AbortSignal. Si PR #22 est revendiquée concurremment, reprendre issue #13/#14 sur branche distincte. Aucun merge ni déploiement S1.
+- **ROLLBACK** : revert ciblé des deux commits de code/test et de cette entrée documentaire sur branche Draft.
+
+---
+
+## 2026-11-08 — Issue #5 / PR #22 : concurrence de normalisation des jobs épuisés (suite)
+
+- **RECONCILIATION** : PR #22 OPEN/Draft, HEAD vérifié avant intervention `aba774b168e59ef80b056f1cde8982b831c4d614`, base `main` selon GitHub ; AGENTS.md, docs/15, journal courant, checkpoint historique et SQL/tests concernés relus. PR #1 documentaire fusionnée selon GitHub. Aucun claim concurrent explicite relevé dans les derniers commentaires consultés.
+- **TEST ADDITIF** : commit `5d6ddf6223728e5a1008c2a6ef67ef02cea5cbba` ajoute `test/integration/backfill-exhausted-concurrency.test.ts` : deux connexions PostgreSQL lancent simultanément `FAIL_EXHAUSTED_BACKFILLS_SQL` sur une fixture RETRY/4, vérifient une seule transition observée, FAILED, attempts=4 et finished_at non nul. Utilise la primitive et les tables existantes ; base isolée et registre seedé obligatoires. Aucun code de production, migration ou source historique modifié.
+- **VALIDATION** : commit GitHub confirmé ; test PostgreSQL **NOT_RUN**. Recherche Actions pull_request sur HEAD précédent : aucun run retourné, interface limitée à la première page/événement ; **CI NON ATTESTÉE**, pas de PASS revendiqué. PR Draft, pas de merge ni S1.
+- **BLOCK_REASON** : preuve CI/PostgreSQL isolée sur HEAD exact manquante ; heartbeat timer et effets externes d'adaptateurs non certifiés ; protection/revue de main à vérifier avant toute fusion.
+- **NEXT_ACTION** : obtenir CI et exécuter la suite d'intégration sur PostgreSQL isolé, corriger tout échec ; tester la course heartbeat/recovery et l'annulation coopérative. En cas de claim concurrent, basculer vers un travail indépendant #13/#14. Ne pas fusionner ni déployer S1.
+- **ROLLBACK** : revert ciblé du commit de test et de cette entrée sur branche Draft ; aucune donnée financière modifiée.
+
+---
+
+
+## 2026-11-08 — Issue #5 / PR #22 : test des exclusions de normalisation des jobs épuisés
+
+- **RECONCILIATION** : dépôt privé confirmé par GitHub, PR #22 seule PR ouverte (Draft selon dernier état documentaire, vérifier métadonnées avant merge), issue #5 ouverte ; AGENTS.md, contrat docs/15, documents maîtres 00–14, dernier checkpoint et SQL/tests du worker consultés sur la branche. Dernier HEAD documentaire précédent : `201a8d334f370ceae125dcbd7c589d862999ea62`. Recherche GitHub Actions filtrée sur ce SHA : aucun run retourné (interface limitée aux événements pull_request/première page, donc absence de CI non démontrée). Pas de claim concurrent explicite dans les commentaires de PR consultés.
+- **TEST ADDITIF** : commit `6532ebfe97d098c4b47fd7b0958ab1866d736733` dans `test/integration/backfill-expired-budget.test.ts`. Trois fixtures isolées : PENDING/4 doit devenir FAILED ; RUNNING/4 doit rester RUNNING ; RETRY/3 doit rester RETRY ; une limite de 0 ne doit modifier aucune ligne ; compteurs conservés. Réutilise `FAIL_EXHAUSTED_BACKFILLS_SQL`, sans migration, changement de source, nouveau moteur ou opération S1.
+- **VALIDATION** : commit GitHub confirmé ; test PostgreSQL **NOT_RUN** ; CI du nouveau HEAD **NON ATTESTÉE** ; aucune revendication de PASS, revue ou déploiement.
+- **BLOCK_REASON** : accès à une base PostgreSQL de test isolée et preuve de CI sur HEAD exact non obtenus ; tests end-to-end heartbeat/AbortSignal et effets externes des adaptateurs toujours incomplets. Protection main à contrôler et respecter avant toute intégration.
+- **NEXT_ACTION** : obtenir une exécution CI et PostgreSQL isolée sur le HEAD exact de PR #22, corriger les éventuelles régressions, tester timer de renouvellement/annulation pendant concurrence ; si PR #22 revendiquée par un autre agent, sélectionner un travail indépendant des issues #13–#17. Ne pas fusionner, ne pas déployer S1.
+- **ROLLBACK** : revert ciblé du commit de test et de cette entrée sur la branche Draft ; aucun effet sur les données financières ni sur main.
+
+---
+
+
+## 2026-11-08 — Issue #5 / PR #22 : normalisation bornée des anciens RETRY épuisés
+
+- **RECONCILIATION** : dépôt privé, main `73256f48d81d38ce8ff6f51be9e024b25cf5dadb` (non protégé), PR #22 OPEN/Draft au HEAD initial `78ab825863f56a4970b7c6a033ffb89d1314c778`; AGENTS.md, documents maîtres 00–15, dernier checkpoint, issue #5, SQL et tests relus. Les PR de staging restent indépendantes. Aucun claim concurrent explicite constaté ; recontrôler avant chaque écriture.
+- **CODE** : `126c3b9f0cae42ee4a0aaafde19e9e93b2185614` ajoute `FAIL_EXHAUSTED_BACKFILLS_SQL` : transition atomique et bornée des anciennes lignes PENDING/RETRY avec attempts >= 4 vers FAILED, `finished_at` et motif, sans incrémenter attempts ni toucher RUNNING ; `1b4ede54ba3a49e5f6c06e34f3bda9d041ba6c81` raccorde cette primitive avant recovery/claim dans le worker existant. Pas de migration, de nouveau registre ni de données financières touchées.
+- **TEST** : `a1b9b68ce08468448835917862d4c478e2257673` ajoute un test PostgreSQL vérifiant FAILED, compteur inchangé, absence de nouveau claim et idempotence. **NOT_RUN** : aucune preuve d'exécution PostgreSQL locale. Le test requiert une DB isolée et seedée.
+- **CI** : interrogation Actions filtrée sur HEAD initial = 0 run ; cela ne prouve pas l'absence générale de CI. **CI du nouveau HEAD NON ATTESTÉE**. Aucune revue indépendante attestée ; PR reste Draft.
+- **BLOCK_REASON** : validation CI/PostgreSQL et revue absentes sur HEAD exact ; tests de timer heartbeat, course recovery et effets externes des adaptateurs officiels non certifiés. Le passage FAILED des anciennes lignes n'a pas été testé sur données réelles et ne doit pas être appliqué à la production sans gates.
+- **NEXT_ACTION** : vérifier les check-runs/actions du HEAD exact de PR #22 et exécuter la suite PostgreSQL en environnement isolé, corriger toute régression ; puis couvrir le timer heartbeat et annulation pendant ingestion. Si PR #22 est réclamée par un autre agent, sélectionner issue #13/#14 sans écriture concurrente. Aucun merge, aucun S1.
+- **ROLLBACK** : revert ciblé des trois commits de code/test sur la branche Draft ; aucune migration ni écriture de données réelles.
+
+---
+
+
+## 2026-11-08 — Issue #5 / PR #22 : garde anti-cinquième claim sur RETRY historique
+
+- **RECONCILIATION** : dépôt privé, PR #1 fusionnée ; PR #22 OPEN/Draft au HEAD de départ `16b414e553331b16d16e664a85c49f583febb01f`. AGENTS.md, docs/00–15, checkpoint 2026-11-06, issue #5, commentaires de PR et SQL/tests lus. La recherche GitHub Actions `pull_request` sur ce HEAD ne retourne aucun run (périmètre limité), **CI NON ATTESTÉE**. Le HEAD de main et les gates doivent être revérifiés avant toute intégration.
+- **DÉFAUT** : `CLAIM_PENDING_BACKFILLS_SQL` sélectionnait les lignes `RETRY` même avec `attempts >= 4` ; une ligne historique/legacy dans cet état pouvait donc recevoir une cinquième attribution, malgré la borne de recovery ajoutée précédemment.
+- **CODE** : commit `e30322897df962091c1a17292af0963f81157be1` ajoute `AND attempts < 4` à la sélection atomique existante, sans changer tables, contrats, ordonnancement ou source registry.
+- **TEST** : commit `8b1f0ca8624421ac394d6d3947ee30033c1b72dd` ajoute le scénario PostgreSQL d'une ligne `RETRY` à quatre tentatives qui ne peut plus être revendiquée. **NOT_RUN** localement ; aucune CI verte revendiquée. Le test utilise une base isolée avec seed et nettoie sa fixture.
+- **LIMITE** : la garde empêche la cinquième attribution mais laisse une ancienne ligne `RETRY` épuisée dans cet état ; la normalisation de ces lignes doit être traitée séparément avec migration/transition sûre et testée. Le test peut revendiquer une autre tâche si la base d'intégration n'est pas isolée : ne jamais l'exécuter en production.
+- **BLOCK_REASON** : CI et PostgreSQL non attestés sur le nouveau HEAD ; normalisation des `RETRY` épuisés et tests intégrés timer/AbortSignal encore incomplets ; revue indépendante non attestée.
+- **NEXT_ACTION** : contrôler CI/check-runs sur HEAD exact et exécuter les tests sur PostgreSQL isolé ; corriger les échecs. Ajouter ensuite une transition atomique bornée des `RETRY` épuisés vers `FAILED` si admissible, et vérifier le timer de heartbeat/annulation. En cas de claim concurrent sur PR #22, poursuivre une tâche indépendante #13/#14. Pas de merge ni S1.
+- **ROLLBACK** : revert ciblé des deux commits sur la branche Draft, aucune migration ni modification de données réelles.
+
+---
+
+## 2026-11-08 — Issue #5 / PR #22 : test de frontière du budget de reprise
+
+- **RECONCILIATION** : PR #1 fusionnée ; PR #22 OPEN/Draft, base main d61fe17a6d038de00c06ea1d78ed20cf05e3c5c8, HEAD avant écriture 0f0ac31904f9abe4e17a70cd4717e0248fb5a745. AGENTS.md, docs/15, dernier journal, checkpoint historique et instructions documentaires consultés ; les autres lots restent séparés.
+- **CI** : recherche des workflows pull_request du HEAD précédent = liste vide ; statuts combinés = liste vide. Ces interfaces sont incomplètes (première page, événement pull_request seulement) : aucun PASS ou absence générale de CI n'est déduit. Le workflow ci.yml existe et inclut PostgreSQL et test:integration.
+- **TEST AJOUTÉ** : commit `92877060951efb71ee6f6c047577dba7fd4a5205` ; `test/integration/backfill-expired-budget.test.ts` couvre le cas complémentaire attempts=3, lease expiré : récupération unique en RETRY, compteur inchangé, verrou libéré, finished_at NULL, motif explicite, seconde récupération impossible. Complète le cas attempts=4 → FAILED. Test écrit, **NOT_RUN** ; pas de preuve de réussite PostgreSQL.
+- **BLOCK_REASON** : aucun check/run CI attesté sur HEAD exact ; exécution PostgreSQL isolée indisponible via ce connecteur ; test timer de heartbeat/perte de possession et effets externes réels non certifiés. PR Draft et revue non attestée.
+- **NEXT_ACTION** : contrôler les check-runs GitHub Actions sur le HEAD exact et exécuter test:integration sur PostgreSQL isolé ; corriger les échecs. Ensuite tester la course heartbeat/recovery et l'annulation pendant ingestion. Ne pas fusionner ni déployer S1 sans gates.
+- **ROLLBACK** : revert ciblé du commit de test, sans migration, modification des 44 sources ni donnée de production.
+
+---
+
+
+## 2026-11-08 — Issue #5 / PR #22 : borne des tentatives lors de la récupération après crash
+
+- **RECONCILIATION** : AGENTS.md, contrat docs/15, dernier journal sur branche Draft, checkpoint historique, issue #5 et PR #22 consultés. Le HEAD historique du précédent checkpoint est une référence et non une preuve de CI. La recherche des runs pull_request pour `7026e3c496633e3dd2516e0ce082a7901e3e7b41` ne retourne aucun résultat (outil limité à la première page et à cet événement).
+- **DÉFAUT STATIQUE** : la récupération des leases expirés remettait systématiquement RUNNING en RETRY, même après quatre claims, permettant des reprises infinies après crash sans passer par la branche d'échec normal.
+- **CODE** : `954383882b13cb78b3f682a9229999c299724b95` corrige `RECOVER_EXPIRED_BACKFILLS_SQL` : les tâches expirées avec attempts >= 4 passent à FAILED, finished_at est fixé, last_error explicite ; les autres continuent en RETRY sans incrémenter attempts. Aucun schéma modifié.
+- **TEST** : `ef9ce189ffe184f88c1616f991811249c1fd30d7` ajoute un scénario PostgreSQL isolé à quatre tentatives, vérifiant FAILED, compteur stable, libération du verrou, finished_at, motif et non-récupération répétée. **NOT_RUN** localement ; aucune réussite CI/PostgreSQL revendiquée.
+- **BLOCK_REASON** : aucune preuve CI/PostgreSQL sur le HEAD des nouveaux commits ; timer de heartbeat, annulation des effets externes et qualification des sources réelles encore à démontrer. Revue indépendante non attestée.
+- **NEXT_ACTION** : vérifier CI du nouveau HEAD, exécuter la suite PostgreSQL sur DB isolée avec seed et corriger tout échec ; ajouter ensuite un test de course heartbeat/recovery et de perte de possession dans le worker. Si PR #22 est revendiquée concurremment, travailler sur issue #13 ou #14 sans écraser ses fichiers. Ne pas fusionner ni déployer S1.
+- **ROLLBACK** : revert ciblé des deux commits sur branche Draft ; aucune écriture main/S1 ni données officielles modifiées.
+
+---
+
+## 2026-11-08 — Issue #5 / PR #22 : concurrence de récupération PostgreSQL
+
+- **RECONCILIATION** : instructions AGENTS.md, contrat docs/15, journal récent et checkpoint 2026-11-06 relus sur la branche Draft ; issue #5 et PR #22 OPEN consultées ; aucune preuve de possession simultanée explicite dans les commentaires consultés. Aucun changement de main/S1.
+- **TEST ADDITIF** : commit `882fc107b53aed4189b0c919e855861bcdac7e04` ; deux connexions PostgreSQL indépendantes déclenchent simultanément `RECOVER_EXPIRED_BACKFILLS_SQL` sur un job RUNNING expiré. Assertion : un seul résultat de récupération pour cet ID, état final RETRY, locked_at NULL et attempts inchangé. Fixture datée 1835 pour limiter les collisions ; nettoyage ciblé. Test ajouté, **NOT_RUN** ; n'atteste pas à lui seul l'exécution d'un worker réel.
+- **BLOCK_REASON** : exécution PostgreSQL isolée et CI sur le nouveau HEAD non attestées ; tests du timer de 60 secondes et effets externes des adaptateurs non validés ; qualification des sources #13/#14 encore requise.
+- **NEXT_ACTION** : vérifier GitHub Actions sur HEAD exact, exécuter les tests PostgreSQL avec seed isolé, corriger tout échec ; ensuite tester le heartbeat réel et l'annulation d'un adaptateur coopératif pendant une récupération concurrente. Si PR #22 est revendiquée par un autre agent, se déplacer vers une tâche indépendante #13–#17. Pas de merge ni S1.
+- **ROLLBACK** : revert ciblé du test et de cette entrée sur la branche Draft ; aucun schéma, source ou runtime modifié.
+
+---
+
+
+## 2026-11-08 — Issue #5 / PR #22 : preuve SQL heartbeat versus recovery (continuité)
+
+- **RECONCILIATION** : dépôt privé vérifié par get_repo ; PR #1 fusionnée ; PR #22 OPEN/DRAFT au HEAD initial `8fe1fd60725e34add9e184c116ebc93a8c0575b2` ; PR #23/#24 fusionnées (chantier staging indépendant). AGENTS.md, contrat 15, dernier worklog et checkpoint historique relus ; aucune fusion ni intervention S1.
+- **TEST AJOUTÉ** : commit `f7fdb28f2a3e9b9481ce34290cf244a68c821daa`, `test/integration/backfill-fencing.test.ts`. Un RUNNING artificiellement âgé de 20 minutes est renouvelé par le propriétaire ; l'ancien token ne peut plus renouveler ; la récupération TTL 900 s ne peut pas voler le lease rafraîchi ; seul le dernier token peut finaliser SUCCESS. Aucune donnée financière réelle et aucune source originelle modifiées.
+- **VALIDATION** : écriture GitHub confirmée. Test PostgreSQL **NOT_RUN**, CI du nouveau HEAD **NON ATTESTÉE** ; aucune déclaration PASS. Revue indépendante non attestée.
+- **BLOCK_REASON** : absence de preuve PostgreSQL/CI sur le HEAD exact, absence de test end-to-end du timer 60 s et des effets externes des adaptateurs ; sources officielles et historique réel non qualifiés.
+- **NEXT_ACTION** : obtenir CI et exécution PostgreSQL isolée sur PR #22, corriger tout échec, compléter test du timer réel et concurrence A/B ; poursuivre les adaptateurs #14 et l'audit #13 si la validation reste bloquée. Ne pas fusionner, ne pas déployer S1.
+- **ROLLBACK** : revert ciblé du test et du checkpoint sur la branche Draft.
+
+---
+
+
+## 2026-11-08 — Issue #5 / PR #22 : test d'annulation en cours de traitement (continuité)
+
+- **RECONCILIATION** : lecture de `AGENTS.md`, documents maîtres `docs/00` à `docs/15`, checkpoint `docs/CONTINUITY_CHECKPOINT_2026-11-06.md` et dernier worklog ; dépôt privé, PR #22 OPEN/DRAFT HEAD avant intervention `13921ef50595e7eae9d554610f82db1f4c37eea1`. Les travaux S1 restent indépendants. Aucune fusion ni écriture main.
+- **TEST AJOUTÉ** : commit `54cd00312d371c982af5182e12439dfa1bbd95fe` dans `test/historical-window.test.ts` : adaptateur coopératif déjà en cours d'attente, propagation de `AbortSignal`, annulation pour perte de possession, rejet de la promesse sans résultat historique. Ce test complète le cas précédent où le signal était déjà annulé avant l'appel ; il ne prouve pas que les adaptateurs officiels futurs annulent leurs effets externes.
+- **VALIDATION** : écriture GitHub confirmée ; test Node local **NOT_RUN** ; CI et PostgreSQL sur ce nouveau HEAD **NON ATTESTÉS**. La recherche des runs PR est limitée et une réponse vide n'est pas un PASS.
+- **BLOCK_REASON** : absence de preuve CI sur HEAD exact, absence de tests intégrés du heartbeat/lease pendant un traitement réel, aucun adaptateur officiel date-borné qualifié, absence de garantie sur les effets externes non coopératifs ; revue et gates non attestés.
+- **NEXT_ACTION** : contrôler les runs/étapes CI du HEAD de PR #22, corriger les erreurs éventuelles ; ajouter un test intégré du heartbeat/perte de lease avec PostgreSQL isolé et vérifier que les transitions terminales restent interdites après expiration/récupération ; qualifier les adaptateurs officiels #14 après autorisation et fixtures, puis poursuivre #13/#15–#17. PR Draft, aucun merge, aucun S1.
+- **ROLLBACK** : revert ciblé du test et de ce checkpoint sur branche PR #22 ; aucune donnée ni runtime modifié.
+
+---
+
+
+## 2026-11-08 — Issue #5 / PR #22 : contrat d'annulation coopérative (continuité)
+
+- **RECONCILIATION** : PR #1 fusionnée, dépôt privé, PR #22 ouverte Draft au HEAD initial `fa524d73cd5ea106e5b551cf7a8bb4d20120a69f` ; AGENTS.md, contrat 15, journal et fichiers métier relus. PR #23/#24 concernent S1 et restent séparées. Recherche GitHub Actions PR sur ce HEAD : liste vide, périmètre limité, **CI NON ATTESTÉE**.
+- **CODE** : `15620dc39e4a20de10170a56d6b4a28bd6a631b6` ajoute un paramètre `AbortSignal` optionnel à `HistoricalWindowAdapter.ingestWindow` ; `58f948d3df0280fb40290c9eea78c042743a4c44` passe le signal depuis le worker et l'annule sur perte de lease ou erreur de renouvellement. Signature antérieure à un argument toujours compatible ; aucune implémentation qualifiée n'est enregistrée.
+- **TEST** : `f458f84e9ee1f4b8958461788c3c2b30017e610f` couvre l'interface optionnelle, le signal annulé et la compatibilité des adaptateurs anciens. **NOT_RUN** localement ; CI PostgreSQL/Node sur nouveau HEAD **NON ATTESTÉE**.
+- **LIMITES** : annulation uniquement coopérative ; aucun adaptateur réel qualifié n'utilise encore le signal ; aucune preuve que des effets externes déjà déclenchés sont interrompus. Pas de collecte, migration, fusion ni S1. Issue #5 **PARTIAL**.
+- **BLOCK_REASON** : CI et tests sur HEAD exact à attester ; adapter-level cancellation, effets externes, heartbeat/concurrence PostgreSQL et historiques officiels restent à prouver.
+- **NEXT_ACTION** : vérifier CI exacte PR #22 ; corriger tout échec ; compléter tests de heartbeat/perte de possession et s'assurer que chaque adaptateur historique futur contrôle AbortSignal avant effets externes, puis poursuivre sources officielles #13/#14 sans contourner licences ou robots. Pas de merge sans gates.
+- **ROLLBACK** : revert ciblé des trois commits sur branche Draft ; aucune donnée ni runtime S1 modifié.
+
+---
+
+
+## 2026-11-07 — Issue #5 / PR #22 : stale SUCCESS après recovery
+
+- RECONCILIATION : PR #1 fusionnée, PR #22 Draft ; HEAD avant intervention 185e834001cbc94fbb78b07507b8141c955da147 ; dépôt privé ; AGENTS.md, contrat 15 et dernier NEXT_ACTION relus.
+- TEST : commit 13da2d95d3da2fc05dedc2e015f470d3ac44e9d6 ajoute le cas PostgreSQL RUNNING expiré → RETRY après recovery → ancien SUCCESS rejeté ; attempts conservé. Aucune modification des 44 sources.
+- PREUVES : commit GitHub confirmé. Test PostgreSQL NOT_RUN ; CI sur HEAD exact NON ATTESTÉ.
+- BLOCK_REASON : preuve CI/PostgreSQL absente ; AbortSignal et arrêt des effets externes des adaptateurs manquants ; historique réel non qualifié.
+- NEXT_ACTION : vérifier CI et exécuter test sur PostgreSQL isolé ; corriger toute régression, puis implémenter annulation coopérative et tests heartbeat/concurrence. PR Draft, pas de fusion ni S1.
+- ROLLBACK : revert ciblé du test sur branche PR #22.
+
+---
+
+
+## 2026-11-07 — Issue #5 / PR #22 : heartbeat conditionnel du backfill (continuation)
+
+- **RÉCONCILIATION** : dépôt privé ; PR #22 ouverte Draft, HEAD avant écriture `a8eb6a9ea5b6d46141e4c15d746dd3be6eeaad37`. PR #1 documentaire fusionnée, instructions de main et checkpoint relus. La dernière entrée de main concerne séparément le staging S1 ; aucune écriture S1 ni modification de ce chantier.
+- **CODE EFFECTIF** : commit `759172b1298a30c8a93d9d40fd3cd41d4cfa1252` dans `src/jobs/backfill.ts` : renouvellement conditionnel toutes les 60 secondes via la primitive SQL existante, sérialisation des renouvellements, conservation du dernier `locked_at` pour les UPDATE terminaux, abandon des transitions terminales si possession perdue ou renouvellement échoué, arrêt du timer en `finally`. Aucun nouveau schéma ni ordonnanceur.
+- **PREUVES / LIMITES** : code committé GitHub ; CI et test PostgreSQL sur HEAD nouveau NON ATTESTÉS. La recherche des runs PR sur HEAD antérieur a retourné vide (périmètre limité). Les adaptateurs ne reçoivent pas encore d'AbortSignal : leurs effets externes ne sont pas interrompus à la perte du lease ; ne pas déclarer reprise crash totalement sûre ni collecte réelle autorisée. L'arrêt du timer n'annule pas un appel réseau en cours.
+- **BLOCK_REASON** : tests CI/PostgreSQL et scénario de renouvellement long non attestés ; cancellation coopérative des adaptateurs et garantie d'absence de doubles effets externes non implémentées ; qualifications de sources historiques incomplètes.
+- **NEXT_ACTION** : vérifier les runs et jobs GitHub Actions sur le HEAD exact de la PR #22, corriger toute CI rouge ; ajouter des tests de heartbeat et de perte de possession, introduire un contrat AbortSignal compatible avec les adaptateurs existants avant toute collecte réelle, et vérifier l'absence de faux SUCCESS après recovery concurrente. Maintenir PR Draft, ne pas fusionner ni déployer S1.
+- **ROLLBACK** : revert ciblé du commit heartbeat sur la branche ; conserver les tables et les archives existantes.
+
+---
+
+## 2026-11-07 — Issue #5 / PR #22 : récupération expirée raccordée avant claim (continuation)
+
+- **RECONCILIATION** : PR #1 fusionnée, instructions AGENTS.md et contrat 15 lus sur main ; PR #22 Draft HEAD initial `5422847cc436e190cabe1b98d19838bdcdff8fe0` ; dépôt privé ; journal de la branche PR #22 relu. Les autres chantiers S1 sont séparés. Aucune autorisation de fusion ou de déploiement déduite.
+- **CODE** : `processBackfillJobs()` appelle désormais `RECOVER_EXPIRED_BACKFILLS_SQL` avant `CLAIM_PENDING_BACKFILLS_SQL`, avec TTL conservateur 900 secondes, lot borné à 100 et journalisation du nombre récupéré. Commit `9e0fbba8481c8bc0977645fde46af5f978e02dae`. Aucune migration, aucun SUCCESS artificiel, aucun nouveau registre.
+- **TEST** : cas PostgreSQL de TTL nul non récupérable ajouté au test de fencing ; commit `94935f0d9be115c108ba2cc8452a2727dbd9b918`. **NOT_RUN** localement ; CI sur HEAD exact à confirmer. Les scénarios de concurrence et d'effets externes restent incomplets.
+- **LIMITES** : le heartbeat périodique et l'annulation d'un traitement en cours en cas de perte de claim ne sont pas raccordés. Un adaptateur qui dépasse 900 s peut encore être repris en parallèle : **ne pas activer la collecte historique réelle tant que cette condition n'est pas corrigée et validée**. Pas de données réelles certifiées, pas de S1.
+- **BLOCK_REASON** : CI PostgreSQL sur nouveau HEAD non attestée ; heartbeat/abort et fencing des effets externes manquants ; revue/protections avant merge non attestées.
+- **NEXT_ACTION** : contrôler la CI sur HEAD exact de PR #22 ; introduire une boucle de renouvellement fiable (jeton de possession actualisé à chaque heartbeat), arrêter le traitement lors d'une perte de claim et refuser tout SUCCESS après perte de lease ; tests PostgreSQL A/B, expiration et crash. Si PR #22 est possédée par une autre exécution, sélectionner une issue indépendante parmi #13–#17. Ne pas fusionner ni déployer sans gates.
+- **ROLLBACK** : revert ciblé des deux commits sur la branche Draft, sans effet S1.
+
+---
+
+
+## 2026-11-07 — Issue #5 / PR #22 : primitive de récupération atomique des baux expirés
+
+- **RECONCILIATION** : AGENTS.md, contrat 15, worklog de main, PR #22 et code de la branche relus. Dépôt privé au contrôle. PR #22 Draft, HEAD de départ `6698e2064e1cc7821f2cd9e7888bae40baaa5fc1`. Recherche GitHub Actions filtrée aux runs pull_request sur ce SHA : liste vide, **pas de conclusion CI**. Travaux S1 parallèles séparés.
+- **CODE** : `src/jobs/backfillClaim.ts` ajoute `RECOVER_EXPIRED_BACKFILLS_SQL`, sélection bornée des `RUNNING` expirés avec `FOR UPDATE SKIP LOCKED`, transition atomique vers `RETRY`, remise à NULL du verrou, sans succès fictif. Délai strictement positif ; aucune migration ni création de registre. Commit `351c1173e812d004f8ad40f05aabff5ef83db9d9`.
+- **TEST** : `test/integration/backfill-fencing.test.ts` couvre non-récupération du lease vivant, récupération d'un lease expiré et idempotence de la récupération. Commit `6ee2302892e134358f4a6e2a3ce0bbc2aab77bf0`. **NOT_RUN** localement, CI sur ce HEAD non encore attestée ; test à exécuter sur PostgreSQL isolé.
+- **LIMITES** : primitive SQL non raccordée au worker ; aucun heartbeat périodique, aucune récupération planifiée ni garantie de fencing des effets externes. Le test utilise une fixture PostgreSQL isolée ; ne jamais l'exécuter sur une DB de production. Issue #5 **PARTIAL**, pas de S1.
+- **BLOCK_REASON** : absence de preuve CI/PostgreSQL sur HEAD exact, pas de boucle heartbeat/recovery, risque de double effet externe non levé. Fusion interdite sans checks/revue/protections.
+- **NEXT_ACTION** : vérifier CI et logs du HEAD exact ; raccorder le renouvellement au worker avec arrêt sur perte de claim, puis déclencher la récupération bornée avant claim, tester concurrence/expiration/reprise et rollback ; poursuivre les adaptateurs officiels indépendants si la PR est détenue par un autre agent.
+
+---
+
+
+## 2026-11-07 — Issue #5 / PR #22 : réparation du test de lease (contrôle de reprise)
+
+- **RECONCILIATION** : AGENTS.md et contrat d'exécution relus sur main (PR #1 déjà fusionnée) ; PR #22 toujours traitée comme Draft ; branche de travail existante réutilisée. Le checkpoint le plus récent de la branche était « première primitive de renouvellement de lease » ; aucune preuve CI associée au HEAD documentaire précédent n'a été retournée par la recherche limitée aux workflows pull_request.
+- **DÉFAUT CONSTATÉ** : le fichier `test/integration/backfill-fencing.test.ts` contenait 14 séquences littérales `\\n` introduites dans le code TypeScript, hors chaîne ; cela invalide la syntaxe et empêche la validation PostgreSQL attendue. Vérification par lecture exacte du fichier sur la branche avant écriture.
+- **CORRECTION** : remplacement ciblé des 14 séquences littérales par des fins de ligne réelles, sans modifier la logique de production, les tables, les sources ou les fixtures métier. Commit technique `053557d5e66b752bf5a6f8f04cd4aacab3d6829c`.
+- **TESTS** : NOT_RUN localement ; CI sur nouveau HEAD NON ATTESTÉ à ce checkpoint. Une absence de run dans la recherche PR limitée n'est pas preuve d'absence de tout workflow.
+- **BLOCK_REASON** : CI et test PostgreSQL de la branche corrigée à contrôler ; heartbeat réellement branché au worker, TTL et récupération atomique des RUNNING expirés encore absents ; données historiques autorisées non attestées.
+- **NEXT_ACTION** : vérifier les workflows sur SHA exact `053557d5e66b752bf5a6f8f04cd4aacab3d6829c`, corriger toute régression, puis raccorder le renouvellement au worker avec perte de possession fail-closed et ajouter la récupération atomique des RUNNING expirés avec test A→B ; conserver PR Draft et aucun déploiement S1.
+- **ROLLBACK** : revert ciblé du commit technique sur la branche PR #22 ; aucun changement main ni S1.
+
+---
+
+
+## 2026-11-07 — Issue #5 : CI fencing et première primitive de renouvellement de lease
+
+- **RECONCILIATION** : PR #22 Draft, HEAD initial vérifié `bc26d61e4e57ae59618e8575a535c43b1d6e0317`. CI GitHub run 42392572629 = SUCCESS pour ce HEAD antérieur uniquement ; la PR #1 est fusionnée et les instructions canoniques sont sur main.
+- **CODE** : ajout de `RENEW_BACKFILL_LEASE_SQL` dans `src/jobs/backfillClaim.ts` : renouvellement de `locked_at` uniquement pour `RUNNING`, `attempts` et horodatage de possession correspondants ; aucune nouvelle table/migration. Commit `3ce5ae155ffe761213fbd5e20bd304a227b91ff0`.
+- **TEST** : scénario PostgreSQL enrichi : propriétaire renouvelle, génération périmée rejetée, puis ancien propriétaire ne peut plus renouveler après réattribution. Commit `c091c2ac13086876706fb42059e8a7b9fcfe651d`. Tests locaux NOT_RUN ; CI de ce nouveau HEAD à contrôler.
+- **LIMITES** : primitive SQL non encore appelée périodiquement par l'exécuteur ; pas de TTL, heartbeat opérationnel, recovery atomique, ni fencing des effets externes. Ne pas déclarer la reprise crash terminée.
+- **BLOCK_REASON** : validation CI du nouveau HEAD attendue ; absence de protocole opérationnel de renouvellement et reprise des leases ; données historiques officielles non attestées.
+- **NEXT_ACTION** : vérifier CI du commit `c091c2ac13086876706fb42059e8a7b9fcfe651d` ; raccorder le heartbeat au worker avec annulation sûre en cas de perte de possession, puis implémenter reprise atomique des RUNNING expirés avec tests de concurrence, sans faux SUCCESS. Garder PR #22 Draft jusqu'aux gates.
+- **ROLLBACK** : revert ciblé des commits de PR #22 ; aucune écriture S1 ni fusion.
+
+---
+
+## 2026-11-07 — Issue #5 : fencing additif des transitions terminales backfill (PR en validation)
+
+- **RECONCILIATION** : GitHub indique dépôt privé, PR #1 fusionnée et PR #2 close sans merge ; PR #4/#10/#11/#12/#18/#19/#21 fusionnées. Le travail est repris sur une branche dédiée issue de main, sans écriture directe sur main ni S1.
+- **DÉFAUT CONSTATÉ** : les trois UPDATE terminaux de `src/jobs/backfill.ts` ne vérifiaient pas la génération de claim ; la voie catch ne vérifiait même pas `status='RUNNING'`. Un ancien worker pouvait modifier le statut après réattribution.
+- **CORRECTION ADDITIVE** : `CLAIM_PENDING_BACKFILLS_SQL` retourne désormais `claim_attempt` et `claim_locked_at` (les colonnes `attempts` et `locked_at` existaient déjà). Les sorties `BLOCKED_ADAPTER`, `SUCCESS`, `FAILED/RETRY` vérifient `status='RUNNING' AND attempts=claim_attempt AND locked_at::text=claim_locked_at`. Aucune migration ni altération du registre des 44 sources.
+- **TEST** : `test/integration/backfill-fencing.test.ts` reproduit A revendique → génération réattribuée à B → UPDATE SUCCESS/FAILED de A refusés → B seul conclut. Test PostgreSQL ajouté ; **NOT_RUN localement**. La CI sur HEAD exact et la revue restent à contrôler.
+- **LIMITE** : ceci est un premier garde de fencing et **non** une implémentation complète de lease, heartbeat, reprise automatique des RUNNING expirés ou garanties sur effets externes d'adaptateurs. L'issue #5 demeure PARTIAL.
+- **BLOCK_REASON** : CI/recette PostgreSQL sur HEAD exact non encore attestées ; protocole complet de lease/heartbeat/recovery à développer ; zéro adaptateur historique officiellement qualifié.
+- **NEXT_ACTION** : examiner la CI et les tests de la PR de fencing, corriger toute régression ; implémenter ensuite expiration/heartbeat/recovery transactionnels et démontrer A expiré → B reprend → A refusé, sans faux SUCCESS ni duplication d'effets. Poursuivre #14/#15/#16/#17 sur tâches indépendantes si les preuves de source bloquent.
+- **ROLLBACK** : revert ciblé des commits de la PR, sans reset ni migration ni mutation S1.
+
+---
+
 ## 2026-11-07 — Audit live S1 réitéré, staging en lecture seule et protection image Docker
 
 - **MANDAT** : conserver exactement les domaines `sadiaaf.wealthtechinnovations.com` et `api.sadiaaf.wealthtechinnovations.com` ; vérifier si serveur et composants sont réellement prêts/installés, puis poursuivre l'étape admissible suivante sans destruction ni reconfiguration anticipée.

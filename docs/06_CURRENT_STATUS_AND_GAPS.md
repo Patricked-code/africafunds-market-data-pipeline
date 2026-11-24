@@ -128,6 +128,12 @@
 - **NEXT_ACTION :** contrôler la PR #37 ouverte en Draft, CI et Docker sur son HEAD exact ; appliquer et attester une fois la protection main et Allow auto-merge par un moyen admin autorisé ; intégrer la PR seulement après revue indépendante ; tester l'enrôlement auto-merge natif sur une PR pilote sans bypass, puis reprendre les lots 0–13. Aucun besoin d'intervention humaine à chaque développement si un reviewer indépendant automatisé effectivement habilité intervient.
 
 
+## Backfill issue #5 — fencing, recovery et annulation coopérative en PR (2026-11-08)
+
+- **PARTIAL / CI non attestée sur ce HEAD** : transitions terminales conditionnées au claim ; récupération atomique de leases expirés, heartbeat conditionnel 60 s et contrat optionnel `AbortSignal` ajoutés dans la PR #22. Tests PostgreSQL et contrat d'annulation ajoutés mais NON ATTESTÉS sur HEAD actuel.
+- **NON TERMINÉ** : preuve de concurrence/heartbeat sur PostgreSQL isolé, arrêt effectif des effets externes dans des adaptateurs qualifiés, historiques réels autorisés et données témoins. Aucun adaptateur historique qualifié enregistré ; aucune migration ni déploiement S1.
+- **NEXT_ACTION** : vérifier CI sur HEAD exact PR #22, valider heartbeat/recovery/AbortSignal sur PostgreSQL isolé, puis qualifier les adaptateurs officiels avant toute collecte. Voir `docs/09_CHANGELOG_WORKLOG.md`.
+
 ## Audit S1 et sécurité de déploiement — 2026-11-07
 
 - **PREUVE SERVEUR READ-ONLY** : les domaines `sadiaaf.wealthtechinnovations.com` et `api.sadiaaf.wealthtechinnovations.com` existent et répondent tous deux **HTTP 500** à `curl -I` depuis S1 ; aucun dépôt Git racine dans leurs vhosts ; le seul conteneur Docker actif observé est le bridge MCP. Cela n'atteste pas l'absence d'autres bases/service hors Docker.
