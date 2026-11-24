@@ -25,6 +25,9 @@ export interface PrReadinessConfig{
  // The historical gate remains the only enrollment/merge authority.
  verifyEligibility(input:{claim:Readonly<Claim>;pr:Readonly<Pr>;files:Readonly<Files>;ciRunId:number;dockerRunId:number}):Promise<boolean>;
  verifyQuiescence(identity:Owner,operation:PendingLifecycle):Promise<boolean>;
+ // Required for exceptional recovery. Must verify real independent evidence,
+ // not merely trust the worker or the presence of a GitHub object.
+ verifyRecovery?(input:{claim:Readonly<Claim>;operation:Readonly<PendingLifecycle>;effect:"absent"|"merged";evidence:readonly string[];mergeSha?:string}):Promise<boolean>;
 }
 export function createGitHubPrReadiness(config:PrReadinessConfig){
  const token=z.string().min(1).max(4096).regex(/^[A-Za-z0-9_.-]+$/).parse(config.prToken);
@@ -115,7 +118,64 @@ export function createGitHubPrReadiness(config:PrReadinessConfig){
   await settle(i,c,o,ci,docker);
   return {head:c.trace.head,prNumber:n,phase:kind==="label"?"labeled" as const:"ready" as const};
  }
- return {label:(i:Owner,n:number,ci:number,docker:number)=>execute(i,"label",n,ci,docker),
+ async function capture(i:Owner){
+  if(await config.authenticate(i)!==true)throw Error("READINESS_UNAUTHENTICATED");
+  const snapshot=await config.store.read(),c=snapshot.state.claims.find(x=>same(x,i)),o=c?.pendingLifecycle;
+  if(!c||!o||(o.kind!=="label"&&o.kind!=="ready")||!o.prNumber||await config.verifyQuiescence(i,o)!==true)
+   throw Error("READINESS_STILL_UNCERTAIN");
+  return {snapshot,c,o,n:o.prNumber};
+ }
+ const recoveryEvidence=z.array(z.string().regex(/^(?:issue|pr|ci):[1-9][0-9]{0,19}$/)).min(1).max(20);
+ async function recoverAbsent(i:Owner,raw:readonly string[]){
+  const evidence=recoveryEvidence.parse(raw);
+  if(new Set(evidence).size!==evidence.length)throw Error("READINESS_RECOVERY_EVIDENCE_INVALID");
+  const {snapshot,c,o,n}=await capture(i);
+  const absent=async()=>{
+   repo.parse(await get(""));
+   if(await config.verifyWriterIsolation(c.branch)!==true)throw Error("READINESS_POLICY_UNCONFIRMED");
+   const p=await observe(c,n,o.issue,c.base);
+   return p.draft&&hasLabel(p)===(o.kind==="ready");
+  };
+  if(!await absent())throw Error("READINESS_EFFECT_NOT_ABSENT");
+  if(!config.verifyRecovery||await config.verifyRecovery({claim:structuredClone(c),operation:structuredClone(o),effect:"absent",evidence:[...evidence]})!==true)
+   throw Error("READINESS_RECOVERY_PROOF_DENIED");
+  if(!await absent()||await config.verifyQuiescence(i,o)!==true)throw Error("READINESS_ABSENCE_CHANGED");
+  const next=transition(snapshot.state,{kind:"lifecycle-absent",...i,operation:o,
+   trace:{head:o.head,nextAction:"Reconcile fresh canonical admission before any promotion",
+    evidence:[...new Set(["commit:"+o.head,"pr:"+n,...evidence,...c.trace.evidence.slice(0,8)])]}},config.now());
+  await config.store.compareAndSwap(snapshot.version,next);
+  return {phase:"absent" as const,head:o.head,prNumber:n};
+ }
+ async function recoverMerged(i:Owner,rawCi:number,rawDocker:number,raw:readonly string[]){
+  const ci=num.parse(rawCi),docker=num.parse(rawDocker),evidence=recoveryEvidence.parse(raw);
+  if(ci===docker||new Set(evidence).size!==evidence.length)throw Error("READINESS_RECOVERY_EVIDENCE_INVALID");
+  const {snapshot,c,o,n}=await capture(i);
+  if(o.kind!=="ready")throw Error("READINESS_MERGED_PHASE_MISMATCH");
+  const observeMerge=async()=>{
+   repo.parse(await get(""));
+   const p=z.object({number:num,state:z.literal("closed"),merged:z.literal(true),draft:z.literal(false),
+    merge_commit_sha:sha,body:z.string(),head:z.object({sha,ref:z.string(),repo}),
+    base:z.object({ref:z.literal("main"),repo})}).parse(await get("/pulls/"+n));
+   if(p.number!==n||p.head.sha!==o.head||p.head.ref!==c.branch||p.body!==marker(c,o.issue)||!c.trace.evidence.includes("pr:"+n))
+    throw Error("READINESS_MERGE_IDENTITY_MISMATCH");
+   const main=z.object({name:z.literal("main"),protected:z.literal(true),commit:z.object({sha})}).parse(await get("/branches/main"));
+   const compare=z.object({status:z.enum(["ahead","identical"]),merge_base_commit:z.object({sha})})
+    .parse(await get("/compare/"+p.merge_commit_sha+"..."+main.commit.sha));
+   if(compare.merge_base_commit.sha!==p.merge_commit_sha)throw Error("READINESS_MERGE_ANCESTRY_UNCONFIRMED");
+   await checkRun(ci,409761758,"validate",n,o.head);await checkRun(docker,410494947,"Build, boot, migrate and verify persistent PostgreSQL",n,o.head);
+   return p.merge_commit_sha;
+  };
+  const mergeSha=await observeMerge();
+  if(!config.verifyRecovery||await config.verifyRecovery({claim:structuredClone(c),operation:structuredClone(o),effect:"merged",evidence:[...evidence],mergeSha})!==true)
+   throw Error("READINESS_RECOVERY_PROOF_DENIED");
+  if(await observeMerge()!==mergeSha||await config.verifyQuiescence(i,o)!==true)throw Error("READINESS_MERGE_CHANGED");
+  const next=transition(snapshot.state,{kind:"lifecycle-result",...i,operation:o,prNumber:n,
+   trace:{head:o.head,nextAction:"Reconcile merged PR with canonical program and downstream proofs",
+    evidence:[...new Set(["commit:"+o.head,"commit:"+mergeSha,"pr:"+n,"ci:"+ci,"ci:"+docker,...evidence,...c.trace.evidence.slice(0,5)])]}},config.now());
+  await config.store.compareAndSwap(snapshot.version,next);
+  return {phase:"merged-observed" as const,head:o.head,prNumber:n,mergeSha};
+ }
+ return {recoverAbsent,recoverMerged,label:(i:Owner,n:number,ci:number,docker:number)=>execute(i,"label",n,ci,docker),
   ready:(i:Owner,n:number,ci:number,docker:number)=>execute(i,"ready",n,ci,docker),
   async reconcile(i:Owner,ci:number,docker:number){
    num.parse(ci);num.parse(docker);

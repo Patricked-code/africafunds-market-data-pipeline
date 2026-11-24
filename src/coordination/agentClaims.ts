@@ -58,6 +58,23 @@ const admissionCheckpointSchema=z.object({count:z.number().int().min(0).max(2000
 type AdmissionCheckpoint=z.infer<typeof admissionCheckpointSchema>;
 const emptyAdmissionCheckpoint=()=>({count:0,digest:createHash("sha256").update(JSON.stringify({continuity:CONTINUITY_ID,records:[]})).digest("hex")});
 const equalCheckpoint=(a:AdmissionCheckpoint,b:AdmissionCheckpoint)=>a.count===b.count&&a.digest===b.digest;
+const workReceiptSchema=z.object({
+ workId:id,actor:id,session:id,generation:stamp.positive(),receiptRevision:stamp.positive(),releasedAt:stamp,
+ lot:z.number().int().min(0).max(13),branch:claim.shape.branch,base:sha,head:sha,
+ scopes:z.array(scope).min(1).max(100),prNumber:stamp.positive().nullable(),
+ outcome:z.enum(["completed","blocked"]),evidence:trace.shape.evidence.min(1),nextAction:trace.shape.nextAction
+}).strict();
+export type WorkReceipt=z.infer<typeof workReceiptSchema>;
+const receiptLimit=4096;
+function receiptPr(evidence:readonly string[]):number|null{
+ const ids=[...new Set(evidence.filter(e=>e.startsWith("pr:")).map(e=>Number(e.slice(3))))];
+ return ids.length===1&&Number.isSafeInteger(ids[0])?ids[0]!:null;
+}
+function buildWorkReceipt(c:Claim,outcome:WorkReceipt["outcome"],revision:number,now:number):WorkReceipt{
+ return workReceiptSchema.parse({workId:c.workId,actor:c.actor,session:c.session,generation:c.generation,
+ receiptRevision:revision,releasedAt:now,lot:c.lot,branch:c.branch,base:c.base,head:c.trace.head,scopes:c.scopes,
+ prNumber:receiptPr(c.trace.evidence),outcome,evidence:c.trace.evidence,nextAction:c.trace.nextAction});
+}
 const event = z.object({
   revision: stamp.positive(), kind: z.enum(["claim","heartbeat","checkpoint","release","recover","wake-accepted","wake-intent","wake-result","wake-reconciled","mutation-intent","mutation-result","lifecycle-intent","lifecycle-result","lifecycle-absent","admission-history-init","admission-history-advance"]),
   at: stamp, workId: id, actor: id, session: id, generation: stamp.positive(),
@@ -68,12 +85,22 @@ export const stateSchema = z.object({
   claims: z.array(claim), lastEvent: event.nullable(),
   wakeReceipts:z.array(wakeReceiptSchema).max(4096).optional(),
   admissionHistory:admissionCheckpointSchema.optional(),
+  workReceipts:z.array(workReceiptSchema).max(receiptLimit).optional(),
 }).strict().superRefine((s,ctx) => {
   const fail = (message: string) => ctx.addIssue({code:"custom",message});
   if ((s.revision === 0) !== (s.lastEvent === null) ||
       (s.lastEvent && (s.lastEvent.revision !== s.revision || s.lastEvent.at !== s.updatedAt))) fail("invalid event revision");
   if(s.admissionHistory?.count===0&&!equalCheckpoint(s.admissionHistory,emptyAdmissionCheckpoint()))fail("invalid empty admission history");
   if(s.lastEvent?.kind.startsWith("admission-history-")&&!s.admissionHistory)fail("missing admission checkpoint");
+  let previousReceiptRevision=0;
+  const workKeys=new Set<string>();
+  for(const r of s.workReceipts??[]){
+    const key=r.workId+":"+r.generation;
+    if(workKeys.has(key)||r.receiptRevision<=previousReceiptRevision||r.receiptRevision>s.revision||
+      r.generation>=r.receiptRevision||r.releasedAt>s.updatedAt||r.prNumber!==receiptPr(r.evidence)||
+      new Set(r.scopes).size!==r.scopes.length)fail("invalid work receipt");
+    workKeys.add(key);previousReceiptRevision=r.receiptRevision;
+  }
   const keys = new Set<string>();
   for (const r of s.wakeReceipts ?? []) {
     if (keys.has(r.signal.key) || r.startedAt > s.updatedAt || r.intentRevision > s.revision ||
@@ -102,7 +129,7 @@ export type Command =
   | ({kind:"recover"; leaseMs:number; previousGeneration:number; reconciledHead:string} & Admission)
   | ({kind:"heartbeat"; leaseMs:number} & Identity)
   | ({kind:"checkpoint"; trace:Trace} & Identity)
-  | ({kind:"release"; trace:Trace} & Identity)
+  | ({kind:"release"; trace:Trace; passOutcome?:WorkReceipt["outcome"]} & Identity)
   | ({kind:"mutation-intent"; mutation:PendingMutation} & Identity)
   | ({kind:"mutation-result"; candidateHead:string; observedHead:string; trace:Trace} & Identity)
   | ({kind:"lifecycle-intent"; operation:PendingLifecycle} & Identity)
@@ -199,7 +226,14 @@ export function transition(input:State, command:Command, now:number):State {
     claims = s.claims.filter(c => c !== old);
     if (command.kind !== "release") claims.push(next);
   }
+  let workReceipts=s.workReceipts;
+  if(command.kind==="release"&&command.passOutcome!==undefined){
+    if(!old||JSON.stringify(old.trace)!==JSON.stringify(next.trace))throw Error("WORK_RECEIPT_CHECKPOINT_REQUIRED");
+    if((workReceipts??[]).length>=receiptLimit)throw Error("WORK_RECEIPT_CAPACITY_EXHAUSTED");
+    workReceipts=[...(workReceipts??[]),buildWorkReceipt(next,command.passOutcome,revision,now)];
+  }
   return stateSchema.parse({...s,continuity:CONTINUITY_ID,revision,updatedAt:now,claims,
+    ...(workReceipts===undefined?{}:{workReceipts}),
     lastEvent:{revision,kind:command.kind,at:now,workId:next.workId,actor:next.actor,
       session:next.session,generation:next.generation,trace:next.trace,
       ...(command.kind === "recover" ? {previousGeneration:command.previousGeneration} : {})}});
@@ -254,6 +288,7 @@ export class GitHubClaimStore implements ClaimStore {
     if (current.version !== version || next.revision !== current.state.revision+1 || next.updatedAt < current.state.updatedAt)
       throw new Error("CLAIM_CAS_CONFLICT");
     assertAdmissionHistorySuccessor(current.state,next);
+    assertWorkReceiptSuccessor(current.state,next);
     const tree = shaResponse.parse(await this.request("POST","/git/trees",{
       tree:[{path:statePath,mode:"100644",type:"blob",content:JSON.stringify(next)+"\n"}]
     })).sha;
@@ -307,6 +342,8 @@ export async function runClaimedWorkPass(ports:WorkPassPorts):Promise<{
   for (let i=0;i<ports.maxUnits;i++) {
     // The trusted selector must reconcile GitHub, actual dependencies, owners,
     // branch heads and authorization anew on every call. No local task list.
+    const before=stateSchema.parse((await ports.store.read()).state);
+    if((before.workReceipts??[]).length>=receiptLimit)throw Error("WORK_RECEIPT_CAPACITY_EXHAUSTED");
     const candidate = await ports.selectNext([...finished]);
     if (!candidate) return {stop:"no-work",finished};
     if (finished.includes(candidate.workId)) throw new Error("WORK_ALREADY_ATTEMPTED_IN_PASS");
@@ -338,7 +375,7 @@ export async function runClaimedWorkPass(ports:WorkPassPorts):Promise<{
     const proof = trace.parse(result.trace);
     if (proof.evidence.length===0) throw new Error("WORK_PASS_EVIDENCE_REQUIRED");
     await context.checkpoint(proof);
-    await applyCommand(ports.store,{kind:"release",...owner,trace:proof},ports.now());
+    await applyCommand(ports.store,{kind:"release",...owner,trace:proof,passOutcome:result.outcome},ports.now());
     // 'completed' means this bounded unit has returned, not that a whole
     // lot, PR, CI, source or production release has been certified DONE.
     finished.push(candidate.workId);
@@ -562,4 +599,30 @@ export function createAdmissionHistoryPort(config:AdmissionHistoryStoreConfig){
    return persist(snapshot,next,"admission-history-advance",["issue:9"]);
   }
  };
+}
+
+// Immutable receipts retained in the existing CAS state; not a task queue,
+// not an admission, and not proof that a PR is merged or a lot is DONE.
+function assertWorkReceiptSuccessor(previous:State,next:State){
+ const a=previous.workReceipts??[],b=next.workReceipts??[];
+ if(b.length<a.length||b.length>a.length+1||JSON.stringify(a)!==JSON.stringify(b.slice(0,a.length)))
+  throw Error("WORK_RECEIPT_HISTORY_DIVERGED");
+ if(b.length===a.length)return;
+ const r=b[b.length-1]!,e=next.lastEvent;
+ const c=previous.claims.find(x=>x.workId===r.workId&&x.generation===r.generation);
+ if(!c||c.pendingMutation||c.pendingLifecycle||e?.kind!=="release"||e.workId!==r.workId||
+    e.generation!==r.generation||e.actor!==r.actor||e.session!==r.session||
+    next.claims.some(x=>x.workId===r.workId)||JSON.stringify(e.trace)!==JSON.stringify(c.trace)||
+    JSON.stringify(r)!==JSON.stringify(buildWorkReceipt(c,r.outcome,next.revision,next.updatedAt)))
+  throw Error("WORK_RECEIPT_RELEASE_NOT_PROVEN");
+}
+export async function listWorkReceipts(store:ClaimStore,workId:string):Promise<WorkReceipt[]>{
+ id.parse(workId);
+ return (stateSchema.parse((await store.read()).state).workReceipts??[]).filter(r=>r.workId===workId);
+}
+export async function readWorkReceipt(store:ClaimStore,workId:string,generation:number):Promise<WorkReceipt>{
+ stamp.positive().parse(generation);
+ const receipt=(await listWorkReceipts(store,workId)).find(r=>r.generation===generation);
+ if(!receipt)throw Error("WORK_RECEIPT_NOT_FOUND");
+ return receipt;
 }
